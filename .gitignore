@@ -1,1 +1,28 @@
-DiveMate.ddb
+# Artefactos de build
+/build/
+
+# libdivecomputer: clon externo (ver README para clonar / futuro submodule)
+/vendor/libdivecomputer/
+
+# Datos personales de buceo (no subir a git)
+*.ddb
+*.db
+*.sqlite
+
+# Flutter / Dart (cuando exista el proyecto)
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+.gradle/
+local.properties
+key.properties
+*.keystore
+*.jks
+
+# Varios
+.DS_Store

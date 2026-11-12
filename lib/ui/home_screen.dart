@@ -1,0 +1,89 @@
+/// Pantalla principal con navegación por pestañas: inmersiones, sitios, stats.
+library;
+
+import 'package:flutter/material.dart';
+
+import '../db/divemate_db.dart';
+import '../settings.dart';
+import 'dives_tab.dart';
+import 'sites_tab.dart';
+import 'stats_tab.dart';
+import 'text_scale_sheet.dart';
+
+class HomeScreen extends StatefulWidget {
+  final DivemateDb db;
+  final Settings settings;
+  final VoidCallback onChangeDb;
+
+  const HomeScreen({
+    super.key,
+    required this.db,
+    required this.settings,
+    required this.onChangeDb,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _index = 0;
+
+  static const _titles = ['Inmersiones', 'Sitios', 'Estadísticas'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_titles[_index]),
+        actions: [
+          IconButton(
+            tooltip: 'Tamaño de letra',
+            icon: const Icon(Icons.format_size),
+            onPressed: () => showTextScaleSheet(context, widget.settings),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (v) {
+              if (v == 'change_db') widget.onChangeDb();
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'change_db',
+                child: Text('Cambiar base de datos'),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        index: _index,
+        children: [
+          DivesTab(db: widget.db),
+          SitesTab(db: widget.db),
+          StatsTab(db: widget.db),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (i) => setState(() => _index = i),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.scuba_diving_outlined),
+            selectedIcon: Icon(Icons.scuba_diving),
+            label: 'Inmersiones',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.place_outlined),
+            selectedIcon: Icon(Icons.place),
+            label: 'Sitios',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart),
+            label: 'Stats',
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -2,7 +2,9 @@
 
 Logbook de buceo para Android. Reemplazo propio y mantenible de DiveMate.
 
-Nombre interno/paquete: `pandive`. Nombre visible: *Panda Dive*. Logo: oso panda buceando.
+Nombre visible: **Pandive**. Identificador de aplicación: **`org.drslump.pandive`** (dominio `drslump.org`). Logo: oso panda buceando.
+
+**Accesibilidad**: la app usa **tipografía grande por defecto** (pensada para presbicia, uso sin gafas). El tamaño de letra es configurable a más pequeño para quien lo prefiera.
 
 ---
 
@@ -74,12 +76,24 @@ echo 'export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform
 source ~/.bashrc
 ```
 
-Instala componentes:
+Instala componentes. Google deprecó `sdkmanager` en favor del nuevo **`android` CLI** (aunque `sdkmanager` todavía funciona).
+
+Con el nuevo `android` CLI (recomendado). Es una descarga aparte; instalador oficial en Linux:
 
 ```bash
-sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-sdkmanager "ndk;27.2.12479018"
-sdkmanager --licenses   # acepta todas
+# revisa el script antes de ejecutarlo si quieres:
+#   curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/install.sh -o /tmp/android-cli.sh && less /tmp/android-cli.sh && bash /tmp/android-cli.sh
+curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/install.sh | bash
+
+android sdk install platform-tools platforms/android-35 build-tools/35.0.0 ndk/27.2.12479018
+# sin paso --licenses: las acepta automaticamente
+```
+
+Alternativa con el antiguo `sdkmanager` (muestra un warning de deprecacion, pero funciona):
+
+```bash
+sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
+sdkmanager --licenses
 ```
 
 ### 4. Enlazar Flutter con el SDK y verificar
@@ -88,6 +102,13 @@ sdkmanager --licenses   # acepta todas
 flutter config --android-sdk "$ANDROID_HOME"
 flutter doctor          # resuelve lo que aparezca en rojo
 ```
+
+> **JDK para Gradle**: el build de Android (Gradle) **no soporta Java 25**. Necesita **JDK 17**. Si tu Java por defecto es más nuevo, instala el 17 y apunta Flutter a él:
+> ```bash
+> sudo dnf install -y java-17-openjdk-devel    # o temurin-17-jdk
+> flutter config --jdk-dir /usr/lib/jvm/java-17-temurin-jdk   # ajusta a tu ruta
+> ```
+> Comprueba la ruta real con: `dirname $(dirname $(readlink -f $(which javac)))` tras seleccionar el 17, o busca en `/usr/lib/jvm/`.
 
 ### 5. Dispositivo físico
 
@@ -121,12 +142,52 @@ El `--release` necesita una clave de firma propia. Generación de keystore y con
 
 ---
 
+## Compilar libdivecomputer
+
+El código fuente vive en `vendor/libdivecomputer/` (clon de git).
+
+**Build nativo** (Linux, para probar/depurar en el ordenador):
+
+```bash
+cd vendor/libdivecomputer
+autoreconf --install            # solo la primera vez (clon de git)
+./configure --prefix=/tmp/ldc-install
+make -j$(nproc)
+# CLI de prueba: lista computers soportados
+LD_LIBRARY_PATH=src/.libs ./examples/.libs/dctool list
+```
+
+**Cross-compile para Android** (requiere NDK):
+
+```bash
+export ANDROID_NDK=$HOME/Android/ndk/27.2.12479018
+./scripts/build-libdivecomputer-android.sh
+# salida: build/android/<abi>/install/lib/libdivecomputer.so
+```
+
+Se compila **sin** libusb/hidapi: en Android el transporte es BLE, implementado desde Kotlin y conectado al I/O personalizado de libdivecomputer.
+
 ## Estado del proyecto
 
 Por fases (ver plan de desarrollo):
 
-- [ ] **Fase 0** — De-riesgo: compilar `libdivecomputer` con NDK y prototipo de descarga BLE (Peregrine) en device real.
-- [ ] **Fase 1** — App base: esquema `drift`, migración del `DiveMate.ddb` actual (~860 inmersiones + perfiles), lista/detalle/gráfico/edición.
+- [~] **Fase 0** — De-riesgo `libdivecomputer`:
+  - [x] Soporte de los 3 computers confirmado (código + runtime `dctool`): Peregrine, Perdix, **Mares Puck 4** (modelo `0x35`). Los tres por **BLE** (único transporte a implementar).
+  - [x] Build nativo en Linux OK (valida fuente + build system).
+  - [x] Script de cross-compile Android listo: `scripts/build-libdivecomputer-android.sh`.
+  - [x] Cross-compile con NDK OK: `.so` para arm64-v8a, armeabi-v7a, x86_64 (Android 24).
+  - [x] API de I/O personalizado (`dc_custom_open` + `DC_TRANSPORT_BLE`) confirmada: el puente BLE Kotlin↔libdivecomputer es viable (patrón de Subsurface).
+  - [ ] Prototipo de descarga BLE en device real (= inicio del plugin nativo, Fase 2).
+- [~] **Fase 1** — App base (sin migración: abre el `.ddb` directamente):
+  - [x] Capa DB (`lib/db/divemate_db.dart`): abre `.ddb`, owner, lista dives, botellas, decode de perfil (validado contra `divemate-cli`).
+  - [x] Pantalla de carga de `.ddb` (file picker), lista de inmersiones, detalle con perfil (`fl_chart`) y botellas.
+  - [x] Tema de fuente grande por defecto + ajuste de tamaño (accesibilidad).
+  - [x] Compila a APK; tests unitarios + contra la DB real pasan.
+  - [x] Navegación por pestañas: Inmersiones / Sitios / Estadísticas.
+  - [x] Búsqueda y filtros en listas.
+  - [x] Estadísticas agregadas (validadas contra `divemate-cli`).
+  - [x] Edición de campos de una inmersión (escritura en el `.ddb`, respeta UUID/Status y marca `Updated`).
+  - [ ] Alta manual de inmersiones nuevas.
 - [ ] **Fase 2** — Importar del ordenador de buceo (plugin nativo + UI de escaneo/descarga).
 - [ ] **Fase 3** — Export Subsurface + backup/restore Google Drive.
 - [ ] **Fase 4** — Pulido: estadísticas, sitios, buddies, equipo, certificaciones.
@@ -135,6 +196,8 @@ Por fases (ver plan de desarrollo):
 
 ## Notas técnicas
 
-- **Base de datos origen**: `DiveMate.ddb` (SQLite). Tablas relevantes: `Logbook` (inmersiones), `Place` (sitios), `Tank` (botellas), `Buddy`, `Divetype`, `Equipment`, `Brevets`. Los perfiles de inmersión viven en campos `Profile*` como hex empaquetado.
-- **Modelo de datos nuevo**: un único buceador; se descartan tablas/campos multi-buceador y `Pictures`.
-- **Mares Puck 4**: modelo reciente. Hay que verificar soporte exacto en la versión actual de `libdivecomputer` antes de darlo por hecho.
+- **Base de datos**: Pandive usa el **mismo formato SQLite `.ddb` que DiveMate** (decisión de diseño: sin migración, abre la DB existente tal cual). Tablas relevantes: `Logbook` (inmersiones), `Place` (sitios), `Tank` (botellas), `Buddy`, `Divetype`, `Equipment`, `Brevets`. "Simplificar" = ocultar en la UI los campos no usados, no cambiar el esquema.
+- **Compatibilidad con `divemate-cli`**: existe una CLI Python (`../divemate-cli`) que consulta/estadística la misma `.ddb`. Mantener el formato la deja funcionando sobre la DB de Pandive.
+- **Un solo buceador**: la `.ddb` puede tener varios `DiverID` (demo/imports); el owner es el de más inmersiones. Pandive opera solo sobre el owner.
+- **Perfiles**: en `Logbook.Profile` (profundidad, 12 chars/muestra, 4 primeros = decímetros) y `Profile2` (temperatura, 11 chars/muestra, 4 primeros = centi-°C); `ProfileInt` = intervalo en segundos. Decode portado de `divemate-cli`.
+- **Mares Puck 4**: soporte confirmado en `libdivecomputer` (modelo `0x35`, BLE).
