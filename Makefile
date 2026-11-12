@@ -34,8 +34,8 @@ apk-release: ## Genera APK de release (requiere keystore)
 	$(FLUTTER) build apk --release
 
 .PHONY: install
-install: ## Instala el último APK en el device conectado
-	$(FLUTTER) install
+install: ## Instala el APK de depuración en el device conectado
+	$(FLUTTER) install --debug
 
 .PHONY: test
 test: ## Ejecuta los tests (unitarios + contra la DB real si existe)
