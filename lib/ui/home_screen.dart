@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../db/divemate_db.dart';
 import '../settings.dart';
+import 'dive_computer_screen.dart';
 import 'dives_tab.dart';
 import 'sites_tab.dart';
 import 'stats_tab.dart';
@@ -44,9 +45,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           PopupMenuButton<String>(
             onSelected: (v) {
-              if (v == 'change_db') widget.onChangeDb();
+              if (v == 'change_db') {
+                widget.onChangeDb();
+              } else if (v == 'dive_computer') {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DiveComputerScreen()),
+                );
+              }
             },
             itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'dive_computer',
+                child: Text('Ordenador de buceo'),
+              ),
               PopupMenuItem(
                 value: 'change_db',
                 child: Text('Cambiar base de datos'),

@@ -61,6 +61,16 @@ clean: ## Limpia artefactos de build de Flutter
 ldc-android: ## Cross-compila libdivecomputer para Android (NDK)
 	./scripts/build-libdivecomputer-android.sh
 
+.PHONY: dc-libs
+dc-libs: ldc-android ## Cross-compila y copia .so + headers al proyecto Android
+	@for abi in arm64-v8a armeabi-v7a x86_64; do \
+		mkdir -p android/app/src/main/jniLibs/$$abi; \
+		cp build/android/$$abi/install/lib/libdivecomputer.so android/app/src/main/jniLibs/$$abi/; \
+	done
+	@rm -rf android/app/src/main/cpp/include/libdivecomputer
+	@cp -r build/android/arm64-v8a/install/include/libdivecomputer android/app/src/main/cpp/include/
+	@echo "libdivecomputer .so + headers copiados a android/app/src/main/"
+
 .PHONY: doctor
 doctor: ## flutter doctor
 	$(FLUTTER) doctor
