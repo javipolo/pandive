@@ -178,7 +178,7 @@ Por fases (ver plan de desarrollo):
   - [x] Cross-compile con NDK OK: `.so` para arm64-v8a, armeabi-v7a, x86_64 (Android 24).
   - [x] API de I/O personalizado (`dc_custom_open` + `DC_TRANSPORT_BLE`) confirmada: el puente BLE Kotlin↔libdivecomputer es viable (patrón de Subsurface).
   - [ ] Prototipo de descarga BLE en device real (= inicio del plugin nativo, Fase 2).
-- [~] **Fase 1** — App base (sin migración: abre el `.ddb` directamente):
+- [x] **Fase 1** — App base (sin migración: abre el `.ddb` directamente):
   - [x] Capa DB (`lib/db/divemate_db.dart`): abre `.ddb`, owner, lista dives, botellas, decode de perfil (validado contra `divemate-cli`).
   - [x] Pantalla de carga de `.ddb` (file picker), lista de inmersiones, detalle con perfil (`fl_chart`) y botellas.
   - [x] Tema de fuente grande por defecto + ajuste de tamaño (accesibilidad).
@@ -187,7 +187,7 @@ Por fases (ver plan de desarrollo):
   - [x] Búsqueda y filtros en listas.
   - [x] Estadísticas agregadas (validadas contra `divemate-cli`).
   - [x] Edición de campos de una inmersión (escritura en el `.ddb`, respeta UUID/Status y marca `Updated`).
-  - [ ] Alta manual de inmersiones nuevas.
+  - [x] Alta manual de inmersiones nuevas (genera Number/UUID, botella opcional).
 - [ ] **Fase 2** — Importar del ordenador de buceo (plugin nativo + UI de escaneo/descarga).
 - [ ] **Fase 3** — Export Subsurface + backup/restore Google Drive.
 - [ ] **Fase 4** — Pulido: estadísticas, sitios, buddies, equipo, certificaciones.

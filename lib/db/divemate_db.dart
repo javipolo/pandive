@@ -5,6 +5,8 @@
 /// la app usa. El decode de perfiles está portado de `divemate-cli`.
 library;
 
+import 'dart:math';
+
 import 'package:sqlite3/sqlite3.dart';
 
 import '../models.dart';
@@ -146,6 +148,82 @@ class DivemateDb {
     final sets = [for (final c in cols) '$c = ?', 'Updated = ?'];
     final params = <Object?>[for (final c in cols) fields[c], _nowStamp(), id];
     _db.execute('UPDATE Logbook SET ${sets.join(', ')} WHERE ID = ?', params);
+  }
+
+  /// Siguiente número de inmersión para el owner (max + 1).
+  int nextDiveNumber() {
+    final owner = ownerId;
+    final sql = owner != null
+        ? 'SELECT MAX(Number) m FROM Logbook WHERE DiverID = ?'
+        : 'SELECT MAX(Number) m FROM Logbook';
+    final rows = _db.select(sql, owner != null ? [owner] : const []);
+    return ((rows.first['m'] as int?) ?? 0) + 1;
+  }
+
+  /// Crea una inmersión nueva (alta manual). Devuelve el ID generado.
+  /// Genera Number (si no se pasa), UUID v4, Updated y Status=1, con DiverID del
+  /// owner. Inserta una botella opcional en la tabla Tank.
+  int createDive({
+    required DateTime dateTime,
+    int? number,
+    String? place,
+    String? country,
+    double? maxDepth,
+    double? avgDepth,
+    double? durationMin,
+    double? waterTemp,
+    double? airTemp,
+    double? weight,
+    int rating = 0,
+    String? buddy,
+    String? diveMaster,
+    String? diveType,
+    String? comments,
+    Cylinder? cylinder,
+  }) {
+    final owner = ownerId ?? 1;
+    final num = number ?? nextDiveNumber();
+    final now = _nowStamp();
+    String p(int v) => v.toString().padLeft(2, '0');
+    final divedate =
+        '${dateTime.year}-${p(dateTime.month)}-${p(dateTime.day)}';
+    final entrytime = '${p(dateTime.hour)}:${p(dateTime.minute)}:00';
+
+    _db.execute(
+      'INSERT INTO Logbook (Number, Divedate, Entrytime, DiverID, UUID, '
+      'Updated, Status, Place, Country, Depth, DepthAvg, Divetime, Watertemp, '
+      'Airtemp, Weight, Rating, Buddy, Divemaster, Divetype, Comments) '
+      'VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [
+        num, divedate, entrytime, owner, _uuid(), now,
+        place, country, maxDepth, avgDepth, durationMin, waterTemp,
+        airTemp, weight, rating, buddy, diveMaster, diveType, comments,
+      ],
+    );
+    final id = _db.lastInsertRowId;
+
+    if (cylinder != null) {
+      _db.execute(
+        'INSERT INTO Tank (LogID, TankID, SortOrd, Tanksize, PresS, PresE, '
+        'O2, He, Name, UUID, Updated) VALUES (?,0,0,?,?,?,?,?,?,?,?)',
+        [
+          id, cylinder.size, cylinder.pressureStart, cylinder.pressureEnd,
+          cylinder.o2, cylinder.he, cylinder.name, _uuid(), now,
+        ],
+      );
+    }
+    return id;
+  }
+
+  /// UUID v4 (sin dependencia externa).
+  static String _uuid() {
+    final r = Random.secure();
+    final b = List<int>.generate(16, (_) => r.nextInt(256));
+    b[6] = (b[6] & 0x0f) | 0x40; // versión 4
+    b[8] = (b[8] & 0x3f) | 0x80; // variante
+    String h(int i) => b[i].toRadixString(16).padLeft(2, '0');
+    return '${h(0)}${h(1)}${h(2)}${h(3)}-${h(4)}${h(5)}-${h(6)}${h(7)}-'
+        '${h(8)}${h(9)}-${h(10)}${h(11)}${h(12)}${h(13)}${h(14)}${h(15)}';
   }
 
   static String _nowStamp() {

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../db/divemate_db.dart';
 import '../models.dart';
 import 'dive_detail_screen.dart';
+import 'new_dive_screen.dart';
 
 class DivesTab extends StatefulWidget {
   final DivemateDb db;
@@ -37,10 +38,26 @@ class _DivesTabState extends State<DivesTab> {
     setState(() => _dives = widget.db.listDives(search: q));
   }
 
+  Future<void> _newDive() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => NewDiveScreen(db: widget.db)),
+    );
+    if (created == true) {
+      _searchCtrl.clear();
+      setState(() => _dives = widget.db.listDives());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _newDive,
+        icon: const Icon(Icons.add),
+        label: const Text('Nueva'),
+      ),
+      body: Column(
+        children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
           child: SearchBar(
@@ -69,7 +86,8 @@ class _DivesTabState extends State<DivesTab> {
                   itemBuilder: (context, i) => _tile(_dives[i]),
                 ),
         ),
-      ],
+        ],
+      ),
     );
   }
 

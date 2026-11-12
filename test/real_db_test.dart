@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/db/divemate_db.dart';
+import 'package:pandive/models.dart';
 import 'package:sqlite3/open.dart';
 
 void main() {
@@ -75,6 +76,46 @@ void main() {
       expect(r.comments, 'prueba pandive');
       expect(r.rating, 4);
       expect(r.weight, 6.5);
+    } finally {
+      w.close();
+    }
+  });
+
+  test('createDive añade inmersión con Number siguiente (copia temporal)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_new_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    dbFile.copySync(tmp.path);
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+
+    final w = DivemateDb.open(tmp.path);
+    try {
+      final before = w.countDives();
+      final nextNum = w.nextDiveNumber();
+      expect(nextNum, 731); // owner tenía hasta la 730
+
+      final id = w.createDive(
+        dateTime: DateTime(2026, 11, 12, 10, 30),
+        place: 'Sitio de prueba',
+        country: 'España',
+        maxDepth: 30.5,
+        durationMin: 45,
+        waterTemp: 19,
+        rating: 5,
+        cylinder: const Cylinder(size: 12, pressureStart: 200, pressureEnd: 50, o2: 32),
+      );
+      expect(id, greaterThan(0));
+      expect(w.countDives(), before + 1);
+
+      final created = w.getDive(id)!;
+      expect(created.number, 731);
+      expect(created.place, 'Sitio de prueba');
+      expect(created.maxDepth, 30.5);
+      expect(created.rating, 5);
+
+      final cyls = w.cylinders(id);
+      expect(cyls, hasLength(1));
+      expect(cyls.first.size, 12);
+      expect(cyls.first.gasLabel, 'Nitrox EAN32');
     } finally {
       w.close();
     }
