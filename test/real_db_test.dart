@@ -121,6 +121,49 @@ void main() {
     }
   });
 
+  test('importDownloaded guarda perfil y deduplica (copia temporal)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_imp_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    dbFile.copySync(tmp.path);
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+
+    final w = DivemateDb.open(tmp.path);
+    try {
+      final dl = DownloadedDive(
+        fingerprint: 'deadbeef',
+        datetime: DateTime(2031, 3, 4, 9, 30),
+        divetimeSec: 1800,
+        maxDepth: 10,
+        avgDepth: 7,
+        tempMin: 19,
+        gasmixes: const [GasMix(0.32, 0)],
+        samples: const [
+          DiveSample(0, 5, 20),
+          DiveSample(10000, 10, 19),
+          DiveSample(20000, 8, null),
+        ],
+      );
+      final before = w.countDives();
+      expect(w.importDownloaded(dl, computer: 'Shearwater Peregrine'), isTrue);
+      expect(w.countDives(), before + 1);
+      // re-import: dedupe por fecha/hora
+      expect(w.importDownloaded(dl, computer: 'Shearwater Peregrine'), isFalse);
+      expect(w.countDives(), before + 1);
+
+      final dive = w.listDives().firstWhere((d) => d.date == DateTime(2031, 3, 4, 9, 30));
+      expect(dive.maxDepth, 10);
+      expect(dive.computer, 'Shearwater Peregrine');
+      final p = w.diveProfile(dive.id)!;
+      expect(p.intervalSeconds, 10);
+      expect(p.depths, [5.0, 10.0, 8.0]);
+      expect(p.temps[0], 20);
+      expect(p.temps[1], 19);
+      expect(p.temps[2], isNull);
+    } finally {
+      w.close();
+    }
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

@@ -48,9 +48,10 @@ class MainActivity : FlutterActivity() {
         val vendor = call.argument<String>("vendor") ?: ""
         val product = call.argument<String>("product") ?: ""
         val address = call.argument<String>("address") ?: ""
+        val fingerprint = call.argument<String>("fingerprint") ?: ""
         Thread {
             val json = try {
-                DiveComputer.download(this, vendor, product, address)
+                DiveComputer.download(this, vendor, product, address, fingerprint)
             } catch (e: Exception) {
                 "{\"error\":\"${(e.message ?: "fallo").replace("\"", "'")}\"}"
             }

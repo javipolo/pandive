@@ -278,9 +278,21 @@ static dc_descriptor_t *find_descriptor(const char *vendor, const char *product)
     return found;
 }
 
+// Decodifica una cadena hex ("a1b2...") a bytes. Devuelve la longitud en bytes.
+static unsigned int hex_decode(const char *hex, unsigned char *out, unsigned int max) {
+    unsigned int n = 0;
+    for (; hex[0] && hex[1] && n < max; hex += 2, n++) {
+        unsigned int b;
+        if (sscanf(hex, "%2x", &b) != 1) break;
+        out[n] = (unsigned char) b;
+    }
+    return n;
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_drslump_pandive_DiveComputer_nativeDownload(
-        JNIEnv *env, jobject thiz, jstring jvendor, jstring jproduct, jobject conn) {
+        JNIEnv *env, jobject thiz, jstring jvendor, jstring jproduct,
+        jobject conn, jstring jfingerprint) {
     (void) thiz;
     const char *vendor = (*env)->GetStringUTFChars(env, jvendor, NULL);
     const char *product = (*env)->GetStringUTFChars(env, jproduct, NULL);
@@ -321,6 +333,17 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
     if (rc != DC_STATUS_SUCCESS) {
         sb_fmt(&out, "{\"error\":\"No se pudo abrir el dispositivo (%d)\"}", rc);
         dc_iostream_close(iostream); dc_context_free(ctx); dc_descriptor_free(desc); goto done;
+    }
+
+    // Fingerprint: solo descargar inmersiones más nuevas que esta.
+    if (jfingerprint) {
+        const char *fphex = (*env)->GetStringUTFChars(env, jfingerprint, NULL);
+        if (fphex && fphex[0]) {
+            unsigned char fp[64];
+            unsigned int fplen = hex_decode(fphex, fp, sizeof(fp));
+            if (fplen) dc_device_set_fingerprint(device, fp, fplen);
+        }
+        if (fphex) (*env)->ReleaseStringUTFChars(env, jfingerprint, fphex);
     }
 
     // Progreso: DC_EVENT_PROGRESS -> DiveComputer.reportProgress(cur, max)

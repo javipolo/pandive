@@ -49,7 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 widget.onChangeDb();
               } else if (v == 'dive_computer') {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const DiveComputerScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => DiveComputerScreen(
+                      db: widget.db,
+                      settings: widget.settings,
+                    ),
+                  ),
                 );
               }
             },

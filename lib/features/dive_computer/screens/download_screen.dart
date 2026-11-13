@@ -1,20 +1,29 @@
-/// Descarga las inmersiones de un dispositivo y las muestra (hito C.1: todavía
-/// no se guardan en el .ddb; eso es el hito C.2).
+/// Descarga las inmersiones de un dispositivo, las muestra y las guarda en el
+/// .ddb (dedupe + fingerprint incremental).
 library;
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/dive_computer.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
+import 'package:pandive/features/dive_computer/widgets/downloaded_dive_tile.dart';
 
 class DownloadScreen extends StatefulWidget {
   final ScannedDevice device;
-  const DownloadScreen({super.key, required this.device});
+  final DivemateDb db;
+  final Settings settings;
+  const DownloadScreen({
+    super.key,
+    required this.device,
+    required this.db,
+    required this.settings,
+  });
 
   @override
   State<DownloadScreen> createState() => _DownloadScreenState();
@@ -22,16 +31,16 @@ class DownloadScreen extends StatefulWidget {
 
 class _DownloadScreenState extends State<DownloadScreen> {
   final _svc = DiveComputerService();
-  final _dateFmt = DateFormat('d MMM yyyy, HH:mm', 'es');
   late Future<DownloadResult> _future;
   late final (String, String)? _model;
   StreamSubscription<double>? _progressSub;
   double _progress = 0;
+  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    WakelockPlus.enable(); // no dejar que se apague la pantalla descargando
+    WakelockPlus.enable();
     _model = modelForDeviceName(widget.device.name);
     _progressSub = _svc.progress().listen((p) {
       if (mounted) setState(() => _progress = p);
@@ -56,12 +65,34 @@ class _DownloadScreenState extends State<DownloadScreen> {
       vendor: m.$1,
       product: m.$2,
       address: widget.device.id,
+      fingerprint: widget.settings.dcFingerprint(widget.device.id) ?? '',
     );
+  }
+
+  Future<void> _save(List<DownloadedDive> dives) async {
+    setState(() => _saving = true);
+    final computer = _model != null ? '${_model.$1} ${_model.$2}' : null;
+    var added = 0;
+    for (final d in dives) {
+      if (widget.db.importDownloaded(d, computer: computer)) added++;
+    }
+    // Guardar fingerprint de la más reciente (primera que devuelve el aparato).
+    final fp = dives.isNotEmpty ? dives.first.fingerprint : '';
+    if (fp.isNotEmpty) {
+      await widget.settings.setDcFingerprint(widget.device.id, fp);
+    }
+    if (!mounted) return;
+    final skipped = dives.length - added;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Guardadas $added nuevas'
+            '${skipped > 0 ? ', $skipped ya existían' : ''}.')));
+    Navigator.of(context).pop(added > 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final title = _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
+    final title =
+        _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
     return Scaffold(
       appBar: AppBar(title: Text('Descargar · $title')),
       body: FutureBuilder<DownloadResult>(
@@ -97,37 +128,19 @@ class _DownloadScreenState extends State<DownloadScreen> {
 
   Widget _list(List<DownloadedDive> dives) {
     if (dives.isEmpty) {
-      return const Center(child: Text('El ordenador no devolvió inmersiones'));
+      return const Center(child: Text('No hay inmersiones nuevas'));
     }
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: Text('${dives.length} inmersiones descargadas (aún sin guardar)',
-              style: Theme.of(context).textTheme.titleMedium),
-        ),
-        Expanded(
-          child: ListView.separated(
-            itemCount: dives.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
-            itemBuilder: (context, i) => _tile(dives[i]),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _tile(DownloadedDive d) {
-    final stats = [
-      if (d.maxDepth != null) '${d.maxDepth!.toStringAsFixed(1)} m',
-      if (d.divetimeSec != null) '${(d.divetimeSec! / 60).round()} min',
-      '${d.samples.length} muestras',
-    ].join('   ');
-    return ListTile(
-      leading: const Icon(Icons.download_done),
-      title: Text(d.datetime != null ? _dateFmt.format(d.datetime!) : 'Inmersión'),
-      subtitle: Text(stats),
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _saving ? null : () => _save(dives),
+        icon: const Icon(Icons.save),
+        label: Text(_saving ? 'Guardando…' : 'Guardar ${dives.length}'),
+      ),
+      body: ListView.separated(
+        itemCount: dives.length,
+        separatorBuilder: (_, _) => const Divider(height: 1),
+        itemBuilder: (context, i) => DownloadedDiveTile(dive: dives[i]),
+      ),
     );
   }
 }
-

@@ -20,6 +20,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_profile.dart` -> decode del perfil (profundidad/temperatura)
 - `lib/core/db/db_stats.dart` -> sitios de buceo y estadísticas agregadas
 - `lib/core/db/db_writes.dart` -> escritura: editar y crear inmersiones
+- `lib/core/db/db_import.dart` -> importar inmersiones descargadas (encode perfil + dedupe)
 
 ### Core · modelos (`models.dart` es el barrel)
 - `lib/core/models/models.dart` -> barrel: reexporta todos los modelos
@@ -67,6 +68,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dive_computer/screens/download_screen.dart` -> descarga inmersiones de un dispositivo y las muestra
 - `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo y vista de error
 - `lib/features/dive_computer/widgets/download_progress.dart` -> indicador circular de progreso con %
+- `lib/features/dive_computer/widgets/downloaded_dive_tile.dart` -> fila de inmersión descargada
 
 Nativo (fuera de lib/): `android/app/src/main/kotlin/org/drslump/pandive/`
 (DiveComputer, BleScanner, BleConnection, MainActivity) y

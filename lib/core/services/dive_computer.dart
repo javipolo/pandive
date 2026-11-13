@@ -95,11 +95,13 @@ class DiveComputerService {
     required String vendor,
     required String product,
     required String address,
+    String fingerprint = '',
   }) async {
     final raw = await _channel.invokeMethod<String>('download', {
       'vendor': vendor,
       'product': product,
       'address': address,
+      'fingerprint': fingerprint,
     });
     final j = jsonDecode(raw ?? '{}') as Map<String, dynamic>;
     if (j['error'] != null) {

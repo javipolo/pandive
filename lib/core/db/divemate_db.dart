@@ -15,6 +15,7 @@ part 'db_queries.dart';
 part 'db_profile.dart';
 part 'db_stats.dart';
 part 'db_writes.dart';
+part 'db_import.dart';
 
 class DivemateDb {
   final Database _db;

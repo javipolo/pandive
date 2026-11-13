@@ -5,11 +5,15 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/dive_computer.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'scan_screen.dart';
 
 class DiveComputerScreen extends StatefulWidget {
-  const DiveComputerScreen({super.key});
+  final DivemateDb db;
+  final Settings settings;
+  const DiveComputerScreen({super.key, required this.db, required this.settings});
 
   @override
   State<DiveComputerScreen> createState() => _DiveComputerScreenState();
@@ -45,7 +49,9 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
       appBar: AppBar(title: const Text('Ordenador de buceo')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ScanScreen()),
+          MaterialPageRoute(
+            builder: (_) => ScanScreen(db: widget.db, settings: widget.settings),
+          ),
         ),
         icon: const Icon(Icons.bluetooth_searching),
         label: const Text('Buscar'),

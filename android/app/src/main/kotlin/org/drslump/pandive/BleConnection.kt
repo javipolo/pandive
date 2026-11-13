@@ -51,7 +51,9 @@ class BleConnection(private val context: Context, private val address: String) {
     private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "Conectado; pidiendo MTU")
+                Log.i(TAG, "Conectado; prioridad alta + MTU")
+                // Intervalo de conexión corto -> descarga más rápida.
+                g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
                 if (!g.requestMtu(247)) g.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (!ready) {

@@ -41,4 +41,11 @@ class Settings extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  /// Fingerprint (hex) de la última inmersión descargada de un ordenador, para
+  /// descargas incrementales (solo buceos nuevos).
+  String? dcFingerprint(String address) => _prefs.getString('fp_$address');
+
+  Future<void> setDcFingerprint(String address, String fingerprint) =>
+      _prefs.setString('fp_$address', fingerprint);
 }

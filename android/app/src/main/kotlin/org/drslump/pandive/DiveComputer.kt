@@ -17,7 +17,9 @@ object DiveComputer {
 
     external fun nativeSupportedCount(): Int
     external fun nativeSupportedList(): String
-    external fun nativeDownload(vendor: String, product: String, conn: BleConnection): String
+    external fun nativeDownload(
+        vendor: String, product: String, conn: BleConnection, fingerprint: String,
+    ): String
 
     private val main = Handler(Looper.getMainLooper())
 
@@ -37,7 +39,10 @@ object DiveComputer {
      * [vendor]/[product] y devuelve el JSON del wrapper nativo. Bloqueante:
      * llamar desde un hilo de trabajo.
      */
-    fun download(context: Context, vendor: String, product: String, address: String): String {
+    fun download(
+        context: Context, vendor: String, product: String, address: String,
+        fingerprint: String,
+    ): String {
         val conn = BleConnection(context.applicationContext, address)
         try {
             if (!conn.connect(20000)) {
@@ -45,7 +50,7 @@ object DiveComputer {
                     .replace("\\", " ").replace("\"", "'")
                 return "{\"error\":\"$msg\"}"
             }
-            return nativeDownload(vendor, product, conn)
+            return nativeDownload(vendor, product, conn, fingerprint)
         } finally {
             conn.close()
         }

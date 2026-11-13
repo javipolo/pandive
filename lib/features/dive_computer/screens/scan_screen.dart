@@ -6,12 +6,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/dive_computer.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  final DivemateDb db;
+  final Settings settings;
+  const ScanScreen({super.key, required this.db, required this.settings});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -79,7 +83,13 @@ class _ScanScreenState extends State<ScanScreen> {
     if (mounted) setState(() => _scanning = false);
     if (!mounted) return;
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => DownloadScreen(device: d)),
+      MaterialPageRoute(
+        builder: (_) => DownloadScreen(
+          device: d,
+          db: widget.db,
+          settings: widget.settings,
+        ),
+      ),
     );
   }
 
