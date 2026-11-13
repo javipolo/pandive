@@ -3,7 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../settings.dart';
+import 'package:pandive/core/settings/settings.dart';
 
 Future<void> showTextScaleSheet(BuildContext context, Settings settings) {
   return showModalBottomSheet(

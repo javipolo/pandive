@@ -1,6 +1,6 @@
 // Smoke test básico de Pandive.
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pandive/models.dart';
+import 'package:pandive/core/models/models.dart';
 
 void main() {
   test('gasLabel identifica mezclas', () {

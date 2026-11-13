@@ -4,8 +4,8 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pandive/db/divemate_db.dart';
-import 'package:pandive/models.dart';
+import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/models/models.dart';
 import 'package:sqlite3/open.dart';
 
 void main() {

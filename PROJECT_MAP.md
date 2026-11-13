@@ -3,35 +3,64 @@
 Lee esto ANTES de buscar con Grep/Glob: te lleva directo al `.dart` exacto.
 Mantenlo actualizado al crear/mover/borrar ficheros en `lib/`.
 
-> Nota: la estructura todavía es plana (`lib/ui/`). El objetivo es feature-first
-> (`core/` + `features/<nombre>/`); ver reglas en `CLAUDE.md`/`AGENTS.md`.
+Estructura feature-first: `core/` (transversal) + `features/<nombre>/` (cada una
+con `screens/` y, si hace falta, `widgets/`).
 
 ## Core / Config
 
-- `lib/main.dart` -> arranque, tema, abre la DB, pantalla raíz según estado
-- `lib/settings.dart` -> preferencias: escala de texto y ruta de DB activa
-- `lib/models.dart` -> modelos: Dive, DiveProfile, Cylinder, DiveSite, LogbookStats
-- `lib/db/divemate_db.dart` -> capa SQLite: queries, decode de perfil, escritura
-- `lib/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
-- `lib/ui/load_db_screen.dart` -> elegir un fichero .ddb para cargar
-- `lib/ui/home_screen.dart` -> shell con pestañas (inmersiones/sitios/stats) y menú
-- `lib/ui/profile_chart.dart` -> gráfico de perfil profundidad/temperatura (fl_chart)
-- `lib/ui/text_scale_sheet.dart` -> hoja inferior para ajustar tamaño de letra
+- `lib/main.dart` -> arranque: init locale, carga settings, lanza la app
+- `lib/core/app.dart` -> MaterialApp, escala de texto global, AppRoot (elige pantalla)
+- `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)
+- `lib/core/settings/settings.dart` -> preferencias: escala de texto y ruta de DB activa
+- `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
+
+### Core · base de datos (una librería con `part`s)
+- `lib/core/db/divemate_db.dart` -> abre .ddb, owner, helpers; declara los parts
+- `lib/core/db/db_queries.dart` -> lecturas: listar/obtener inmersiones, botellas, nº siguiente
+- `lib/core/db/db_profile.dart` -> decode del perfil (profundidad/temperatura)
+- `lib/core/db/db_stats.dart` -> sitios de buceo y estadísticas agregadas
+- `lib/core/db/db_writes.dart` -> escritura: editar y crear inmersiones
+
+### Core · modelos (`models.dart` es el barrel)
+- `lib/core/models/models.dart` -> barrel: reexporta todos los modelos
+- `lib/core/models/dive.dart` -> inmersión (fila de Logbook)
+- `lib/core/models/dive_profile.dart` -> perfil muestreado (tiempos/profundidades/temps)
+- `lib/core/models/cylinder.dart` -> botella/mezcla (+ etiqueta de gas)
+- `lib/core/models/dive_site.dart` -> punto de buceo con nº de inmersiones
+- `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
+
+### Core · widgets compartidos
+- `lib/core/widgets/profile_chart.dart` -> gráfico de perfil profundidad/temperatura (fl_chart)
+- `lib/core/widgets/stat_card.dart` -> tarjeta etiqueta/valor
+- `lib/core/widgets/labeled_field.dart` -> campo de texto con etiqueta/borde
+- `lib/core/widgets/star_rating.dart` -> selector de valoración por estrellas
+- `lib/core/widgets/date_time_field.dart` -> selector de fecha+hora (ListTile)
+- `lib/core/widgets/text_scale_sheet.dart` -> hoja inferior para ajustar tamaño de letra
 
 ## Features
 
-### Inmersiones
-- `lib/ui/dives_tab.dart` -> lista de inmersiones, búsqueda y botón "Nueva"
-- `lib/ui/dive_detail_screen.dart` -> detalle: datos, perfil, botellas, editar
-- `lib/ui/edit_dive_screen.dart` -> editar campos editables de una inmersión
-- `lib/ui/new_dive_screen.dart` -> formulario de alta manual de inmersión
+### home
+- `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
 
-### Sitios
-- `lib/ui/sites_tab.dart` -> lista de puntos de buceo con conteo y enlace a mapa
+### load_db
+- `lib/features/load_db/screens/load_db_screen.dart` -> elegir un fichero .ddb
 
-### Estadísticas
-- `lib/ui/stats_tab.dart` -> estadísticas agregadas y barras por año
+### dives (inmersiones)
+- `lib/features/dives/screens/dives_screen.dart` -> lista + búsqueda + botón "Nueva"
+- `lib/features/dives/screens/dive_detail_screen.dart` -> detalle: datos, perfil, botellas, editar
+- `lib/features/dives/screens/edit_dive_screen.dart` -> editar campos editables
+- `lib/features/dives/screens/new_dive_screen.dart` -> formulario de alta manual
+- `lib/features/dives/widgets/cylinder_input.dart` -> sección de formulario de botella (+controller)
+- `lib/features/dives/widgets/cylinder_tile.dart` -> tarjeta de botella en el detalle
 
-### Ordenador de buceo
-- `lib/ui/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
-- `lib/ui/scan_screen.dart` -> escaneo BLE y lista de ordenadores cercanos
+### sites (sitios)
+- `lib/features/sites/screens/sites_screen.dart` -> lista de sitios con conteo y mapa
+
+### stats (estadísticas)
+- `lib/features/stats/screens/stats_screen.dart` -> tarjetas de stats + barras por año
+- `lib/features/stats/widgets/year_bars.dart` -> barras de inmersiones por año
+
+### dive_computer (ordenador de buceo)
+- `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
+- `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE y lista de ordenadores
+- `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo y vista de error

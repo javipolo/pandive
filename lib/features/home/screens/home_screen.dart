@@ -3,13 +3,13 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../db/divemate_db.dart';
-import '../settings.dart';
-import 'dive_computer_screen.dart';
-import 'dives_tab.dart';
-import 'sites_tab.dart';
-import 'stats_tab.dart';
-import 'text_scale_sheet.dart';
+import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/widgets/text_scale_sheet.dart';
+import 'package:pandive/features/dive_computer/screens/dive_computer_screen.dart';
+import 'package:pandive/features/dives/screens/dives_screen.dart';
+import 'package:pandive/features/sites/screens/sites_screen.dart';
+import 'package:pandive/features/stats/screens/stats_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final DivemateDb db;

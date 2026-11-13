@@ -4,8 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../db/divemate_db.dart';
-import '../models.dart';
+import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/models/models.dart';
 
 class SitesTab extends StatefulWidget {
   final DivemateDb db;

@@ -4,8 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../db/divemate_db.dart';
-import '../models.dart';
+import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/models/models.dart';
 import 'dive_detail_screen.dart';
 import 'new_dive_screen.dart';
 

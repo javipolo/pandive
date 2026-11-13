@@ -5,7 +5,7 @@ library;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../models.dart';
+import 'package:pandive/core/models/models.dart';
 
 class ProfileChart extends StatelessWidget {
   final DiveProfile profile;

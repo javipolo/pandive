@@ -6,7 +6,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../services/dive_computer.dart';
+import 'package:pandive/core/services/dive_computer.dart';
+import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -49,15 +50,11 @@ class _ScanScreenState extends State<ScanScreen> {
       _scanning = true;
     });
     _sub = _svc.scan().listen(
-      (d) {
-        setState(() => _devices[d.id] = d);
-      },
-      onError: (e) {
-        setState(() {
-          _scanning = false;
-          _error = 'Error de escaneo: $e';
-        });
-      },
+      (d) => setState(() => _devices[d.id] = d),
+      onError: (e) => setState(() {
+        _scanning = false;
+        _error = 'Error de escaneo: $e';
+      }),
     );
   }
 
@@ -87,9 +84,8 @@ class _ScanScreenState extends State<ScanScreen> {
             'De momento el escaneo ya detecta el ordenador.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Vale'),
-          ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Vale')),
         ],
       ),
     );
@@ -106,38 +102,19 @@ class _ScanScreenState extends State<ScanScreen> {
             const Padding(
               padding: EdgeInsets.all(16),
               child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2)),
             )
           else
             IconButton(
-              icon: const Icon(Icons.refresh),
-              tooltip: 'Reescanear',
-              onPressed: _start,
-            ),
+                icon: const Icon(Icons.refresh),
+                tooltip: 'Reescanear',
+                onPressed: _start),
         ],
       ),
       body: _error != null
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.bluetooth_disabled, size: 56),
-                    const SizedBox(height: 12),
-                    Text(_error!, textAlign: TextAlign.center),
-                    const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: _start,
-                      child: const Text('Reintentar'),
-                    ),
-                  ],
-                ),
-              ),
-            )
+          ? ScanErrorView(message: _error!, onRetry: _start)
           : Column(
               children: [
                 if (_permissionOk)
@@ -156,26 +133,14 @@ class _ScanScreenState extends State<ScanScreen> {
                       : ListView.separated(
                           itemCount: devices.length,
                           separatorBuilder: (_, _) => const Divider(height: 1),
-                          itemBuilder: (context, i) => _tile(devices[i]),
+                          itemBuilder: (context, i) => ScannedDeviceTile(
+                            device: devices[i],
+                            onTap: () => _onTap(devices[i]),
+                          ),
                         ),
                 ),
               ],
             ),
-    );
-  }
-
-  Widget _tile(ScannedDevice d) {
-    return ListTile(
-      leading: Icon(
-        d.likely ? Icons.scuba_diving : Icons.bluetooth,
-        color: d.likely ? Theme.of(context).colorScheme.primary : null,
-      ),
-      title: Text(d.name),
-      subtitle: Text('${d.id}   ·   ${d.rssi} dBm'),
-      trailing: d.likely
-          ? const Chip(label: Text('Buceo'))
-          : null,
-      onTap: () => _onTap(d),
     );
   }
 }

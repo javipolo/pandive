@@ -5,7 +5,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../services/dive_computer.dart';
+import 'package:pandive/core/services/dive_computer.dart';
 import 'scan_screen.dart';
 
 class DiveComputerScreen extends StatefulWidget {
