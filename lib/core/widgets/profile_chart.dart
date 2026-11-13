@@ -56,6 +56,10 @@ class _ProfileChartState extends State<ProfileChart> {
         tLo = ((tHi + tLo) / 2 - 2.5).floorToDouble();
         tHi = tLo + 5;
       }
+      // Margen de un "step" arriba y abajo para que la línea no toque bordes.
+      final pad = ((tHi - tLo) / 5).ceil().toDouble();
+      tLo -= pad;
+      tHi += pad;
       double tempY(double v) => minY + (v - tLo) / (tHi - tLo) * (maxY - minY);
       tempSpots = [
         for (var i = 0; i < profile.temps.length; i++)
