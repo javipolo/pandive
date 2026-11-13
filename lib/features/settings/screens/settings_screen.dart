@@ -73,8 +73,12 @@ class SettingsScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const SizedBox(width: 16),
-                  const Text('A', style: TextStyle(fontSize: 14)),
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    tooltip: '−',
+                    onPressed: () =>
+                        settings.setTextScale(settings.textScale - 0.1),
+                  ),
                   Expanded(
                     child: Slider(
                       min: Settings.minTextScale,
@@ -86,8 +90,12 @@ class SettingsScreen extends StatelessWidget {
                       onChanged: settings.setTextScale,
                     ),
                   ),
-                  const Text('A', style: TextStyle(fontSize: 28)),
-                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    tooltip: '+',
+                    onPressed: () =>
+                        settings.setTextScale(settings.textScale + 0.1),
+                  ),
                 ],
               ),
               Center(

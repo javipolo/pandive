@@ -63,12 +63,6 @@ class DiveDetailBody extends StatelessWidget {
             )),
             child: SizedBox(height: 260, child: ProfileChart(profile: profile)),
           ),
-          if (profile.hasTemp)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(t.tempRelativeNote,
-                  style: Theme.of(context).textTheme.bodySmall),
-            ),
         ],
         if (cylinders.isNotEmpty) ...[
           const SizedBox(height: 24),
