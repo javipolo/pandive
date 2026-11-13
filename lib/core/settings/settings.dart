@@ -2,12 +2,13 @@
 /// de la base de datos activa. Persistido con shared_preferences.
 library;
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends ChangeNotifier {
   static const _kTextScale = 'text_scale';
   static const _kDbPath = 'db_path';
+  static const _kLocale = 'locale';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -38,6 +39,21 @@ class Settings extends ChangeNotifier {
       await _prefs.remove(_kDbPath);
     } else {
       await _prefs.setString(_kDbPath, path);
+    }
+    notifyListeners();
+  }
+
+  /// Idioma de la app: null = seguir el del sistema; si no, 'es' / 'en'.
+  Locale? get locale {
+    final code = _prefs.getString(_kLocale);
+    return code == null ? null : Locale(code);
+  }
+
+  Future<void> setLocale(String? code) async {
+    if (code == null) {
+      await _prefs.remove(_kLocale);
+    } else {
+      await _prefs.setString(_kLocale, code);
     }
     notifyListeners();
   }

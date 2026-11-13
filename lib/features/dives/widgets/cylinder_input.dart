@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class CylinderInputController {
   final size = TextEditingController();
@@ -41,20 +42,21 @@ class CylinderInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = controller;
+    final t = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Botella (opcional)',
+        Text(t.cylinderOptional,
             style: Theme.of(context).textTheme.titleMedium),
         Row(children: [
-          Expanded(child: LabeledField(controller: c.size, label: 'Litros', number: true)),
+          Expanded(child: LabeledField(controller: c.size, label: t.liters, number: true)),
           const SizedBox(width: 12),
-          Expanded(child: LabeledField(controller: c.o2, label: 'O₂ %', number: true)),
+          Expanded(child: LabeledField(controller: c.o2, label: t.o2pct, number: true)),
         ]),
         Row(children: [
-          Expanded(child: LabeledField(controller: c.start, label: 'Presión ini (bar)', number: true)),
+          Expanded(child: LabeledField(controller: c.start, label: t.presStart, number: true)),
           const SizedBox(width: 12),
-          Expanded(child: LabeledField(controller: c.end, label: 'Presión fin (bar)', number: true)),
+          Expanded(child: LabeledField(controller: c.end, label: t.presEnd, number: true)),
         ]),
       ],
     );

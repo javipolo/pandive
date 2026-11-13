@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/dive_computer/widgets/downloaded_dive_tile.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class DownloadResultList extends StatelessWidget {
   final int total;
@@ -23,13 +24,14 @@ class DownloadResultList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final existing = total - newDives.length;
     if (newDives.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'Las $total inmersiones del ordenador ya están en tu logbook.',
+            t.allAlreadyInDb(total),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium,
           ),
@@ -40,15 +42,14 @@ class DownloadResultList extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: saving ? null : onSave,
         icon: const Icon(Icons.save),
-        label: Text(saving ? 'Guardando…' : 'Guardar ${newDives.length}'),
+        label: Text(saving ? t.saving : t.saveN(newDives.length)),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
             child: Text(
-              '$total descargadas · ${newDives.length} nuevas'
-              '${existing > 0 ? ' ($existing ya en la DB)' : ''}',
+              t.downloadedSummary(total, newDives.length, existing),
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),

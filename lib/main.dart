@@ -6,7 +6,7 @@ import 'core/settings/settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('es');
+  await initializeDateFormatting(); // todos los locales (es + en)
   final settings = await Settings.load();
   runApp(PandiveApp(settings: settings));
 }

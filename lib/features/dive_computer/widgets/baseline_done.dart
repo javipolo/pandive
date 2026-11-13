@@ -3,12 +3,15 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/l10n/app_localizations.dart';
+
 class BaselineDone extends StatelessWidget {
   final VoidCallback onDone;
   const BaselineDone({super.key, required this.onDone});
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -16,13 +19,12 @@ class BaselineDone extends StatelessWidget {
           const Icon(Icons.check_circle_outline, size: 64),
           const SizedBox(height: 12),
           Text(
-            'Marcado como ya importado.\nLas próximas descargas solo traerán '
-            'buceos nuevos.',
+            t.baselineDone,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 16),
-          FilledButton(onPressed: onDone, child: const Text('Hecho')),
+          FilledButton(onPressed: onDone, child: Text(t.done)),
         ]),
       ),
     );

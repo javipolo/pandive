@@ -26,3 +26,6 @@ key.properties
 
 # Varios
 .DS_Store
+
+# l10n generado (se regenera con flutter gen-l10n)
+lib/l10n/app_localizations*.dart

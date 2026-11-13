@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 import 'dive_detail_screen.dart';
 import 'new_dive_screen.dart';
 
@@ -18,7 +19,6 @@ class DivesTab extends StatefulWidget {
 }
 
 class _DivesTabState extends State<DivesTab> {
-  final _dateFmt = DateFormat('d MMM yyyy', 'es');
   final _searchCtrl = TextEditingController();
   late List<Dive> _dives;
 
@@ -50,11 +50,12 @@ class _DivesTabState extends State<DivesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _newDive,
         icon: const Icon(Icons.add),
-        label: const Text('Nueva'),
+        label: Text(t.newDive),
       ),
       body: Column(
         children: [
@@ -62,7 +63,7 @@ class _DivesTabState extends State<DivesTab> {
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
           child: SearchBar(
             controller: _searchCtrl,
-            hintText: 'Buscar sitio, país, nota, nº…',
+            hintText: t.searchDives,
             leading: const Icon(Icons.search),
             trailing: [
               if (_searchCtrl.text.isNotEmpty)
@@ -79,7 +80,7 @@ class _DivesTabState extends State<DivesTab> {
         ),
         Expanded(
           child: _dives.isEmpty
-              ? const Center(child: Text('Sin resultados'))
+              ? Center(child: Text(t.noResults))
               : ListView.separated(
                   itemCount: _dives.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
@@ -92,6 +93,8 @@ class _DivesTabState extends State<DivesTab> {
   }
 
   Widget _tile(Dive d) {
+    final dateFmt =
+        DateFormat('d MMM yyyy', Localizations.localeOf(context).languageCode);
     final subtitle = [
       if (d.place != null) d.place!,
       if (d.country != null) d.country!,
@@ -105,14 +108,14 @@ class _DivesTabState extends State<DivesTab> {
     return ListTile(
       leading: CircleAvatar(child: Text(d.number?.toString() ?? '—')),
       title: Text(
-        subtitle.isEmpty ? 'Inmersión' : subtitle,
+        subtitle.isEmpty ? AppLocalizations.of(context).dive : subtitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (d.date != null) Text(_dateFmt.format(d.date!)),
+          if (d.date != null) Text(dateFmt.format(d.date!)),
           if (stats.isNotEmpty)
             Text(stats, style: Theme.of(context).textTheme.bodySmall),
         ],

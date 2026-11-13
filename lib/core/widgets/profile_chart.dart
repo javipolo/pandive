@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class ProfileChart extends StatelessWidget {
   final DiveProfile profile;
@@ -13,8 +14,9 @@ class ProfileChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     if (profile.isEmpty) {
-      return const Center(child: Text('Sin perfil registrado'));
+      return Center(child: Text(t.noProfile));
     }
     final cs = Theme.of(context).colorScheme;
     final times = profile.timesMinutes;
@@ -65,7 +67,7 @@ class ProfileChart extends StatelessWidget {
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           leftTitles: AxisTitles(
-            axisNameWidget: const Text('prof (m)'),
+            axisNameWidget: Text(t.axisDepth),
             sideTitles: SideTitles(
               showTitles: true,
               interval: depthStep,
@@ -77,7 +79,7 @@ class ProfileChart extends StatelessWidget {
             ),
           ),
           bottomTitles: AxisTitles(
-            axisNameWidget: const Text('tiempo (min)'),
+            axisNameWidget: Text(t.axisTime),
             sideTitles: SideTitles(
               showTitles: true,
               interval: _niceStep(maxTime, 6),

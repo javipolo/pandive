@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 import 'scan_screen.dart';
 
 class DiveComputerScreen extends StatefulWidget {
@@ -45,8 +46,9 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Ordenador de buceo')),
+      appBar: AppBar(title: Text(t.diveComputerTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
@@ -54,7 +56,7 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
           ),
         ),
         icon: const Icon(Icons.bluetooth_searching),
-        label: const Text('Buscar'),
+        label: Text(t.search),
       ),
       body: FutureBuilder<(int, List<String>)>(
         future: _future,
@@ -66,7 +68,7 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('Error al hablar con libdivecomputer:\n${snap.error}',
+                child: Text(t.nativeError('${snap.error}'),
                     textAlign: TextAlign.center),
               ),
             );
@@ -84,9 +86,8 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
                 child: Card(
                   child: ListTile(
                     leading: const Icon(Icons.memory),
-                    title: Text('$count modelos soportados'),
-                    subtitle: const Text(
-                        'libdivecomputer enlazado correctamente (nativo).'),
+                    title: Text(t.modelsSupported(count)),
+                    subtitle: Text(t.nativeLinkOk),
                   ),
                 ),
               ),
@@ -94,7 +95,7 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SearchBar(
                   controller: _searchCtrl,
-                  hintText: 'Filtrar modelos…',
+                  hintText: t.filterModels,
                   leading: const Icon(Icons.search),
                   onChanged: (v) => setState(() => _filter = v),
                 ),

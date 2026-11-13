@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/l10n/app_localizations.dart';
 import 'db/divemate_db.dart';
 import 'settings/settings.dart';
 import 'theme/app_theme.dart';
@@ -24,6 +25,9 @@ class PandiveApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: appTheme(Brightness.light),
           darkTheme: appTheme(Brightness.dark),
+          locale: settings.locale, // null = idioma del sistema
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           builder: (context, child) {
             // Escala de texto global (accesibilidad / presbicia).
             final mq = MediaQuery.of(context);
@@ -53,7 +57,8 @@ class AppRoot extends StatefulWidget {
 
 class _AppRootState extends State<AppRoot> {
   DivemateDb? _db;
-  String? _error;
+  DbLoadError? _error;
+  String? _errorDetail;
 
   @override
   void initState() {
@@ -65,6 +70,7 @@ class _AppRootState extends State<AppRoot> {
     _db?.close();
     _db = null;
     _error = null;
+    _errorDetail = null;
     if (path == null) {
       setState(() {});
       return;
@@ -73,12 +79,13 @@ class _AppRootState extends State<AppRoot> {
       final db = DivemateDb.open(path);
       if (!db.looksValid) {
         db.close();
-        _error = 'El fichero no parece una base de datos DiveMate válida.';
+        _error = DbLoadError.invalid;
       } else {
         _db = db;
       }
     } catch (e) {
-      _error = 'No se pudo abrir la base de datos: $e';
+      _error = DbLoadError.openFailed;
+      _errorDetail = '$e';
     }
     setState(() {});
   }
@@ -96,6 +103,7 @@ class _AppRootState extends State<AppRoot> {
       return LoadDbScreen(
         settings: widget.settings,
         error: _error,
+        errorDetail: _errorDetail,
         onLoaded: (path) async {
           await widget.settings.setDbPath(path);
           _tryOpen(path);

@@ -8,6 +8,7 @@ import 'package:pandive/core/widgets/date_time_field.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/star_rating.dart';
 import 'package:pandive/features/dives/widgets/cylinder_input.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class NewDiveScreen extends StatefulWidget {
   final DivemateDb db;
@@ -80,17 +81,18 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
     } catch (e) {
       setState(() => _saving = false);
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error al crear: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context).errorCreate('$e'))));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nueva inmersión #$_number'),
+        title: Text(t.newDiveNumber(_number)),
         actions: [
           TextButton.icon(
             onPressed: _saving ? null : _save,
@@ -100,7 +102,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.check),
-            label: const Text('Guardar'),
+            label: Text(t.save),
           ),
         ],
       ),
@@ -112,27 +114,28 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
             onChanged: (v) => setState(() => _when = v),
           ),
           const Divider(),
-          LabeledField(controller: _place, label: 'Sitio'),
-          LabeledField(controller: _country, label: 'País'),
+          LabeledField(controller: _place, label: t.fieldSite),
+          LabeledField(controller: _country, label: t.fieldCountry),
           _twoCols(
-            LabeledField(controller: _maxDepth, label: 'Prof. máx (m)', number: true),
-            LabeledField(controller: _avgDepth, label: 'Prof. media (m)', number: true),
+            LabeledField(controller: _maxDepth, label: t.fieldMaxDepthM, number: true),
+            LabeledField(controller: _avgDepth, label: t.fieldAvgDepthM, number: true),
           ),
           _twoCols(
-            LabeledField(controller: _duration, label: 'Duración (min)', number: true),
-            LabeledField(controller: _weight, label: 'Lastre (kg)', number: true),
+            LabeledField(controller: _duration, label: t.fieldDurationMin, number: true),
+            LabeledField(controller: _weight, label: t.fieldWeightKg, number: true),
           ),
           _twoCols(
-            LabeledField(controller: _waterTemp, label: 'Temp. agua (°C)', number: true),
-            LabeledField(controller: _airTemp, label: 'Temp. aire (°C)', number: true),
+            LabeledField(controller: _waterTemp, label: t.fieldWaterTempC, number: true),
+            LabeledField(controller: _airTemp, label: t.fieldAirTempC, number: true),
           ),
           const SizedBox(height: 8),
-          StarRating(value: _rating, onChanged: (v) => setState(() => _rating = v)),
+          StarRating(value: _rating, label: t.ratingLabel,
+              onChanged: (v) => setState(() => _rating = v)),
           const SizedBox(height: 8),
-          LabeledField(controller: _buddy, label: 'Compañero'),
-          LabeledField(controller: _diveMaster, label: 'Guía'),
-          LabeledField(controller: _diveType, label: 'Tipo de inmersión'),
-          LabeledField(controller: _comments, label: 'Notas', maxLines: 4),
+          LabeledField(controller: _buddy, label: t.fieldBuddy),
+          LabeledField(controller: _diveMaster, label: t.fieldGuide),
+          LabeledField(controller: _diveType, label: t.fieldDiveType),
+          LabeledField(controller: _comments, label: t.fieldNotes, maxLines: 4),
           const SizedBox(height: 16),
           CylinderInput(controller: _cyl),
         ],
@@ -141,8 +144,6 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
   }
 
   Widget _twoCols(Widget a, Widget b) => Row(children: [
-        Expanded(child: a),
-        const SizedBox(width: 12),
-        Expanded(child: b),
+        Expanded(child: a), const SizedBox(width: 12), Expanded(child: b),
       ]);
 }

@@ -11,7 +11,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/main.dart` -> arranque: init locale, carga settings, lanza la app
 - `lib/core/app.dart` -> MaterialApp, escala de texto global, AppRoot (elige pantalla)
 - `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)
-- `lib/core/settings/settings.dart` -> preferencias: escala de texto y ruta de DB activa
+- `lib/core/settings/settings.dart` -> preferencias: escala de texto, ruta de DB activa, idioma
+- `lib/l10n/app_en.arb` / `app_es.arb` -> traducciones (plantilla EN + ES); `AppLocalizations` se genera con `flutter gen-l10n`
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
 
 ### Core · base de datos (una librería con `part`s)
@@ -39,7 +40,6 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/widgets/labeled_field.dart` -> campo de texto con etiqueta/borde
 - `lib/core/widgets/star_rating.dart` -> selector de valoración por estrellas
 - `lib/core/widgets/date_time_field.dart` -> selector de fecha+hora (ListTile)
-- `lib/core/widgets/text_scale_sheet.dart` -> hoja inferior para ajustar tamaño de letra
 
 ## Features
 
@@ -47,7 +47,10 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
 
 ### load_db
-- `lib/features/load_db/screens/load_db_screen.dart` -> elegir un fichero .ddb
+- `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb (con enum DbLoadError)
+
+### settings
+- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma + tamaño de letra
 
 ### dives (inmersiones)
 - `lib/features/dives/screens/dives_screen.dart` -> lista + búsqueda + botón "Nueva"

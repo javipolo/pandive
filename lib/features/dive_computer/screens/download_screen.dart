@@ -16,6 +16,7 @@ import 'package:pandive/features/dive_computer/widgets/baseline_done.dart';
 import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
 import 'package:pandive/features/dive_computer/widgets/download_result_list.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class DownloadScreen extends StatefulWidget {
   final ScannedDevice device;
@@ -64,7 +65,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
     final m = _model;
     if (m == null) {
       return DownloadResult(
-          error: 'Modelo no reconocido por el nombre "${widget.device.name}".');
+          error: AppLocalizations.of(context)
+              .modelNotRecognized(widget.device.name));
     }
     final res = await _svc.download(
       vendor: m.$1,
@@ -93,17 +95,20 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
     if (!mounted) return;
     final skipped = dives.length - added;
+    final t = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Guardadas $added nuevas'
-            '${skipped > 0 ? ', $skipped ya existían' : ''}.')));
+        content: Text(skipped > 0
+            ? t.savedNewAndExisting(added, skipped)
+            : t.savedNew(added))));
     Navigator.of(context).pop(added > 0);
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final name =
         _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
-    final prefix = widget.baseline ? 'Marcar importado' : 'Descargar';
+    final prefix = widget.baseline ? t.markPrefix : t.downloadPrefix;
     return Scaffold(
       appBar: AppBar(title: Text('$prefix · $name')),
       body: FutureBuilder<DownloadResult>(

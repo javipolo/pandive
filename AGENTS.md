@@ -22,6 +22,17 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 - **Control de comandos**: NO ejecutes `flutter build` ni lances emuladores
   automáticamente. Solo `flutter analyze` (o `make analyze`) tras un cambio
   grande para verificar. El usuario compila y prueba (sideload del APK).
+- **i18n obligatorio**: TODO texto visible al usuario va traducido. Nunca
+  hardcodees cadenas en la UI; usa claves de `AppLocalizations`
+  (`final t = AppLocalizations.of(context); ... t.miClave`). Al añadir cualquier
+  feature, añade su texto a **todos** los `lib/l10n/app_<code>.arb` (mismas
+  claves en todos; `app_en.arb` es la plantilla y lleva los `@clave` con
+  placeholders) y ejecuta `flutter gen-l10n`. Fechas con
+  `DateFormat(patrón, Localizations.localeOf(context).languageCode)`, no locale
+  fijo. **Añadir un idioma nuevo** (p.ej. catalán) = crear `app_ca.arb` con las
+  mismas claves traducidas; `supportedLocales` lo recoge solo. Mantén las claves
+  sincronizadas entre idiomas (si falta una, el build avisa). Idioma elegible en
+  Ajustes (`Settings.locale`).
 
 ## Workflow
 

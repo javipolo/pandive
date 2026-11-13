@@ -11,19 +11,24 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/l10n/app_localizations.dart';
+
+/// Error al abrir la DB activa, para mostrarlo localizado en la pantalla.
+enum DbLoadError { invalid, openFailed }
 
 class LoadDbScreen extends StatefulWidget {
   final Settings settings;
-  final String? error;
+  final DbLoadError? error;
+  final String? errorDetail; // detalle para openFailed
   final Future<void> Function(String path) onLoaded;
 
   const LoadDbScreen({
     super.key,
     required this.settings,
     required this.error,
+    this.errorDetail,
     required this.onLoaded,
   });
-
   @override
   State<LoadDbScreen> createState() => _LoadDbScreenState();
 }
@@ -51,11 +56,10 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
     } catch (e) {
       setState(() {
         _busy = false;
-        _localError = 'Error al cargar: $e';
+        _localError = AppLocalizations.of(context).errorLoad('$e');
       });
     }
   }
-
   Future<void> _createNew() async {
     setState(() {
       _busy = true;
@@ -71,14 +75,20 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
     } catch (e) {
       setState(() {
         _busy = false;
-        _localError = 'Error al crear: $e';
+        _localError = AppLocalizations.of(context).errorCreate('$e');
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final err = _localError ?? widget.error;
+    final t = AppLocalizations.of(context);
+    final err = _localError ??
+        switch (widget.error) {
+          DbLoadError.invalid => t.invalidDb,
+          DbLoadError.openFailed => t.dbOpenFailed(widget.errorDetail ?? ''),
+          null => null,
+        };
     return Scaffold(
       appBar: AppBar(title: const Text('Pandive')),
       body: Center(
@@ -94,13 +104,13 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Carga tu logbook',
+                t.loadHeadline,
                 style: Theme.of(context).textTheme.headlineSmall,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Selecciona un fichero .ddb de DiveMate para empezar.',
+                t.loadSubtitle,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -123,13 +133,13 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.folder_open),
-                label: const Text('Elegir fichero .ddb'),
+                label: Text(t.pickFile),
               ),
               const SizedBox(height: 8),
               TextButton.icon(
                 onPressed: _busy ? null : _createNew,
                 icon: const Icon(Icons.add),
-                label: const Text('Crear logbook nuevo (vacío)'),
+                label: Text(t.createNewDb),
               ),
             ],
           ),

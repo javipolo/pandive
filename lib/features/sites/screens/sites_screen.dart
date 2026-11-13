@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class SitesTab extends StatefulWidget {
   final DivemateDb db;
@@ -61,20 +62,21 @@ class _SitesTabState extends State<SitesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
           child: SearchBar(
             controller: _searchCtrl,
-            hintText: 'Buscar sitio, país, región…',
+            hintText: t.searchSites,
             leading: const Icon(Icons.search),
             onChanged: _search,
           ),
         ),
         Expanded(
           child: _shown.isEmpty
-              ? const Center(child: Text('Sin sitios'))
+              ? Center(child: Text(t.noSites))
               : ListView.separated(
                   itemCount: _shown.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
@@ -98,7 +100,8 @@ class _SitesTabState extends State<SitesTab> {
 
     return ListTile(
       leading: CircleAvatar(child: Text('${s.diveCount}')),
-      title: Text(s.name ?? 'Sitio', maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(s.name ?? AppLocalizations.of(context).site,
+          maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -110,7 +113,7 @@ class _SitesTabState extends State<SitesTab> {
       trailing: s.hasCoords
           ? IconButton(
               icon: const Icon(Icons.map_outlined),
-              tooltip: 'Abrir en mapa',
+              tooltip: AppLocalizations.of(context).openMap,
               onPressed: () => _openMap(s),
             )
           : null,

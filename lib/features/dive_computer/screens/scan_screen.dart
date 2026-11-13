@@ -11,6 +11,7 @@ import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class ScanScreen extends StatefulWidget {
   final DivemateDb db;
@@ -41,11 +42,11 @@ class _ScanScreenState extends State<ScanScreen> {
     });
     final ok = await _svc.requestBlePermissions();
     if (!mounted) return;
+    final t = AppLocalizations.of(context);
     if (!ok) {
       setState(() {
         _permissionOk = false;
-        _error = 'Faltan permisos de Bluetooth. Concédelos en Ajustes para '
-            'poder buscar el ordenador de buceo.';
+        _error = t.btPermsMissing;
       });
       return;
     }
@@ -57,7 +58,7 @@ class _ScanScreenState extends State<ScanScreen> {
       (d) => setState(() => _devices[d.id] = d),
       onError: (e) => setState(() {
         _scanning = false;
-        _error = 'Error de escaneo: $e';
+        _error = t.scanError('$e');
       }),
     );
   }
@@ -97,10 +98,11 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final devices = _sorted;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buscar ordenador'),
+        title: Text(t.scanTitle),
         actions: [
           if (_scanning)
             const Padding(
@@ -113,7 +115,7 @@ class _ScanScreenState extends State<ScanScreen> {
           else
             IconButton(
                 icon: const Icon(Icons.refresh),
-                tooltip: 'Reescanear',
+                tooltip: t.rescan,
                 onPressed: _start),
         ],
       ),
@@ -125,15 +127,13 @@ class _ScanScreenState extends State<ScanScreen> {
                   Padding(
                     padding: const EdgeInsets.all(12),
                     child: Text(
-                      _scanning
-                          ? 'Buscando… enciende el ordenador y activa su Bluetooth.'
-                          : 'Escaneo detenido.',
+                      _scanning ? t.scanningHint : t.scanStopped,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                 Expanded(
                   child: devices.isEmpty
-                      ? const Center(child: Text('Ningún dispositivo todavía'))
+                      ? Center(child: Text(t.noDevicesYet))
                       : ListView.separated(
                           itemCount: devices.length,
                           separatorBuilder: (_, _) => const Divider(height: 1),

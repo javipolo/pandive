@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
-import 'package:pandive/core/widgets/text_scale_sheet.dart';
 import 'package:pandive/features/dive_computer/screens/dive_computer_screen.dart';
 import 'package:pandive/features/dives/screens/dives_screen.dart';
+import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/features/sites/screens/sites_screen.dart';
 import 'package:pandive/features/stats/screens/stats_screen.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   final DivemateDb db;
@@ -30,47 +31,47 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
-  static const _titles = ['Inmersiones', 'Sitios', 'Estadísticas'];
   int _dataVersion = 0; // se incrementa para forzar recarga de las pestañas
+
+  void _openDiveComputer() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+          builder: (_) => DiveComputerScreen(
+            db: widget.db,
+            settings: widget.settings,
+          ),
+        ))
+        .then((_) {
+      if (mounted) setState(() => _dataVersion++); // refrescar tras importar
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final titles = [t.navDives, t.navSites, t.navStats];
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_index]),
+        title: Text(titles[_index]),
         actions: [
           IconButton(
-            tooltip: 'Tamaño de letra',
-            icon: const Icon(Icons.format_size),
-            onPressed: () => showTextScaleSheet(context, widget.settings),
+            tooltip: t.settings,
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => SettingsScreen(settings: widget.settings))),
           ),
           PopupMenuButton<String>(
             onSelected: (v) {
               if (v == 'change_db') {
                 widget.onChangeDb();
               } else if (v == 'dive_computer') {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(
-                      builder: (_) => DiveComputerScreen(
-                        db: widget.db,
-                        settings: widget.settings,
-                      ),
-                    ))
-                    // Al volver, refrescar las pestañas (puede haber dives nuevos).
-                    .then((_) {
-                  if (mounted) setState(() => _dataVersion++);
-                });
+                _openDiveComputer();
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (context) => [
               PopupMenuItem(
-                value: 'dive_computer',
-                child: Text('Ordenador de buceo'),
-              ),
-              PopupMenuItem(
-                value: 'change_db',
-                child: Text('Cambiar base de datos'),
-              ),
+                  value: 'dive_computer', child: Text(t.menuDiveComputer)),
+              PopupMenuItem(value: 'change_db', child: Text(t.menuChangeDb)),
             ],
           ),
         ],
@@ -86,21 +87,21 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.scuba_diving_outlined),
-            selectedIcon: Icon(Icons.scuba_diving),
-            label: 'Inmersiones',
+            icon: const Icon(Icons.scuba_diving_outlined),
+            selectedIcon: const Icon(Icons.scuba_diving),
+            label: t.navDives,
           ),
           NavigationDestination(
-            icon: Icon(Icons.place_outlined),
-            selectedIcon: Icon(Icons.place),
-            label: 'Sitios',
+            icon: const Icon(Icons.place_outlined),
+            selectedIcon: const Icon(Icons.place),
+            label: t.navSites,
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Stats',
+            icon: const Icon(Icons.bar_chart_outlined),
+            selectedIcon: const Icon(Icons.bar_chart),
+            label: t.navStats,
           ),
         ],
       ),

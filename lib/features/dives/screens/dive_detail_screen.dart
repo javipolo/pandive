@@ -9,6 +9,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
 import 'package:pandive/core/widgets/stat_card.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 import 'edit_dive_screen.dart';
 
 class DiveDetailScreen extends StatefulWidget {
@@ -37,16 +38,18 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final profile = db.diveProfile(dive.id);
     final cylinders = db.cylinders(dive.id);
-    final dateFmt = DateFormat('EEEE d MMMM yyyy, HH:mm', 'es');
+    final dateFmt = DateFormat(
+        'EEEE d MMMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(dive.number != null ? 'Inmersión #${dive.number}' : 'Inmersión'),
+        title: Text(dive.number != null ? t.diveNumber(dive.number!) : t.dive),
         actions: [
           IconButton(
-            tooltip: 'Editar',
+            tooltip: t.edit,
             icon: const Icon(Icons.edit),
             onPressed: _edit,
           ),
@@ -68,25 +71,25 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
           Wrap(spacing: 12, runSpacing: 12, children: _statCards()),
           if (profile != null && !profile.isEmpty) ...[
             const SizedBox(height: 24),
-            Text('Perfil', style: Theme.of(context).textTheme.titleLarge),
+            Text(t.profile, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             SizedBox(height: 260, child: ProfileChart(profile: profile)),
             if (profile.hasTemp)
               Padding(
                 padding: const EdgeInsets.only(top: 6),
-                child: Text('Línea roja: temperatura (relativa)',
+                child: Text(t.tempRelativeNote,
                     style: Theme.of(context).textTheme.bodySmall),
               ),
           ],
           if (cylinders.isNotEmpty) ...[
             const SizedBox(height: 24),
-            Text('Botellas', style: Theme.of(context).textTheme.titleLarge),
+            Text(t.cylinders, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             ...cylinders.map((c) => CylinderTile(cylinder: c)),
           ],
           if (dive.comments != null) ...[
             const SizedBox(height: 24),
-            Text('Notas', style: Theme.of(context).textTheme.titleLarge),
+            Text(t.notes, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(dive.comments!, style: Theme.of(context).textTheme.bodyLarge),
           ],
@@ -97,19 +100,20 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
   }
 
   List<Widget> _statCards() {
+    final t = AppLocalizations.of(context);
     final items = <(String, String)>[
-      if (dive.maxDepth != null) ('Prof. máx', '${dive.maxDepth!.toStringAsFixed(1)} m'),
-      if (dive.avgDepth != null) ('Prof. media', '${dive.avgDepth!.toStringAsFixed(1)} m'),
-      if (dive.durationMin != null) ('Duración', '${dive.durationMin!.round()} min'),
-      if (dive.waterTemp != null) ('Temp. agua', '${dive.waterTemp!.toStringAsFixed(0)} °C'),
-      if (dive.airTemp != null) ('Temp. aire', '${dive.airTemp!.toStringAsFixed(0)} °C'),
-      if (dive.surfaceInterval != null) ('Interv. sup.', dive.surfaceInterval!),
-      if (dive.weight != null) ('Lastre', '${dive.weight!.toStringAsFixed(1)} kg'),
-      if (dive.rating != null && dive.rating! > 0) ('Valoración', '★' * dive.rating!),
-      if (dive.computer != null) ('Ordenador', dive.computer!),
-      if (dive.buddy != null) ('Compañero', dive.buddy!),
-      if (dive.diveMaster != null) ('Guía', dive.diveMaster!),
-      if (dive.diveType != null) ('Tipo', dive.diveType!),
+      if (dive.maxDepth != null) (t.statMaxDepth, '${dive.maxDepth!.toStringAsFixed(1)} m'),
+      if (dive.avgDepth != null) (t.statAvgDepth, '${dive.avgDepth!.toStringAsFixed(1)} m'),
+      if (dive.durationMin != null) (t.statDuration, '${dive.durationMin!.round()} min'),
+      if (dive.waterTemp != null) (t.statWaterTemp, '${dive.waterTemp!.toStringAsFixed(0)} °C'),
+      if (dive.airTemp != null) (t.statAirTemp, '${dive.airTemp!.toStringAsFixed(0)} °C'),
+      if (dive.surfaceInterval != null) (t.statSurfaceInt, dive.surfaceInterval!),
+      if (dive.weight != null) (t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),
+      if (dive.rating != null && dive.rating! > 0) (t.statRating, '★' * dive.rating!),
+      if (dive.computer != null) (t.statComputer, dive.computer!),
+      if (dive.buddy != null) (t.statBuddy, dive.buddy!),
+      if (dive.diveMaster != null) (t.statGuide, dive.diveMaster!),
+      if (dive.diveType != null) (t.statType, dive.diveType!),
     ];
     return [for (final it in items) StatCard(label: it.$1, value: it.$2)];
   }

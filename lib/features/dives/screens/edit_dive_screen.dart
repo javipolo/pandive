@@ -7,6 +7,7 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/star_rating.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class EditDiveScreen extends StatefulWidget {
   final DivemateDb db;
@@ -66,19 +67,20 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
     } catch (e) {
       setState(() => _saving = false);
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context).errorSave('$e'))));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.dive.number != null
-            ? 'Editar #${widget.dive.number}'
-            : 'Editar inmersión'),
+            ? t.editDiveNumber(widget.dive.number!)
+            : t.editDive),
         actions: [
           TextButton.icon(
             onPressed: _saving ? null : _save,
@@ -88,27 +90,29 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.check),
-            label: const Text('Guardar'),
+            label: Text(t.save),
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          LabeledField(controller: _place, label: 'Sitio'),
-          LabeledField(controller: _country, label: 'País'),
+          LabeledField(controller: _place, label: t.fieldSite),
+          LabeledField(controller: _country, label: t.fieldCountry),
           const SizedBox(height: 8),
-          StarRating(value: _rating, onChanged: (v) => setState(() => _rating = v)),
+          StarRating(
+              value: _rating,
+              label: t.ratingLabel,
+              onChanged: (v) => setState(() => _rating = v)),
           const SizedBox(height: 8),
-          LabeledField(controller: _buddy, label: 'Compañero'),
-          LabeledField(controller: _diveMaster, label: 'Guía'),
-          LabeledField(controller: _diveType, label: 'Tipo de inmersión'),
-          LabeledField(controller: _weight, label: 'Lastre (kg)', number: true),
-          LabeledField(controller: _comments, label: 'Notas', maxLines: 5),
+          LabeledField(controller: _buddy, label: t.fieldBuddy),
+          LabeledField(controller: _diveMaster, label: t.fieldGuide),
+          LabeledField(controller: _diveType, label: t.fieldDiveType),
+          LabeledField(controller: _weight, label: t.fieldWeightKg, number: true),
+          LabeledField(controller: _comments, label: t.fieldNotes, maxLines: 5),
           const SizedBox(height: 16),
           Text(
-            'Solo se editan estos campos. Profundidad, tiempo y perfil vienen '
-            'del ordenador de buceo y no se tocan a mano.',
+            t.editFieldsNote,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],

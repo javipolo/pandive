@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
 
@@ -41,8 +43,8 @@ dependencies:
   path_provider: ^2.1.4
   # Gráfico de perfil de inmersión
   fl_chart: ^0.69.0
-  # Formato de fechas/números
-  intl: ^0.19.0
+  # Formato de fechas/números (versión que exige flutter_localizations)
+  intl: ^0.20.2
   # Persistencia de preferencias (tamaño de letra, DB activa)
   shared_preferences: ^2.3.2
   # Abrir coordenadas de un sitio en la app de mapas
@@ -70,6 +72,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
+  generate: true   # genera AppLocalizations desde lib/l10n/*.arb
   assets:
     - assets/logo/pandive_logo.png
 
