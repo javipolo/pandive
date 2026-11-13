@@ -72,6 +72,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dive_computer/widgets/download_progress.dart` -> indicador circular de progreso con %
 - `lib/features/dive_computer/widgets/downloaded_dive_tile.dart` -> fila de inmersión descargada
 - `lib/features/dive_computer/widgets/baseline_done.dart` -> confirmación de "marcar como ya importado"
+- `lib/features/dive_computer/widgets/download_result_list.dart` -> resumen de descarga + lista de solo las nuevas
 
 Nativo (fuera de lib/): `android/app/src/main/kotlin/org/drslump/pandive/`
 (DiveComputer, BleScanner, BleConnection, MainActivity) y

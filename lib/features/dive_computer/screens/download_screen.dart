@@ -14,7 +14,7 @@ import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/widgets/baseline_done.dart';
 import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
-import 'package:pandive/features/dive_computer/widgets/downloaded_dive_tile.dart';
+import 'package:pandive/features/dive_computer/widgets/download_result_list.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 
 class DownloadScreen extends StatefulWidget {
@@ -41,6 +41,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   StreamSubscription<double>? _progressSub;
   double _progress = 0;
   bool _saving = false;
+  List<DownloadedDive>? _newCache; // inmersiones que no existen en la DB
 
   @override
   void initState() {
@@ -131,20 +132,15 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 
   Widget _list(List<DownloadedDive> dives) {
-    if (dives.isEmpty) {
-      return const Center(child: Text('No hay inmersiones nuevas'));
-    }
-    return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _saving ? null : () => _save(dives),
-        icon: const Icon(Icons.save),
-        label: Text(_saving ? 'Guardando…' : 'Guardar ${dives.length}'),
-      ),
-      body: ListView.separated(
-        itemCount: dives.length,
-        separatorBuilder: (_, _) => const Divider(height: 1),
-        itemBuilder: (context, i) => DownloadedDiveTile(dive: dives[i]),
-      ),
+    _newCache ??= [
+      for (final d in dives)
+        if (d.datetime == null || !widget.db.hasDiveAt(d.datetime!)) d,
+    ];
+    return DownloadResultList(
+      total: dives.length,
+      newDives: _newCache!,
+      saving: _saving,
+      onSave: () => _save(dives),
     );
   }
 }

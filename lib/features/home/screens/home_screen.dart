@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
   static const _titles = ['Inmersiones', 'Sitios', 'Estadísticas'];
+  int _dataVersion = 0; // se incrementa para forzar recarga de las pestañas
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
               if (v == 'change_db') {
                 widget.onChangeDb();
               } else if (v == 'dive_computer') {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => DiveComputerScreen(
-                      db: widget.db,
-                      settings: widget.settings,
-                    ),
-                  ),
-                );
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                      builder: (_) => DiveComputerScreen(
+                        db: widget.db,
+                        settings: widget.settings,
+                      ),
+                    ))
+                    // Al volver, refrescar las pestañas (puede haber dives nuevos).
+                    .then((_) {
+                  if (mounted) setState(() => _dataVersion++);
+                });
               }
             },
             itemBuilder: (context) => const [
@@ -74,9 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: _index,
         children: [
-          DivesTab(db: widget.db),
-          SitesTab(db: widget.db),
-          StatsTab(db: widget.db),
+          DivesTab(key: ValueKey('dives-$_dataVersion'), db: widget.db),
+          SitesTab(key: ValueKey('sites-$_dataVersion'), db: widget.db),
+          StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
         ],
       ),
       bottomNavigationBar: NavigationBar(
