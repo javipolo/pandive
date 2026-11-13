@@ -26,6 +26,31 @@ class ScannedDeviceTile extends StatelessWidget {
   }
 }
 
+/// Hoja de acciones al tocar un ordenador: descargar o marcar como importado.
+/// Devuelve false = descargar, true = marcar (baseline), null = cancelar.
+Future<bool?> showDiveComputerActionSheet(BuildContext context) {
+  return showModalBottomSheet<bool>(
+    context: context,
+    showDragHandle: true,
+    builder: (_) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        ListTile(
+          leading: const Icon(Icons.download),
+          title: const Text('Descargar inmersiones'),
+          subtitle: const Text('Trae los buceos nuevos del ordenador'),
+          onTap: () => Navigator.pop(context, false),
+        ),
+        ListTile(
+          leading: const Icon(Icons.flag_outlined),
+          title: const Text('Marcar como ya importado'),
+          subtitle: const Text('Rápido: fija el punto de partida sin descargarlo todo'),
+          onTap: () => Navigator.pop(context, true),
+        ),
+      ]),
+    ),
+  );
+}
+
 class ScanErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;

@@ -96,12 +96,14 @@ class DiveComputerService {
     required String product,
     required String address,
     String fingerprint = '',
+    int maxDives = 0, // 0 = todas; 1 = solo la más reciente (fingerprint)
   }) async {
     final raw = await _channel.invokeMethod<String>('download', {
       'vendor': vendor,
       'product': product,
       'address': address,
       'fingerprint': fingerprint,
+      'maxDives': maxDives,
     });
     final j = jsonDecode(raw ?? '{}') as Map<String, dynamic>;
     if (j['error'] != null) {

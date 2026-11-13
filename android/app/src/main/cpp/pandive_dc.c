@@ -183,7 +183,9 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
 // Callback por inmersión: parsea y añade al JSON
 // ---------------------------------------------------------------------------
 
-typedef struct { strbuf_t *sb; dc_device_t *device; int count; } dive_ctx_t;
+typedef struct {
+    strbuf_t *sb; dc_device_t *device; int count; int maxDives;
+} dive_ctx_t;
 
 static int dive_cb(const unsigned char *data, unsigned int size,
                    const unsigned char *fp, unsigned int fsize, void *ud) {
@@ -238,6 +240,8 @@ static int dive_cb(const unsigned char *data, unsigned int size,
     sb_puts(dc->sb, "]}");
 
     dc_parser_destroy(parser);
+    // maxDives > 0: parar tras N (p.ej. 1 para "marcar como ya importado").
+    if (dc->maxDives > 0 && dc->count >= dc->maxDives) return 0;
     return 1;
 }
 
@@ -292,7 +296,7 @@ static unsigned int hex_decode(const char *hex, unsigned char *out, unsigned int
 JNIEXPORT jstring JNICALL
 Java_org_drslump_pandive_DiveComputer_nativeDownload(
         JNIEnv *env, jobject thiz, jstring jvendor, jstring jproduct,
-        jobject conn, jstring jfingerprint) {
+        jobject conn, jstring jfingerprint, jint maxDives) {
     (void) thiz;
     const char *vendor = (*env)->GetStringUTFChars(env, jvendor, NULL);
     const char *product = (*env)->GetStringUTFChars(env, jproduct, NULL);
@@ -353,7 +357,8 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
     if (pc.mid) dc_device_set_events(device, DC_EVENT_PROGRESS, event_cb, &pc);
 
     sb_puts(&out, "{\"dives\":[");
-    dive_ctx_t dctx = { .sb = &out, .device = device, .count = 0 };
+    dive_ctx_t dctx = { .sb = &out, .device = device, .count = 0,
+                        .maxDives = maxDives };
     rc = dc_device_foreach(device, dive_cb, &dctx);
     sb_puts(&out, "]");
     if (rc != DC_STATUS_SUCCESS)

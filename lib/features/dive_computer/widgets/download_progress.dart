@@ -1,4 +1,4 @@
-/// Indicador de progreso de descarga (circular con %).
+/// Indicador de progreso de descarga: rueda grande + % debajo (legible).
 library;
 
 import 'package:flutter/material.dart';
@@ -9,30 +9,28 @@ class DownloadProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pct = (progress * 100).round();
     final determinate = progress > 0;
+    final pct = (progress * 100).round();
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 96,
-            height: 96,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: determinate ? progress : null,
-                  strokeWidth: 8,
-                ),
-                if (determinate)
-                  Text('$pct%', style: Theme.of(context).textTheme.titleMedium),
-              ],
+            width: 150,
+            height: 150,
+            child: CircularProgressIndicator(
+              value: determinate ? progress : null,
+              strokeWidth: 14,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 28),
           Text(
-            'Conectando y descargando…\nMantén el ordenador cerca y encendido.',
+            determinate ? '$pct %' : 'Conectando…',
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Descargando del ordenador.\nMantenlo cerca y encendido.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),

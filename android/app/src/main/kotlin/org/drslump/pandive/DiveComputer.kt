@@ -19,6 +19,7 @@ object DiveComputer {
     external fun nativeSupportedList(): String
     external fun nativeDownload(
         vendor: String, product: String, conn: BleConnection, fingerprint: String,
+        maxDives: Int,
     ): String
 
     private val main = Handler(Looper.getMainLooper())
@@ -41,7 +42,7 @@ object DiveComputer {
      */
     fun download(
         context: Context, vendor: String, product: String, address: String,
-        fingerprint: String,
+        fingerprint: String, maxDives: Int,
     ): String {
         val conn = BleConnection(context.applicationContext, address)
         try {
@@ -50,7 +51,7 @@ object DiveComputer {
                     .replace("\\", " ").replace("\"", "'")
                 return "{\"error\":\"$msg\"}"
             }
-            return nativeDownload(vendor, product, conn, fingerprint)
+            return nativeDownload(vendor, product, conn, fingerprint, maxDives)
         } finally {
             conn.close()
         }

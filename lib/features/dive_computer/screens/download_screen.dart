@@ -1,5 +1,6 @@
-/// Descarga las inmersiones de un dispositivo, las muestra y las guarda en el
-/// .ddb (dedupe + fingerprint incremental).
+/// Descarga inmersiones de un dispositivo y las guarda (dedupe + fingerprint).
+/// En modo [baseline] solo lee la más reciente para fijar el fingerprint
+/// (marcar como ya importado) y no guarda nada.
 library;
 
 import 'dart:async';
@@ -11,18 +12,22 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/dive_computer/widgets/baseline_done.dart';
 import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
 import 'package:pandive/features/dive_computer/widgets/downloaded_dive_tile.dart';
+import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 
 class DownloadScreen extends StatefulWidget {
   final ScannedDevice device;
   final DivemateDb db;
   final Settings settings;
+  final bool baseline;
   const DownloadScreen({
     super.key,
     required this.device,
     required this.db,
     required this.settings,
+    this.baseline = false,
   });
 
   @override
@@ -47,7 +52,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
     });
     _future = _download();
   }
-
   @override
   void dispose() {
     _progressSub?.cancel();
@@ -61,12 +65,19 @@ class _DownloadScreenState extends State<DownloadScreen> {
       return DownloadResult(
           error: 'Modelo no reconocido por el nombre "${widget.device.name}".');
     }
-    return _svc.download(
+    final res = await _svc.download(
       vendor: m.$1,
       product: m.$2,
       address: widget.device.id,
-      fingerprint: widget.settings.dcFingerprint(widget.device.id) ?? '',
+      fingerprint:
+          widget.baseline ? '' : (widget.settings.dcFingerprint(widget.device.id) ?? ''),
+      maxDives: widget.baseline ? 1 : 0,
     );
+    if (widget.baseline && res.ok && res.dives.isNotEmpty) {
+      await widget.settings
+          .setDcFingerprint(widget.device.id, res.dives.first.fingerprint);
+    }
+    return res;
   }
 
   Future<void> _save(List<DownloadedDive> dives) async {
@@ -76,7 +87,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
     for (final d in dives) {
       if (widget.db.importDownloaded(d, computer: computer)) added++;
     }
-    // Guardar fingerprint de la más reciente (primera que devuelve el aparato).
     final fp = dives.isNotEmpty ? dives.first.fingerprint : '';
     if (fp.isNotEmpty) {
       await widget.settings.setDcFingerprint(widget.device.id, fp);
@@ -91,10 +101,11 @@ class _DownloadScreenState extends State<DownloadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title =
+    final name =
         _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
+    final prefix = widget.baseline ? 'Marcar importado' : 'Descargar';
     return Scaffold(
-      appBar: AppBar(title: Text('Descargar · $title')),
+      appBar: AppBar(title: Text('$prefix · $name')),
       body: FutureBuilder<DownloadResult>(
         future: _future,
         builder: (context, snap) {
@@ -102,29 +113,22 @@ class _DownloadScreenState extends State<DownloadScreen> {
             return DownloadProgress(progress: _progress);
           }
           final res = snap.data;
-          if (snap.hasError) return _error('${snap.error}');
-          if (res == null || !res.ok) return _error(res?.error ?? 'Error');
-          return _list(res.dives);
+          final err = snap.hasError
+              ? '${snap.error}'
+              : (res == null || !res.ok ? (res?.error ?? 'Error') : null);
+          if (err != null) {
+            return ScanErrorView(
+                message: err,
+                onRetry: () => setState(() => _future = _download()));
+          }
+          if (widget.baseline) {
+            return BaselineDone(onDone: () => Navigator.of(context).pop());
+          }
+          return _list(res!.dives);
         },
       ),
     );
   }
-
-  Widget _error(String msg) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.error_outline, size: 56),
-            const SizedBox(height: 12),
-            Text(msg, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => setState(() => _future = _download()),
-              child: const Text('Reintentar'),
-            ),
-          ]),
-        ),
-      );
 
   Widget _list(List<DownloadedDive> dives) {
     if (dives.isEmpty) {

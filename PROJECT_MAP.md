@@ -68,9 +68,10 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
 - `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE y lista de ordenadores
 - `lib/features/dive_computer/screens/download_screen.dart` -> descarga inmersiones de un dispositivo y las muestra
-- `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo y vista de error
+- `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo, vista de error, hoja de acciones (descargar/marcar)
 - `lib/features/dive_computer/widgets/download_progress.dart` -> indicador circular de progreso con %
 - `lib/features/dive_computer/widgets/downloaded_dive_tile.dart` -> fila de inmersión descargada
+- `lib/features/dive_computer/widgets/baseline_done.dart` -> confirmación de "marcar como ya importado"
 
 Nativo (fuera de lib/): `android/app/src/main/kotlin/org/drslump/pandive/`
 (DiveComputer, BleScanner, BleConnection, MainActivity) y

@@ -34,7 +34,6 @@ class _ScanScreenState extends State<ScanScreen> {
     super.initState();
     _start();
   }
-
   Future<void> _start() async {
     setState(() {
       _error = null;
@@ -82,12 +81,15 @@ class _ScanScreenState extends State<ScanScreen> {
     await _sub?.cancel(); // parar escaneo antes de conectar
     if (mounted) setState(() => _scanning = false);
     if (!mounted) return;
+    final baseline = await showDiveComputerActionSheet(context);
+    if (baseline == null || !mounted) return;
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => DownloadScreen(
           device: d,
           db: widget.db,
           settings: widget.settings,
+          baseline: baseline,
         ),
       ),
     );
