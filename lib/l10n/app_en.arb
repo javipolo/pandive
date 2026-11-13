@@ -6,6 +6,8 @@
   "navStats": "Stats",
   "menuDiveComputer": "Dive computer",
   "menuChangeDb": "Change database",
+  "database": "Database",
+  "changeDbWarning": "You'll stop using the current logbook and go back to the load screen to open or create another. The file isn't deleted.",
   "settings": "Settings",
 
   "settingsTitle": "Settings",

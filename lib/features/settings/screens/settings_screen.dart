@@ -8,7 +8,35 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Settings settings;
-  const SettingsScreen({super.key, required this.settings});
+  final VoidCallback onChangeDb;
+  const SettingsScreen({
+    super.key,
+    required this.settings,
+    required this.onChangeDb,
+  });
+
+  Future<void> _confirmChangeDb(BuildContext context) async {
+    final t = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(t.menuChangeDb),
+        content: Text(t.changeDbWarning),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(t.cancel)),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(t.menuChangeDb)),
+        ],
+      ),
+    );
+    if (ok == true && context.mounted) {
+      Navigator.pop(context); // cerrar ajustes
+      onChangeDb();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +96,15 @@ class SettingsScreen extends StatelessWidget {
                       settings.setTextScale(Settings.defaultTextScale),
                   child: Text(t.reset),
                 ),
+              ),
+              const Divider(),
+              _header(context, t.database),
+              ListTile(
+                leading: Icon(Icons.swap_horiz,
+                    color: Theme.of(context).colorScheme.error),
+                title: Text(t.menuChangeDb),
+                subtitle: Text(t.changeDbWarning),
+                onTap: () => _confirmChangeDb(context),
               ),
             ],
           ),

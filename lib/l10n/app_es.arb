@@ -6,6 +6,8 @@
   "navStats": "Estadísticas",
   "menuDiveComputer": "Ordenador de buceo",
   "menuChangeDb": "Cambiar base de datos",
+  "database": "Base de datos",
+  "changeDbWarning": "Dejarás de usar el logbook actual y volverás a la pantalla de carga para abrir o crear otro. El fichero no se borra.",
   "settings": "Ajustes",
 
   "settingsTitle": "Ajustes",

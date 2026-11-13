@@ -59,21 +59,15 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: t.settings,
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => SettingsScreen(settings: widget.settings))),
+                builder: (_) => SettingsScreen(
+                      settings: widget.settings,
+                      onChangeDb: widget.onChangeDb,
+                    ))),
           ),
-          PopupMenuButton<String>(
-            onSelected: (v) {
-              if (v == 'change_db') {
-                widget.onChangeDb();
-              } else if (v == 'dive_computer') {
-                _openDiveComputer();
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                  value: 'dive_computer', child: Text(t.menuDiveComputer)),
-              PopupMenuItem(value: 'change_db', child: Text(t.menuChangeDb)),
-            ],
+          IconButton(
+            tooltip: t.menuDiveComputer,
+            icon: const Icon(Icons.bluetooth),
+            onPressed: _openDiveComputer,
           ),
         ],
       ),
