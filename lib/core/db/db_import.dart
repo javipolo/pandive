@@ -1,7 +1,31 @@
 part of 'divemate_db.dart';
 
+/// Crea la tabla de sincronización (fingerprints por dispositivo) si falta.
+/// Específica de Pandive; divemate-cli la ignora.
+void _ensureSyncTable(Database db) {
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveSync '
+      '(DeviceId TEXT PRIMARY KEY, Fingerprint TEXT, Updated TEXT)');
+}
+
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.
 extension DivemateDbImport on DivemateDb {
+  /// Fingerprint de la última inmersión importada de [deviceId] (o null).
+  String? fingerprintFor(String deviceId) {
+    final r = _db.select(
+        'SELECT Fingerprint FROM PandiveSync WHERE DeviceId = ?', [deviceId]);
+    return r.isEmpty ? null : r.first['Fingerprint'] as String?;
+  }
+
+  /// Guarda el fingerprint de [deviceId] (upsert).
+  void setFingerprintFor(String deviceId, String fingerprint) {
+    _db.execute(
+      'INSERT INTO PandiveSync (DeviceId, Fingerprint, Updated) VALUES (?,?,?) '
+      'ON CONFLICT(DeviceId) DO UPDATE SET Fingerprint=excluded.Fingerprint, '
+      'Updated=excluded.Updated',
+      [deviceId, fingerprint, _nowStamp()],
+    );
+  }
+
   /// ¿Ya existe una inmersión del owner en esa fecha/hora? (dedupe simple).
   bool hasDiveAt(DateTime dt) {
     final owner = ownerId;

@@ -71,12 +71,11 @@ class _DownloadScreenState extends State<DownloadScreen> {
       product: m.$2,
       address: widget.device.id,
       fingerprint:
-          widget.baseline ? '' : (widget.settings.dcFingerprint(widget.device.id) ?? ''),
+          widget.baseline ? '' : (widget.db.fingerprintFor(widget.device.id) ?? ''),
       maxDives: widget.baseline ? 1 : 0,
     );
     if (widget.baseline && res.ok && res.dives.isNotEmpty) {
-      await widget.settings
-          .setDcFingerprint(widget.device.id, res.dives.first.fingerprint);
+      widget.db.setFingerprintFor(widget.device.id, res.dives.first.fingerprint);
     }
     return res;
   }
@@ -90,7 +89,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
     final fp = dives.isNotEmpty ? dives.first.fingerprint : '';
     if (fp.isNotEmpty) {
-      await widget.settings.setDcFingerprint(widget.device.id, fp);
+      widget.db.setFingerprintFor(widget.device.id, fp);
     }
     if (!mounted) return;
     final skipped = dives.length - added;

@@ -139,6 +139,10 @@ void main() {
       );
       expect(ok, isTrue);
       expect(w.countDives(), 1);
+      // fingerprint vive en la DB: nueva => vacío; roundtrip
+      expect(w.fingerprintFor('AA:BB'), isNull);
+      w.setFingerprintFor('AA:BB', 'cafe');
+      expect(w.fingerprintFor('AA:BB'), 'cafe');
     } finally {
       w.close();
     }

@@ -31,6 +31,7 @@ class DivemateDb {
       path,
       mode: readOnly ? OpenMode.readOnly : OpenMode.readWrite,
     );
+    if (!readOnly) _ensureSyncTable(db); // fingerprints por dispositivo
     return DivemateDb._(db);
   }
 
@@ -38,6 +39,7 @@ class DivemateDb {
   factory DivemateDb.createEmpty(String path) {
     final db = sqlite3.open(path, mode: OpenMode.readWriteCreate);
     _createSchema(db);
+    _ensureSyncTable(db);
     return DivemateDb._(db);
   }
 
