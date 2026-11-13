@@ -81,9 +81,11 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
       color: cs.primaryContainer,
       child: ListTile(
         dense: true,
-        title: Text('$label  ($count)',
+        title: Text('${label.toUpperCase()}  ($count)',
             style: TextStyle(
-                fontWeight: FontWeight.bold, color: cs.onPrimaryContainer)),
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+                color: cs.onPrimaryContainer)),
         trailing: Icon(collapsed ? Icons.expand_more : Icons.expand_less,
             color: cs.onPrimaryContainer),
         onTap: onTap,

@@ -50,6 +50,14 @@ class DiveDetailBody extends StatelessWidget {
                 divetimeMin: dive.durationMin, avgDepthM: dive.avgDepth),
           ),
         ),
+        if (tags.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            children: [for (final tag in tags) Chip(label: Text(tag.name))],
+          ),
+        ],
         if (profile != null && !profile.isEmpty) ...[
           const SizedBox(height: 24),
           Text(t.profile, style: Theme.of(context).textTheme.titleLarge),
@@ -85,16 +93,6 @@ class DiveDetailBody extends StatelessWidget {
           Text(t.notes, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(dive.comments!, style: Theme.of(context).textTheme.bodyLarge),
-        ],
-        if (tags.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          Text(t.tags, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 4,
-            children: [for (final tag in tags) Chip(label: Text('#${tag.name}'))],
-          ),
         ],
         const SizedBox(height: 32),
       ],

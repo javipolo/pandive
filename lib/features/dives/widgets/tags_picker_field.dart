@@ -28,7 +28,7 @@ class TagsPickerField extends StatelessWidget {
                   children: [
                     for (final tag in tags)
                       Chip(
-                        label: Text('#${tag.name}'),
+                        label: Text(tag.name),
                         visualDensity: VisualDensity.compact,
                       ),
                   ],

@@ -56,6 +56,27 @@ extension DivemateDbTags on DivemateDb {
     return added;
   }
 
+  void renameTag(int id, String name) => _db.execute(
+      'UPDATE PandiveTag SET Name=? WHERE Id=?', [name.trim(), id]);
+
+  void deleteTag(int id) {
+    _db.execute('DELETE FROM PandiveDiveTag WHERE TagId=?', [id]);
+    _db.execute('DELETE FROM PandiveTag WHERE Id=?', [id]);
+  }
+
+  List<Dive> listDivesByTag(int tagId) {
+    final owner = ownerId;
+    final diver = owner != null ? 'AND L.DiverID = $owner' : '';
+    final rows = _db.select(
+      'SELECT ${DivemateDbQueries._diveColumns} FROM Logbook L '
+      'JOIN PandiveDiveTag D ON D.DiveId = L.ID '
+      'WHERE D.TagId = ? AND (L.Status IS NULL OR L.Status != 2) $diver '
+      'ORDER BY L.Divedate DESC, L.Entrytime DESC',
+      [tagId],
+    );
+    return rows.map(_diveFromRow).toList();
+  }
+
   void setDiveTags(int diveId, List<Tag> tags) {
     _db.execute('DELETE FROM PandiveDiveTag WHERE DiveId = ?', [diveId]);
     for (final t in tags) {

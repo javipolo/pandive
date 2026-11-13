@@ -1,5 +1,5 @@
 /// Perfil de inmersión: profundidad (azul, superficie arriba) + temperatura
-/// (roja, eje derecho). Al tocar, línea vertical y valores en ese punto.
+/// (roja, eje derecho). Al tocar: línea vertical a toda altura + valores.
 library;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -9,12 +9,20 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart_axes.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-class ProfileChart extends StatelessWidget {
+class ProfileChart extends StatefulWidget {
   final DiveProfile profile;
   const ProfileChart({super.key, required this.profile});
 
   @override
+  State<ProfileChart> createState() => _ProfileChartState();
+}
+
+class _ProfileChartState extends State<ProfileChart> {
+  int? _idx;
+
+  @override
   Widget build(BuildContext context) {
+    final profile = widget.profile;
     final t = AppLocalizations.of(context);
     if (profile.isEmpty) return Center(child: Text(t.noProfile));
     final cs = Theme.of(context).colorScheme;
@@ -37,7 +45,6 @@ class ProfileChart extends StatelessWidget {
       for (var i = 0; i < depths.length; i++) FlSpot(times[i], -depths[i]),
     ];
 
-    // Temperatura: rango con mínimo 5° entre arriba y abajo.
     final hasTemp = profile.hasTemp;
     var tLo = 0.0, tHi = 5.0;
     List<FlSpot> tempSpots = [];
@@ -63,7 +70,23 @@ class ProfileChart extends StatelessWidget {
       minY: minY,
       maxY: maxY,
       clipData: const FlClipData.all(),
-      lineTouchData: profileTouch(context, times, depths, prefix, profile.temps),
+      lineTouchData: LineTouchData(
+        handleBuiltInTouches: true,
+        touchTooltipData: profileTooltip(times, depths, prefix, profile.temps),
+        touchCallback: (event, resp) {
+          final spots = resp?.lineBarSpots;
+          if (!event.isInterestedForInteractions || spots == null || spots.isEmpty) {
+            if (_idx != null) setState(() => _idx = null);
+            return;
+          }
+          final i = spots.first.spotIndex;
+          if (i != _idx) setState(() => _idx = i);
+        },
+      ),
+      extraLinesData: ExtraLinesData(verticalLines: [
+        if (_idx != null && _idx! < times.length)
+          VerticalLine(x: times[_idx!], color: cs.primary, strokeWidth: 2),
+      ]),
       gridData: FlGridData(
         show: true,
         horizontalInterval: depthStep,

@@ -81,11 +81,17 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
 
   Widget _header(BuildContext context, String country, int n) {
     final collapsed = _collapsed.contains(country);
+    final cs = Theme.of(context).colorScheme;
     return ListTile(
-      tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      title: Text(country,
-          style: const TextStyle(fontWeight: FontWeight.bold)),
-      trailing: Icon(collapsed ? Icons.expand_more : Icons.expand_less),
+      dense: true,
+      tileColor: cs.primaryContainer,
+      title: Text('${country.toUpperCase()}  ($n)',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+              color: cs.onPrimaryContainer)),
+      trailing: Icon(collapsed ? Icons.expand_more : Icons.expand_less,
+          color: cs.onPrimaryContainer),
       onTap: () => setState(() =>
           collapsed ? _collapsed.remove(country) : _collapsed.add(country)),
     );

@@ -57,31 +57,21 @@ AxisTitles timeAxis(BuildContext c, AppLocalizations t, double maxTime) => AxisT
       ),
     );
 
-LineTouchData profileTouch(
-  BuildContext context,
+LineTouchTooltipData profileTooltip(
   List<double> times,
   List<double> depths,
   List<double> prefix,
   List<double?> temps,
 ) {
-  final cs = Theme.of(context).colorScheme;
-  return LineTouchData(
-    touchTooltipData: LineTouchTooltipData(
-      getTooltipItems: (spots) => [
-        for (final s in spots)
-          if (s.barIndex == 0)
-            LineTooltipItem(_tip(s.spotIndex, times, depths, prefix, temps),
-                const TextStyle(color: Colors.white, fontSize: 12))
-          else
-            null,
-      ],
-    ),
-    getTouchedSpotIndicator: (bar, indexes) => indexes
-        .map((_) => TouchedSpotIndicatorData(
-              FlLine(color: cs.primary, strokeWidth: 2),
-              const FlDotData(show: true),
-            ))
-        .toList(),
+  return LineTouchTooltipData(
+    getTooltipItems: (spots) => [
+      for (final s in spots)
+        if (s.barIndex == 0)
+          LineTooltipItem(_tip(s.spotIndex, times, depths, prefix, temps),
+              const TextStyle(color: Colors.white, fontSize: 12))
+        else
+          null,
+    ],
   );
 }
 

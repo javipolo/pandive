@@ -39,7 +39,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
 
 ### Core · widgets compartidos
-- `lib/core/widgets/profile_chart.dart` -> gráfico de perfil profundidad/temperatura (fl_chart)
+- `lib/core/widgets/profile_chart.dart` -> gráfico de perfil (prof + temp eje dcho, línea táctil)
+- `lib/core/widgets/profile_chart_axes.dart` -> ejes y tooltip del gráfico de perfil
+- `lib/core/widgets/save_action.dart` -> botón Guardar de AppBar
 - `lib/core/widgets/stat_card.dart` -> tarjeta etiqueta/valor
 - `lib/core/widgets/labeled_field.dart` -> campo de texto con etiqueta/borde
 - `lib/core/widgets/star_rating.dart` -> selector de valoración por estrellas
@@ -53,8 +55,12 @@ con `screens/` y, si hace falta, `widgets/`).
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb (con enum DbLoadError)
 
+### tags (etiquetas)
+- `lib/features/tags/screens/tags_tab.dart` -> lista de tags (crear/renombrar/borrar, ver buceos)
+- `lib/features/dives/screens/dives_list_screen.dart` -> lista simple de buceos (tag/buddy/sitio)
+
 ### settings
-- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma + tamaño de letra
+- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tamaño letra, herramientas, DB
 
 ### buddies (compañeros)
 - `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar)
