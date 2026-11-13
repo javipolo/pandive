@@ -1,0 +1,66 @@
+/// Inmersión descargada del ordenador (parseada por libdivecomputer, vía JSON).
+library;
+
+class DiveSample {
+  final int timeMs;
+  final double depth;
+  final double? temp;
+  const DiveSample(this.timeMs, this.depth, this.temp);
+}
+
+class GasMix {
+  final double o2; // fracción 0-1
+  final double he;
+  const GasMix(this.o2, this.he);
+}
+
+class DownloadedDive {
+  final String fingerprint;
+  final DateTime? datetime;
+  final int? divetimeSec;
+  final double? maxDepth;
+  final double? avgDepth;
+  final double? tempMin;
+  final List<GasMix> gasmixes;
+  final List<DiveSample> samples;
+
+  const DownloadedDive({
+    required this.fingerprint,
+    this.datetime,
+    this.divetimeSec,
+    this.maxDepth,
+    this.avgDepth,
+    this.tempMin,
+    this.gasmixes = const [],
+    this.samples = const [],
+  });
+
+  factory DownloadedDive.fromJson(Map<String, dynamic> j) {
+    return DownloadedDive(
+      fingerprint: (j['fingerprint'] ?? '') as String,
+      datetime: j['datetime'] != null ? DateTime.tryParse(j['datetime']) : null,
+      divetimeSec: (j['divetime'] as num?)?.toInt(),
+      maxDepth: (j['maxdepth'] as num?)?.toDouble(),
+      avgDepth: (j['avgdepth'] as num?)?.toDouble(),
+      tempMin: (j['tempmin'] as num?)?.toDouble(),
+      gasmixes: [
+        for (final g in (j['gasmixes'] as List? ?? []))
+          GasMix((g['o2'] as num).toDouble(), (g['he'] as num).toDouble()),
+      ],
+      samples: [
+        for (final s in (j['samples'] as List? ?? []))
+          DiveSample((s[0] as num).toInt(), (s[1] as num).toDouble(),
+              s[2] == null ? null : (s[2] as num).toDouble()),
+      ],
+    );
+  }
+}
+
+/// Resultado de una descarga: inmersiones o un error.
+class DownloadResult {
+  final List<DownloadedDive> dives;
+  final String? error;
+  const DownloadResult({this.dives = const [], this.error});
+
+  bool get ok => error == null;
+}

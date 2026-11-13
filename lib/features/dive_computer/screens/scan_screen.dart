@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/services/dive_computer.dart';
+import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -73,21 +74,12 @@ class _ScanScreenState extends State<ScanScreen> {
     return list;
   }
 
-  void _onTap(ScannedDevice d) {
-    // Hito C: aquí irá la conexión + descarga.
-    showDialog<void>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(d.name),
-        content: const Text(
-            'La descarga de inmersiones llega en el siguiente paso (hito C). '
-            'De momento el escaneo ya detecta el ordenador.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Vale')),
-        ],
-      ),
+  Future<void> _onTap(ScannedDevice d) async {
+    await _sub?.cancel(); // parar escaneo antes de conectar
+    if (mounted) setState(() => _scanning = false);
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => DownloadScreen(device: d)),
     );
   }
 

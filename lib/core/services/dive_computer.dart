@@ -1,9 +1,13 @@
 /// Servicio de ordenador de buceo (puente a libdivecomputer vía MethodChannel).
-/// Fase 2, hito A: consultas de capacidad. Escaneo/descarga llegan en hitos B-D.
+/// Capacidad, escaneo BLE y descarga de inmersiones.
 library;
+
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'package:pandive/core/models/models.dart';
 
 /// Un dispositivo BLE encontrado durante el escaneo.
 class ScannedDevice {
@@ -72,4 +76,40 @@ class DiveComputerService {
         .receiveBroadcastStream()
         .map((e) => ScannedDevice.fromMap(e as Map));
   }
+
+  /// Conecta por BLE a [address] y descarga las inmersiones del modelo
+  /// [vendor]/[product]. Bloqueante en nativo; puede tardar.
+  Future<DownloadResult> download({
+    required String vendor,
+    required String product,
+    required String address,
+  }) async {
+    final raw = await _channel.invokeMethod<String>('download', {
+      'vendor': vendor,
+      'product': product,
+      'address': address,
+    });
+    final j = jsonDecode(raw ?? '{}') as Map<String, dynamic>;
+    if (j['error'] != null) {
+      return DownloadResult(error: j['error'] as String);
+    }
+    final dives = [
+      for (final d in (j['dives'] as List? ?? []))
+        DownloadedDive.fromJson(d as Map<String, dynamic>),
+    ];
+    return DownloadResult(dives: dives);
+  }
+}
+
+/// Mapea el nombre anunciado por BLE al (vendor, product) de libdivecomputer.
+/// Cobertura inicial de los modelos objetivo; ampliable.
+(String vendor, String product)? modelForDeviceName(String name) {
+  final n = name.toLowerCase();
+  if (n.contains('peregrine')) return ('Shearwater', 'Peregrine');
+  if (n.contains('perdix')) return ('Shearwater', 'Perdix');
+  if (n.contains('petrel')) return ('Shearwater', 'Petrel 2');
+  if (n.contains('teric')) return ('Shearwater', 'Teric');
+  if (n.contains('tern')) return ('Shearwater', 'Tern');
+  if (n.contains('puck')) return ('Mares', 'Puck 4');
+  return null;
 }

@@ -27,6 +27,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/dive_profile.dart` -> perfil muestreado (tiempos/profundidades/temps)
 - `lib/core/models/cylinder.dart` -> botella/mezcla (+ etiqueta de gas)
 - `lib/core/models/dive_site.dart` -> punto de buceo con nº de inmersiones
+- `lib/core/models/downloaded_dive.dart` -> inmersión descargada del ordenador (+ muestras/gases, parse JSON)
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
 
 ### Core · widgets compartidos
@@ -63,4 +64,9 @@ con `screens/` y, si hace falta, `widgets/`).
 ### dive_computer (ordenador de buceo)
 - `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
 - `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE y lista de ordenadores
+- `lib/features/dive_computer/screens/download_screen.dart` -> descarga inmersiones de un dispositivo y las muestra
 - `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo y vista de error
+
+Nativo (fuera de lib/): `android/app/src/main/kotlin/org/drslump/pandive/`
+(DiveComputer, BleScanner, BleConnection, MainActivity) y
+`android/app/src/main/cpp/pandive_dc.c` (wrapper JNI de libdivecomputer).
