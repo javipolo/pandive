@@ -121,6 +121,29 @@ void main() {
     }
   });
 
+  test('createEmpty crea una DB válida y vacía', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_new_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      expect(w.looksValid, isTrue);
+      expect(w.countDives(), 0);
+      expect(w.nextDiveNumber(), 1);
+      // se puede importar en ella
+      final ok = w.importDownloaded(
+        const DownloadedDive(
+          fingerprint: 'x',
+          samples: [DiveSample(0, 3, 21), DiveSample(10000, 5, 21)],
+        ),
+      );
+      expect(ok, isTrue);
+      expect(w.countDives(), 1);
+    } finally {
+      w.close();
+    }
+  });
+
   test('importDownloaded guarda perfil y deduplica (copia temporal)', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_imp_${DateTime.now().microsecondsSinceEpoch}.ddb');

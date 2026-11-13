@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 
 class LoadDbScreen extends StatefulWidget {
@@ -51,6 +52,26 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
       setState(() {
         _busy = false;
         _localError = 'Error al cargar: $e';
+      });
+    }
+  }
+
+  Future<void> _createNew() async {
+    setState(() {
+      _busy = true;
+      _localError = null;
+    });
+    try {
+      final docs = await getApplicationDocumentsDirectory();
+      // Nombre único: no sobrescribe un logbook existente.
+      final dest = File(
+          '${docs.path}/logbook-${DateTime.now().millisecondsSinceEpoch}.ddb');
+      DivemateDb.createEmpty(dest.path).close();
+      await widget.onLoaded(dest.path);
+    } catch (e) {
+      setState(() {
+        _busy = false;
+        _localError = 'Error al crear: $e';
       });
     }
   }
@@ -103,6 +124,12 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
                       )
                     : const Icon(Icons.folder_open),
                 label: const Text('Elegir fichero .ddb'),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: _busy ? null : _createNew,
+                icon: const Icon(Icons.add),
+                label: const Text('Crear logbook nuevo (vacío)'),
               ),
             ],
           ),

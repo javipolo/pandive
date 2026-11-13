@@ -21,6 +21,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_stats.dart` -> sitios de buceo y estadísticas agregadas
 - `lib/core/db/db_writes.dart` -> escritura: editar y crear inmersiones
 - `lib/core/db/db_import.dart` -> importar inmersiones descargadas (encode perfil + dedupe)
+- `lib/core/db/db_create.dart` -> crear una .ddb vacía nueva (esquema DiveMate + buceador)
+- `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
 
 ### Core · modelos (`models.dart` es el barrel)
 - `lib/core/models/models.dart` -> barrel: reexporta todos los modelos
