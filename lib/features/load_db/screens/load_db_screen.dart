@@ -66,7 +66,11 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.scuba_diving, size: 72),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Image.asset('assets/logo/pandive_logo.png',
+                    width: 128, height: 128),
+              ),
               const SizedBox(height: 16),
               Text(
                 'Carga tu logbook',
