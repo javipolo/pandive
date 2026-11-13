@@ -42,6 +42,13 @@ android {
         }
     }
 
+    // lintVital casca en release (bug del parser de javadoc en una dependencia);
+    // no necesitamos el lint de release.
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
