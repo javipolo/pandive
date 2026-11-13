@@ -47,6 +47,8 @@ dependencies:
   shared_preferences: ^2.3.2
   # Abrir coordenadas de un sitio en la app de mapas
   url_launcher: ^6.3.1
+  # Permisos runtime (Bluetooth para la descarga del ordenador de buceo)
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

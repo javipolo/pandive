@@ -2,14 +2,18 @@ package org.drslump.pandive
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val channel = "pandive/dc"
+    private val methodChannel = "pandive/dc"
+    private val scanChannel = "pandive/dc/scan"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channel)
+        val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        MethodChannel(messenger, methodChannel)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "supportedCount" -> result.success(DiveComputer.nativeSupportedCount())
@@ -17,5 +21,7 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+
+        EventChannel(messenger, scanChannel).setStreamHandler(BleScanner(this))
     }
 }

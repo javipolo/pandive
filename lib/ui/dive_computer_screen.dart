@@ -6,6 +6,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../services/dive_computer.dart';
+import 'scan_screen.dart';
 
 class DiveComputerScreen extends StatefulWidget {
   const DiveComputerScreen({super.key});
@@ -42,6 +43,13 @@ class _DiveComputerScreenState extends State<DiveComputerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Ordenador de buceo')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ScanScreen()),
+        ),
+        icon: const Icon(Icons.bluetooth_searching),
+        label: const Text('Buscar'),
+      ),
       body: FutureBuilder<(int, List<String>)>(
         future: _future,
         builder: (context, snap) {
