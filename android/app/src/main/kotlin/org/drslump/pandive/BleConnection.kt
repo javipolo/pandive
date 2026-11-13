@@ -45,8 +45,6 @@ class BleConnection(private val context: Context, private val address: String) {
     private val connectLatch = CountDownLatch(1)
     @Volatile private var connectError: String? = null
     @Volatile private var ready = false
-    @Volatile private var writeLatch: CountDownLatch? = null
-    @Volatile private var writeOk = false
 
     private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
@@ -98,14 +96,6 @@ class BleConnection(private val context: Context, private val address: String) {
             g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray
         ) {
             incoming.put(value.copyOf())
-        }
-
-        @Deprecated("API < 33")
-        override fun onCharacteristicWrite(
-            g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int
-        ) {
-            writeOk = status == BluetoothGatt.GATT_SUCCESS
-            writeLatch?.countDown()
         }
 
         override fun onDescriptorWrite(
@@ -176,21 +166,18 @@ class BleConnection(private val context: Context, private val address: String) {
     fun bleRead(timeoutMs: Int): ByteArray? =
         incoming.poll(timeoutMs.toLong(), TimeUnit.MILLISECONDS)
 
-    /** Escribe [data] y espera confirmación. Devuelve true si OK. */
+    /** Escribe [data] sin esperar confirmación (fire-and-forget, como
+     *  Subsurface): el protocolo alterna escritura->lectura, así que no hay
+     *  solape, y evitar la espera por callback acelera mucho la descarga. */
     @SuppressLint("MissingPermission")
     fun bleWrite(data: ByteArray): Boolean {
         val g = gatt ?: return false
         val c = writeChar ?: return false
-        val latch = CountDownLatch(1)
-        writeLatch = latch
-        writeOk = false
         val mode = if (c.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0)
             BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
         else BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         @Suppress("DEPRECATION")
-        run { c.writeType = mode; c.value = data; g.writeCharacteristic(c) }
-        if (!latch.await(5, TimeUnit.SECONDS)) return false
-        return writeOk
+        return run { c.writeType = mode; c.value = data; g.writeCharacteristic(c) }
     }
 
     @SuppressLint("MissingPermission")
