@@ -1,5 +1,5 @@
 /// Crear o editar un sitio de buceo. Campos: nombre, país, masa de agua,
-/// región, lat/lon, dificultad, valoración. (Sin agua/altitud/mapa/forecast.)
+/// región, dificultad, valoración. (Sin lat/lon/agua/altitud/mapa/forecast por ahora.)
 library;
 
 import 'package:flutter/material.dart';
@@ -25,17 +25,13 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
   late final _country = TextEditingController(text: widget.site?.country ?? '');
   late final _water = TextEditingController(text: widget.site?.waterName ?? '');
   late final _region = TextEditingController(text: widget.site?.region ?? '');
-  late final _lat =
-      TextEditingController(text: widget.site?.lat?.toString() ?? '');
-  late final _lon =
-      TextEditingController(text: widget.site?.lon?.toString() ?? '');
   late final _difficulty =
       TextEditingController(text: widget.site?.difficulty ?? '');
   late int _rating = widget.site?.rating ?? 0;
 
   @override
   void dispose() {
-    for (final c in [_name, _country, _water, _region, _lat, _lon, _difficulty]) {
+    for (final c in [_name, _country, _water, _region, _difficulty]) {
       c.dispose();
     }
     super.dispose();
@@ -50,8 +46,6 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
       'Country': _s(_country),
       'WaterName': _s(_water),
       'Region': _s(_region),
-      'Lat': _s(_lat),
-      'Lon': _s(_lon),
       'Difficulty': _s(_difficulty),
       'Rating': _rating,
     };
@@ -93,8 +87,6 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
           LabeledField(controller: _country, label: t.fieldCountry),
           LabeledField(controller: _water, label: t.fieldStretchOfWater),
           LabeledField(controller: _region, label: t.fieldRegion),
-          LabeledField(controller: _lat, label: t.fieldLatitude, number: true),
-          LabeledField(controller: _lon, label: t.fieldLongitude, number: true),
           LabeledField(controller: _difficulty, label: t.fieldDifficulty),
           const SizedBox(height: 8),
           StarRating(
