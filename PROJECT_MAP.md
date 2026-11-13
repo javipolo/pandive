@@ -24,6 +24,10 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_import.dart` -> importar inmersiones descargadas (encode perfil + dedupe)
 - `lib/core/db/db_create.dart` -> crear una .ddb vacía nueva (esquema DiveMate + buceador)
 - `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
+- `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy
+- `lib/core/db/db_sites.dart` -> sitios (Place): obtener/crear/actualizar, find-or-create
+- `lib/core/db/db_tanks.dart` -> botellas por buceo, presets "mis botellas", buceos por sitio/buddy
+- `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 
 ### Core · modelos (`models.dart` es el barrel)
 - `lib/core/models/models.dart` -> barrel: reexporta todos los modelos
@@ -52,13 +56,24 @@ con `screens/` y, si hace falta, `widgets/`).
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma + tamaño de letra
 
+### buddies (compañeros)
+- `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar)
+- `lib/features/buddies/screens/buddy_dives_screen.dart` -> buceos de un compañero
+- `lib/features/buddies/screens/buddy_picker_screen.dart` -> multi-selección de compañeros (para editar buceo)
+
 ### dives (inmersiones)
 - `lib/features/dives/screens/dives_screen.dart` -> lista + búsqueda + botón "Nueva"
 - `lib/features/dives/screens/dive_detail_screen.dart` -> detalle: datos, perfil, botellas, editar
 - `lib/features/dives/screens/edit_dive_screen.dart` -> editar campos editables
 - `lib/features/dives/screens/new_dive_screen.dart` -> formulario de alta manual
-- `lib/features/dives/widgets/cylinder_input.dart` -> sección de formulario de botella (+controller)
+- `lib/features/dives/widgets/cylinder_input.dart` -> sección de formulario de botella (alta manual)
 - `lib/features/dives/widgets/cylinder_tile.dart` -> tarjeta de botella en el detalle
+- `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle (datos, perfil, botellas, SAC)
+- `lib/features/dives/widgets/dive_form.dart` -> campos escalares editables (+ controllers)
+- `lib/features/dives/widgets/site_picker_field.dart` -> campo de sitio elegido
+- `lib/features/dives/widgets/buddies_picker_field.dart` -> campo de compañeros elegidos (chips)
+- `lib/features/dives/widgets/tanks_editor.dart` -> editor de botellas + SAC
+- `lib/features/dives/widgets/tank_edit_sheet.dart` -> hoja para añadir/editar una botella
 
 ### sites (sitios)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios con conteo y mapa

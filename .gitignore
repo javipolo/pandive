@@ -29,3 +29,6 @@ key.properties
 
 # l10n generado (se regenera con flutter gen-l10n)
 lib/l10n/app_localizations*.dart
+
+# Material de referencia (screenshots de DiveMate, no parte de la app)
+/reference/

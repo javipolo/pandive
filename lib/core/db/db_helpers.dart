@@ -51,6 +51,19 @@ double? _num(Object? v) {
   return double.tryParse(v.toString());
 }
 
+/// Material de botella <-> entero (Tank.Tanktype): 1=aluminio, 2=acero.
+TankMaterial? _materialFromInt(int? v) => switch (v) {
+      1 => TankMaterial.aluminium,
+      2 => TankMaterial.steel,
+      _ => null,
+    };
+
+int? _materialToInt(TankMaterial? m) => switch (m) {
+      TankMaterial.aluminium => 1,
+      TankMaterial.steel => 2,
+      null => null,
+    };
+
 /// Temperatura, descartando centinelas/implausibles (p.ej. -300 °C).
 double? _temp(Object? v) {
   final t = _num(v);

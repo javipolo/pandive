@@ -1,0 +1,71 @@
+part of 'divemate_db.dart';
+
+/// Compañeros de buceo (tabla Buddy). Guardamos el nombre en FirstName.
+extension DivemateDbBuddies on DivemateDb {
+  /// Nº de inmersiones del owner que referencian a un buddy (por BuddyIDs).
+  String _buddyCountSubquery() {
+    final owner = ownerId;
+    final diverFilter = owner != null ? 'AND L.DiverID = $owner' : '';
+    return "(SELECT COUNT(*) FROM Logbook L WHERE "
+        "(L.Status IS NULL OR L.Status != 2) $diverFilter AND "
+        "(',' || IFNULL(L.BuddyIDs,'') || ',') LIKE ('%,' || B.ID || ',%'))";
+  }
+
+  /// Lista de buddies, alfabética, con nº de inmersiones.
+  List<Buddy> listBuddies() {
+    final rows = _db.select(
+      'SELECT B.ID, B.FirstName, B.LastName, ${_buddyCountSubquery()} AS dives '
+      'FROM Buddy B ORDER BY B.FirstName COLLATE NOCASE, B.LastName COLLATE NOCASE',
+    );
+    return rows.map((r) {
+      final name = [_str(r['FirstName']), _str(r['LastName'])]
+          .whereType<String>()
+          .join(' ');
+      return Buddy(
+        id: r['ID'] as int,
+        name: name.isEmpty ? '—' : name,
+        diveCount: (r['dives'] as int?) ?? 0,
+      );
+    }).toList();
+  }
+
+  /// Busca un buddy por nombre (case-insensitive) o lo crea. Devuelve su ID.
+  int findOrCreateBuddy(String name) {
+    final n = name.trim();
+    final found = _db.select(
+      'SELECT ID FROM Buddy WHERE '
+      "TRIM(IFNULL(FirstName,'') || ' ' || IFNULL(LastName,'')) = ? COLLATE NOCASE",
+      [n],
+    );
+    if (found.isNotEmpty) return found.first['ID'] as int;
+    _db.execute(
+      'INSERT INTO Buddy (FirstName, UUID, Updated) VALUES (?,?,?)',
+      [n, _uuid(), _nowStamp()],
+    );
+    return _db.lastInsertRowId;
+  }
+
+  void renameBuddy(int id, String name) {
+    _db.execute(
+      'UPDATE Buddy SET FirstName=?, LastName=NULL, Updated=? WHERE ID=?',
+      [name.trim(), _nowStamp(), id],
+    );
+  }
+
+  void deleteBuddy(int id) => _db.execute('DELETE FROM Buddy WHERE ID=?', [id]);
+
+  /// Compañeros de una inmersión (según Logbook.BuddyIDs).
+  List<Buddy> diveBuddies(int diveId) {
+    final rows = _db.select('SELECT BuddyIDs FROM Logbook WHERE ID=?', [diveId]);
+    if (rows.isEmpty) return [];
+    final ids = (_str(rows.first['BuddyIDs']) ?? '')
+        .split(',')
+        .map((e) => int.tryParse(e.trim()))
+        .whereType<int>()
+        .toList();
+    if (ids.isEmpty) return [];
+    final all = listBuddies();
+    return [for (final b in all) if (ids.contains(b.id)) b];
+  }
+}
+

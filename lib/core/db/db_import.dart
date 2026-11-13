@@ -5,6 +5,10 @@ part of 'divemate_db.dart';
 void _ensureSyncTable(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveSync '
       '(DeviceId TEXT PRIMARY KEY, Fingerprint TEXT, Updated TEXT)');
+  // "Mis botellas": presets reutilizables de tamaño + material.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveTankPreset '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Litres REAL, '
+      'Material INTEGER)');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.

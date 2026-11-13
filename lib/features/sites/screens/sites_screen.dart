@@ -1,12 +1,12 @@
-/// Pestaña de sitios de buceo (tabla Place) con nº de inmersiones y mapa.
+/// Pestaña de sitios de buceo: lista agrupada por país + crear/editar.
 library;
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
-import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/features/sites/screens/site_edit_screen.dart';
+import 'package:pandive/features/sites/widgets/sites_grouped_list.dart';
 
 class SitesTab extends StatefulWidget {
   final DivemateDb db;
@@ -17,106 +17,25 @@ class SitesTab extends StatefulWidget {
 }
 
 class _SitesTabState extends State<SitesTab> {
-  final _searchCtrl = TextEditingController();
-  late List<DiveSite> _all;
-  late List<DiveSite> _shown;
+  late List<DiveSite> _sites = widget.db.listSites();
 
-  @override
-  void initState() {
-    super.initState();
-    _all = widget.db.listSites();
-    _shown = _all;
-  }
-
-  @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
-  }
-
-  void _search(String q) {
-    final s = q.trim().toLowerCase();
-    setState(() {
-      _shown = s.isEmpty
-          ? _all
-          : _all.where((e) {
-              return (e.name ?? '').toLowerCase().contains(s) ||
-                  (e.country ?? '').toLowerCase().contains(s) ||
-                  (e.region ?? '').toLowerCase().contains(s);
-            }).toList();
-    });
-  }
-
-  Future<void> _openMap(DiveSite site) async {
-    if (!site.hasCoords) return;
-    final uri = Uri.parse('geo:${site.lat},${site.lon}?q=${site.lat},${site.lon}'
-        '(${Uri.encodeComponent(site.name ?? 'Punto de buceo')})');
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      // Fallback a Google Maps web si no hay app de mapas.
-      await launchUrl(
-        Uri.parse('https://maps.google.com/?q=${site.lat},${site.lon}'),
-        mode: LaunchMode.externalApplication,
-      );
+  Future<void> _open(DiveSite? site) async {
+    final changed = await Navigator.of(context).push<bool>(MaterialPageRoute(
+      builder: (_) => SiteEditScreen(db: widget.db, site: site),
+    ));
+    if (changed == true && mounted) {
+      setState(() => _sites = widget.db.listSites());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-          child: SearchBar(
-            controller: _searchCtrl,
-            hintText: t.searchSites,
-            leading: const Icon(Icons.search),
-            onChanged: _search,
-          ),
-        ),
-        Expanded(
-          child: _shown.isEmpty
-              ? Center(child: Text(t.noSites))
-              : ListView.separated(
-                  itemCount: _shown.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, i) => _tile(_shown[i]),
-                ),
-        ),
-      ],
-    );
-  }
-
-  Widget _tile(DiveSite s) {
-    final sub = [
-      if (s.region != null) s.region!,
-      if (s.country != null) s.country!,
-    ].join(' · ');
-    final extra = [
-      if (s.maxDepth != null && s.maxDepth! > 0)
-        'máx ${s.maxDepth!.toStringAsFixed(0)} m',
-      if (s.rating != null && s.rating! > 0) '★' * s.rating!,
-    ].join('   ');
-
-    return ListTile(
-      leading: CircleAvatar(child: Text('${s.diveCount}')),
-      title: Text(s.name ?? AppLocalizations.of(context).site,
-          maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (sub.isNotEmpty) Text(sub),
-          if (extra.isNotEmpty)
-            Text(extra, style: Theme.of(context).textTheme.bodySmall),
-        ],
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _open(null),
+        child: const Icon(Icons.add),
       ),
-      trailing: s.hasCoords
-          ? IconButton(
-              icon: const Icon(Icons.map_outlined),
-              tooltip: AppLocalizations.of(context).openMap,
-              onPressed: () => _openMap(s),
-            )
-          : null,
+      body: SitesGroupedList(sites: _sites, onTap: _open),
     );
   }
 }

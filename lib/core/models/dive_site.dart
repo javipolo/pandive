@@ -6,9 +6,11 @@ class DiveSite {
   final String? name;
   final String? country;
   final String? region;
+  final String? waterName; // "stretch of water"
   final double? lat;
   final double? lon;
   final double? maxDepth;
+  final String? difficulty;
   final int? rating;
   final int diveCount;
 
@@ -17,9 +19,11 @@ class DiveSite {
     this.name,
     this.country,
     this.region,
+    this.waterName,
     this.lat,
     this.lon,
     this.maxDepth,
+    this.difficulty,
     this.rating,
     this.diveCount = 0,
   });

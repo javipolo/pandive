@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/sac.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
 import 'package:pandive/core/widgets/stat_card.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
@@ -37,7 +38,16 @@ class DiveDetailBody extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium),
         ],
         const SizedBox(height: 20),
-        Wrap(spacing: 12, runSpacing: 12, children: _statCards(context, t)),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: _statCards(
+            context,
+            t,
+            computeSac(cylinders,
+                divetimeMin: dive.durationMin, avgDepthM: dive.avgDepth),
+          ),
+        ),
         if (profile != null && !profile.isEmpty) ...[
           const SizedBox(height: 24),
           Text(t.profile, style: Theme.of(context).textTheme.titleLarge),
@@ -67,9 +77,10 @@ class DiveDetailBody extends StatelessWidget {
     );
   }
 
-  List<Widget> _statCards(BuildContext context, AppLocalizations t) {
+  List<Widget> _statCards(BuildContext context, AppLocalizations t, double? sac) {
     final items = <(String, String)>[
       if (dive.maxDepth != null) (t.statMaxDepth, '${dive.maxDepth!.toStringAsFixed(1)} m'),
+      if (sac != null) (t.sacLabel, '${sac.toStringAsFixed(1)} l/min'),
       if (dive.avgDepth != null) (t.statAvgDepth, '${dive.avgDepth!.toStringAsFixed(1)} m'),
       if (dive.durationMin != null) (t.statDuration, '${dive.durationMin!.round()} min'),
       if (dive.waterTemp != null) (t.statWaterTemp, '${dive.waterTemp!.toStringAsFixed(0)} °C'),

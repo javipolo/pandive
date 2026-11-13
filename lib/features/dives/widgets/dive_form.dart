@@ -1,5 +1,5 @@
-/// Formulario de campos escalares de una inmersión (todos editables menos el
-/// perfil). Reutilizable; el estado de fecha/valoración vive en el padre.
+/// Campos escalares de una inmersión (fecha, profundidades, tiempos, etc.).
+/// Sitio, compañeros y botellas se gestionan aparte con selectores.
 library;
 
 import 'package:flutter/material.dart';
@@ -10,10 +10,8 @@ import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/star_rating.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Controllers de los campos de texto del formulario.
+/// Controllers de los campos de texto escalares.
 class DiveFormControllers {
-  final place = TextEditingController();
-  final country = TextEditingController();
   final maxDepth = TextEditingController();
   final avgDepth = TextEditingController();
   final duration = TextEditingController();
@@ -21,15 +19,10 @@ class DiveFormControllers {
   final airTemp = TextEditingController();
   final weight = TextEditingController();
   final surfaceInterval = TextEditingController();
-  final buddy = TextEditingController();
-  final diveMaster = TextEditingController();
-  final diveType = TextEditingController();
   final comments = TextEditingController();
 
   DiveFormControllers.fromDive(Dive d) {
     String n(double? v) => v == null ? '' : '$v';
-    place.text = d.place ?? '';
-    country.text = d.country ?? '';
     maxDepth.text = n(d.maxDepth);
     avgDepth.text = n(d.avgDepth);
     duration.text = d.durationMin == null ? '' : '${d.durationMin!.round()}';
@@ -37,22 +30,20 @@ class DiveFormControllers {
     airTemp.text = n(d.airTemp);
     weight.text = n(d.weight);
     surfaceInterval.text = d.surfaceInterval ?? '';
-    buddy.text = d.buddy ?? '';
-    diveMaster.text = d.diveMaster ?? '';
-    diveType.text = d.diveType ?? '';
     comments.text = d.comments ?? '';
   }
 
   void dispose() {
     for (final c in [
-      place, country, maxDepth, avgDepth, duration, waterTemp, airTemp,
-      weight, surfaceInterval, buddy, diveMaster, diveType, comments,
+      maxDepth, avgDepth, duration, waterTemp, airTemp, weight,
+      surfaceInterval, comments,
     ]) {
       c.dispose();
     }
   }
 }
 
+/// Column (embebible) con los campos escalares.
 class DiveForm extends StatelessWidget {
   final DiveFormControllers c;
   final DateTime when;
@@ -78,13 +69,11 @@ class DiveForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DateTimeField(value: when, onChanged: onWhen),
-        const Divider(),
-        LabeledField(controller: c.place, label: t.fieldSite),
-        LabeledField(controller: c.country, label: t.fieldCountry),
+        StarRating(value: rating, label: t.ratingLabel, onChanged: onRating),
         _two(
           LabeledField(controller: c.maxDepth, label: t.fieldMaxDepthM, number: true),
           LabeledField(controller: c.avgDepth, label: t.fieldAvgDepthM, number: true),
@@ -98,12 +87,6 @@ class DiveForm extends StatelessWidget {
           LabeledField(controller: c.airTemp, label: t.fieldAirTempC, number: true),
         ),
         LabeledField(controller: c.surfaceInterval, label: t.fieldSurfaceInt),
-        const SizedBox(height: 8),
-        StarRating(value: rating, label: t.ratingLabel, onChanged: onRating),
-        const SizedBox(height: 8),
-        LabeledField(controller: c.buddy, label: t.fieldBuddy),
-        LabeledField(controller: c.diveMaster, label: t.fieldGuide),
-        LabeledField(controller: c.diveType, label: t.fieldDiveType),
         LabeledField(controller: c.comments, label: t.fieldNotes, maxLines: 4),
       ],
     );

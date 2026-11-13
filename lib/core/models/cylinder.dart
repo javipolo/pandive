@@ -1,6 +1,8 @@
 /// Botella/mezcla de una inmersión (tabla Tank).
 library;
 
+enum TankMaterial { aluminium, steel }
+
 class Cylinder {
   final double? size; // litros
   final double? pressureStart; // bar
@@ -8,6 +10,7 @@ class Cylinder {
   final double? o2; // % oxígeno
   final double? he; // % helio
   final String? name;
+  final TankMaterial? material;
 
   const Cylinder({
     this.size,
@@ -16,6 +19,7 @@ class Cylinder {
     this.o2,
     this.he,
     this.name,
+    this.material,
   });
 
   /// Nombre de la mezcla: Air / Nitrox EANxx / Trimix.

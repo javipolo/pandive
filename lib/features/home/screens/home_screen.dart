@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/buddies/screens/buddies_tab.dart';
 import 'package:pandive/features/dive_computer/screens/dive_computer_screen.dart';
 import 'package:pandive/features/dives/screens/dives_screen.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final titles = [t.navDives, t.navSites, t.navStats];
+    final titles = [t.navDives, t.navSites, t.buddies, t.navStats];
     return Scaffold(
       appBar: AppBar(
         title: Text(titles[_index]),
@@ -81,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           DivesTab(key: ValueKey('dives-$_dataVersion'), db: widget.db),
           SitesTab(key: ValueKey('sites-$_dataVersion'), db: widget.db),
+          BuddiesTab(key: ValueKey('buddies-$_dataVersion'), db: widget.db),
           StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
         ],
       ),
@@ -97,6 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.place_outlined),
             selectedIcon: const Icon(Icons.place),
             label: t.navSites,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.people_outline),
+            selectedIcon: const Icon(Icons.people),
+            label: t.buddies,
           ),
           NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),

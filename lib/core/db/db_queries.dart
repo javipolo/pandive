@@ -65,7 +65,7 @@ extension DivemateDbQueries on DivemateDb {
   /// Botellas de una inmersión, en orden.
   List<Cylinder> cylinders(int logId) {
     final rows = _db.select(
-      'SELECT Tanksize, PresS, PresE, O2, He, Name FROM Tank '
+      'SELECT Tanksize, PresS, PresE, O2, He, Name, Tanktype FROM Tank '
       'WHERE LogID = ? ORDER BY SortOrd, TankID',
       [logId],
     );
@@ -77,6 +77,7 @@ extension DivemateDbQueries on DivemateDb {
               o2: _num(r['O2']),
               he: _num(r['He']),
               name: _str(r['Name']),
+              material: _materialFromInt(r['Tanktype'] as int?),
             ))
         .toList();
   }
