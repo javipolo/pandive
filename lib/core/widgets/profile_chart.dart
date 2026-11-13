@@ -102,9 +102,11 @@ class ProfileChart extends StatelessWidget {
             color: cs.primary,
             barWidth: 2,
             dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(
+            // Rellena la columna de agua (superficie -> curva) en azul; la zona
+            // más profunda que el buceador queda en blanco.
+            aboveBarData: BarAreaData(
               show: true,
-              color: cs.primary.withValues(alpha: 0.15),
+              color: cs.primary.withValues(alpha: 0.28),
             ),
           ),
           if (tempSpots != null)

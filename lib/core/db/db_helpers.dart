@@ -6,7 +6,10 @@ part of 'divemate_db.dart';
 /// campos de sincronización, etc.).
 const _editableColumns = {
   'Comments', 'Rating', 'Buddy', 'Divemaster', 'Divetype', 'Weight',
-  'Place', 'Country',
+  'Place', 'Country', 'PlaceID', 'BuddyIDs',
+  // Todos los campos escalares editables a mano (el perfil NO se edita).
+  'Depth', 'DepthAvg', 'Divetime', 'Watertemp', 'Airtemp', 'Surfint',
+  'PresS', 'PresE', 'Divedate', 'Entrytime',
 };
 
 Dive _diveFromRow(Row r) {

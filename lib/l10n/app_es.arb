@@ -64,6 +64,7 @@
   "fieldDiveType": "Tipo de inmersión",
   "fieldWeightKg": "Lastre (kg)",
   "fieldNotes": "Notas",
+  "fieldSurfaceInt": "Intervalo superficie",
   "fieldMaxDepthM": "Prof. máx (m)",
   "fieldAvgDepthM": "Prof. media (m)",
   "fieldDurationMin": "Duración (min)",

@@ -34,6 +34,10 @@ class _DivesTabState extends State<DivesTab> {
     super.dispose();
   }
 
+  void _reload() {
+    setState(() => _dives = widget.db.listDives(search: _searchCtrl.text));
+  }
+
   void _search(String q) {
     setState(() => _dives = widget.db.listDives(search: q));
   }
@@ -46,6 +50,19 @@ class _DivesTabState extends State<DivesTab> {
       _searchCtrl.clear();
       setState(() => _dives = widget.db.listDives());
     }
+  }
+
+  Future<void> _openDetail(int index) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DiveDetailScreen(
+          db: widget.db,
+          dives: _dives,
+          initialIndex: index,
+        ),
+      ),
+    );
+    _reload(); // refrescar por si se editó alguna inmersión
   }
 
   @override
@@ -84,7 +101,7 @@ class _DivesTabState extends State<DivesTab> {
               : ListView.separated(
                   itemCount: _dives.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, i) => _tile(_dives[i]),
+                  itemBuilder: (context, i) => _tile(_dives[i], i),
                 ),
         ),
         ],
@@ -92,7 +109,7 @@ class _DivesTabState extends State<DivesTab> {
     );
   }
 
-  Widget _tile(Dive d) {
+  Widget _tile(Dive d, int index) {
     final dateFmt =
         DateFormat('d MMM yyyy', Localizations.localeOf(context).languageCode);
     final subtitle = [
@@ -121,11 +138,7 @@ class _DivesTabState extends State<DivesTab> {
         ],
       ),
       isThreeLine: d.date != null && stats.isNotEmpty,
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => DiveDetailScreen(db: widget.db, dive: d),
-        ),
-      ),
+      onTap: () => _openDetail(index),
     );
   }
 }

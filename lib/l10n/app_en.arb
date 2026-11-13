@@ -71,6 +71,7 @@
   "fieldDiveType": "Dive type",
   "fieldWeightKg": "Weight (kg)",
   "fieldNotes": "Notes",
+  "fieldSurfaceInt": "Surface interval",
   "fieldMaxDepthM": "Max depth (m)",
   "fieldAvgDepthM": "Avg depth (m)",
   "fieldDurationMin": "Duration (min)",

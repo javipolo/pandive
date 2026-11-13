@@ -1,18 +1,16 @@
-/// Formulario de edición de los campos editables de una inmersión.
+/// Edición de todos los campos escalares de una inmersión (el perfil no).
 library;
 
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
-import 'package:pandive/core/widgets/labeled_field.dart';
-import 'package:pandive/core/widgets/star_rating.dart';
+import 'package:pandive/features/dives/widgets/dive_form.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class EditDiveScreen extends StatefulWidget {
   final DivemateDb db;
   final Dive dive;
-
   const EditDiveScreen({super.key, required this.db, required this.dive});
 
   @override
@@ -20,48 +18,43 @@ class EditDiveScreen extends StatefulWidget {
 }
 
 class _EditDiveScreenState extends State<EditDiveScreen> {
-  late final _place = TextEditingController(text: widget.dive.place ?? '');
-  late final _country = TextEditingController(text: widget.dive.country ?? '');
-  late final _buddy = TextEditingController(text: widget.dive.buddy ?? '');
-  late final _diveMaster =
-      TextEditingController(text: widget.dive.diveMaster ?? '');
-  late final _diveType =
-      TextEditingController(text: widget.dive.diveType ?? '');
-  late final _weight = TextEditingController(
-      text: widget.dive.weight != null ? '${widget.dive.weight}' : '');
-  late final _comments =
-      TextEditingController(text: widget.dive.comments ?? '');
+  late final DiveFormControllers _c = DiveFormControllers.fromDive(widget.dive);
+  late DateTime _when = widget.dive.date ?? DateTime.now();
   late int _rating = widget.dive.rating ?? 0;
   bool _saving = false;
 
   @override
   void dispose() {
-    for (final c in [
-      _place, _country, _buddy, _diveMaster, _diveType, _weight, _comments,
-    ]) {
-      c.dispose();
-    }
+    _c.dispose();
     super.dispose();
   }
 
-  String? _s(TextEditingController c) {
-    final s = c.text.trim();
-    return s.isEmpty ? null : s;
-  }
+  double? _d(TextEditingController c) =>
+      double.tryParse(c.text.trim().replaceAll(',', '.'));
+  String? _s(TextEditingController c) =>
+      c.text.trim().isEmpty ? null : c.text.trim();
 
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
-      final w = _weight.text.trim().replaceAll(',', '.');
+      String p(int v) => v.toString().padLeft(2, '0');
       widget.db.updateDive(widget.dive.id, {
-        'Place': _s(_place),
-        'Country': _s(_country),
-        'Buddy': _s(_buddy),
-        'Divemaster': _s(_diveMaster),
-        'Divetype': _s(_diveType),
-        'Comments': _s(_comments),
+        'Place': _s(_c.place),
+        'Country': _s(_c.country),
+        'Depth': _d(_c.maxDepth),
+        'DepthAvg': _d(_c.avgDepth),
+        'Divetime': _d(_c.duration),
+        'Watertemp': _d(_c.waterTemp),
+        'Airtemp': _d(_c.airTemp),
+        'Weight': _d(_c.weight),
+        'Surfint': _s(_c.surfaceInterval),
+        'Buddy': _s(_c.buddy),
+        'Divemaster': _s(_c.diveMaster),
+        'Divetype': _s(_c.diveType),
+        'Comments': _s(_c.comments),
         'Rating': _rating,
-        'Weight': w.isEmpty ? null : double.tryParse(w),
+        'Divedate': '${_when.year}-${p(_when.month)}-${p(_when.day)}',
+        'Entrytime': '${p(_when.hour)}:${p(_when.minute)}:00',
       });
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
@@ -94,28 +87,12 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          LabeledField(controller: _place, label: t.fieldSite),
-          LabeledField(controller: _country, label: t.fieldCountry),
-          const SizedBox(height: 8),
-          StarRating(
-              value: _rating,
-              label: t.ratingLabel,
-              onChanged: (v) => setState(() => _rating = v)),
-          const SizedBox(height: 8),
-          LabeledField(controller: _buddy, label: t.fieldBuddy),
-          LabeledField(controller: _diveMaster, label: t.fieldGuide),
-          LabeledField(controller: _diveType, label: t.fieldDiveType),
-          LabeledField(controller: _weight, label: t.fieldWeightKg, number: true),
-          LabeledField(controller: _comments, label: t.fieldNotes, maxLines: 5),
-          const SizedBox(height: 16),
-          Text(
-            t.editFieldsNote,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
+      body: DiveForm(
+        c: _c,
+        when: _when,
+        onWhen: (v) => setState(() => _when = v),
+        rating: _rating,
+        onRating: (v) => setState(() => _rating = v),
       ),
     );
   }
