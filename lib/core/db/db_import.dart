@@ -9,6 +9,11 @@ void _ensureSyncTable(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveTankPreset '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Litres REAL, '
       'Material INTEGER)');
+  // Etiquetas (tags) reutilizables + enlace por inmersión.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveTag '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTag '
+      '(DiveId INTEGER, TagId INTEGER, PRIMARY KEY (DiveId, TagId))');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.

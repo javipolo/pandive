@@ -21,6 +21,8 @@ class DiveFormControllers {
   final surfaceInterval = TextEditingController();
   final comments = TextEditingController();
 
+  DiveFormControllers.empty();
+
   DiveFormControllers.fromDive(Dive d) {
     String n(double? v) => v == null ? '' : '$v';
     maxDepth.text = n(d.maxDepth);

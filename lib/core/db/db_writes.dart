@@ -14,12 +14,13 @@ extension DivemateDbWrites on DivemateDb {
 
   /// Crea una inmersión nueva (alta manual). Devuelve el ID generado. Genera
   /// Number (si no se pasa), UUID v4, Updated y Status=1, con DiverID del owner.
-  /// Inserta una botella opcional en la tabla Tank.
+  /// Las botellas se añaden aparte con setDiveTanks.
   int createDive({
     required DateTime dateTime,
     int? number,
     String? place,
     String? country,
+    int? placeId,
     double? maxDepth,
     double? avgDepth,
     double? durationMin,
@@ -28,10 +29,8 @@ extension DivemateDbWrites on DivemateDb {
     double? weight,
     int rating = 0,
     String? buddy,
-    String? diveMaster,
-    String? diveType,
+    String? buddyIds,
     String? comments,
-    Cylinder? cylinder,
   }) {
     final owner = ownerId ?? 1;
     final num = number ?? nextDiveNumber();
@@ -42,27 +41,15 @@ extension DivemateDbWrites on DivemateDb {
 
     _db.execute(
       'INSERT INTO Logbook (Number, Divedate, Entrytime, DiverID, UUID, '
-      'Updated, Status, Place, Country, Depth, DepthAvg, Divetime, Watertemp, '
-      'Airtemp, Weight, Rating, Buddy, Divemaster, Divetype, Comments) '
+      'Updated, Status, Place, Country, PlaceID, Depth, DepthAvg, Divetime, '
+      'Watertemp, Airtemp, Weight, Rating, Buddy, BuddyIDs, Comments) '
       'VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?,?,?,?)',
       [
         num, divedate, entrytime, owner, _uuid(), now,
-        place, country, maxDepth, avgDepth, durationMin, waterTemp,
-        airTemp, weight, rating, buddy, diveMaster, diveType, comments,
+        place, country, placeId, maxDepth, avgDepth, durationMin, waterTemp,
+        airTemp, weight, rating, buddy, buddyIds, comments,
       ],
     );
-    final id = _db.lastInsertRowId;
-
-    if (cylinder != null) {
-      _db.execute(
-        'INSERT INTO Tank (LogID, TankID, SortOrd, Tanksize, PresS, PresE, '
-        'O2, He, Name, UUID, Updated) VALUES (?,0,0,?,?,?,?,?,?,?,?)',
-        [
-          id, cylinder.size, cylinder.pressureStart, cylinder.pressureEnd,
-          cylinder.o2, cylinder.he, cylinder.name, _uuid(), now,
-        ],
-      );
-    }
-    return id;
+    return _db.lastInsertRowId;
   }
 }

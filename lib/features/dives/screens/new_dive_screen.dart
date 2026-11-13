@@ -1,13 +1,20 @@
-/// Formulario de alta manual de una inmersión nueva.
+/// Alta manual de inmersión: campos, sitio, compañeros y botellas (como editar).
 library;
 
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
-import 'package:pandive/core/widgets/date_time_field.dart';
-import 'package:pandive/core/widgets/labeled_field.dart';
-import 'package:pandive/core/widgets/star_rating.dart';
-import 'package:pandive/features/dives/widgets/cylinder_input.dart';
+import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/sac.dart';
+import 'package:pandive/core/widgets/save_action.dart';
+import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
+import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
+import 'package:pandive/features/dives/widgets/buddies_picker_field.dart';
+import 'package:pandive/features/dives/widgets/dive_form.dart';
+import 'package:pandive/features/dives/widgets/site_picker_field.dart';
+import 'package:pandive/features/dives/widgets/tags_picker_field.dart';
+import 'package:pandive/features/dives/widgets/tanks_editor.dart';
+import 'package:pandive/features/sites/screens/site_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class NewDiveScreen extends StatefulWidget {
@@ -19,64 +26,70 @@ class NewDiveScreen extends StatefulWidget {
 }
 
 class _NewDiveScreenState extends State<NewDiveScreen> {
-  final _place = TextEditingController();
-  final _country = TextEditingController();
-  final _maxDepth = TextEditingController();
-  final _avgDepth = TextEditingController();
-  final _duration = TextEditingController();
-  final _waterTemp = TextEditingController();
-  final _airTemp = TextEditingController();
-  final _weight = TextEditingController();
-  final _buddy = TextEditingController();
-  final _diveMaster = TextEditingController();
-  final _diveType = TextEditingController();
-  final _comments = TextEditingController();
-  final _cyl = CylinderInputController();
-
+  final DiveFormControllers _c = DiveFormControllers.empty();
   DateTime _when = DateTime.now();
   int _rating = 0;
-  bool _saving = false;
+  DiveSite? _site;
+  List<Buddy> _buddies = [];
+  List<Tag> _tags = [];
+  List<Cylinder> _tanks = [];
+  late final List<TankPreset> _presets = widget.db.listTankPresets();
   late final int _number = widget.db.nextDiveNumber();
+  bool _saving = false;
 
   @override
   void dispose() {
-    for (final c in [
-      _place, _country, _maxDepth, _avgDepth, _duration, _waterTemp,
-      _airTemp, _weight, _buddy, _diveMaster, _diveType, _comments,
-    ]) {
-      c.dispose();
-    }
-    _cyl.dispose();
+    _c.dispose();
     super.dispose();
   }
 
   double? _d(TextEditingController c) =>
       double.tryParse(c.text.trim().replaceAll(',', '.'));
-
   String? _s(TextEditingController c) =>
       c.text.trim().isEmpty ? null : c.text.trim();
+
+  Future<void> _pickSite() async {
+    final s = await Navigator.of(context).push<DiveSite>(MaterialPageRoute(
+        builder: (_) => SitePickerScreen(db: widget.db)));
+    if (s != null) setState(() => _site = s);
+  }
+
+  Future<void> _pickBuddies() async {
+    final r = await Navigator.of(context).push<List<Buddy>>(MaterialPageRoute(
+        builder: (_) => BuddyPickerScreen(
+            db: widget.db, selectedIds: [for (final b in _buddies) b.id])));
+    if (r != null) setState(() => _buddies = r);
+  }
+
+  Future<void> _pickTags() async {
+    final r = await Navigator.of(context).push<List<Tag>>(MaterialPageRoute(
+        builder: (_) => TagPickerScreen(
+            db: widget.db, selectedIds: [for (final t in _tags) t.id])));
+    if (r != null) setState(() => _tags = r);
+  }
 
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
-      widget.db.createDive(
+      final id = widget.db.createDive(
         dateTime: _when,
         number: _number,
-        place: _s(_place),
-        country: _s(_country),
-        maxDepth: _d(_maxDepth),
-        avgDepth: _d(_avgDepth),
-        durationMin: _d(_duration),
-        waterTemp: _d(_waterTemp),
-        airTemp: _d(_airTemp),
-        weight: _d(_weight),
+        place: _site?.name,
+        country: _site?.country,
+        placeId: _site?.id,
+        maxDepth: _d(_c.maxDepth),
+        avgDepth: _d(_c.avgDepth),
+        durationMin: _d(_c.duration),
+        waterTemp: _d(_c.waterTemp),
+        airTemp: _d(_c.airTemp),
+        weight: _d(_c.weight),
         rating: _rating,
-        buddy: _s(_buddy),
-        diveMaster: _s(_diveMaster),
-        diveType: _s(_diveType),
-        comments: _s(_comments),
-        cylinder: _cyl.toCylinder(),
+        buddy: _buddies.isEmpty ? null : _buddies.map((b) => b.name).join(', '),
+        buddyIds: _buddies.isEmpty ? null : _buddies.map((b) => b.id).join(','),
+        comments: _s(_c.comments),
       );
+      widget.db.setDiveTanks(id, _tanks);
+      widget.db.setDiveTags(id, _tags);
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _saving = false);
@@ -90,60 +103,39 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final sac = computeSac(_tanks,
+        divetimeMin: _d(_c.duration), avgDepthM: _d(_c.avgDepth));
     return Scaffold(
       appBar: AppBar(
         title: Text(t.newDiveNumber(_number)),
-        actions: [
-          TextButton.icon(
-            onPressed: _saving ? null : _save,
-            icon: _saving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.check),
-            label: Text(t.save),
-          ),
-        ],
+        actions: [SaveAction(saving: _saving, onSave: _save)],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          DateTimeField(
-            value: _when,
-            onChanged: (v) => setState(() => _when = v),
+          SitePickerField(
+            site: _site,
+            onTap: _pickSite,
+            onClear: () => setState(() => _site = null),
           ),
-          const Divider(),
-          LabeledField(controller: _place, label: t.fieldSite),
-          LabeledField(controller: _country, label: t.fieldCountry),
-          _twoCols(
-            LabeledField(controller: _maxDepth, label: t.fieldMaxDepthM, number: true),
-            LabeledField(controller: _avgDepth, label: t.fieldAvgDepthM, number: true),
+          BuddiesPickerField(buddies: _buddies, onTap: _pickBuddies),
+          TagsPickerField(tags: _tags, onTap: _pickTags),
+          DiveForm(
+            c: _c,
+            when: _when,
+            onWhen: (v) => setState(() => _when = v),
+            rating: _rating,
+            onRating: (v) => setState(() => _rating = v),
           ),
-          _twoCols(
-            LabeledField(controller: _duration, label: t.fieldDurationMin, number: true),
-            LabeledField(controller: _weight, label: t.fieldWeightKg, number: true),
-          ),
-          _twoCols(
-            LabeledField(controller: _waterTemp, label: t.fieldWaterTempC, number: true),
-            LabeledField(controller: _airTemp, label: t.fieldAirTempC, number: true),
-          ),
-          const SizedBox(height: 8),
-          StarRating(value: _rating, label: t.ratingLabel,
-              onChanged: (v) => setState(() => _rating = v)),
-          const SizedBox(height: 8),
-          LabeledField(controller: _buddy, label: t.fieldBuddy),
-          LabeledField(controller: _diveMaster, label: t.fieldGuide),
-          LabeledField(controller: _diveType, label: t.fieldDiveType),
-          LabeledField(controller: _comments, label: t.fieldNotes, maxLines: 4),
           const SizedBox(height: 16),
-          CylinderInput(controller: _cyl),
+          TanksEditor(
+            tanks: _tanks,
+            presets: _presets,
+            sac: sac,
+            onChanged: (list) => setState(() => _tanks = list),
+          ),
         ],
       ),
     );
   }
-
-  Widget _twoCols(Widget a, Widget b) => Row(children: [
-        Expanded(child: a), const SizedBox(width: 12), Expanded(child: b),
-      ]);
 }

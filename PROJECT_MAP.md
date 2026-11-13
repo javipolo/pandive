@@ -66,8 +66,13 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/screens/dive_detail_screen.dart` -> detalle: datos, perfil, botellas, editar
 - `lib/features/dives/screens/edit_dive_screen.dart` -> editar campos editables
 - `lib/features/dives/screens/new_dive_screen.dart` -> formulario de alta manual
-- `lib/features/dives/widgets/cylinder_input.dart` -> sección de formulario de botella (alta manual)
 - `lib/features/dives/widgets/cylinder_tile.dart` -> tarjeta de botella en el detalle
+- `lib/features/dives/widgets/month_grouped_dives.dart` -> lista de buceos agrupada por mes (colapsable)
+- `lib/features/dives/widgets/tags_picker_field.dart` -> campo de etiquetas elegidas (chips)
+- `lib/features/dives/screens/profile_fullscreen_screen.dart` -> perfil a pantalla completa (apaisado)
+- `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas
+- `lib/core/widgets/save_action.dart` -> botón Guardar de AppBar
+- `lib/core/db/db_tags.dart` -> etiquetas (tags) y enlace por inmersión
 - `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle (datos, perfil, botellas, SAC)
 - `lib/features/dives/widgets/dive_form.dart` -> campos escalares editables (+ controllers)
 - `lib/features/dives/widgets/site_picker_field.dart` -> campo de sitio elegido

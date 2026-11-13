@@ -31,6 +31,8 @@
   "searchDives": "Buscar sitio, país, nota, nº…",
   "noResults": "Sin resultados",
   "newDive": "Nueva",
+  "newDiveManual": "Nueva inmersión (manual)",
+  "diveTransfer": "Transferir del ordenador",
   "dive": "Inmersión",
   "diveNumber": "Inmersión #{number}",
 
@@ -163,6 +165,10 @@
   "pressureOut": "Presión salida (bar)",
   "heLabel": "He %",
   "sacLabel": "SAC",
+  "tags": "Etiquetas",
+  "selectTags": "Seleccionar etiquetas",
+  "newTag": "Nueva etiqueta",
+  "noTags": "Aún no hay etiquetas",
   "noProfile": "Sin perfil registrado",
   "axisDepth": "prof (m)",
   "axisTime": "tiempo (min)"

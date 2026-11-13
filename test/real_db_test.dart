@@ -101,8 +101,10 @@ void main() {
         durationMin: 45,
         waterTemp: 19,
         rating: 5,
-        cylinder: const Cylinder(size: 12, pressureStart: 200, pressureEnd: 50, o2: 32),
       );
+      w.setDiveTanks(id, const [
+        Cylinder(size: 12, pressureStart: 200, pressureEnd: 50, o2: 32),
+      ]);
       expect(id, greaterThan(0));
       expect(w.countDives(), before + 1);
 

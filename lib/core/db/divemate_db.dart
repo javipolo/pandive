@@ -21,6 +21,7 @@ part 'db_helpers.dart';
 part 'db_buddies.dart';
 part 'db_sites.dart';
 part 'db_tanks.dart';
+part 'db_tags.dart';
 
 class DivemateDb {
   final Database _db;

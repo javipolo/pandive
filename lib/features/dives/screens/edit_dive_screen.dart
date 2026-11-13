@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/sac.dart';
+import 'package:pandive/core/widgets/save_action.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
+import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
 import 'package:pandive/features/dives/widgets/buddies_picker_field.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
 import 'package:pandive/features/dives/widgets/site_picker_field.dart';
+import 'package:pandive/features/dives/widgets/tags_picker_field.dart';
 import 'package:pandive/features/dives/widgets/tanks_editor.dart';
 import 'package:pandive/features/sites/screens/site_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -29,6 +32,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
   late int _rating = widget.dive.rating ?? 0;
   DiveSite? _site;
   List<Buddy> _buddies = [];
+  List<Tag> _tags = [];
   List<Cylinder> _tanks = [];
   late final List<TankPreset> _presets = widget.db.listTankPresets();
   bool _saving = false;
@@ -39,15 +43,14 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
     final pid = widget.dive.placeId;
     _site = pid != null ? widget.db.getSite(pid) : null;
     _buddies = widget.db.diveBuddies(widget.dive.id);
+    _tags = widget.db.tagsForDive(widget.dive.id);
     _tanks = widget.db.cylinders(widget.dive.id);
   }
-
   @override
   void dispose() {
     _c.dispose();
     super.dispose();
   }
-
   double? _d(TextEditingController c) =>
       double.tryParse(c.text.trim().replaceAll(',', '.'));
   String? _s(TextEditingController c) =>
@@ -58,14 +61,18 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
         builder: (_) => SitePickerScreen(db: widget.db)));
     if (s != null) setState(() => _site = s);
   }
-
   Future<void> _pickBuddies() async {
     final r = await Navigator.of(context).push<List<Buddy>>(MaterialPageRoute(
         builder: (_) => BuddyPickerScreen(
             db: widget.db, selectedIds: [for (final b in _buddies) b.id])));
     if (r != null) setState(() => _buddies = r);
   }
-
+  Future<void> _pickTags() async {
+    final r = await Navigator.of(context).push<List<Tag>>(MaterialPageRoute(
+        builder: (_) => TagPickerScreen(
+            db: widget.db, selectedIds: [for (final t in _tags) t.id])));
+    if (r != null) setState(() => _tags = r);
+  }
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
@@ -89,6 +96,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
         'BuddyIDs': _buddies.isEmpty ? null : _buddies.map((b) => b.id).join(','),
       });
       widget.db.setDiveTanks(widget.dive.id, _tanks);
+      widget.db.setDiveTags(widget.dive.id, _tags);
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _saving = false);
@@ -98,7 +106,6 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -109,15 +116,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
         title: Text(widget.dive.number != null
             ? t.editDiveNumber(widget.dive.number!)
             : t.editDive),
-        actions: [
-          TextButton.icon(
-            onPressed: _saving ? null : _save,
-            icon: _saving
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.check),
-            label: Text(t.save),
-          ),
-        ],
+        actions: [SaveAction(saving: _saving, onSave: _save)],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -128,6 +127,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
             onClear: () => setState(() => _site = null),
           ),
           BuddiesPickerField(buddies: _buddies, onTap: _pickBuddies),
+          TagsPickerField(tags: _tags, onTap: _pickTags),
           DiveForm(
             c: _c,
             when: _when,

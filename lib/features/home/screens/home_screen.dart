@@ -74,7 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: _index,
         children: [
-          DivesTab(key: ValueKey('dives-$_dataVersion'), db: widget.db),
+          DivesTab(
+              key: ValueKey('dives-$_dataVersion'),
+              db: widget.db,
+              settings: widget.settings),
           SitesTab(key: ValueKey('sites-$_dataVersion'), db: widget.db),
           BuddiesTab(key: ValueKey('buddies-$_dataVersion'), db: widget.db),
           StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
