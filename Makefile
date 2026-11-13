@@ -33,9 +33,19 @@ apk: ## Genera APK de depuración (sideload)
 apk-release: ## Genera APK de release (requiere keystore)
 	$(FLUTTER) build apk --release
 
+APK := build/app/outputs/flutter-apk/app-debug.apk
+
 .PHONY: install
 install: ## Instala el APK de depuración en el device conectado
 	$(FLUTTER) install --debug
+
+.PHONY: install-apk
+install-apk: ## Instala app-debug.apk con adb (donde esté el móvil)
+	adb install -r $(APK)
+
+.PHONY: apk-path
+apk-path: ## Imprime la ruta absoluta del APK de depuración
+	@echo "$(CURDIR)/$(APK)"
 
 .PHONY: test
 test: ## Ejecuta los tests (unitarios + contra la DB real si existe)
