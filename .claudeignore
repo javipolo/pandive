@@ -1,0 +1,12 @@
+# Directorios generados / pesados
+.dart_tool/
+.idea/
+build/
+**/build/
+android/.gradle/
+ios/Pods/
+
+# Ficheros generados por Flutter / codegen
+.flutter-plugins*
+*.g.dart
+*.freezed.dart

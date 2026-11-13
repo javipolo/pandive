@@ -4,6 +4,25 @@ Pandive is an Android dive logbook (Flutter) that replaces DiveMate. One diver,
 no photos. It reads/writes the **same SQLite `.ddb` format as DiveMate** (no
 migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 
+## Reglas del proyecto (estrictas)
+
+- **Localización rápida**: antes de buscar con Grep/Glob, lee `PROJECT_MAP.md`
+  para ir directo al `.dart` exacto.
+- **Arquitectura feature-first**: organiza `lib/` en `core/` (tema, rutas,
+  servicios globales, widgets genéricos) y `features/<nombre>/` (subcarpetas
+  `screens/`, `widgets/`, `logic/` o `providers/`).
+- **Anti-anidamiento (regla de oro Flutter)**: ningún `.dart` supera **150
+  líneas**. Si un `build()` crece, extrae sub-widgets privados o ficheros en
+  `features/<nombre>/widgets/`.
+- **Separación UI vs lógica**: la lógica de negocio y el estado van fuera de los
+  widgets visuales (usa el gestor de estado que ya haya o el más simple, sin
+  sobreingeniería).
+- **Mantenimiento del mapa**: cada vez que crees, muevas o borres un fichero en
+  `lib/`, actualiza `PROJECT_MAP.md` en el mismo turno.
+- **Control de comandos**: NO ejecutes `flutter build` ni lances emuladores
+  automáticamente. Solo `flutter analyze` (o `make analyze`) tras un cambio
+  grande para verificar. El usuario compila y prueba (sideload del APK).
+
 ## Workflow
 
 - **Commit per feature, automatically.** When you finish a logical feature (or a
