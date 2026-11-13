@@ -1,4 +1,5 @@
-/// Detalle de inmersión con navegación por deslizamiento (anterior/siguiente).
+/// Detalle de inmersión con navegación por deslizamiento (anterior/siguiente),
+/// manteniendo la posición de scroll vertical al cambiar de buceo.
 library;
 
 import 'package:flutter/material.dart';
@@ -26,17 +27,40 @@ class DiveDetailScreen extends StatefulWidget {
 }
 
 class _DiveDetailScreenState extends State<DiveDetailScreen> {
-  late final PageController _controller =
+  late final PageController _pageCtrl =
       PageController(initialPage: widget.initialIndex);
   late final List<Dive> _dives = [...widget.dives];
   late int _index = widget.initialIndex;
+  final Map<int, ScrollController> _ctrls = {};
+  double _offset = 0; // scroll vertical compartido entre buceos
 
   DivemateDb get db => widget.db;
 
+  ScrollController _bodyController(int i) => _ctrls.putIfAbsent(i, () {
+        final c = ScrollController(initialScrollOffset: _offset);
+        c.addListener(() {
+          if (c.hasClients) _offset = c.offset;
+        });
+        return c;
+      });
+
   @override
   void dispose() {
-    _controller.dispose();
+    _pageCtrl.dispose();
+    for (final c in _ctrls.values) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  void _onPageChanged(int i) {
+    setState(() => _index = i);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _ctrls[i];
+      if (c != null && c.hasClients) {
+        c.jumpTo(_offset.clamp(0, c.position.maxScrollExtent));
+      }
+    });
   }
 
   Future<void> _edit() async {
@@ -46,9 +70,7 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
     );
     if (changed == true) {
       final reloaded = db.getDive(dive.id);
-      if (reloaded != null && mounted) {
-        setState(() => _dives[_index] = reloaded);
-      }
+      if (reloaded != null && mounted) setState(() => _dives[_index] = reloaded);
     }
   }
 
@@ -61,18 +83,33 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
         title: Text(dive.number != null ? t.diveNumber(dive.number!) : t.dive),
         actions: [
           IconButton(
-            tooltip: t.edit,
-            icon: const Icon(Icons.edit),
-            onPressed: _edit,
-          ),
+              tooltip: t.edit, icon: const Icon(Icons.edit), onPressed: _edit),
         ],
       ),
       body: PageView.builder(
-        controller: _controller,
+        controller: _pageCtrl,
+        physics: const _CalmPagePhysics(),
         itemCount: _dives.length,
-        onPageChanged: (i) => setState(() => _index = i),
-        itemBuilder: (context, i) => DiveDetailBody(db: db, dive: _dives[i]),
+        onPageChanged: _onPageChanged,
+        itemBuilder: (context, i) => DiveDetailBody(
+          db: db,
+          dive: _dives[i],
+          controller: _bodyController(i),
+        ),
       ),
     );
   }
+}
+
+/// Exige más desplazamiento horizontal antes de pasar de página, para que el
+/// scroll vertical no cambie de buceo sin querer.
+class _CalmPagePhysics extends PageScrollPhysics {
+  const _CalmPagePhysics({super.parent});
+
+  @override
+  _CalmPagePhysics applyTo(ScrollPhysics? ancestor) =>
+      _CalmPagePhysics(parent: buildParent(ancestor));
+
+  @override
+  double get dragStartDistanceMotionThreshold => 24.0;
 }

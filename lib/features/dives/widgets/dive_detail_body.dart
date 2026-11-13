@@ -16,7 +16,9 @@ import 'package:pandive/l10n/app_localizations.dart';
 class DiveDetailBody extends StatelessWidget {
   final DivemateDb db;
   final Dive dive;
-  const DiveDetailBody({super.key, required this.db, required this.dive});
+  final ScrollController? controller;
+  const DiveDetailBody(
+      {super.key, required this.db, required this.dive, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class DiveDetailBody extends StatelessWidget {
         'EEEE d MMMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
 
     return ListView(
+      controller: controller,
       padding: const EdgeInsets.all(16),
       children: [
         if (dive.place != null)
