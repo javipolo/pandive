@@ -242,6 +242,23 @@ static int dive_cb(const unsigned char *data, unsigned int size,
 }
 
 // ---------------------------------------------------------------------------
+// Progreso: reenvía DC_EVENT_PROGRESS a DiveComputer.reportProgress(cur,max)
+// ---------------------------------------------------------------------------
+
+typedef struct { JNIEnv *env; jclass cls; jmethodID mid; } prog_ctx_t;
+
+static void event_cb(dc_device_t *device, dc_event_type_t event,
+                     const void *data, void *ud) {
+    (void) device;
+    if (event != DC_EVENT_PROGRESS) return;
+    prog_ctx_t *pc = ud;
+    if (!pc->mid) return;
+    const dc_event_progress_t *p = data;
+    (*pc->env)->CallStaticVoidMethod(pc->env, pc->cls, pc->mid,
+                                     (jint) p->current, (jint) p->maximum);
+}
+
+// ---------------------------------------------------------------------------
 // Descarga principal
 // ---------------------------------------------------------------------------
 
@@ -305,6 +322,12 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
         sb_fmt(&out, "{\"error\":\"No se pudo abrir el dispositivo (%d)\"}", rc);
         dc_iostream_close(iostream); dc_context_free(ctx); dc_descriptor_free(desc); goto done;
     }
+
+    // Progreso: DC_EVENT_PROGRESS -> DiveComputer.reportProgress(cur, max)
+    jclass dcCls = (*env)->FindClass(env, "org/drslump/pandive/DiveComputer");
+    prog_ctx_t pc = { env, dcCls, NULL };
+    if (dcCls) pc.mid = (*env)->GetStaticMethodID(env, dcCls, "reportProgress", "(II)V");
+    if (pc.mid) dc_device_set_events(device, DC_EVENT_PROGRESS, event_cb, &pc);
 
     sb_puts(&out, "{\"dives\":[");
     dive_ctx_t dctx = { .sb = &out, .device = device, .count = 0 };

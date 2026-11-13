@@ -34,6 +34,18 @@ class ScannedDevice {
 class DiveComputerService {
   static const _channel = MethodChannel('pandive/dc');
   static const _scanChannel = EventChannel('pandive/dc/scan');
+  static const _progressChannel = EventChannel('pandive/dc/progress');
+
+  /// Progreso de descarga en curso (0.0–1.0). Suscríbete antes de llamar a
+  /// [download] para no perder eventos.
+  Stream<double> progress() {
+    return _progressChannel.receiveBroadcastStream().map((e) {
+      final m = e as Map;
+      final cur = (m['current'] as num?)?.toDouble() ?? 0;
+      final max = (m['maximum'] as num?)?.toDouble() ?? 0;
+      return max > 0 ? (cur / max).clamp(0.0, 1.0) : 0.0;
+    });
+  }
 
   /// Nº de modelos de ordenador soportados por libdivecomputer.
   Future<int> supportedCount() async {

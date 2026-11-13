@@ -2,11 +2,15 @@
 /// no se guardan en el .ddb; eso es el hito C.2).
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/dive_computer.dart';
+import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
 
 class DownloadScreen extends StatefulWidget {
   final ScannedDevice device;
@@ -21,12 +25,25 @@ class _DownloadScreenState extends State<DownloadScreen> {
   final _dateFmt = DateFormat('d MMM yyyy, HH:mm', 'es');
   late Future<DownloadResult> _future;
   late final (String, String)? _model;
+  StreamSubscription<double>? _progressSub;
+  double _progress = 0;
 
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable(); // no dejar que se apague la pantalla descargando
     _model = modelForDeviceName(widget.device.name);
+    _progressSub = _svc.progress().listen((p) {
+      if (mounted) setState(() => _progress = p);
+    });
     _future = _download();
+  }
+
+  @override
+  void dispose() {
+    _progressSub?.cancel();
+    WakelockPlus.disable();
+    super.dispose();
   }
 
   Future<DownloadResult> _download() async {
@@ -51,7 +68,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const _Progress();
+            return DownloadProgress(progress: _progress);
           }
           final res = snap.data;
           if (snap.hasError) return _error('${snap.error}');
@@ -114,15 +131,3 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 }
 
-class _Progress extends StatelessWidget {
-  const _Progress();
-  @override
-  Widget build(BuildContext context) => const Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text('Conectando y descargando…\nMantén el ordenador cerca y encendido.',
-              textAlign: TextAlign.center),
-        ]),
-      );
-}

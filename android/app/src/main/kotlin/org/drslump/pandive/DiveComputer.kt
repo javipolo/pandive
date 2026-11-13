@@ -1,6 +1,9 @@
 package org.drslump.pandive
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import io.flutter.plugin.common.EventChannel
 
 /**
  * Puente a libdivecomputer vía el wrapper JNI nativo (libpandive_dc.so).
@@ -15,6 +18,19 @@ object DiveComputer {
     external fun nativeSupportedCount(): Int
     external fun nativeSupportedList(): String
     external fun nativeDownload(vendor: String, product: String, conn: BleConnection): String
+
+    private val main = Handler(Looper.getMainLooper())
+
+    /** Sink del EventChannel de progreso (lo fija MainActivity). */
+    @Volatile
+    var progressSink: EventChannel.EventSink? = null
+
+    /** Llamado desde C (JNI) en cada DC_EVENT_PROGRESS. */
+    @JvmStatic
+    fun reportProgress(current: Int, maximum: Int) {
+        val sink = progressSink ?: return
+        main.post { sink.success(mapOf("current" to current, "maximum" to maximum)) }
+    }
 
     /**
      * Conecta al dispositivo [address], descarga las inmersiones del modelo

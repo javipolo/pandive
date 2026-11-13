@@ -27,6 +27,17 @@ class MainActivity : FlutterActivity() {
             }
 
         EventChannel(messenger, scanChannel).setStreamHandler(BleScanner(this))
+
+        EventChannel(messenger, "pandive/dc/progress").setStreamHandler(
+            object : EventChannel.StreamHandler {
+                override fun onListen(args: Any?, events: EventChannel.EventSink?) {
+                    DiveComputer.progressSink = events
+                }
+                override fun onCancel(args: Any?) {
+                    DiveComputer.progressSink = null
+                }
+            }
+        )
     }
 
     // Descarga en un hilo de trabajo (bloqueante); responde en el hilo principal.
