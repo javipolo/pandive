@@ -189,6 +189,7 @@
   "selectTags": "Select tags",
   "newTag": "New tag",
   "noTags": "No tags yet",
+  "fullscreen": "Fullscreen",
   "noProfile": "No profile recorded",
   "axisDepth": "depth (m)",
   "axisTime": "time (min)"

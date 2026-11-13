@@ -54,14 +54,24 @@ class DiveDetailBody extends StatelessWidget {
           const SizedBox(height: 24),
           Text(t.profile, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => ProfileFullscreenScreen(
-                profile: profile,
-                title: dive.place ?? t.dive,
+          Stack(
+            children: [
+              SizedBox(height: 260, child: ProfileChart(profile: profile)),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: IconButton.filledTonal(
+                  icon: const Icon(Icons.fullscreen),
+                  tooltip: t.fullscreen,
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => ProfileFullscreenScreen(
+                      profile: profile,
+                      title: dive.place ?? t.dive,
+                    ),
+                  )),
+                ),
               ),
-            )),
-            child: SizedBox(height: 260, child: ProfileChart(profile: profile)),
+            ],
           ),
         ],
         if (cylinders.isNotEmpty) ...[
