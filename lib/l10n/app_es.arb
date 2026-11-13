@@ -170,6 +170,9 @@
   "newTag": "Nueva etiqueta",
   "noTags": "Aún no hay etiquetas",
   "fullscreen": "Pantalla completa",
+  "tools": "Herramientas",
+  "importHashtags": "Importar #hashtags de los comentarios como etiquetas",
+  "importHashtagsResult": "{count} etiquetas asignadas.",
   "noProfile": "Sin perfil registrado",
   "axisDepth": "prof (m)",
   "axisTime": "tiempo (min)"

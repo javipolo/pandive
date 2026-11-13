@@ -190,6 +190,10 @@
   "newTag": "New tag",
   "noTags": "No tags yet",
   "fullscreen": "Fullscreen",
+  "tools": "Tools",
+  "importHashtags": "Import #hashtags from comments as tags",
+  "importHashtagsResult": "{count} tags assigned.",
+  "@importHashtagsResult": { "placeholders": { "count": {} } },
   "noProfile": "No profile recorded",
   "axisDepth": "depth (m)",
   "axisTime": "time (min)"

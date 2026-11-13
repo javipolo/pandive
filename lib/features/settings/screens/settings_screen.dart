@@ -3,17 +3,26 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Settings settings;
+  final DivemateDb db;
   final VoidCallback onChangeDb;
   const SettingsScreen({
     super.key,
     required this.settings,
+    required this.db,
     required this.onChangeDb,
   });
+
+  void _importHashtags(BuildContext context) {
+    final n = db.importHashtagsFromComments();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context).importHashtagsResult(n))));
+  }
 
   Future<void> _confirmChangeDb(BuildContext context) async {
     final t = AppLocalizations.of(context);
@@ -104,6 +113,13 @@ class SettingsScreen extends StatelessWidget {
                       settings.setTextScale(Settings.defaultTextScale),
                   child: Text(t.reset),
                 ),
+              ),
+              const Divider(),
+              _header(context, t.tools),
+              ListTile(
+                leading: const Icon(Icons.tag),
+                title: Text(t.importHashtags),
+                onTap: () => _importHashtags(context),
               ),
               const Divider(),
               _header(context, t.database),

@@ -150,6 +150,27 @@ void main() {
     }
   });
 
+  test('importHashtagsFromComments crea y asigna tags', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_tags_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final id = w.createDive(
+        dateTime: DateTime(2030, 1, 1, 10, 0),
+        comments: 'Buceo guapo #sidemount en #cueva',
+      );
+      final added = w.importHashtagsFromComments();
+      expect(added, 2);
+      final names = w.tagsForDive(id).map((t) => t.name).toSet();
+      expect(names, {'sidemount', 'cueva'});
+      // idempotente
+      expect(w.importHashtagsFromComments(), 0);
+    } finally {
+      w.close();
+    }
+  });
+
   test('importDownloaded guarda perfil y deduplica (copia temporal)', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_imp_${DateTime.now().microsecondsSinceEpoch}.ddb');

@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => SettingsScreen(
                       settings: widget.settings,
+                      db: widget.db,
                       onChangeDb: widget.onChangeDb,
                     ))),
           ),

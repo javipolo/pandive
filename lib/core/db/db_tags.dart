@@ -31,6 +31,31 @@ extension DivemateDbTags on DivemateDb {
         .toList();
   }
 
+  /// Recorre los comentarios de todas las inmersiones, extrae #hashtags y los
+  /// asigna como tags (creándolos si hace falta). No borra tags existentes.
+  /// Devuelve el nº de asignaciones (dive, tag) nuevas. Útil para migrar.
+  int importHashtagsFromComments() {
+    final re = RegExp(r'#(\w+)', unicode: true);
+    var added = 0;
+    for (final d in listDives()) {
+      final c = d.comments;
+      if (c == null) continue;
+      final have = {for (final t in tagsForDive(d.id)) t.name.toLowerCase()};
+      for (final m in re.allMatches(c)) {
+        final name = m.group(1)!;
+        if (have.contains(name.toLowerCase())) continue;
+        final tagId = findOrCreateTag(name);
+        _db.execute(
+          'INSERT OR IGNORE INTO PandiveDiveTag (DiveId, TagId) VALUES (?,?)',
+          [d.id, tagId],
+        );
+        have.add(name.toLowerCase());
+        added++;
+      }
+    }
+    return added;
+  }
+
   void setDiveTags(int diveId, List<Tag> tags) {
     _db.execute('DELETE FROM PandiveDiveTag WHERE DiveId = ?', [diveId]);
     for (final t in tags) {
