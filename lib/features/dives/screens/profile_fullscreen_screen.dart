@@ -1,13 +1,13 @@
-/// Perfil de inmersión a pantalla completa, forzando orientación apaisada.
+/// Perfil de inmersión maximizado. Se ve en la orientación actual del móvil:
+/// en vertical ocupa toda la pantalla, y si giras el móvil, apaisado (mejor).
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
 
-class ProfileFullscreenScreen extends StatefulWidget {
+class ProfileFullscreenScreen extends StatelessWidget {
   final DiveProfile profile;
   final String title;
   const ProfileFullscreenScreen({
@@ -17,33 +17,12 @@ class ProfileFullscreenScreen extends StatefulWidget {
   });
 
   @override
-  State<ProfileFullscreenScreen> createState() =>
-      _ProfileFullscreenScreenState();
-}
-
-class _ProfileFullscreenScreenState extends State<ProfileFullscreenScreen> {
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(title)),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
-        child: ProfileChart(profile: widget.profile),
+        child: ProfileChart(profile: profile),
       ),
     );
   }
