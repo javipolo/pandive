@@ -2,7 +2,7 @@ part of 'divemate_db.dart';
 
 /// Botellas por inmersión, presets "mis botellas", y listados filtrados.
 extension DivemateDbTanks on DivemateDb {
-  /// Reemplaza las botellas de una inmersión por [tanks].
+  /// Reemplaza las botellas de una inmersión por [tanks] y recalcula el SAC.
   void setDiveTanks(int logId, List<Cylinder> tanks) {
     _db.execute('DELETE FROM Tank WHERE LogID = ?', [logId]);
     final now = _nowStamp();
@@ -17,6 +17,38 @@ extension DivemateDbTanks on DivemateDb {
         ],
       );
     }
+    recomputeSac(logId);
+  }
+
+  /// SAC/RMV persistido de una inmersión (columna propia), o null.
+  double? diveSac(int logId) {
+    final r = _db.select('SELECT PandiveSac FROM Logbook WHERE ID=?', [logId]);
+    return r.isEmpty ? null : _num(r.first['PandiveSac']);
+  }
+
+  /// Calcula el SAC/RMV y lo guarda en la columna propia `Logbook.PandiveSac`.
+  void recomputeSac(int logId) {
+    final d = getDive(logId);
+    if (d == null) return;
+    final sac = computeSac(cylinders(logId),
+        divetimeMin: d.durationMin, avgDepthM: d.avgDepth);
+    _db.execute('UPDATE Logbook SET PandiveSac = ? WHERE ID = ?', [sac, logId]);
+  }
+
+  /// Rellena `PandiveSac` donde falte y haya botellas con presiones (al abrir).
+  int fillMissingSac() {
+    final owner = ownerId;
+    final filter = owner != null ? 'AND L.DiverID = $owner' : '';
+    final rows = _db.select(
+      'SELECT L.ID FROM Logbook L WHERE (L.Status IS NULL OR L.Status != 2) '
+      '$filter AND L.PandiveSac IS NULL AND EXISTS (SELECT 1 FROM Tank T '
+      'WHERE T.LogID = L.ID AND T.PresS IS NOT NULL AND T.PresE IS NOT NULL '
+      'AND T.Tanksize IS NOT NULL)',
+    );
+    for (final r in rows) {
+      recomputeSac(r['ID'] as int);
+    }
+    return rows.length;
   }
 
   // --- presets "mis botellas" ---

@@ -11,6 +11,7 @@ import 'dart:math';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../models/models.dart';
+import '../sac.dart';
 import '../text/collate.dart';
 
 part 'db_queries.dart';
@@ -43,8 +44,11 @@ class DivemateDb {
     );
     if (!readOnly) _ensureSyncTable(db); // fingerprints por dispositivo
     final inst = DivemateDb._(db);
-    // Persistir prof. media calculada del perfil donde falte (exportable).
-    if (!readOnly) inst.fillMissingAvgDepth();
+    // Persistir prof. media (exportable) y SAC (columna propia) donde falten.
+    if (!readOnly) {
+      inst.fillMissingAvgDepth();
+      inst.fillMissingSac();
+    }
     return inst;
   }
 

@@ -461,6 +461,26 @@ void main() {
     }
   });
 
+  test('SAC se persiste en PandiveSac al guardar botellas', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_sac_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final id = w.createDive(
+          dateTime: DateTime(2030, 9, 1, 10, 0),
+          durationMin: 40,
+          avgDepth: 15);
+      w.setDiveTanks(id, const [
+        Cylinder(size: 12, pressureStart: 200, pressureEnd: 50),
+      ]);
+      // litros = (200-50)*12 = 1800 ; ata = 15/10+1 = 2.5 ; 1800/(40*2.5)=18
+      expect(w.diveSac(id), closeTo(18, 0.01));
+    } finally {
+      w.close();
+    }
+  });
+
   test('ordenadores de buceo: add / list / saved / remove', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_comp_${DateTime.now().microsecondsSinceEpoch}.ddb');

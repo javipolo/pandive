@@ -28,6 +28,10 @@ void _ensureSyncTable(Database db) {
   try {
     db.execute('ALTER TABLE PandiveDiveTypeTank ADD COLUMN Name TEXT');
   } catch (_) {/* ya existe */}
+  // Columna propia para el SAC/RMV calculado (DiveMate no la tiene; la ignora).
+  try {
+    db.execute('ALTER TABLE Logbook ADD COLUMN PandiveSac REAL');
+  } catch (_) {/* ya existe */}
   // Ordenadores de buceo guardados (reconexión por MAC sin reescanear).
   db.execute('CREATE TABLE IF NOT EXISTS PandiveComputer '
       '(Address TEXT PRIMARY KEY, Name TEXT, Vendor TEXT, Product TEXT, '
