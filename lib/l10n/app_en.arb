@@ -179,6 +179,7 @@
   "fieldLongitude": "Longitude",
   "fieldDifficulty": "Difficulty",
   "tanks": "Tanks",
+  "tankName": "Name (left, deco…)",
   "addTank": "Add tank",
   "tankN": "Tank {n}",
   "@tankN": { "placeholders": { "n": {} } },

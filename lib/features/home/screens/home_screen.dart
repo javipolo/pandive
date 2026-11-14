@@ -8,6 +8,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/buddies/screens/buddies_tab.dart';
 import 'package:pandive/features/dives/screens/dives_screen.dart';
 import 'package:pandive/features/equipment/screens/equipment_tab.dart';
+import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/features/sites/screens/sites_screen.dart';
@@ -56,12 +57,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Cambia de sección (barra inferior o menú lateral) y recarga datos.
+  void _go(int i) {
+    _searchCtrl.clear();
+    setState(() {
+      _index = i;
+      _dataVersion++;
+      _searching = false;
+      _query = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final titles = [
       t.navDives, t.navSites, t.buddies, t.tags, t.equipment, t.navStats];
     return Scaffold(
+      drawer: HomeDrawer(selectedIndex: _index, onSelected: _go),
       appBar: AppBar(
         leading: _searching
             ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: _exitSearch)
@@ -131,20 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
           StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
         ],
       ),
-      // Recrear las pestañas al cambiar para reflejar cambios (nuevos sitios,
-      // compañeros, tags, importaciones...).
-      bottomNavigationBar: HomeNavBar(
-        selectedIndex: _index,
-        onSelected: (i) {
-          _searchCtrl.clear();
-          setState(() {
-            _index = i;
-            _dataVersion++;
-            _searching = false;
-            _query = '';
-          });
-        },
-      ),
+      bottomNavigationBar: HomeNavBar(selectedIndex: _index, onSelected: _go),
     );
   }
 }

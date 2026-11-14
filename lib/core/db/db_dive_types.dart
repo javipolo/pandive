@@ -14,15 +14,16 @@ extension DivemateDbDiveTypes on DivemateDb {
         .toList();
   }
 
-  /// Botellas-plantilla de un tipo (solo litros + material).
+  /// Botellas-plantilla de un tipo (nombre + litros + material; sin presiones).
   List<Cylinder> diveTypeTanks(int typeId) {
     final rows = _db.select(
-      'SELECT Litres, Material FROM PandiveDiveTypeTank '
+      'SELECT Litres, Material, Name FROM PandiveDiveTypeTank '
       'WHERE TypeId = ? ORDER BY SortOrd, Id',
       [typeId],
     );
     return rows
         .map((r) => Cylinder(
+              name: _str(r['Name']),
               size: _num(r['Litres']),
               material: _materialFromInt(r['Material'] as int?),
             ))
@@ -50,9 +51,10 @@ extension DivemateDbDiveTypes on DivemateDb {
     _db.execute('DELETE FROM PandiveDiveTypeTank WHERE TypeId=?', [typeId]);
     for (var i = 0; i < tanks.length; i++) {
       _db.execute(
-        'INSERT INTO PandiveDiveTypeTank (TypeId, Litres, Material, SortOrd) '
-        'VALUES (?,?,?,?)',
-        [typeId, tanks[i].size, _materialToInt(tanks[i].material), i],
+        'INSERT INTO PandiveDiveTypeTank (TypeId, Litres, Material, SortOrd, '
+        'Name) VALUES (?,?,?,?,?)',
+        [typeId, tanks[i].size, _materialToInt(tanks[i].material), i,
+          tanks[i].name],
       );
     }
   }

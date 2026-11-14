@@ -315,15 +315,18 @@ void main() {
     final w = DivemateDb.createEmpty(tmp.path);
     try {
       final id = w.addDiveType('Sidemount', const [
-        Cylinder(size: 11.1, material: TankMaterial.aluminium),
-        Cylinder(size: 11.1, material: TankMaterial.aluminium),
+        Cylinder(name: 'Izquierda', size: 11.1, material: TankMaterial.aluminium),
+        Cylinder(name: 'Derecha', size: 11.1, material: TankMaterial.aluminium),
       ]);
       var types = w.listDiveTypes();
       expect(types, hasLength(1));
       expect(types.first.name, 'Sidemount');
       expect(types.first.tanks, hasLength(2));
+      expect(types.first.tanks.first.name, 'Izquierda');
       expect(types.first.tanks.first.size, 11.1);
       expect(types.first.tanks.first.material, TankMaterial.aluminium);
+      // Las plantillas no llevan presiones.
+      expect(types.first.tanks.first.pressureStart, isNull);
 
       w.updateDiveType(id, 'Monobotella 15L',
           const [Cylinder(size: 15, material: TankMaterial.steel)]);

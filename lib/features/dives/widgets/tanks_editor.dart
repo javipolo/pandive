@@ -83,7 +83,7 @@ class TanksEditor extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.propane_tank_outlined),
-        title: Text(t.tankN(i + 1)),
+        title: Text(c.name ?? t.tankN(i + 1)),
         subtitle: Text(parts.join('   ')),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline),

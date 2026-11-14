@@ -1,4 +1,6 @@
-/// Hoja modal para añadir/editar una botella (litros, material, presiones, gas).
+/// Hoja modal para añadir/editar una botella: nombre (izquierda, deco…), litros,
+/// material y, salvo en modo [template], presiones y gas. En plantillas de tipo
+/// de buceo no se piden presiones (antes del buceo no se conocen).
 library;
 
 import 'package:flutter/material.dart';
@@ -11,15 +13,15 @@ Future<Cylinder?> showTankEditSheet(
   BuildContext context, {
   Cylinder? initial,
   required List<TankPreset> presets,
+  bool template = false,
 }) {
   return showModalBottomSheet<Cylinder>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
     builder: (_) => Padding(
-      padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: _TankSheet(initial: initial, presets: presets),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: _TankSheet(initial: initial, presets: presets, template: template),
     ),
   );
 }
@@ -27,13 +29,16 @@ Future<Cylinder?> showTankEditSheet(
 class _TankSheet extends StatefulWidget {
   final Cylinder? initial;
   final List<TankPreset> presets;
-  const _TankSheet({this.initial, required this.presets});
+  final bool template;
+  const _TankSheet(
+      {this.initial, required this.presets, this.template = false});
 
   @override
   State<_TankSheet> createState() => _TankSheetState();
 }
 
 class _TankSheetState extends State<_TankSheet> {
+  late final _name = TextEditingController(text: widget.initial?.name ?? '');
   late final _litres = _ctrl(widget.initial?.size);
   late final _presIn = _ctrl(widget.initial?.pressureStart);
   late final _presOut = _ctrl(widget.initial?.pressureEnd);
@@ -47,10 +52,12 @@ class _TankSheetState extends State<_TankSheet> {
 
   double? _d(TextEditingController c) =>
       double.tryParse(c.text.trim().replaceAll(',', '.'));
+  String? _s(TextEditingController c) =>
+      c.text.trim().isEmpty ? null : c.text.trim();
 
   @override
   void dispose() {
-    for (final c in [_litres, _presIn, _presOut, _o2, _he]) {
+    for (final c in [_name, _litres, _presIn, _presOut, _o2, _he]) {
       c.dispose();
     }
     super.dispose();
@@ -60,11 +67,12 @@ class _TankSheetState extends State<_TankSheet> {
     Navigator.pop(
       context,
       Cylinder(
+        name: _s(_name),
         size: _d(_litres),
-        pressureStart: _d(_presIn),
-        pressureEnd: _d(_presOut),
-        o2: _d(_o2),
-        he: _d(_he),
+        pressureStart: widget.template ? null : _d(_presIn),
+        pressureEnd: widget.template ? null : _d(_presOut),
+        o2: widget.template ? null : _d(_o2),
+        he: widget.template ? null : _d(_he),
         material: _material,
       ),
     );
@@ -93,27 +101,32 @@ class _TankSheetState extends State<_TankSheet> {
               onChanged: (p) {
                 if (p == null) return;
                 setState(() {
+                  if (_name.text.trim().isEmpty) _name.text = p.name;
                   _litres.text = '${p.litres}';
                   _material = p.material;
                 });
               },
             ),
           ),
+        LabeledField(controller: _name, label: t.tankName),
+        const SizedBox(height: 8),
         Row(children: [
           Expanded(child: LabeledField(controller: _litres, label: t.liters, number: true)),
           const SizedBox(width: 12),
           Expanded(child: _materialToggle(t)),
         ]),
-        Row(children: [
-          Expanded(child: LabeledField(controller: _presIn, label: t.pressureIn, number: true)),
-          const SizedBox(width: 12),
-          Expanded(child: LabeledField(controller: _presOut, label: t.pressureOut, number: true)),
-        ]),
-        Row(children: [
-          Expanded(child: LabeledField(controller: _o2, label: t.o2pct, number: true)),
-          const SizedBox(width: 12),
-          Expanded(child: LabeledField(controller: _he, label: t.heLabel, number: true)),
-        ]),
+        if (!widget.template) ...[
+          Row(children: [
+            Expanded(child: LabeledField(controller: _presIn, label: t.pressureIn, number: true)),
+            const SizedBox(width: 12),
+            Expanded(child: LabeledField(controller: _presOut, label: t.pressureOut, number: true)),
+          ]),
+          Row(children: [
+            Expanded(child: LabeledField(controller: _o2, label: t.o2pct, number: true)),
+            const SizedBox(width: 12),
+            Expanded(child: LabeledField(controller: _he, label: t.heLabel, number: true)),
+          ]),
+        ],
         const SizedBox(height: 12),
         FilledButton(onPressed: _save, child: Text(t.save)),
       ],

@@ -160,6 +160,7 @@
   "fieldLongitude": "Longitud",
   "fieldDifficulty": "Dificultad",
   "tanks": "Botellas",
+  "tankName": "Nombre (izquierda, deco…)",
   "addTank": "Añadir botella",
   "tankN": "Botella {n}",
   "material": "Material",

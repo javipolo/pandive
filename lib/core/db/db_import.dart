@@ -23,7 +23,11 @@ void _ensureSyncTable(Database db) {
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTypeTank '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, TypeId INTEGER, Litres REAL, '
-      'Material INTEGER, SortOrd INTEGER)');
+      'Material INTEGER, SortOrd INTEGER, Name TEXT)');
+  // Migración: añadir Name si la tabla se creó antes (ignora si ya existe).
+  try {
+    db.execute('ALTER TABLE PandiveDiveTypeTank ADD COLUMN Name TEXT');
+  } catch (_) {/* ya existe */}
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.

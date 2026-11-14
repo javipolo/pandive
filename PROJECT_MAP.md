@@ -58,7 +58,8 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### home
 - `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
-- `lib/features/home/widgets/home_nav_bar.dart` -> barra inferior (6 pestañas)
+- `lib/features/home/widgets/home_nav_bar.dart` -> barra inferior (Inmersiones/Sitios/Compañeros)
+- `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats)
 
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb (con enum DbLoadError)

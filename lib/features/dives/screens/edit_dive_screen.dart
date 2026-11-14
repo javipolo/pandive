@@ -75,7 +75,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
     if (chosen == null) return;
     setState(() {
       _typeName = chosen.name;
-      _tanks = [...chosen.tanks];
+      _tanks = [..._tanks, ...chosen.tanks]; // añade a las existentes
     });
   }
   Future<void> _save() async {

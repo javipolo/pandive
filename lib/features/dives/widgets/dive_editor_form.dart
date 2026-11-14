@@ -59,7 +59,8 @@ class DiveEditorForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(
+          16, 16, 16, 16 + MediaQuery.of(context).viewInsets.bottom),
       children: [
         SitePickerField(site: site, onTap: onPickSite, onClear: onClearSite),
         BuddiesPickerField(buddies: buddies, onTap: onPickBuddies),

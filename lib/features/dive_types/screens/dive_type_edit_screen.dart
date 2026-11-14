@@ -32,7 +32,7 @@ class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
   }
 
   Future<void> _addTank() async {
-    final c = await showTankEditSheet(context, presets: _presets);
+    final c = await showTankEditSheet(context, presets: _presets, template: true);
     if (c != null) setState(() => _tanks.add(c));
   }
 
@@ -56,7 +56,8 @@ class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
         actions: [SaveAction(saving: false, onSave: _save)],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(
+            16, 16, 16, 16 + MediaQuery.of(context).viewInsets.bottom),
         children: [
           LabeledField(controller: _name, label: t.name),
           const SizedBox(height: 16),
@@ -65,7 +66,8 @@ class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.propane_tank_outlined),
-                title: Text(
+                title: Text(_tanks[i].name ?? t.tankN(i + 1)),
+                subtitle: Text(
                     '${_tanks[i].size?.toStringAsFixed(1) ?? '—'} L · '
                     '${_tanks[i].material == TankMaterial.steel ? t.steel : t.aluminium}'),
                 trailing: IconButton(

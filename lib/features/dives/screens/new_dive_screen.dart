@@ -72,7 +72,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
     if (chosen == null) return;
     setState(() {
       _typeName = chosen.name;
-      _tanks = [...chosen.tanks]; // añade las botellas del tipo
+      _tanks = [..._tanks, ...chosen.tanks]; // añade a las existentes
     });
   }
 

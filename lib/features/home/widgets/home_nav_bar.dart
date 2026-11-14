@@ -14,16 +14,14 @@ class HomeNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    // Tags/Equipo/Stats viven en el menú lateral, no aquí.
     return NavigationBar(
-      selectedIndex: selectedIndex,
+      selectedIndex: selectedIndex.clamp(0, 2),
       onDestinationSelected: onSelected,
       destinations: [
         _dest(Icons.scuba_diving_outlined, Icons.scuba_diving, t.navDives),
         _dest(Icons.place_outlined, Icons.place, t.navSites),
         _dest(Icons.people_outline, Icons.people, t.buddies),
-        _dest(Icons.label_outline, Icons.label, t.tags),
-        _dest(Icons.tune_outlined, Icons.tune, t.equipment),
-        _dest(Icons.bar_chart_outlined, Icons.bar_chart, t.navStats),
       ],
     );
   }
