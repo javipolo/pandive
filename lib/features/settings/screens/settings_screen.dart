@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
@@ -29,6 +30,13 @@ class SettingsScreen extends StatelessWidget {
     final n = db.importHashtagsFromComments();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context).importHashtagsResult(n))));
+  }
+
+  void _exportDb() {
+    final path = settings.dbPath;
+    if (path != null) {
+      SharePlus.instance.share(ShareParams(files: [XFile(path)]));
+    }
   }
 
   Future<void> _confirmChangeDb(BuildContext context) async {
@@ -92,6 +100,11 @@ class SettingsScreen extends StatelessWidget {
                 leading: const Icon(Icons.tag),
                 title: Text(t.importHashtags),
                 onTap: () => _importHashtags(context),
+              ),
+              ListTile(
+                leading: const Icon(Icons.ios_share),
+                title: Text(t.exportLogbook),
+                onTap: _exportDb,
               ),
               const Divider(),
               _header(context, t.backup),

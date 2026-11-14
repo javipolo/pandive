@@ -216,6 +216,7 @@
   "noTags": "No tags yet",
   "fullscreen": "Fullscreen",
   "tools": "Tools",
+  "exportLogbook": "Export logbook (.ddb)",
   "importHashtags": "Import #hashtags from comments as tags",
   "importHashtagsResult": "{count} tags assigned.",
   "@importHashtagsResult": { "placeholders": { "count": {} } },

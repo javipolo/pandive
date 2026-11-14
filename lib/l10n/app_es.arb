@@ -195,6 +195,7 @@
   "noTags": "Aún no hay etiquetas",
   "fullscreen": "Pantalla completa",
   "tools": "Herramientas",
+  "exportLogbook": "Exportar logbook (.ddb)",
   "importHashtags": "Importar #hashtags de los comentarios como etiquetas",
   "importHashtagsResult": "{count} etiquetas asignadas.",
   "equipment": "Equipo",
