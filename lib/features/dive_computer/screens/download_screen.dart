@@ -23,12 +23,14 @@ class DownloadScreen extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   final bool baseline;
+  final bool all; // ignora el fingerprint: baja todas las inmersiones
   const DownloadScreen({
     super.key,
     required this.device,
     required this.db,
     required this.settings,
     this.baseline = false,
+    this.all = false,
   });
 
   @override
@@ -73,8 +75,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
       vendor: m.$1,
       product: m.$2,
       address: widget.device.id,
-      fingerprint:
-          widget.baseline ? '' : (widget.db.fingerprintFor(widget.device.id) ?? ''),
+      fingerprint: (widget.baseline || widget.all)
+          ? ''
+          : (widget.db.fingerprintFor(widget.device.id) ?? ''),
       maxDives: widget.baseline ? 1 : 0,
     );
     if (widget.baseline && res.ok && res.dives.isNotEmpty) {

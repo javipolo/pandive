@@ -129,6 +129,7 @@
   "scanError": "Scan error: {error}",
   "@scanError": { "placeholders": { "error": {} } },
 
+  "downloadAll": "Download all dives",
   "actionDownload": "Download dives",
   "actionDownloadSub": "Gets the new dives from the computer",
   "actionMarkImported": "Mark as already imported",

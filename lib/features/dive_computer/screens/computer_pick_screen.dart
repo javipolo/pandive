@@ -10,7 +10,6 @@ import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/screens/scan_screen.dart';
-import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class ComputerPickScreen extends StatefulWidget {
@@ -35,9 +34,8 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
     if (mounted) _reload();
   }
 
-  Future<void> _use(DiveComputerRef ref) async {
-    final baseline = await showDiveComputerActionSheet(context);
-    if (baseline == null || !mounted) return;
+  Future<void> _download(DiveComputerRef ref,
+      {bool baseline = false, bool all = false}) async {
     final d = ScannedDevice(
         name: ref.name, id: ref.address, rssi: 0, likely: true);
     await Navigator.of(context).push(MaterialPageRoute(
@@ -45,8 +43,21 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
           device: d,
           db: widget.db,
           settings: widget.settings,
-          baseline: baseline),
+          baseline: baseline,
+          all: all),
     ));
+  }
+
+  void _menu(DiveComputerRef ref, String v) {
+    switch (v) {
+      case 'all':
+        _download(ref, all: true);
+      case 'mark':
+        _download(ref, baseline: true);
+      case 'delete':
+        widget.db.removeComputer(ref.address);
+        _reload();
+    }
   }
 
   @override
@@ -73,7 +84,16 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
                 leading: const Icon(Icons.watch),
                 title: Text(c.name),
                 subtitle: Text(c.address),
-                onTap: () => _use(c),
+                onTap: () => _download(c),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (v) => _menu(c, v),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(value: 'all', child: Text(t.downloadAll)),
+                    PopupMenuItem(
+                        value: 'mark', child: Text(t.actionMarkImported)),
+                    PopupMenuItem(value: 'delete', child: Text(t.delete)),
+                  ],
+                ),
               ),
         ],
       ),

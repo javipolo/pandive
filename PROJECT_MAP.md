@@ -118,8 +118,7 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### dive_computer (ordenador de buceo)
 - `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
-- `lib/features/dive_computer/screens/computer_pick_screen.dart` -> "Dive transfer": elige guardado o Buscar
-- `lib/features/dive_computer/screens/computers_settings_screen.dart` -> lista/borra ordenadores (Ajustes)
+- `lib/features/dive_computer/screens/computer_pick_screen.dart` -> "Dive transfer": tocar=descargar; menú (descargar todo/marcar/borrar); Buscar
 - `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE; al elegir, ofrece guardar (checkbox)
 - `lib/features/dive_computer/screens/download_screen.dart` -> descarga inmersiones de un dispositivo y las muestra
 - `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo, vista de error, hoja de acciones (descargar/marcar)
