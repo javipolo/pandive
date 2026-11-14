@@ -43,10 +43,15 @@ class _BackupScreenState extends State<BackupScreen> {
 
   Future<void> _toggleAccount() async {
     setState(() => _busy = true);
-    if (_svc.connected) {
-      await _svc.signOut();
-    } else {
-      await _svc.signIn();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      if (_svc.connected) {
+        await _svc.signOut();
+      } else {
+        await _svc.signIn();
+      }
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
     }
     if (mounted) setState(() => _busy = false);
   }
