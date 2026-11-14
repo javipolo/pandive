@@ -1,7 +1,18 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Firma release desde android/key.properties (no versionado). Si falta, cae a debug.
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -49,10 +60,24 @@ android {
         abortOnError = false
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // Firmado con la debug key por ahora, para sideload.
-            signingConfig = signingConfigs.getByName("debug")
+            // Firma release propia (android/key.properties); si falta, debug.
+            signingConfig = if (hasReleaseKeystore)
+                signingConfigs.getByName("release")
+            else
+                signingConfigs.getByName("debug")
             // R8 con nuestras reglas keep: conserva los métodos que llama el
             // nativo por JNI (BleConnection.bleRead/bleWrite, DiveComputer.*).
             isMinifyEnabled = true
