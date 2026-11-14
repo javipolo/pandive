@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
 import 'db/divemate_db.dart';
+import 'services/drive_backup.dart';
 import 'settings/settings.dart';
 import 'theme/app_theme.dart';
 import '../features/home/screens/home_screen.dart';
@@ -83,12 +84,18 @@ class _AppRootState extends State<AppRoot> {
         _error = DbLoadError.invalid;
       } else {
         _db = db;
+        _maybeBackup();
       }
     } catch (e) {
       _error = DbLoadError.openFailed;
       _errorDetail = '$e';
     }
     setState(() {});
+  }
+
+  // Backup diario automático a Drive (silencioso; no hace nada si no procede).
+  void _maybeBackup() {
+    DriveBackupService().backupIfNeeded(widget.settings);
   }
 
   @override
@@ -118,6 +125,7 @@ class _AppRootState extends State<AppRoot> {
         await widget.settings.setDbPath(null);
         _tryOpen(null);
       },
+      onReloadDb: () => _tryOpen(widget.settings.dbPath),
     );
   }
 }

@@ -20,12 +20,14 @@ class HomeScreen extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   final VoidCallback onChangeDb;
+  final VoidCallback onReloadDb;
 
   const HomeScreen({
     super.key,
     required this.db,
     required this.settings,
     required this.onChangeDb,
+    required this.onReloadDb,
   });
 
   @override
@@ -113,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         settings: widget.settings,
                         db: widget.db,
                         onChangeDb: widget.onChangeDb,
+                        onReloadDb: widget.onReloadDb,
                       ))),
             ),
           ],

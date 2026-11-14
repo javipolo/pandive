@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Red para backup/restauración en Google Drive -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Bluetooth LE para descargar del ordenador de buceo -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />

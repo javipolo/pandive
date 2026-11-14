@@ -14,6 +14,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/settings/settings.dart` -> preferencias: escala de texto, ruta DB, idioma, tema, horario nocturno, hueco fusión
 - `lib/l10n/app_en.arb` / `app_es.arb` -> traducciones (plantilla EN + ES); `AppLocalizations` se genera con `flutter gen-l10n`
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
+- `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth, carpeta, hash (parts)
+- `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/list/restore/poda
+- `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10
 
 ### Core · base de datos (una librería con `part`s)
 - `lib/core/db/divemate_db.dart` -> abre .ddb, owner, helpers; declara los parts
@@ -71,8 +74,12 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/tags/screens/tags_tab.dart` -> lista de tags (crear/renombrar/borrar, ver buceos)
 - `lib/features/dives/screens/dives_list_screen.dart` -> lista simple de buceos (tag/buddy/sitio)
 
+### backup (copia de seguridad en Drive)
+- `lib/features/backup/screens/backup_screen.dart` -> conectar cuenta, backup manual, auto diario, restaurar
+- `lib/features/backup/widgets/restore_list.dart` -> lista de backups de Drive para restaurar
+
 ### settings
-- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tamaño letra, hueco fusión, herramientas, DB
+- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, backup, herramientas, DB
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)

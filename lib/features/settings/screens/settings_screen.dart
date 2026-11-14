@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/backup/screens/backup_screen.dart';
 import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';
 import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
 import 'package:pandive/features/settings/widgets/night_hours_control.dart';
@@ -15,11 +16,13 @@ class SettingsScreen extends StatelessWidget {
   final Settings settings;
   final DivemateDb db;
   final VoidCallback onChangeDb;
+  final VoidCallback onReloadDb;
   const SettingsScreen({
     super.key,
     required this.settings,
     required this.db,
     required this.onChangeDb,
+    required this.onReloadDb,
   });
 
   void _importHashtags(BuildContext context) {
@@ -89,6 +92,16 @@ class SettingsScreen extends StatelessWidget {
                 leading: const Icon(Icons.tag),
                 title: Text(t.importHashtags),
                 onTap: () => _importHashtags(context),
+              ),
+              const Divider(),
+              _header(context, t.backup),
+              ListTile(
+                leading: const Icon(Icons.cloud_upload_outlined),
+                title: Text(t.backupDrive),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => BackupScreen(
+                        settings: settings, onReloadDb: onReloadDb))),
               ),
               const Divider(),
               _header(context, t.database),

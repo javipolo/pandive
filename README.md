@@ -201,3 +201,31 @@ Por fases (ver plan de desarrollo):
 - **Un solo buceador**: la `.ddb` puede tener varios `DiverID` (demo/imports); el owner es el de más inmersiones. Pandive opera solo sobre el owner.
 - **Perfiles**: en `Logbook.Profile` (profundidad, 12 chars/muestra, 4 primeros = decímetros) y `Profile2` (temperatura, 11 chars/muestra, 4 primeros = centi-°C); `ProfileInt` = intervalo en segundos. Decode portado de `divemate-cli`.
 - **Mares Puck 4**: soporte confirmado en `libdivecomputer` (modelo `0x35`, BLE).
+
+---
+
+## Backup en Google Drive (configuración OAuth, una vez)
+
+El backup/restore usa `google_sign_in` con el scope **`drive.file`** (no sensible,
+sin verificación de Google): la app solo ve los ficheros que ella crea, en una
+carpeta visible "Pandive Backups". Para que funcione en el móvil hay que crear un
+cliente OAuth de Android en Google Cloud (no se embebe ninguna clave en el APK;
+Android lo resuelve por paquete + SHA-1):
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → crea un proyecto.
+2. **APIs y servicios → Biblioteca** → habilita **Google Drive API**.
+3. **Pantalla de consentimiento OAuth** → tipo *External* → añade tu cuenta de
+   Google como **usuario de prueba** (así no hace falta verificación).
+4. **Credenciales → Crear → ID de cliente OAuth → Android**:
+   - Paquete: `org.drslump.pandive`
+   - SHA-1 de la clave de firma (release y, si quieres probar en debug, también
+     la debug):
+     ```
+     keytool -list -v -keystore <tu-release.keystore> -alias <alias>
+     keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+     ```
+5. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
+
+El backup automático diario se dispara al abrir la app si han pasado >24 h y la
+DB cambió. Se guarda `latest.ddb` + copias con timestamp (se conservan las 10
+más recientes). Al restaurar, por defecto se ofrece `latest`.

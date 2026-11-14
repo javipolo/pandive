@@ -13,6 +13,9 @@ class Settings extends ChangeNotifier {
   static const _kNightStart = 'night_start';
   static const _kNightEnd = 'night_end';
   static const _kTheme = 'theme_mode';
+  static const _kBackupAuto = 'backup_auto';
+  static const _kBackupTime = 'backup_last_time';
+  static const _kBackupHash = 'backup_last_hash';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -92,6 +95,22 @@ class Settings extends ChangeNotifier {
   bool isNight(int hour) {
     final s = nightStartHour, e = nightEndHour;
     return s <= e ? (hour >= s && hour < e) : (hour >= s || hour < e);
+  }
+
+  /// Backup diario automático a Drive activado.
+  bool get autoBackup => _prefs.getBool(_kBackupAuto) ?? false;
+  Future<void> setAutoBackup(bool v) async {
+    await _prefs.setBool(_kBackupAuto, v);
+    notifyListeners();
+  }
+
+  int get backupLastTime => _prefs.getInt(_kBackupTime) ?? 0;
+  String? get backupLastHash => _prefs.getString(_kBackupHash);
+
+  Future<void> setBackupState(String hash, int timeMs) async {
+    await _prefs.setString(_kBackupHash, hash);
+    await _prefs.setInt(_kBackupTime, timeMs);
+    notifyListeners();
   }
 
   Future<void> setLocale(String? code) async {
