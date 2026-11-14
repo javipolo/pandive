@@ -17,11 +17,13 @@ class DivesTab extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   final String query;
+  final bool collapseAll;
   const DivesTab({
     super.key,
     required this.db,
     required this.settings,
     this.query = '',
+    this.collapseAll = false,
   });
 
   @override
@@ -89,7 +91,10 @@ class _DivesTabState extends State<DivesTab> {
       ),
       body: _dives.isEmpty
           ? Center(child: Text(t.noResults))
-          : MonthGroupedDives(dives: _dives, onOpen: _openDetail),
+          : MonthGroupedDives(
+              dives: _dives,
+              onOpen: _openDetail,
+              collapseAll: widget.collapseAll),
     );
   }
 }

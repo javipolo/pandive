@@ -1,0 +1,84 @@
+/// Fila de inmersión estilo DiveMate: número grande a la izquierda (2 líneas),
+/// nombre del sitio arriba y fecha/hora/tiempo/profundidad debajo.
+library;
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import 'package:pandive/core/models/models.dart';
+import 'package:pandive/l10n/app_localizations.dart';
+
+class DiveRow extends StatelessWidget {
+  final Dive dive;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final bool selected;
+
+  const DiveRow({
+    super.key,
+    required this.dive,
+    required this.onTap,
+    this.onLongPress,
+    this.selected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
+    final cs = Theme.of(context).colorScheme;
+    final title = [dive.place, dive.country]
+        .whereType<String>()
+        .where((e) => e.isNotEmpty)
+        .join(', ');
+
+    final parts = <String>[
+      if (dive.date != null) DateFormat('dd/MM/yyyy HH:mm', locale).format(dive.date!),
+      if (dive.durationMin != null) '${dive.durationMin!.round()} min',
+      if (dive.maxDepth != null) '${NumberFormat('0.0', locale).format(dive.maxDepth)} m',
+    ].join('   ');
+
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Container(
+        color: selected ? cs.primaryContainer.withValues(alpha: 0.5) : null,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 52,
+              child: Text(
+                dive.number?.toString() ?? '—',
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold, color: cs.primary),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title.isEmpty ? t.dive : title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(parts, style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ),
+            ),
+            if (selected)
+              Icon(Icons.check_circle, color: cs.primary),
+          ],
+        ),
+      ),
+    );
+  }
+}

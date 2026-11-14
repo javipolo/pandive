@@ -34,9 +34,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _dataVersion = 0; // se incrementa para forzar recarga de las pestañas
   bool _searching = false;
   String _query = '';
+  bool _collapseAll = false;
   final _searchCtrl = TextEditingController();
 
   bool get _canSearch => _index <= 3; // todas menos estadísticas
+  bool get _canCollapse => _index == 0 || _index == 1; // inmersiones / sitios
 
   @override
   void dispose() {
@@ -80,6 +82,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: const Icon(Icons.search),
                 onPressed: () => setState(() => _searching = true),
               ),
+            if (_canCollapse)
+              IconButton(
+                tooltip: '',
+                iconSize: 30,
+                icon: Icon(_collapseAll ? Icons.unfold_more : Icons.unfold_less),
+                onPressed: () => setState(() => _collapseAll = !_collapseAll),
+              ),
             IconButton(
               tooltip: t.settings,
               icon: const Icon(Icons.settings),
@@ -100,11 +109,13 @@ class _HomeScreenState extends State<HomeScreen> {
               key: ValueKey('dives-$_dataVersion'),
               db: widget.db,
               settings: widget.settings,
-              query: _index == 0 && _searching ? _query : ''),
+              query: _index == 0 && _searching ? _query : '',
+              collapseAll: _collapseAll),
           SitesTab(
               key: ValueKey('sites-$_dataVersion'),
               db: widget.db,
-              query: _index == 1 && _searching ? _query : ''),
+              query: _index == 1 && _searching ? _query : '',
+              collapseAll: _collapseAll),
           BuddiesTab(
               key: ValueKey('buddies-$_dataVersion'),
               db: widget.db,

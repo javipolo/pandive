@@ -1,17 +1,27 @@
-/// Lista de inmersiones agrupada por mes, con cabeceras colapsables y
-/// colapsar/expandir todo.
+/// Lista de inmersiones agrupada por mes, con cabeceras colapsables.
+/// El colapsar/expandir todo lo controla la barra superior (collapseAll).
 library;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
-import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/features/dives/widgets/dive_row.dart';
 
 class MonthGroupedDives extends StatefulWidget {
   final List<Dive> dives;
   final void Function(int index) onOpen;
-  const MonthGroupedDives({super.key, required this.dives, required this.onOpen});
+  final void Function(int index)? onLongPress;
+  final Set<int> selected;
+  final bool collapseAll;
+  const MonthGroupedDives({
+    super.key,
+    required this.dives,
+    required this.onOpen,
+    this.onLongPress,
+    this.selected = const {},
+    this.collapseAll = false,
+  });
 
   @override
   State<MonthGroupedDives> createState() => _MonthGroupedDivesState();
@@ -25,49 +35,43 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
       : '${d.date!.year}-${d.date!.month.toString().padLeft(2, '0')}';
 
   @override
-  Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context).languageCode;
-    final monthFmt = DateFormat('MMMM yyyy', locale);
-    final dateFmt = DateFormat('d MMM yyyy', locale);
+  void didUpdateWidget(MonthGroupedDives old) {
+    super.didUpdateWidget(old);
+    if (old.collapseAll != widget.collapseAll) {
+      _collapsed
+        ..clear()
+        ..addAll(widget.collapseAll ? widget.dives.map(_key) : const []);
+    }
+  }
 
-    // Grupos en orden de aparición (la lista ya viene ordenada desc).
+  @override
+  Widget build(BuildContext context) {
+    final monthFmt =
+        DateFormat('MMMM yyyy', Localizations.localeOf(context).languageCode);
     final keys = <String>[];
-    final groups = <String, List<int>>{}; // key -> índices en widget.dives
+    final groups = <String, List<int>>{};
     for (var i = 0; i < widget.dives.length; i++) {
       final k = _key(widget.dives[i]);
       (groups[k] ??= (keys..add(k), <int>[]).$2).add(i);
     }
 
-    final allCollapsed = keys.isNotEmpty && _collapsed.length == keys.length;
-    final rows = <Widget>[
-      Align(
-        alignment: Alignment.centerRight,
-        child: IconButton(
-          tooltip: '',
-          icon: Icon(allCollapsed ? Icons.unfold_more : Icons.unfold_less),
-          onPressed: () => setState(() {
-            if (allCollapsed) {
-              _collapsed.clear();
-            } else {
-              _collapsed.addAll(keys);
-            }
-          }),
-        ),
-      ),
-    ];
+    final rows = <Widget>[];
     for (final k in keys) {
       final idxs = groups[k]!;
-      final label = k == '—'
-          ? '—'
-          : monthFmt.format(widget.dives[idxs.first].date!);
+      final label =
+          k == '—' ? '—' : monthFmt.format(widget.dives[idxs.first].date!);
       final collapsed = _collapsed.contains(k);
-      rows.add(_header(context, label, idxs.length, collapsed, () {
-        setState(() =>
-            collapsed ? _collapsed.remove(k) : _collapsed.add(k));
-      }));
+      rows.add(_header(context, label, idxs.length, collapsed,
+          () => setState(() => collapsed ? _collapsed.remove(k) : _collapsed.add(k))));
       if (!collapsed) {
         for (final i in idxs) {
-          rows.add(_tile(context, widget.dives[i], i, dateFmt));
+          rows.add(DiveRow(
+            dive: widget.dives[i],
+            selected: widget.selected.contains(i),
+            onTap: () => widget.onOpen(i),
+            onLongPress:
+                widget.onLongPress == null ? null : () => widget.onLongPress!(i),
+          ));
         }
       }
     }
@@ -90,31 +94,6 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
             color: cs.onPrimaryContainer),
         onTap: onTap,
       ),
-    );
-  }
-
-  Widget _tile(BuildContext context, Dive d, int index, DateFormat dateFmt) {
-    final subtitle =
-        [d.place, d.country].whereType<String>().where((e) => e.isNotEmpty).join(' · ');
-    final stats = [
-      if (d.maxDepth != null) '${d.maxDepth!.toStringAsFixed(1)} m',
-      if (d.durationMin != null) '${d.durationMin!.round()} min',
-      if (d.waterTemp != null) '${d.waterTemp!.toStringAsFixed(0)} °C',
-    ].join('   ');
-    return ListTile(
-      leading: CircleAvatar(child: Text(d.number?.toString() ?? '—')),
-      title: Text(subtitle.isEmpty ? AppLocalizations.of(context).dive : subtitle,
-          maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (d.date != null) Text(dateFmt.format(d.date!)),
-          if (stats.isNotEmpty)
-            Text(stats, style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ),
-      isThreeLine: d.date != null && stats.isNotEmpty,
-      onTap: () => widget.onOpen(index),
     );
   }
 }

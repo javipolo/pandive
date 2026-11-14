@@ -13,11 +13,13 @@ class SitesGroupedList extends StatefulWidget {
   /// Si se pasa, el filtro viene de fuera (barra superior) y se oculta la barra
   /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
   final String? externalQuery;
+  final bool collapseAll;
   const SitesGroupedList({
     super.key,
     required this.sites,
     required this.onTap,
     this.externalQuery,
+    this.collapseAll = false,
   });
 
   @override
@@ -33,6 +35,18 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(SitesGroupedList old) {
+    super.didUpdateWidget(old);
+    if (old.collapseAll != widget.collapseAll) {
+      _collapsed
+        ..clear()
+        ..addAll(widget.collapseAll
+            ? widget.sites.map((s) => s.country ?? '—')
+            : const []);
+    }
   }
 
   Map<String, List<DiveSite>> _grouped() {
