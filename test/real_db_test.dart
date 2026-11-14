@@ -387,6 +387,45 @@ void main() {
     }
   });
 
+  test('renombrar sitio se propaga a las inmersiones existentes', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_rsite_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final sid = w.createSite({'Place': 'Cala Vella', 'Country': 'España'});
+      final did = w.createDive(
+          dateTime: DateTime(2030, 7, 1, 10, 0),
+          place: 'Cala Vella',
+          country: 'España',
+          placeId: sid);
+      w.updateSite(sid, {'Place': 'Cala Nova', 'Country': 'España'});
+      final d = w.getDive(did)!;
+      expect(d.place, 'Cala Nova');
+    } finally {
+      w.close();
+    }
+  });
+
+  test('renombrar buddy se propaga al texto Buddy de las inmersiones', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_rbud_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final bid = w.findOrCreateBuddy('Marina');
+      final did = w.createDive(
+          dateTime: DateTime(2030, 8, 1, 10, 0),
+          buddy: 'Marina',
+          buddyIds: '$bid');
+      w.renameBuddy(bid, 'Marina López');
+      final d = w.getDive(did)!;
+      expect(d.buddy, 'Marina López');
+    } finally {
+      w.close();
+    }
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

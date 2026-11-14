@@ -34,7 +34,16 @@ extension DivemateDbSites on DivemateDb {
     final sets = [for (final c in cols) '$c = ?', 'Updated = ?'];
     final params = <Object?>[for (final c in cols) fields[c], _nowStamp(), id];
     _db.execute('UPDATE Place SET ${sets.join(', ')} WHERE ID=?', params);
+    // Propaga nombre/país a las inmersiones ya registradas de este sitio.
+    if (fields.containsKey('Place') || fields.containsKey('Country')) {
+      _db.execute(
+        'UPDATE Logbook SET Place=?, Country=?, Updated=? WHERE PlaceID=?',
+        [fields['Place'], fields['Country'], _nowStamp(), id],
+      );
+    }
   }
+
+  void deleteSite(int id) => _db.execute('DELETE FROM Place WHERE ID=?', [id]);
 
   int createSite(Map<String, Object?> fields) {
     _db.execute(

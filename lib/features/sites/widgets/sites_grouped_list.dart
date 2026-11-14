@@ -10,6 +10,10 @@ import 'package:pandive/l10n/app_localizations.dart';
 class SitesGroupedList extends StatefulWidget {
   final List<DiveSite> sites;
   final void Function(DiveSite) onTap;
+  /// Si se pasan, el tile muestra un menú editar/borrar a la derecha (pestaña de
+  /// sitios). En el selector se omiten y el tile solo selecciona.
+  final void Function(DiveSite)? onEdit;
+  final void Function(DiveSite)? onDelete;
   /// Si se pasa, el filtro viene de fuera (barra superior) y se oculta la barra
   /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
   final String? externalQuery;
@@ -18,6 +22,8 @@ class SitesGroupedList extends StatefulWidget {
     super.key,
     required this.sites,
     required this.onTap,
+    this.onEdit,
+    this.onDelete,
     this.externalQuery,
     this.collapseAll = false,
   });
@@ -36,7 +42,6 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     _searchCtrl.dispose();
     super.dispose();
   }
-
   @override
   void didUpdateWidget(SitesGroupedList old) {
     super.didUpdateWidget(old);
@@ -48,7 +53,6 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
             : const []);
     }
   }
-
   Map<String, List<DiveSite>> _grouped() {
     final q = (widget.externalQuery ?? _q).trim().toLowerCase();
     final map = <String, List<DiveSite>>{};
@@ -67,7 +71,6 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     }
     return map;
   }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -101,7 +104,6 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
       ],
     );
   }
-
   Widget _header(BuildContext context, String country, int n) {
     final collapsed = _collapsed.contains(country);
     final cs = Theme.of(context).colorScheme;
@@ -133,6 +135,16 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
           maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(sub),
       onTap: () => widget.onTap(s),
+      trailing: widget.onEdit == null
+          ? null
+          : PopupMenuButton<String>(
+              onSelected: (v) =>
+                  v == 'edit' ? widget.onEdit!(s) : widget.onDelete!(s),
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'edit', child: Text(t.edit)),
+                PopupMenuItem(value: 'delete', child: Text(t.delete)),
+              ],
+            ),
     );
   }
 }

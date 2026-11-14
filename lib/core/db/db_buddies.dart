@@ -50,6 +50,33 @@ extension DivemateDbBuddies on DivemateDb {
       'UPDATE Buddy SET FirstName=?, LastName=NULL, Updated=? WHERE ID=?',
       [name.trim(), _nowStamp(), id],
     );
+    _refreshBuddyNames(id);
+  }
+
+  /// Recompone el texto `Logbook.Buddy` de las inmersiones que referencian al
+  /// buddy [id] (por BuddyIDs), para reflejar su nombre actual.
+  void _refreshBuddyNames(int id) {
+    final rows = _db.select(
+      "SELECT ID, BuddyIDs FROM Logbook WHERE "
+      "(',' || IFNULL(BuddyIDs,'') || ',') LIKE ('%,' || ? || ',%')",
+      [id],
+    );
+    if (rows.isEmpty) return;
+    final names = {for (final b in listBuddies()) b.id: b.name};
+    final now = _nowStamp();
+    for (final r in rows) {
+      final ids = (_str(r['BuddyIDs']) ?? '')
+          .split(',')
+          .map((e) => int.tryParse(e.trim()))
+          .whereType<int>();
+      final text = ids
+          .map((i) => names[i])
+          .whereType<String>()
+          .where((n) => n != '—')
+          .join(', ');
+      _db.execute('UPDATE Logbook SET Buddy=?, Updated=? WHERE ID=?',
+          [text.isEmpty ? null : text, now, r['ID']]);
+    }
   }
 
   void deleteBuddy(int id) => _db.execute('DELETE FROM Buddy WHERE ID=?', [id]);
