@@ -227,7 +227,16 @@ Android lo resuelve por paquete + SHA-1):
      registrar. Puedes añadir varios SHA-1 al mismo cliente: p.ej. el debug
      `~/.android/debug.keystore` alias `androiddebugkey`, pass `android`, si
      alguna vez quieres probar un build debug.)
-5. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
+5. **Credenciales → Crear → ID de cliente OAuth → Aplicación web**: crea uno
+   (nombre libre, sin orígenes). Copia su **Client ID** (`…apps.googleusercontent.com`).
+   `google_sign_in` lo exige en Android como `serverClientId`. Guárdalo en:
+   ```
+   echo 'TU_WEB_CLIENT_ID.apps.googleusercontent.com' > android/gdrive_client_id.txt
+   ```
+   (fichero no versionado; `make apk`/`apk-release` lo inyecta como
+   `--dart-define=GDRIVE_SERVER_CLIENT_ID`). Sin él, Conectar falla con
+   "ServerClientID must be provided".
+6. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
 
 > La firma release vive en `android/app/pandive-release.jks` + `android/key.properties`
 > (ambos **gitignored**, no se versionan). Si cambias de clave, añade el nuevo

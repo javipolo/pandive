@@ -15,6 +15,15 @@ import 'backup_util.dart';
 
 part 'drive_backup_ops.dart';
 
+/// OAuth client ID **de tipo Web** del proyecto Google Cloud. google_sign_in v7
+/// lo exige en Android como `serverClientId`. Pégalo aquí (termina en
+/// `.apps.googleusercontent.com`) o pásalo con
+/// `--dart-define=GDRIVE_SERVER_CLIENT_ID=...`. No es secreto.
+const _serverClientId = String.fromEnvironment(
+  'GDRIVE_SERVER_CLIENT_ID',
+  defaultValue: '',
+);
+
 /// Un backup listado en Drive (para restaurar).
 class BackupEntry {
   final String id;
@@ -38,14 +47,22 @@ class DriveBackupService {
 
   Future<void> _ensureInit() async {
     if (_inited) return;
-    await _gsi.initialize();
+    if (_serverClientId.isEmpty) {
+      throw Exception('Falta el OAuth Web client ID (serverClientId). '
+          'Ver README › Backup en Google Drive.');
+    }
+    await _gsi.initialize(serverClientId: _serverClientId);
     _inited = true;
   }
 
   /// Reconexión silenciosa (sin UI). Devuelve true si hay cuenta.
   Future<bool> signInSilently() async {
-    await _ensureInit();
-    _account = await _gsi.attemptLightweightAuthentication();
+    try {
+      await _ensureInit();
+      _account = await _gsi.attemptLightweightAuthentication();
+    } catch (_) {
+      return false;
+    }
     return _account != null;
   }
 

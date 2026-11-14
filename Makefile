@@ -10,6 +10,11 @@ export ANDROID_HOME
 export ANDROID_NDK
 export PATH := $(dir $(FLUTTER)):$(ANDROID_HOME)/platform-tools:$(PATH)
 
+# OAuth Web client ID para Google Drive (serverClientId). Se lee de
+# android/gdrive_client_id.txt (no versionado) o de la variable de entorno.
+GDRIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_client_id.txt 2>/dev/null))
+DART_DEFINES := $(if $(GDRIVE_CLIENT_ID),--dart-define=GDRIVE_SERVER_CLIENT_ID=$(GDRIVE_CLIENT_ID),)
+
 .DEFAULT_GOAL := help
 
 .PHONY: help
@@ -27,11 +32,11 @@ run: ## Compila, instala y lanza en el device conectado
 
 .PHONY: apk
 apk: ## Genera APK de depuración (sideload)
-	$(FLUTTER) build apk --debug
+	$(FLUTTER) build apk --debug $(DART_DEFINES)
 
 .PHONY: apk-release
 apk-release: ## Genera APK de release (requiere keystore)
-	$(FLUTTER) build apk --release
+	$(FLUTTER) build apk --release $(DART_DEFINES)
 
 APK := build/app/outputs/flutter-apk/app-debug.apk
 
