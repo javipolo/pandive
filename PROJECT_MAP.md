@@ -30,7 +30,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_merge.dart` -> fusionar inmersiones (perfil concatenado, unión de datos)
 - `lib/core/db/db_pending.dart` -> caché de descargados no guardados (reaparecen una vez)
 - `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
+- `lib/core/db/db_computers.dart` -> ordenadores de buceo guardados (por MAC)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
+- `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos
 
 ### Core · modelos (`models.dart` es el barrel)
 - `lib/core/models/models.dart` -> barrel: reexporta todos los modelos
@@ -38,6 +40,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/dive_profile.dart` -> perfil muestreado (tiempos/profundidades/temps)
 - `lib/core/models/cylinder.dart` -> botella/mezcla (+ etiqueta de gas)
 - `lib/core/models/dive_site.dart` -> punto de buceo con nº de inmersiones
+- `lib/core/models/dive_computer_ref.dart` -> ordenador de buceo guardado (MAC+nombre+modelo)
 - `lib/core/models/dive_type.dart` -> tipo de buceo (nombre + plantilla de botellas)
 - `lib/core/models/downloaded_dive.dart` -> inmersión descargada del ordenador (+ muestras/gases, parse JSON)
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
@@ -71,6 +74,7 @@ con `screens/` y, si hace falta, `widgets/`).
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tamaño letra, hueco fusión, herramientas, DB
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
+- `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
 - `lib/features/settings/widgets/night_hours_control.dart` -> franja horaria de inmersión nocturna (desde/hasta)
 
@@ -114,7 +118,9 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### dive_computer (ordenador de buceo)
 - `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
-- `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE y lista de ordenadores
+- `lib/features/dive_computer/screens/computer_pick_screen.dart` -> "Dive transfer": elige guardado o Buscar
+- `lib/features/dive_computer/screens/computers_settings_screen.dart` -> lista/borra ordenadores (Ajustes)
+- `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE; al elegir, ofrece guardar (checkbox)
 - `lib/features/dive_computer/screens/download_screen.dart` -> descarga inmersiones de un dispositivo y las muestra
 - `lib/features/dive_computer/widgets/scan_widgets.dart` -> fila de dispositivo, vista de error, hoja de acciones (descargar/marcar)
 - `lib/features/dive_computer/widgets/download_progress.dart` -> indicador circular de progreso con %

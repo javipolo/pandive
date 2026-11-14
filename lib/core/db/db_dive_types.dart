@@ -3,15 +3,15 @@ part of 'divemate_db.dart';
 /// Tipos de buceo configurables y su plantilla de botellas.
 extension DivemateDbDiveTypes on DivemateDb {
   List<DiveType> listDiveTypes() {
-    final rows = _db.select(
-        'SELECT Id, Name FROM PandiveDiveType ORDER BY Name COLLATE NOCASE');
+    final rows = _db.select('SELECT Id, Name FROM PandiveDiveType');
     return rows
         .map((r) => DiveType(
               id: r['Id'] as int,
               name: _str(r['Name']) ?? '',
               tanks: diveTypeTanks(r['Id'] as int),
             ))
-        .toList();
+        .toList()
+      ..sort((a, b) => compareFold(a.name, b.name));
   }
 
   /// Botellas-plantilla de un tipo (nombre + litros + material; sin presiones).

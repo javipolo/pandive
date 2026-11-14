@@ -11,6 +11,7 @@ import 'dart:math';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../models/models.dart';
+import '../text/collate.dart';
 
 part 'db_queries.dart';
 part 'db_profile.dart';
@@ -26,6 +27,7 @@ part 'db_tags.dart';
 part 'db_merge.dart';
 part 'db_pending.dart';
 part 'db_dive_types.dart';
+part 'db_computers.dart';
 
 class DivemateDb {
   final Database _db;

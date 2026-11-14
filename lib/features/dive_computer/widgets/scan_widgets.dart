@@ -55,6 +55,33 @@ Future<bool?> showDiveComputerActionSheet(BuildContext context) {
   );
 }
 
+/// Pregunta si guardar el ordenador recién escaneado (checkbox marcado por
+/// defecto). Devuelve true=guardar, false=no guardar, null=cancelar.
+Future<bool?> showSaveComputerDialog(BuildContext context, String name) {
+  final t = AppLocalizations.of(context);
+  var save = true;
+  return showDialog<bool>(
+    context: context,
+    builder: (_) => StatefulBuilder(
+      builder: (c, setDlg) => AlertDialog(
+        title: Text(name),
+        content: CheckboxListTile(
+          value: save,
+          onChanged: (v) => setDlg(() => save = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          title: Text(t.saveComputer),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c), child: Text(t.cancel)),
+          FilledButton(
+              onPressed: () => Navigator.pop(c, save),
+              child: Text(t.continueLabel)),
+        ],
+      ),
+    ),
+  );
+}
+
 class ScanErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;

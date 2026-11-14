@@ -29,7 +29,6 @@ class _ScanScreenState extends State<ScanScreen> {
   String? _error;
   bool _scanning = false;
   bool _permissionOk = false;
-
   @override
   void initState() {
     super.initState();
@@ -62,13 +61,11 @@ class _ScanScreenState extends State<ScanScreen> {
       }),
     );
   }
-
   @override
   void dispose() {
     _sub?.cancel();
     super.dispose();
   }
-
   List<ScannedDevice> get _sorted {
     final list = _devices.values.toList();
     list.sort((a, b) {
@@ -77,10 +74,18 @@ class _ScanScreenState extends State<ScanScreen> {
     });
     return list;
   }
-
   Future<void> _onTap(ScannedDevice d) async {
     await _sub?.cancel(); // parar escaneo antes de conectar
     if (mounted) setState(() => _scanning = false);
+    if (!mounted) return;
+    if (!widget.db.isComputerSaved(d.id)) {
+      final save = await showSaveComputerDialog(context, d.name);
+      if (save == null || !mounted) return;
+      if (save) {
+        final m = modelForDeviceName(d.name);
+        widget.db.addComputer(d.id, d.name, vendor: m?.$1, product: m?.$2);
+      }
+    }
     if (!mounted) return;
     final baseline = await showDiveComputerActionSheet(context);
     if (baseline == null || !mounted) return;
@@ -95,7 +100,6 @@ class _ScanScreenState extends State<ScanScreen> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -108,15 +112,12 @@ class _ScanScreenState extends State<ScanScreen> {
             const Padding(
               padding: EdgeInsets.all(16),
               child: SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: 20, height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2)),
             )
           else
             IconButton(
-                icon: const Icon(Icons.refresh),
-                tooltip: t.rescan,
-                onPressed: _start),
+                icon: const Icon(Icons.refresh), tooltip: t.rescan, onPressed: _start),
         ],
       ),
       body: _error != null
@@ -126,10 +127,8 @@ class _ScanScreenState extends State<ScanScreen> {
                 if (_permissionOk)
                   Padding(
                     padding: const EdgeInsets.all(12),
-                    child: Text(
-                      _scanning ? t.scanningHint : t.scanStopped,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    child: Text(_scanning ? t.scanningHint : t.scanStopped,
+                        style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 Expanded(
                   child: devices.isEmpty

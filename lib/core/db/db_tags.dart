@@ -3,11 +3,11 @@ part of 'divemate_db.dart';
 /// Etiquetas (tags) reutilizables y su enlace por inmersión.
 extension DivemateDbTags on DivemateDb {
   List<Tag> listTags() {
-    final rows = _db.select(
-        'SELECT Id, Name FROM PandiveTag ORDER BY Name COLLATE NOCASE');
+    final rows = _db.select('SELECT Id, Name FROM PandiveTag');
     return rows
         .map((r) => Tag(id: r['Id'] as int, name: _str(r['Name']) ?? ''))
-        .toList();
+        .toList()
+      ..sort((a, b) => compareFold(a.name, b.name));
   }
 
   int findOrCreateTag(String name) {

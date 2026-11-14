@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/text/collate.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SitesGroupedList extends StatefulWidget {
@@ -66,8 +67,7 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
       (map[s.country ?? '—'] ??= []).add(s);
     }
     for (final list in map.values) {
-      list.sort((a, b) => (a.name ?? '').toLowerCase().compareTo(
-          (b.name ?? '').toLowerCase()));
+      list.sort((a, b) => compareFold(a.name ?? '', b.name ?? ''));
     }
     return map;
   }
@@ -75,7 +75,7 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final grouped = _grouped();
-    final countries = grouped.keys.toList()..sort();
+    final countries = grouped.keys.toList()..sort(compareFold);
     return Column(
       children: [
         if (widget.externalQuery == null)

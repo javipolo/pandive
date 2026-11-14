@@ -28,6 +28,10 @@ void _ensureSyncTable(Database db) {
   try {
     db.execute('ALTER TABLE PandiveDiveTypeTank ADD COLUMN Name TEXT');
   } catch (_) {/* ya existe */}
+  // Ordenadores de buceo guardados (reconexión por MAC sin reescanear).
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveComputer '
+      '(Address TEXT PRIMARY KEY, Name TEXT, Vendor TEXT, Product TEXT, '
+      'Updated TEXT)');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.

@@ -107,6 +107,11 @@
   "statsLast": "Last",
   "perYear": "Per year",
 
+  "computers": "Dive computers",
+  "searchComputer": "Search for a new one",
+  "saveComputer": "Save this dive computer",
+  "noComputers": "No saved dive computers",
+  "continueLabel": "Continue",
   "diveComputerTitle": "Dive computer",
   "modelsSupported": "{count} models supported",
   "@modelsSupported": { "placeholders": { "count": {} } },

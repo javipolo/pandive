@@ -34,7 +34,11 @@ extension DivemateDbTanks on DivemateDb {
               material: _materialFromInt(r['Material'] as int?) ??
                   TankMaterial.aluminium,
             ))
-        .toList();
+        .toList()
+      ..sort((a, b) {
+        final c = a.litres.compareTo(b.litres);
+        return c != 0 ? c : compareFold(a.name, b.name);
+      });
   }
 
   int addTankPreset(String name, double litres, TankMaterial material) {

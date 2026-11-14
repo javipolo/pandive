@@ -26,7 +26,8 @@ extension DivemateDbBuddies on DivemateDb {
         name: name.isEmpty ? '—' : name,
         diveCount: (r['dives'] as int?) ?? 0,
       );
-    }).toList();
+    }).toList()
+      ..sort((a, b) => compareFold(a.name, b.name));
   }
 
   /// Busca un buddy por nombre (case-insensitive) o lo crea. Devuelve su ID.

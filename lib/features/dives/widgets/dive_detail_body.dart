@@ -26,6 +26,8 @@ class DiveDetailBody extends StatelessWidget {
     final profile = db.diveProfile(dive.id);
     final cylinders = db.cylinders(dive.id);
     final tags = db.tagsForDive(dive.id);
+    // Prof. media: la de la DB o, si falta, la calculada del perfil.
+    final avgDepth = dive.avgDepth ?? _profileAvg(profile);
     final dateFmt = DateFormat(
         'EEEE d MMMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
 
@@ -50,7 +52,8 @@ class DiveDetailBody extends StatelessWidget {
             context,
             t,
             computeSac(cylinders,
-                divetimeMin: dive.durationMin, avgDepthM: dive.avgDepth),
+                divetimeMin: dive.durationMin, avgDepthM: avgDepth),
+            avgDepth,
           ),
         ),
         if (tags.isNotEmpty) ...[
@@ -102,11 +105,12 @@ class DiveDetailBody extends StatelessWidget {
     );
   }
 
-  List<Widget> _statCards(BuildContext context, AppLocalizations t, double? sac) {
+  List<Widget> _statCards(
+      BuildContext context, AppLocalizations t, double? sac, double? avgDepth) {
     final items = <(String, String)>[
       if (dive.maxDepth != null) (t.statMaxDepth, '${dive.maxDepth!.toStringAsFixed(1)} m'),
       if (sac != null) (t.sacLabel, '${sac.toStringAsFixed(1)} l/min'),
-      if (dive.avgDepth != null) (t.statAvgDepth, '${dive.avgDepth!.toStringAsFixed(1)} m'),
+      if (avgDepth != null) (t.statAvgDepth, '${avgDepth.toStringAsFixed(1)} m'),
       if (dive.durationMin != null) (t.statDuration, '${dive.durationMin!.round()} min'),
       if (dive.waterTemp != null) (t.statWaterTemp, '${dive.waterTemp!.toStringAsFixed(0)} °C'),
       if (dive.airTemp != null) (t.statAirTemp, '${dive.airTemp!.toStringAsFixed(0)} °C'),
@@ -118,5 +122,13 @@ class DiveDetailBody extends StatelessWidget {
       if (dive.buddy != null) (t.statBuddy, dive.buddy!),
     ];
     return [for (final it in items) StatCard(label: it.$1, value: it.$2)];
+  }
+
+  /// Media de las profundidades del perfil (muestras en el agua, > 0).
+  double? _profileAvg(DiveProfile? p) {
+    if (p == null || p.isEmpty) return null;
+    final xs = p.depths.where((d) => d > 0).toList();
+    if (xs.isEmpty) return null;
+    return xs.reduce((a, b) => a + b) / xs.length;
   }
 }

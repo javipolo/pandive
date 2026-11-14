@@ -100,6 +100,11 @@
   "statsLast": "Última",
   "perYear": "Por año",
 
+  "computers": "Ordenadores de buceo",
+  "searchComputer": "Buscar uno nuevo",
+  "saveComputer": "Guardar este ordenador",
+  "noComputers": "Sin ordenadores guardados",
+  "continueLabel": "Continuar",
   "diveComputerTitle": "Ordenador de buceo",
   "modelsSupported": "{count} modelos soportados",
   "nativeLinkOk": "libdivecomputer enlazado correctamente (nativo).",

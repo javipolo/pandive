@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/dive_computer/screens/computers_settings_screen.dart';
+import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';
 import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
 import 'package:pandive/features/settings/widgets/night_hours_control.dart';
 import 'package:pandive/features/settings/widgets/text_scale_control.dart';
@@ -56,43 +58,11 @@ class SettingsScreen extends StatelessWidget {
     return AnimatedBuilder(
       animation: settings,
       builder: (context, _) {
-        final current = settings.locale?.languageCode; // null = sistema
         return Scaffold(
           appBar: AppBar(title: Text(t.settingsTitle)),
           body: ListView(
             children: [
-              _header(context, t.language),
-              RadioGroup<String?>(
-                groupValue: current,
-                onChanged: (v) => settings.setLocale(v),
-                child: Column(
-                  children: [
-                    for (final opt in <(String?, String)>[
-                      (null, t.languageSystem),
-                      ('es', t.languageSpanish),
-                      ('en', t.languageEnglish),
-                    ])
-                      RadioListTile<String?>(value: opt.$1, title: Text(opt.$2)),
-                  ],
-                ),
-              ),
-              const Divider(),
-              _header(context, t.theme),
-              RadioGroup<ThemeMode>(
-                groupValue: settings.themeMode,
-                onChanged: (v) => v == null ? null : settings.setThemeMode(v),
-                child: Column(
-                  children: [
-                    for (final opt in <(ThemeMode, String)>[
-                      (ThemeMode.system, t.themeSystem),
-                      (ThemeMode.light, t.themeLight),
-                      (ThemeMode.dark, t.themeDark),
-                    ])
-                      RadioListTile<ThemeMode>(
-                          value: opt.$1, title: Text(opt.$2)),
-                  ],
-                ),
-              ),
+              LanguageThemeSelectors(settings: settings),
               const Divider(),
               _header(context, t.textSize),
               Padding(
@@ -120,6 +90,15 @@ class SettingsScreen extends StatelessWidget {
                 leading: const Icon(Icons.tag),
                 title: Text(t.importHashtags),
                 onTap: () => _importHashtags(context),
+              ),
+              const Divider(),
+              _header(context, t.computers),
+              ListTile(
+                leading: const Icon(Icons.watch),
+                title: Text(t.computers),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => ComputersSettingsScreen(db: db))),
               ),
               const Divider(),
               _header(context, t.database),

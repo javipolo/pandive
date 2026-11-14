@@ -426,6 +426,43 @@ void main() {
     }
   });
 
+  test('buddies se ordenan ignorando acentos (Àliga/Álvaro antes que Baliza)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_sort_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      w.findOrCreateBuddy('Baliza');
+      w.findOrCreateBuddy('Álvaro');
+      w.findOrCreateBuddy('Àliga');
+      final names = w.listBuddies().map((b) => b.name).toList();
+      expect(names, ['Àliga', 'Álvaro', 'Baliza']);
+    } finally {
+      w.close();
+    }
+  });
+
+  test('ordenadores de buceo: add / list / saved / remove', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_comp_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      expect(w.listComputers(), isEmpty);
+      w.addComputer('AA:BB', 'Peregrine',
+          vendor: 'Shearwater', product: 'Peregrine');
+      expect(w.isComputerSaved('AA:BB'), isTrue);
+      expect(w.isComputerSaved('CC:DD'), isFalse);
+      final c = w.listComputers().single;
+      expect(c.name, 'Peregrine');
+      expect(c.vendor, 'Shearwater');
+      w.removeComputer('AA:BB');
+      expect(w.listComputers(), isEmpty);
+    } finally {
+      w.close();
+    }
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

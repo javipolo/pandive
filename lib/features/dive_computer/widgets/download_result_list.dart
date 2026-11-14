@@ -70,10 +70,8 @@ class _DownloadResultListState extends State<DownloadResultList> {
             onChanged: (_) => _toggleAll(),
             controlAffinity: ListTileControlAffinity.leading,
             title: Text(t.selectAll),
-            secondary: Text(
-                t.downloadedSummary(
-                    items.length + widget.existing, items.length, widget.existing),
-                style: Theme.of(context).textTheme.bodySmall),
+            subtitle: Text(t.downloadedSummary(
+                items.length + widget.existing, items.length, widget.existing)),
           ),
           const Divider(height: 1),
           Expanded(

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
-import 'package:pandive/features/dive_computer/screens/scan_screen.dart';
+import 'package:pandive/features/dive_computer/screens/computer_pick_screen.dart';
 import 'package:pandive/features/dives/screens/new_dive_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -34,6 +34,7 @@ Future<void> showAddDiveSheet(
   if (!context.mounted || choice == null) return;
   final route = choice == 'new'
       ? MaterialPageRoute(builder: (_) => NewDiveScreen(db: db))
-      : MaterialPageRoute(builder: (_) => ScanScreen(db: db, settings: settings));
+      : MaterialPageRoute(
+          builder: (_) => ComputerPickScreen(db: db, settings: settings));
   await Navigator.of(context).push(route);
 }
