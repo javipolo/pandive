@@ -2,12 +2,14 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LabeledField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final int maxLines;
   final bool number;
+  final bool integer; // solo dígitos (sin decimales)
 
   const LabeledField({
     super.key,
@@ -15,6 +17,7 @@ class LabeledField extends StatelessWidget {
     required this.label,
     this.maxLines = 1,
     this.number = false,
+    this.integer = false,
   });
 
   @override
@@ -24,9 +27,13 @@ class LabeledField extends StatelessWidget {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
-        keyboardType: number
-            ? const TextInputType.numberWithOptions(decimal: true)
-            : TextInputType.text,
+        keyboardType: integer
+            ? TextInputType.number
+            : number
+                ? const TextInputType.numberWithOptions(decimal: true)
+                : TextInputType.text,
+        inputFormatters:
+            integer ? [FilteringTextInputFormatter.digitsOnly] : null,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),

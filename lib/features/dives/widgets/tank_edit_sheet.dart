@@ -40,8 +40,8 @@ class _TankSheet extends StatefulWidget {
 class _TankSheetState extends State<_TankSheet> {
   late final _name = TextEditingController(text: widget.initial?.name ?? '');
   late final _litres = _ctrl(widget.initial?.size);
-  late final _presIn = _ctrl(widget.initial?.pressureStart);
-  late final _presOut = _ctrl(widget.initial?.pressureEnd);
+  late final _presIn = _intCtrl(widget.initial?.pressureStart);
+  late final _presOut = _intCtrl(widget.initial?.pressureEnd);
   late final _o2 = _ctrl(widget.initial?.o2);
   late final _he = _ctrl(widget.initial?.he);
   late TankMaterial _material =
@@ -49,6 +49,8 @@ class _TankSheetState extends State<_TankSheet> {
 
   TextEditingController _ctrl(double? v) =>
       TextEditingController(text: v == null ? '' : '$v');
+  TextEditingController _intCtrl(double? v) =>
+      TextEditingController(text: v == null ? '' : '${v.round()}');
 
   double? _d(TextEditingController c) =>
       double.tryParse(c.text.trim().replaceAll(',', '.'));
@@ -69,8 +71,8 @@ class _TankSheetState extends State<_TankSheet> {
       Cylinder(
         name: _s(_name),
         size: _d(_litres),
-        pressureStart: widget.template ? null : _d(_presIn),
-        pressureEnd: widget.template ? null : _d(_presOut),
+        pressureStart: widget.template ? null : _d(_presIn)?.roundToDouble(),
+        pressureEnd: widget.template ? null : _d(_presOut)?.roundToDouble(),
         o2: widget.template ? null : _d(_o2),
         he: widget.template ? null : _d(_he),
         material: _material,
@@ -89,6 +91,7 @@ class _TankSheetState extends State<_TankSheet> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: DropdownButtonFormField<TankPreset>(
+              isExpanded: true,
               decoration: InputDecoration(
                   labelText: t.tankTypes, border: const OutlineInputBorder()),
               items: [
@@ -117,9 +120,9 @@ class _TankSheetState extends State<_TankSheet> {
         ]),
         if (!widget.template) ...[
           Row(children: [
-            Expanded(child: LabeledField(controller: _presIn, label: t.pressureIn, number: true)),
+            Expanded(child: LabeledField(controller: _presIn, label: t.pressureIn, integer: true)),
             const SizedBox(width: 12),
-            Expanded(child: LabeledField(controller: _presOut, label: t.pressureOut, number: true)),
+            Expanded(child: LabeledField(controller: _presOut, label: t.pressureOut, integer: true)),
           ]),
           Row(children: [
             Expanded(child: LabeledField(controller: _o2, label: t.o2pct, number: true)),
