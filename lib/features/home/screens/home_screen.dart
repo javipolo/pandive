@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _query = '';
   final _searchCtrl = TextEditingController();
 
-  bool get _canSearch => _index == 0 || _index == 1; // inmersiones / sitios
+  bool get _canSearch => _index <= 3; // todas menos estadísticas
 
   @override
   void dispose() {
@@ -105,8 +105,14 @@ class _HomeScreenState extends State<HomeScreen> {
               key: ValueKey('sites-$_dataVersion'),
               db: widget.db,
               query: _index == 1 && _searching ? _query : ''),
-          BuddiesTab(key: ValueKey('buddies-$_dataVersion'), db: widget.db),
-          TagsTab(key: ValueKey('tags-$_dataVersion'), db: widget.db),
+          BuddiesTab(
+              key: ValueKey('buddies-$_dataVersion'),
+              db: widget.db,
+              query: _index == 2 && _searching ? _query : ''),
+          TagsTab(
+              key: ValueKey('tags-$_dataVersion'),
+              db: widget.db,
+              query: _index == 3 && _searching ? _query : ''),
           StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
         ],
       ),

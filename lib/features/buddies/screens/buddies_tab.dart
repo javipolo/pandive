@@ -10,7 +10,8 @@ import 'buddy_dives_screen.dart';
 
 class BuddiesTab extends StatefulWidget {
   final DivemateDb db;
-  const BuddiesTab({super.key, required this.db});
+  final String query;
+  const BuddiesTab({super.key, required this.db, this.query = ''});
 
   @override
   State<BuddiesTab> createState() => _BuddiesTabState();
@@ -69,18 +70,22 @@ class _BuddiesTabState extends State<BuddiesTab> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final q = widget.query.trim().toLowerCase();
+    final shown = q.isEmpty
+        ? _buddies
+        : _buddies.where((b) => b.name.toLowerCase().contains(q)).toList();
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _add,
         icon: const Icon(Icons.person_add),
         label: Text(t.addBuddy),
       ),
-      body: _buddies.isEmpty
+      body: shown.isEmpty
           ? Center(child: Text(t.noBuddies))
           : ListView.separated(
-              itemCount: _buddies.length,
+              itemCount: shown.length,
               separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, i) => _tile(_buddies[i], t),
+              itemBuilder: (context, i) => _tile(shown[i], t),
             ),
     );
   }
