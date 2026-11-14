@@ -64,6 +64,8 @@ LineTouchTooltipData profileTooltip(
   List<double?> temps,
 ) {
   return LineTouchTooltipData(
+    fitInsideVertically: true,
+    fitInsideHorizontally: true,
     getTooltipItems: (spots) => [
       for (final s in spots)
         if (s.barIndex == 0)
