@@ -38,6 +38,10 @@ class DiveRow extends StatelessWidget {
       if (dive.maxDepth != null) '${NumberFormat('0.0', locale).format(dive.maxDepth)} m',
     ].join('   ');
 
+    // Diurna (sol) vs nocturna (luna) según la hora de entrada.
+    final hour = dive.date?.hour;
+    final night = hour != null && (hour < 7 || hour >= 20);
+
     return InkWell(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -48,13 +52,25 @@ class DiveRow extends StatelessWidget {
           children: [
             SizedBox(
               width: 52,
-              child: Text(
-                dive.number?.toString() ?? '—',
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold, color: cs.primary),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      dive.number?.toString() ?? '—',
+                      maxLines: 1,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold, color: cs.primary),
+                    ),
+                  ),
+                  if (hour != null)
+                    Icon(
+                      night ? Icons.nightlight_round : Icons.wb_sunny,
+                      size: 18,
+                      color: night ? cs.primary : Colors.amber,
+                    ),
+                ],
               ),
             ),
             const SizedBox(width: 8),
