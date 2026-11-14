@@ -82,7 +82,7 @@ class _TankSheetState extends State<_TankSheet> {
             padding: const EdgeInsets.only(bottom: 8),
             child: DropdownButtonFormField<TankPreset>(
               decoration: InputDecoration(
-                  labelText: t.myTanks, border: const OutlineInputBorder()),
+                  labelText: t.tankTypes, border: const OutlineInputBorder()),
               items: [
                 for (final p in widget.presets)
                   DropdownMenuItem(

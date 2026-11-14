@@ -1,6 +1,5 @@
-/// Descarga inmersiones de un dispositivo y las guarda (dedupe + fingerprint).
-/// En modo [baseline] solo lee la más reciente para fijar el fingerprint
-/// (marcar como ya importado) y no guarda nada.
+/// Descarga inmersiones, deja elegir cuáles guardar y avanza el fingerprint.
+/// En modo [baseline] solo lee la más reciente para marcarla como importada.
 library;
 
 import 'dart:async';
@@ -13,6 +12,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/widgets/baseline_done.dart';
+import 'package:pandive/features/dive_computer/widgets/download_items.dart';
 import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
 import 'package:pandive/features/dive_computer/widgets/download_result_list.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
@@ -42,7 +42,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
   StreamSubscription<double>? _progressSub;
   double _progress = 0;
   bool _saving = false;
-  List<DownloadedDive>? _newCache; // inmersiones que no existen en la DB
+  List<DownloadItem>? _items; // nuevos del aparato + pendientes
+  List<DownloadedDive> _deviceDives = const []; // lo que devolvió el aparato
+  int _existing = 0;
 
   @override
   void initState() {
@@ -60,7 +62,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
     WakelockPlus.disable();
     super.dispose();
   }
-
   Future<DownloadResult> _download() async {
     final m = _model;
     if (m == null) {
@@ -81,33 +82,30 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
     return res;
   }
-
-  Future<void> _save(List<DownloadedDive> dives) async {
+  Future<void> _save(Set<String> selected) async {
     setState(() => _saving = true);
     final computer = _model != null ? '${_model.$1} ${_model.$2}' : null;
-    var added = 0;
-    for (final d in dives) {
-      if (widget.db.importDownloaded(d, computer: computer)) added++;
-    }
-    final fp = dives.isNotEmpty ? dives.first.fingerprint : '';
-    if (fp.isNotEmpty) {
-      widget.db.setFingerprintFor(widget.device.id, fp);
-    }
+    final added = applyDownloadSelection(
+      db: widget.db,
+      deviceId: widget.device.id,
+      items: _items!,
+      selected: selected,
+      deviceDives: _deviceDives,
+      computer: computer,
+    );
     if (!mounted) return;
-    final skipped = dives.length - added;
     final t = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(skipped > 0
-            ? t.savedNewAndExisting(added, skipped)
-            : t.savedNew(added))));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(t.savedNew(added))));
     Navigator.of(context).pop(added > 0);
   }
-
+  // Por defecto: nuevos marcados, pendientes desmarcados.
+  Set<String> get _defaultSel =>
+      {for (final it in _items!) if (!it.pending) it.dive.fingerprint};
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final name =
-        _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
+    final name = _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
     final prefix = widget.baseline ? t.markPrefix : t.downloadPrefix;
     return Scaffold(
       appBar: AppBar(title: Text('$prefix · $name')),
@@ -134,17 +132,19 @@ class _DownloadScreenState extends State<DownloadScreen> {
       ),
     );
   }
-
   Widget _list(List<DownloadedDive> dives) {
-    _newCache ??= [
-      for (final d in dives)
-        if (d.datetime == null || !widget.db.hasDiveAt(d.datetime!)) d,
-    ];
+    if (_items == null) {
+      _deviceDives = dives;
+      final r = buildDownloadItems(widget.db, widget.device.id, dives);
+      _items = r.items;
+      _existing = r.existing;
+    }
     return DownloadResultList(
-      total: dives.length,
-      newDives: _newCache!,
+      items: _items!,
+      existing: _existing,
       saving: _saving,
-      onSave: () => _save(dives),
+      initialSelected: _defaultSel,
+      onSave: _save,
     );
   }
 }

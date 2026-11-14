@@ -6,6 +6,7 @@ export 'cylinder.dart';
 export 'dive.dart';
 export 'dive_profile.dart';
 export 'dive_site.dart';
+export 'dive_type.dart';
 export 'downloaded_dive.dart';
 export 'logbook_stats.dart';
 export 'tag.dart';

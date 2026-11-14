@@ -5,6 +5,7 @@
 /// La implementación se reparte en `part`s: lecturas, perfil, stats y escritura.
 library;
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:sqlite3/sqlite3.dart';
@@ -23,6 +24,8 @@ part 'db_sites.dart';
 part 'db_tanks.dart';
 part 'db_tags.dart';
 part 'db_merge.dart';
+part 'db_pending.dart';
+part 'db_dive_types.dart';
 
 class DivemateDb {
   final Database _db;

@@ -45,6 +45,14 @@ extension DivemateDbTanks on DivemateDb {
     return _db.lastInsertRowId;
   }
 
+  void updateTankPreset(
+      int id, String name, double litres, TankMaterial material) {
+    _db.execute(
+      'UPDATE PandiveTankPreset SET Name=?, Litres=?, Material=? WHERE Id=?',
+      [name.trim(), litres, _materialToInt(material), id],
+    );
+  }
+
   void deleteTankPreset(int id) =>
       _db.execute('DELETE FROM PandiveTankPreset WHERE Id = ?', [id]);
 

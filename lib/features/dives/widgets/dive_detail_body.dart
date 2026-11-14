@@ -113,6 +113,7 @@ class DiveDetailBody extends StatelessWidget {
       if (dive.surfaceInterval != null) (t.statSurfaceInt, dive.surfaceInterval!),
       if (dive.weight != null) (t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),
       if (dive.rating != null && dive.rating! > 0) (t.statRating, '★' * dive.rating!),
+      if (dive.diveType != null) (t.diveType, dive.diveType!),
       if (dive.computer != null) (t.statComputer, dive.computer!),
       if (dive.buddy != null) (t.statBuddy, dive.buddy!),
     ];

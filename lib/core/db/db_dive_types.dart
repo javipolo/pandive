@@ -1,0 +1,59 @@
+part of 'divemate_db.dart';
+
+/// Tipos de buceo configurables y su plantilla de botellas.
+extension DivemateDbDiveTypes on DivemateDb {
+  List<DiveType> listDiveTypes() {
+    final rows = _db.select(
+        'SELECT Id, Name FROM PandiveDiveType ORDER BY Name COLLATE NOCASE');
+    return rows
+        .map((r) => DiveType(
+              id: r['Id'] as int,
+              name: _str(r['Name']) ?? '',
+              tanks: diveTypeTanks(r['Id'] as int),
+            ))
+        .toList();
+  }
+
+  /// Botellas-plantilla de un tipo (solo litros + material).
+  List<Cylinder> diveTypeTanks(int typeId) {
+    final rows = _db.select(
+      'SELECT Litres, Material FROM PandiveDiveTypeTank '
+      'WHERE TypeId = ? ORDER BY SortOrd, Id',
+      [typeId],
+    );
+    return rows
+        .map((r) => Cylinder(
+              size: _num(r['Litres']),
+              material: _materialFromInt(r['Material'] as int?),
+            ))
+        .toList();
+  }
+
+  int addDiveType(String name, List<Cylinder> tanks) {
+    _db.execute('INSERT INTO PandiveDiveType (Name) VALUES (?)', [name.trim()]);
+    final id = _db.lastInsertRowId;
+    _setDiveTypeTanks(id, tanks);
+    return id;
+  }
+
+  void updateDiveType(int id, String name, List<Cylinder> tanks) {
+    _db.execute('UPDATE PandiveDiveType SET Name=? WHERE Id=?', [name.trim(), id]);
+    _setDiveTypeTanks(id, tanks);
+  }
+
+  void deleteDiveType(int id) {
+    _db.execute('DELETE FROM PandiveDiveTypeTank WHERE TypeId=?', [id]);
+    _db.execute('DELETE FROM PandiveDiveType WHERE Id=?', [id]);
+  }
+
+  void _setDiveTypeTanks(int typeId, List<Cylinder> tanks) {
+    _db.execute('DELETE FROM PandiveDiveTypeTank WHERE TypeId=?', [typeId]);
+    for (var i = 0; i < tanks.length; i++) {
+      _db.execute(
+        'INSERT INTO PandiveDiveTypeTank (TypeId, Litres, Material, SortOrd) '
+        'VALUES (?,?,?,?)',
+        [typeId, tanks[i].size, _materialToInt(tanks[i].material), i],
+      );
+    }
+  }
+}

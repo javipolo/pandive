@@ -35,6 +35,17 @@ class DownloadedDive {
     this.samples = const [],
   });
 
+  Map<String, dynamic> toJson() => {
+        'fingerprint': fingerprint,
+        'datetime': datetime?.toIso8601String(),
+        'divetime': divetimeSec,
+        'maxdepth': maxDepth,
+        'avgdepth': avgDepth,
+        'tempmin': tempMin,
+        'gasmixes': [for (final g in gasmixes) {'o2': g.o2, 'he': g.he}],
+        'samples': [for (final s in samples) [s.timeMs, s.depth, s.temp]],
+      };
+
   factory DownloadedDive.fromJson(Map<String, dynamic> j) {
     return DownloadedDive(
       fingerprint: (j['fingerprint'] ?? '') as String,

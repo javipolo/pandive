@@ -7,6 +7,8 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/buddies/screens/buddies_tab.dart';
 import 'package:pandive/features/dives/screens/dives_screen.dart';
+import 'package:pandive/features/equipment/screens/equipment_tab.dart';
+import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/features/sites/screens/sites_screen.dart';
 import 'package:pandive/features/stats/screens/stats_screen.dart';
@@ -57,7 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final titles = [t.navDives, t.navSites, t.buddies, t.tags, t.navStats];
+    final titles = [
+      t.navDives, t.navSites, t.buddies, t.tags, t.equipment, t.navStats];
     return Scaffold(
       appBar: AppBar(
         leading: _searching
@@ -124,14 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
               key: ValueKey('tags-$_dataVersion'),
               db: widget.db,
               query: _index == 3 && _searching ? _query : ''),
+          EquipmentTab(key: ValueKey('equip-$_dataVersion'), db: widget.db),
           StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
+      // Recrear las pestañas al cambiar para reflejar cambios (nuevos sitios,
+      // compañeros, tags, importaciones...).
+      bottomNavigationBar: HomeNavBar(
         selectedIndex: _index,
-        // Recrear las pestañas al cambiar para reflejar cambios (nuevos sitios,
-        // compañeros, tags, importaciones...).
-        onDestinationSelected: (i) {
+        onSelected: (i) {
           _searchCtrl.clear();
           setState(() {
             _index = i;
@@ -140,33 +144,6 @@ class _HomeScreenState extends State<HomeScreen> {
             _query = '';
           });
         },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.scuba_diving_outlined),
-            selectedIcon: const Icon(Icons.scuba_diving),
-            label: t.navDives,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.place_outlined),
-            selectedIcon: const Icon(Icons.place),
-            label: t.navSites,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.people_outline),
-            selectedIcon: const Icon(Icons.people),
-            label: t.buddies,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.label_outline),
-            selectedIcon: const Icon(Icons.label),
-            label: t.tags,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.bar_chart_outlined),
-            selectedIcon: const Icon(Icons.bar_chart),
-            label: t.navStats,
-          ),
-        ],
       ),
     );
   }

@@ -1,4 +1,4 @@
-/// Alta manual de inmersión: campos, sitio, compañeros y botellas (como editar).
+/// Alta manual de inmersión: campos, sitio, compañeros, tipo y botellas.
 library;
 
 import 'package:flutter/material.dart';
@@ -9,11 +9,9 @@ import 'package:pandive/core/sac.dart';
 import 'package:pandive/core/widgets/save_action.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
-import 'package:pandive/features/dives/widgets/buddies_picker_field.dart';
+import 'package:pandive/features/dives/widgets/dive_editor_form.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
-import 'package:pandive/features/dives/widgets/site_picker_field.dart';
-import 'package:pandive/features/dives/widgets/tags_picker_field.dart';
-import 'package:pandive/features/dives/widgets/tanks_editor.dart';
+import 'package:pandive/features/dives/widgets/dive_type_picker_field.dart';
 import 'package:pandive/features/sites/screens/site_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -33,6 +31,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
   List<Buddy> _buddies = [];
   List<Tag> _tags = [];
   List<Cylinder> _tanks = [];
+  String? _typeName;
   late final List<TankPreset> _presets = widget.db.listTankPresets();
   late final int _number = widget.db.nextDiveNumber();
   bool _saving = false;
@@ -49,8 +48,8 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
       c.text.trim().isEmpty ? null : c.text.trim();
 
   Future<void> _pickSite() async {
-    final s = await Navigator.of(context).push<DiveSite>(MaterialPageRoute(
-        builder: (_) => SitePickerScreen(db: widget.db)));
+    final s = await Navigator.of(context).push<DiveSite>(
+        MaterialPageRoute(builder: (_) => SitePickerScreen(db: widget.db)));
     if (s != null) setState(() => _site = s);
   }
 
@@ -66,6 +65,15 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
         builder: (_) => TagPickerScreen(
             db: widget.db, selectedIds: [for (final t in _tags) t.id])));
     if (r != null) setState(() => _tags = r);
+  }
+
+  Future<void> _pickType() async {
+    final chosen = await showDiveTypePicker(context, widget.db.listDiveTypes());
+    if (chosen == null) return;
+    setState(() {
+      _typeName = chosen.name;
+      _tanks = [...chosen.tanks]; // añade las botellas del tipo
+    });
   }
 
   Future<void> _save() async {
@@ -88,6 +96,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
         buddyIds: _buddies.isEmpty ? null : _buddies.map((b) => b.id).join(','),
         comments: _s(_c.comments),
       );
+      if (_typeName != null) widget.db.updateDive(id, {'Divetype': _typeName});
       widget.db.setDiveTanks(id, _tanks);
       widget.db.setDiveTags(id, _tags);
       if (mounted) Navigator.of(context).pop(true);
@@ -110,31 +119,26 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
         title: Text(t.newDiveNumber(_number)),
         actions: [SaveAction(saving: _saving, onSave: _save)],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          SitePickerField(
-            site: _site,
-            onTap: _pickSite,
-            onClear: () => setState(() => _site = null),
-          ),
-          BuddiesPickerField(buddies: _buddies, onTap: _pickBuddies),
-          TagsPickerField(tags: _tags, onTap: _pickTags),
-          DiveForm(
-            c: _c,
-            when: _when,
-            onWhen: (v) => setState(() => _when = v),
-            rating: _rating,
-            onRating: (v) => setState(() => _rating = v),
-          ),
-          const SizedBox(height: 16),
-          TanksEditor(
-            tanks: _tanks,
-            presets: _presets,
-            sac: sac,
-            onChanged: (list) => setState(() => _tanks = list),
-          ),
-        ],
+      body: DiveEditorForm(
+        c: _c,
+        when: _when,
+        onWhen: (v) => setState(() => _when = v),
+        rating: _rating,
+        onRating: (v) => setState(() => _rating = v),
+        site: _site,
+        onPickSite: _pickSite,
+        onClearSite: () => setState(() => _site = null),
+        buddies: _buddies,
+        onPickBuddies: _pickBuddies,
+        tags: _tags,
+        onPickTags: _pickTags,
+        diveTypeName: _typeName,
+        onPickType: _pickType,
+        onClearType: () => setState(() => _typeName = null),
+        tanks: _tanks,
+        presets: _presets,
+        onTanksChanged: (list) => setState(() => _tanks = list),
+        sac: sac,
       ),
     );
   }

@@ -28,6 +28,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_sites.dart` -> sitios (Place): obtener/crear/actualizar, find-or-create
 - `lib/core/db/db_tanks.dart` -> botellas por buceo, presets "mis botellas", buceos por sitio/buddy
 - `lib/core/db/db_merge.dart` -> fusionar inmersiones (perfil concatenado, unión de datos)
+- `lib/core/db/db_pending.dart` -> caché de descargados no guardados (reaparecen una vez)
+- `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 
 ### Core · modelos (`models.dart` es el barrel)
@@ -36,6 +38,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/dive_profile.dart` -> perfil muestreado (tiempos/profundidades/temps)
 - `lib/core/models/cylinder.dart` -> botella/mezcla (+ etiqueta de gas)
 - `lib/core/models/dive_site.dart` -> punto de buceo con nº de inmersiones
+- `lib/core/models/dive_type.dart` -> tipo de buceo (nombre + plantilla de botellas)
 - `lib/core/models/downloaded_dive.dart` -> inmersión descargada del ordenador (+ muestras/gases, parse JSON)
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
 
@@ -55,6 +58,7 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### home
 - `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
+- `lib/features/home/widgets/home_nav_bar.dart` -> barra inferior (6 pestañas)
 
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb (con enum DbLoadError)
@@ -84,6 +88,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/dive_row.dart` -> fila de buceo estilo DiveMate (nº grande + 2 líneas)
 - `lib/features/dives/widgets/add_dive_sheet.dart` -> hoja "añadir": alta manual o transferencia
 - `lib/features/dives/widgets/dives_selection_bar.dart` -> barra de selección (stats/fusionar/borrar)
+- `lib/features/dives/widgets/dive_editor_form.dart` -> cuerpo común alta/edición (sitio/buddies/tags/tipo/campos/botellas)
+- `lib/features/dives/widgets/dive_type_picker_field.dart` -> campo + hoja selectora de tipo de buceo
 - `lib/features/dives/widgets/tags_picker_field.dart` -> campo de etiquetas elegidas (chips)
 - `lib/features/dives/screens/profile_fullscreen_screen.dart` -> perfil a pantalla completa (apaisado)
 - `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas
@@ -113,7 +119,15 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dive_computer/widgets/download_progress.dart` -> indicador circular de progreso con %
 - `lib/features/dive_computer/widgets/downloaded_dive_tile.dart` -> fila de inmersión descargada
 - `lib/features/dive_computer/widgets/baseline_done.dart` -> confirmación de "marcar como ya importado"
-- `lib/features/dive_computer/widgets/download_result_list.dart` -> resumen de descarga + lista de solo las nuevas
+- `lib/features/dive_computer/widgets/download_result_list.dart` -> lista seleccionable (elige qué guardar) + marcar todos
+- `lib/features/dive_computer/widgets/download_items.dart` -> construye items (nuevos+pendientes) y aplica la selección
+
+### equipment (tipos de buceo / botella)
+- `lib/features/equipment/screens/equipment_tab.dart` -> hub: tipos de buceo + tipos de botella
+- `lib/features/dive_types/screens/dive_types_screen.dart` -> lista de tipos de buceo
+- `lib/features/dive_types/screens/dive_type_edit_screen.dart` -> crear/editar tipo (nombre + botellas)
+- `lib/features/tank_types/screens/tank_types_screen.dart` -> gestión de tipos de botella (presets)
+- `lib/features/tank_types/widgets/tank_type_edit_sheet.dart` -> hoja crear/editar tipo de botella
 
 Nativo (fuera de lib/): `android/app/src/main/kotlin/org/drslump/pandive/`
 (DiveComputer, BleScanner, BleConnection, MainActivity) y

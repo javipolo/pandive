@@ -308,6 +308,82 @@ void main() {
     }
   });
 
+  test('tipos de buceo: CRUD + plantilla de botellas', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_dt_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final id = w.addDiveType('Sidemount', const [
+        Cylinder(size: 11.1, material: TankMaterial.aluminium),
+        Cylinder(size: 11.1, material: TankMaterial.aluminium),
+      ]);
+      var types = w.listDiveTypes();
+      expect(types, hasLength(1));
+      expect(types.first.name, 'Sidemount');
+      expect(types.first.tanks, hasLength(2));
+      expect(types.first.tanks.first.size, 11.1);
+      expect(types.first.tanks.first.material, TankMaterial.aluminium);
+
+      w.updateDiveType(id, 'Monobotella 15L',
+          const [Cylinder(size: 15, material: TankMaterial.steel)]);
+      types = w.listDiveTypes();
+      expect(types.first.name, 'Monobotella 15L');
+      expect(types.first.tanks, hasLength(1));
+      expect(types.first.tanks.first.material, TankMaterial.steel);
+
+      w.deleteDiveType(id);
+      expect(w.listDiveTypes(), isEmpty);
+      expect(w.diveTypeTanks(id), isEmpty);
+    } finally {
+      w.close();
+    }
+  });
+
+  test('pendientes: add → list → remove (ciclo "una vez más")', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_pend_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      const dev = 'AA:BB';
+      const dl = DownloadedDive(
+        fingerprint: 'cafe',
+        divetimeSec: 600,
+        maxDepth: 12,
+        samples: [DiveSample(0, 3, 20), DiveSample(10000, 12, 19)],
+      );
+      expect(w.listPending(dev), isEmpty);
+      w.addPending(dev, dl);
+      final back = w.listPending(dev);
+      expect(back, hasLength(1));
+      expect(back.first.fingerprint, 'cafe');
+      expect(back.first.samples, hasLength(2));
+      expect(back.first.maxDepth, 12);
+      w.removePending(dev, 'cafe');
+      expect(w.listPending(dev), isEmpty);
+    } finally {
+      w.close();
+    }
+  });
+
+  test('updateTankPreset modifica un tipo de botella', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_tp_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final id = w.addTankPreset('S80', 11.1, TankMaterial.aluminium);
+      w.updateTankPreset(id, '15L', 15, TankMaterial.steel);
+      final p = w.listTankPresets().firstWhere((e) => e.id == id);
+      expect(p.name, '15L');
+      expect(p.litres, 15);
+      expect(p.material, TankMaterial.steel);
+    } finally {
+      w.close();
+    }
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

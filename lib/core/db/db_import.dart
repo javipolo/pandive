@@ -14,6 +14,16 @@ void _ensureSyncTable(Database db) {
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTag '
       '(DiveId INTEGER, TagId INTEGER, PRIMARY KEY (DiveId, TagId))');
+  // Caché de buceos descargados no guardados (reaparecen "una vez más").
+  db.execute('CREATE TABLE IF NOT EXISTS PandivePending '
+      '(DeviceId TEXT, Fingerprint TEXT, Json TEXT, Updated TEXT, '
+      'PRIMARY KEY (DeviceId, Fingerprint))');
+  // Tipos de buceo + su plantilla de botellas.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveType '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTypeTank '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, TypeId INTEGER, Litres REAL, '
+      'Material INTEGER, SortOrd INTEGER)');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.
