@@ -49,15 +49,18 @@ class DriveBackupService {
     return _account != null;
   }
 
-  /// Conexión interactiva (muestra el diálogo de Google).
+  /// Conexión interactiva: selector de cuenta del teléfono + consentimiento de
+  /// Drive en un solo paso (como DiveMate).
   Future<bool> signIn() async {
     await _ensureInit();
     try {
-      _account = await _gsi.authenticate(scopeHint: const [_scope]);
+      final acc = await _gsi.authenticate(scopeHint: const [_scope]);
+      await acc.authorizationClient.authorizeScopes(const [_scope]);
+      _account = acc;
+      return true;
     } on GoogleSignInException {
       return false;
     }
-    return _account != null;
   }
 
   Future<void> signOut() async {
