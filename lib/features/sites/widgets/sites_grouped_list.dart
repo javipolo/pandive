@@ -10,7 +10,15 @@ import 'package:pandive/l10n/app_localizations.dart';
 class SitesGroupedList extends StatefulWidget {
   final List<DiveSite> sites;
   final void Function(DiveSite) onTap;
-  const SitesGroupedList({super.key, required this.sites, required this.onTap});
+  /// Si se pasa, el filtro viene de fuera (barra superior) y se oculta la barra
+  /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
+  final String? externalQuery;
+  const SitesGroupedList({
+    super.key,
+    required this.sites,
+    required this.onTap,
+    this.externalQuery,
+  });
 
   @override
   State<SitesGroupedList> createState() => _SitesGroupedListState();
@@ -28,7 +36,7 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
   }
 
   Map<String, List<DiveSite>> _grouped() {
-    final q = _q.trim().toLowerCase();
+    final q = (widget.externalQuery ?? _q).trim().toLowerCase();
     final map = <String, List<DiveSite>>{};
     for (final s in widget.sites) {
       if (q.isNotEmpty &&
@@ -53,15 +61,16 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     final countries = grouped.keys.toList()..sort();
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-          child: SearchBar(
-            controller: _searchCtrl,
-            hintText: t.searchSites,
-            leading: const Icon(Icons.search),
-            onChanged: (v) => setState(() => _q = v),
+        if (widget.externalQuery == null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+            child: SearchBar(
+              controller: _searchCtrl,
+              hintText: t.searchSites,
+              leading: const Icon(Icons.search),
+              onChanged: (v) => setState(() => _q = v),
+            ),
           ),
-        ),
         Expanded(
           child: countries.isEmpty
               ? Center(child: Text(t.noSitesYet))

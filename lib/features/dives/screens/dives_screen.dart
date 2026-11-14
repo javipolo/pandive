@@ -1,4 +1,5 @@
-/// Pestaña de inmersiones: búsqueda + lista agrupada por mes + añadir.
+/// Pestaña de inmersiones: lista agrupada por mes + añadir. La búsqueda llega
+/// desde la barra superior (query).
 library;
 
 import 'package:flutter/material.dart';
@@ -15,29 +16,34 @@ import 'new_dive_screen.dart';
 class DivesTab extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
-  const DivesTab({super.key, required this.db, required this.settings});
+  final String query;
+  const DivesTab({
+    super.key,
+    required this.db,
+    required this.settings,
+    this.query = '',
+  });
 
   @override
   State<DivesTab> createState() => _DivesTabState();
 }
 
 class _DivesTabState extends State<DivesTab> {
-  final _searchCtrl = TextEditingController();
-  late List<Dive> _dives = widget.db.listDives();
+  late List<Dive> _dives = widget.db.listDives(search: widget.query);
 
   @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
+  void didUpdateWidget(DivesTab old) {
+    super.didUpdateWidget(old);
+    if (old.query != widget.query) _reload();
   }
 
   void _reload() =>
-      setState(() => _dives = widget.db.listDives(search: _searchCtrl.text));
+      setState(() => _dives = widget.db.listDives(search: widget.query));
 
   Future<void> _openDetail(int index) async {
     await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => DiveDetailScreen(
-          db: widget.db, dives: _dives, initialIndex: index),
+      builder: (_) =>
+          DiveDetailScreen(db: widget.db, dives: _dives, initialIndex: index),
     ));
     _reload();
   }
@@ -69,8 +75,7 @@ class _DivesTabState extends State<DivesTab> {
             builder: (_) =>
                 ScanScreen(db: widget.db, settings: widget.settings));
     await Navigator.of(context).push(route);
-    _searchCtrl.clear();
-    setState(() => _dives = widget.db.listDives());
+    _reload();
   }
 
   @override
@@ -82,25 +87,9 @@ class _DivesTabState extends State<DivesTab> {
         icon: const Icon(Icons.add),
         label: Text(t.newDive),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            child: SearchBar(
-              controller: _searchCtrl,
-              hintText: t.searchDives,
-              leading: const Icon(Icons.search),
-              onChanged: (q) =>
-                  setState(() => _dives = widget.db.listDives(search: q)),
-            ),
-          ),
-          Expanded(
-            child: _dives.isEmpty
-                ? Center(child: Text(t.noResults))
-                : MonthGroupedDives(dives: _dives, onOpen: _openDetail),
-          ),
-        ],
-      ),
+      body: _dives.isEmpty
+          ? Center(child: Text(t.noResults))
+          : MonthGroupedDives(dives: _dives, onOpen: _openDetail),
     );
   }
 }

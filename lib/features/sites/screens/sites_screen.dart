@@ -10,7 +10,8 @@ import 'package:pandive/features/sites/widgets/sites_grouped_list.dart';
 
 class SitesTab extends StatefulWidget {
   final DivemateDb db;
-  const SitesTab({super.key, required this.db});
+  final String query;
+  const SitesTab({super.key, required this.db, this.query = ''});
 
   @override
   State<SitesTab> createState() => _SitesTabState();
@@ -35,7 +36,8 @@ class _SitesTabState extends State<SitesTab> {
         onPressed: () => _open(null),
         child: const Icon(Icons.add),
       ),
-      body: SitesGroupedList(sites: _sites, onTap: _open),
+      body: SitesGroupedList(
+          sites: _sites, onTap: _open, externalQuery: widget.query),
     );
   }
 }
