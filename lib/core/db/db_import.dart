@@ -79,6 +79,12 @@ extension DivemateDbImport on DivemateDb {
     final time = dt != null ? '${p(dt.hour)}:${p(dt.minute)}:00' : null;
     final (interval, prof, prof2) = _encodeProfile(d.samples);
     final o2 = d.gasmixes.isNotEmpty ? d.gasmixes.first.o2 * 100 : null;
+    // Prof. media: la del aparato o, si falta, calculada de las muestras.
+    var avgDepth = d.avgDepth;
+    if (avgDepth == null) {
+      final xs = [for (final s in d.samples) if (s.depth > 0) s.depth];
+      if (xs.isNotEmpty) avgDepth = xs.reduce((a, b) => a + b) / xs.length;
+    }
 
     _db.execute(
       'INSERT INTO Logbook (Number, Divedate, Entrytime, DiverID, UUID, Updated, '
@@ -86,7 +92,7 @@ extension DivemateDbImport on DivemateDb {
       'Profile, Profile2) VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?)',
       [
         nextDiveNumber(), date, time, owner, _uuid(), now,
-        d.maxDepth, d.avgDepth,
+        d.maxDepth, avgDepth,
         d.divetimeSec != null ? d.divetimeSec! / 60.0 : null,
         d.tempMin, computer, o2, interval, prof, prof2,
       ],

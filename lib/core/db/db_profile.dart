@@ -51,4 +51,31 @@ extension DivemateDbProfile on DivemateDb {
       temps: temps,
     );
   }
+
+  /// Rellena `DepthAvg` (prof. media) a partir del perfil en las inmersiones que
+  /// no la tienen, para que quede persistida (y exportable a DiveMate: su SAC se
+  /// deriva de DepthAvg + presiones + tiempo). Devuelve cuántas actualizó.
+  int fillMissingAvgDepth() {
+    final owner = ownerId;
+    final filter = owner != null ? 'AND DiverID = $owner' : '';
+    final rows = _db.select(
+      'SELECT ID FROM Logbook WHERE (Status IS NULL OR Status != 2) $filter '
+      "AND (DepthAvg IS NULL OR DepthAvg = 0) AND ProfileInt > 0 "
+      "AND Profile IS NOT NULL AND Profile <> ''",
+    );
+    var n = 0;
+    final now = _nowStamp();
+    for (final r in rows) {
+      final id = r['ID'] as int;
+      final p = diveProfile(id);
+      if (p == null || p.isEmpty) continue;
+      final xs = p.depths.where((d) => d > 0).toList();
+      if (xs.isEmpty) continue;
+      final avg = xs.reduce((a, b) => a + b) / xs.length;
+      _db.execute('UPDATE Logbook SET DepthAvg = ?, Updated = ? WHERE ID = ?',
+          [avg, now, id]);
+      n++;
+    }
+    return n;
+  }
 }

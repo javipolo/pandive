@@ -42,7 +42,10 @@ class DivemateDb {
       mode: readOnly ? OpenMode.readOnly : OpenMode.readWrite,
     );
     if (!readOnly) _ensureSyncTable(db); // fingerprints por dispositivo
-    return DivemateDb._(db);
+    final inst = DivemateDb._(db);
+    // Persistir prof. media calculada del perfil donde falte (exportable).
+    if (!readOnly) inst.fillMissingAvgDepth();
+    return inst;
   }
 
   /// Crea una base de datos DiveMate vacía nueva en [path] (con un buceador).

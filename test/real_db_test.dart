@@ -442,6 +442,25 @@ void main() {
     }
   });
 
+  test('importDownloaded calcula y persiste DepthAvg si el aparato no la da', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_avg_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      w.importDownloaded(const DownloadedDive(
+        fingerprint: 'z',
+        datetime: null,
+        maxDepth: 10,
+        samples: [DiveSample(0, 6, 20), DiveSample(10000, 10, 20)],
+      ));
+      final d = w.listDives().single;
+      expect(d.avgDepth, closeTo(8, 0.01)); // media de 6 y 10
+    } finally {
+      w.close();
+    }
+  });
+
   test('ordenadores de buceo: add / list / saved / remove', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_comp_${DateTime.now().microsecondsSinceEpoch}.ddb');
