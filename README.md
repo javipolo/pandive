@@ -218,13 +218,21 @@ Android lo resuelve por paquete + SHA-1):
    Google como **usuario de prueba** (así no hace falta verificación).
 4. **Credenciales → Crear → ID de cliente OAuth → Android**:
    - Paquete: `org.drslump.pandive`
-   - SHA-1 de la clave de firma (release y, si quieres probar en debug, también
-     la debug):
+   - SHA-1 de la **clave de firma release** (la que usa el APK release, ver
+     `android/key.properties`). Recupéralo con:
      ```
-     keytool -list -v -keystore <tu-release.keystore> -alias <alias>
-     keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+     keytool -list -v -keystore android/app/pandive-release.jks -alias pandive
      ```
+     (El build release se firma con esta clave; es el SHA-1 que hay que
+     registrar. Puedes añadir varios SHA-1 al mismo cliente: p.ej. el debug
+     `~/.android/debug.keystore` alias `androiddebugkey`, pass `android`, si
+     alguna vez quieres probar un build debug.)
 5. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
+
+> La firma release vive en `android/app/pandive-release.jks` + `android/key.properties`
+> (ambos **gitignored**, no se versionan). Si cambias de clave, añade el nuevo
+> SHA-1 al cliente OAuth y reinstala la app (firma distinta → hay que desinstalar
+> la anterior).
 
 El backup automático diario se dispara al abrir la app si han pasado >24 h y la
 DB cambió. Se guarda `latest.ddb` + copias con timestamp (se conservan las 10
