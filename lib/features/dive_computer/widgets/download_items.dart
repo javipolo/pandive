@@ -23,9 +23,10 @@ import 'package:pandive/features/dive_computer/widgets/download_result_list.dart
   return (items: items, existing: dives.length - deviceNew.length);
 }
 
-/// Aplica la selección: guarda los marcados, manda a pendientes los nuevos no
-/// marcados (una vez más) y descarta los pendientes no marcados (gastaron turno).
-/// Avanza el fingerprint al más reciente del aparato. Devuelve cuántos añadió.
+/// Aplica la selección: guarda los marcados y DESCARTA los no marcados de golpe.
+/// Avanza el fingerprint al más reciente del aparato (así no se vuelven a bajar).
+/// Salir con "atrás" (sin guardar) no avanza el fingerprint, y el aparato los
+/// reofrece en la siguiente descarga. Devuelve cuántos añadió.
 int applyDownloadSelection({
   required DivemateDb db,
   required String deviceId,
@@ -37,14 +38,11 @@ int applyDownloadSelection({
   var added = 0;
   for (final it in items) {
     final fp = it.dive.fingerprint;
-    if (selected.contains(fp)) {
-      if (db.importDownloaded(it.dive, computer: computer)) added++;
-      db.removePending(deviceId, fp);
-    } else if (it.pending) {
-      db.removePending(deviceId, fp);
-    } else {
-      db.addPending(deviceId, it.dive);
+    if (selected.contains(fp) &&
+        db.importDownloaded(it.dive, computer: computer)) {
+      added++;
     }
+    db.removePending(deviceId, fp); // guardadas o descartadas: fuera de la caché
   }
   if (deviceDives.isNotEmpty) {
     db.setFingerprintFor(deviceId, deviceDives.first.fingerprint);

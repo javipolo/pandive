@@ -58,8 +58,8 @@ class _DownloadResultListState extends State<DownloadResultList> {
     }
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        // Permite guardar 0: confirma el estado (descarta las no elegidas por
-        // segunda vez) y avanza el fingerprint, aunque no guardes ninguna.
+        // Permite guardar 0: descarta de golpe las no elegidas y avanza el
+        // fingerprint, aunque no guardes ninguna. (Atrás no cambia nada.)
         onPressed: widget.saving ? null : () => widget.onSave(_sel),
         icon: const Icon(Icons.save),
         label: Text(widget.saving ? t.saving : t.saveN(_sel.length)),
