@@ -27,6 +27,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy
 - `lib/core/db/db_sites.dart` -> sitios (Place): obtener/crear/actualizar, find-or-create
 - `lib/core/db/db_tanks.dart` -> botellas por buceo, presets "mis botellas", buceos por sitio/buddy
+- `lib/core/db/db_merge.dart` -> fusionar inmersiones (perfil concatenado, unión de datos)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 
 ### Core · modelos (`models.dart` es el barrel)
@@ -46,6 +47,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/widgets/labeled_field.dart` -> campo de texto con etiqueta/borde
 - `lib/core/widgets/star_rating.dart` -> selector de valoración por estrellas
 - `lib/core/widgets/date_time_field.dart` -> selector de fecha+hora (ListTile)
+- `lib/core/widgets/selection_bar.dart` -> barra de acciones en modo selección (lote)
+- `lib/core/widgets/confirm_dialog.dart` -> diálogo de confirmación reutilizable
+- `lib/core/widgets/name_dialog.dart` -> diálogo de un campo (nombre) reutilizable
 
 ## Features
 
@@ -60,7 +64,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/screens/dives_list_screen.dart` -> lista simple de buceos (tag/buddy/sitio)
 
 ### settings
-- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tamaño letra, herramientas, DB
+- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tamaño letra, hueco fusión, herramientas, DB
+- `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
 
 ### buddies (compañeros)
 - `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar)
@@ -68,12 +73,14 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/buddies/screens/buddy_picker_screen.dart` -> multi-selección de compañeros (para editar buceo)
 
 ### dives (inmersiones)
-- `lib/features/dives/screens/dives_screen.dart` -> lista + búsqueda + botón "Nueva"
+- `lib/features/dives/screens/dives_screen.dart` -> lista + búsqueda + "Nueva" + selección en lote (borrar/fusionar)
 - `lib/features/dives/screens/dive_detail_screen.dart` -> detalle: datos, perfil, botellas, editar
 - `lib/features/dives/screens/edit_dive_screen.dart` -> editar campos editables
 - `lib/features/dives/screens/new_dive_screen.dart` -> formulario de alta manual
 - `lib/features/dives/widgets/cylinder_tile.dart` -> tarjeta de botella en el detalle
-- `lib/features/dives/widgets/month_grouped_dives.dart` -> lista de buceos agrupada por mes (colapsable)
+- `lib/features/dives/widgets/month_grouped_dives.dart` -> lista de buceos agrupada por mes (colapsable, selección)
+- `lib/features/dives/widgets/dive_row.dart` -> fila de buceo estilo DiveMate (nº grande + 2 líneas)
+- `lib/features/dives/widgets/add_dive_sheet.dart` -> hoja "añadir": alta manual o transferencia
 - `lib/features/dives/widgets/tags_picker_field.dart` -> campo de etiquetas elegidas (chips)
 - `lib/features/dives/screens/profile_fullscreen_screen.dart` -> perfil a pantalla completa (apaisado)
 - `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas

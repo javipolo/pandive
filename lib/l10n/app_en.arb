@@ -196,5 +196,20 @@
   "@importHashtagsResult": { "placeholders": { "count": {} } },
   "noProfile": "No profile recorded",
   "axisDepth": "depth (m)",
-  "axisTime": "time (min)"
+  "axisTime": "time (min)",
+
+  "selectedCount": "{count} selected",
+  "@selectedCount": { "placeholders": { "count": {} } },
+  "deleteConfirm": "Delete {count}? This can't be undone.",
+  "@deleteConfirm": { "placeholders": { "count": {} } },
+  "merge": "Merge",
+  "mergeDivesTitle": "Merge dives",
+  "mergeConfirm": "Merge {count} dives into one? The others will be deleted.",
+  "@mergeConfirm": { "placeholders": { "count": {} } },
+  "mergeTooFar": "Too much surface time between dives ({gap} min, limit {limit} min).",
+  "@mergeTooFar": { "placeholders": { "gap": {}, "limit": {} } },
+  "mergeGapSetting": "Max surface gap to merge (min)",
+  "deletedCount": "{count} deleted",
+  "@deletedCount": { "placeholders": { "count": {} } },
+  "mergedOk": "Merged into one dive."
 }

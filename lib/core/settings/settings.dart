@@ -9,6 +9,7 @@ class Settings extends ChangeNotifier {
   static const _kTextScale = 'text_scale';
   static const _kDbPath = 'db_path';
   static const _kLocale = 'locale';
+  static const _kMergeGap = 'merge_gap';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -47,6 +48,14 @@ class Settings extends ChangeNotifier {
   Locale? get locale {
     final code = _prefs.getString(_kLocale);
     return code == null ? null : Locale(code);
+  }
+
+  /// Máximo intervalo en superficie (min) para poder fusionar inmersiones.
+  int get mergeGapMinutes => _prefs.getInt(_kMergeGap) ?? 15;
+
+  Future<void> setMergeGapMinutes(int minutes) async {
+    await _prefs.setInt(_kMergeGap, minutes.clamp(1, 240));
+    notifyListeners();
   }
 
   Future<void> setLocale(String? code) async {

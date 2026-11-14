@@ -214,6 +214,54 @@ void main() {
     }
   });
 
+  test('mergeDives: suma tiempos, une botellas, borra el resto', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_merge2_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      w.importDownloaded(DownloadedDive(
+        fingerprint: 'a',
+        datetime: DateTime(2031, 5, 1, 10, 0),
+        divetimeSec: 60,
+        maxDepth: 10,
+        gasmixes: const [GasMix(0.32, 0)],
+        samples: const [DiveSample(0, 5, 20), DiveSample(10000, 10, 20)],
+      ));
+      w.importDownloaded(DownloadedDive(
+        fingerprint: 'b',
+        datetime: DateTime(2031, 5, 1, 10, 3), // hueco 2 min
+        divetimeSec: 60,
+        maxDepth: 18,
+        gasmixes: const [GasMix(0.21, 0)],
+        samples: const [DiveSample(0, 8, 19), DiveSample(10000, 18, 19)],
+      ));
+      final a = w.listDives().firstWhere((d) => d.date == DateTime(2031, 5, 1, 10, 0));
+      final b = w.listDives().firstWhere((d) => d.date == DateTime(2031, 5, 1, 10, 3));
+
+      // hueco (2 min) mayor que el límite => excepción, nada cambia
+      expect(() => w.mergeDives([a.id, b.id], maxGapMin: 1),
+          throwsA(isA<MergeTooFarException>()));
+      expect(w.countDives(), 2);
+
+      final id = w.mergeDives([a.id, b.id], maxGapMin: 15);
+      expect(id, a.id); // conserva el más antiguo
+      expect(w.countDives(), 1); // el otro queda borrado (Status=2)
+
+      final merged = w.getDive(id)!;
+      expect(merged.durationMin, closeTo(2, 0.01)); // 1 + 1 min
+      expect(merged.maxDepth, 18); // máx de ambos
+      expect(w.cylinders(id), hasLength(2)); // unión de botellas
+
+      final p = w.diveProfile(id)!;
+      expect(p.depths.first, 5.0); // empieza con el primer buceo
+      expect(p.depths.last, 18.0); // acaba con el segundo
+      expect(p.depths.length, greaterThan(4)); // con hueco en superficie
+    } finally {
+      w.close();
+    }
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

@@ -22,6 +22,7 @@ part 'db_buddies.dart';
 part 'db_sites.dart';
 part 'db_tanks.dart';
 part 'db_tags.dart';
+part 'db_merge.dart';
 
 class DivemateDb {
   final Database _db;

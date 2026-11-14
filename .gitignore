@@ -27,6 +27,11 @@ key.properties
 # Varios
 .DS_Store
 
+# El gitignore global del usuario ignora "tags" (ficheros ctags); eso tapa la
+# feature lib/features/tags/. La re-incluimos aquí.
+!lib/features/tags/
+!lib/features/tags/**
+
 # l10n generado (se regenera con flutter gen-l10n)
 lib/l10n/app_localizations*.dart
 

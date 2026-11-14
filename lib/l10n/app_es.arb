@@ -175,5 +175,15 @@
   "importHashtagsResult": "{count} etiquetas asignadas.",
   "noProfile": "Sin perfil registrado",
   "axisDepth": "prof (m)",
-  "axisTime": "tiempo (min)"
+  "axisTime": "tiempo (min)",
+
+  "selectedCount": "{count} seleccionadas",
+  "deleteConfirm": "¿Eliminar {count}? No se puede deshacer.",
+  "merge": "Fusionar",
+  "mergeDivesTitle": "Fusionar inmersiones",
+  "mergeConfirm": "¿Fusionar {count} inmersiones en una? Las demás se eliminarán.",
+  "mergeTooFar": "Demasiado tiempo en superficie entre inmersiones ({gap} min, límite {limit} min).",
+  "mergeGapSetting": "Hueco máx. en superficie para fusionar (min)",
+  "deletedCount": "{count} eliminadas",
+  "mergedOk": "Fusionadas en una inmersión."
 }

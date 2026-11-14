@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/settings/widgets/text_scale_control.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -80,39 +81,40 @@ class SettingsScreen extends StatelessWidget {
                 child: Text(t.textSizeHint,
                     style: Theme.of(context).textTheme.bodySmall),
               ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    tooltip: '−',
-                    onPressed: () =>
-                        settings.setTextScale(settings.textScale - 0.1),
-                  ),
-                  Expanded(
-                    child: Slider(
-                      min: Settings.minTextScale,
-                      max: Settings.maxTextScale,
-                      divisions: 12,
-                      value: settings.textScale.clamp(
-                          Settings.minTextScale, Settings.maxTextScale),
-                      label: '${(settings.textScale * 100).round()}%',
-                      onChanged: settings.setTextScale,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    tooltip: '+',
-                    onPressed: () =>
-                        settings.setTextScale(settings.textScale + 0.1),
-                  ),
-                ],
-              ),
+              TextScaleControl(settings: settings),
               Center(
                 child: TextButton(
                   onPressed: () =>
                       settings.setTextScale(Settings.defaultTextScale),
                   child: Text(t.reset),
                 ),
+              ),
+              const Divider(),
+              _header(context, t.mergeGapSetting),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () => settings
+                        .setMergeGapMinutes(settings.mergeGapMinutes - 1),
+                  ),
+                  Expanded(
+                    child: Slider(
+                      min: 1,
+                      max: 60,
+                      divisions: 59,
+                      value: settings.mergeGapMinutes.clamp(1, 60).toDouble(),
+                      label: '${settings.mergeGapMinutes} min',
+                      onChanged: (v) =>
+                          settings.setMergeGapMinutes(v.round()),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () => settings
+                        .setMergeGapMinutes(settings.mergeGapMinutes + 1),
+                  ),
+                ],
               ),
               const Divider(),
               _header(context, t.tools),
