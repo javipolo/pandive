@@ -132,6 +132,7 @@ class _DivesTabState extends State<DivesTab> {
               ? Center(child: Text(t.noResults))
               : MonthGroupedDives(
                   dives: _dives,
+                  settings: widget.settings,
                   onOpen: _onOpen,
                   onLongPress: (i) => setState(() {
                     _select = true;

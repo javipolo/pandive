@@ -209,6 +209,9 @@
   "mergeTooFar": "Too much surface time between dives ({gap} min, limit {limit} min).",
   "@mergeTooFar": { "placeholders": { "gap": {}, "limit": {} } },
   "mergeGapSetting": "Max surface gap to merge (min)",
+  "nightDiveHours": "Night dive hours",
+  "nightFrom": "From",
+  "nightUntil": "Until",
   "deletedCount": "{count} deleted",
   "@deletedCount": { "placeholders": { "count": {} } },
   "mergedOk": "Merged into one dive."

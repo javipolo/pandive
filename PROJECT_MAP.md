@@ -66,6 +66,8 @@ con `screens/` y, si hace falta, `widgets/`).
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tamaño letra, hueco fusión, herramientas, DB
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
+- `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
+- `lib/features/settings/widgets/night_hours_control.dart` -> franja horaria de inmersión nocturna (desde/hasta)
 
 ### buddies (compañeros)
 - `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar)

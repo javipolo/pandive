@@ -10,6 +10,8 @@ class Settings extends ChangeNotifier {
   static const _kDbPath = 'db_path';
   static const _kLocale = 'locale';
   static const _kMergeGap = 'merge_gap';
+  static const _kNightStart = 'night_start';
+  static const _kNightEnd = 'night_end';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -56,6 +58,27 @@ class Settings extends ChangeNotifier {
   Future<void> setMergeGapMinutes(int minutes) async {
     await _prefs.setInt(_kMergeGap, minutes.clamp(1, 240));
     notifyListeners();
+  }
+
+  /// Franja horaria de inmersión nocturna (por defecto 18:00 → 07:00).
+  int get nightStartHour => _prefs.getInt(_kNightStart) ?? 18;
+  int get nightEndHour => _prefs.getInt(_kNightEnd) ?? 7;
+
+  Future<void> setNightStartHour(int h) async {
+    await _prefs.setInt(_kNightStart, h % 24);
+    notifyListeners();
+  }
+
+  Future<void> setNightEndHour(int h) async {
+    await _prefs.setInt(_kNightEnd, h % 24);
+    notifyListeners();
+  }
+
+  /// ¿Es nocturna una inmersión que entra al agua a esta [hour]? Maneja la
+  /// franja que cruza medianoche (p.ej. 18 → 7).
+  bool isNight(int hour) {
+    final s = nightStartHour, e = nightEndHour;
+    return s <= e ? (hour >= s && hour < e) : (hour >= s || hour < e);
   }
 
   Future<void> setLocale(String? code) async {

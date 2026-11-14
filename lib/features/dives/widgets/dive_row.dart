@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DiveRow extends StatelessWidget {
   final Dive dive;
+  final Settings settings;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final bool selected;
@@ -17,6 +19,7 @@ class DiveRow extends StatelessWidget {
   const DiveRow({
     super.key,
     required this.dive,
+    required this.settings,
     required this.onTap,
     this.onLongPress,
     this.selected = false,
@@ -38,9 +41,9 @@ class DiveRow extends StatelessWidget {
       if (dive.maxDepth != null) '${NumberFormat('0.0', locale).format(dive.maxDepth)} m',
     ].join('   ');
 
-    // Diurna (sol) vs nocturna (luna) según la hora de entrada.
+    // Diurna (sol) vs nocturna (luna) según la hora de entrada (configurable).
     final hour = dive.date?.hour;
-    final night = hour != null && (hour < 7 || hour >= 20);
+    final night = hour != null && settings.isNight(hour);
 
     return InkWell(
       onTap: onTap,

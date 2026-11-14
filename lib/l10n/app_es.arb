@@ -184,6 +184,9 @@
   "mergeConfirm": "¿Fusionar {count} inmersiones en una? Las demás se eliminarán.",
   "mergeTooFar": "Demasiado tiempo en superficie entre inmersiones ({gap} min, límite {limit} min).",
   "mergeGapSetting": "Hueco máx. en superficie para fusionar (min)",
+  "nightDiveHours": "Horario inmersión nocturna",
+  "nightFrom": "Desde",
+  "nightUntil": "Hasta",
   "deletedCount": "{count} eliminadas",
   "mergedOk": "Fusionadas en una inmersión."
 }

@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dives/widgets/dive_row.dart';
 
 class MonthGroupedDives extends StatefulWidget {
   final List<Dive> dives;
+  final Settings settings;
   final void Function(int index) onOpen;
   final void Function(int index)? onLongPress;
   final Set<int> selected;
@@ -17,6 +19,7 @@ class MonthGroupedDives extends StatefulWidget {
   const MonthGroupedDives({
     super.key,
     required this.dives,
+    required this.settings,
     required this.onOpen,
     this.onLongPress,
     this.selected = const {},
@@ -67,6 +70,7 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
         for (final i in idxs) {
           rows.add(DiveRow(
             dive: widget.dives[i],
+            settings: widget.settings,
             selected: widget.selected.contains(i),
             onTap: () => widget.onOpen(i),
             onLongPress:

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
+import 'package:pandive/features/settings/widgets/night_hours_control.dart';
 import 'package:pandive/features/settings/widgets/text_scale_control.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -91,31 +93,10 @@ class SettingsScreen extends StatelessWidget {
               ),
               const Divider(),
               _header(context, t.mergeGapSetting),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: () => settings
-                        .setMergeGapMinutes(settings.mergeGapMinutes - 1),
-                  ),
-                  Expanded(
-                    child: Slider(
-                      min: 1,
-                      max: 60,
-                      divisions: 59,
-                      value: settings.mergeGapMinutes.clamp(1, 60).toDouble(),
-                      label: '${settings.mergeGapMinutes} min',
-                      onChanged: (v) =>
-                          settings.setMergeGapMinutes(v.round()),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => settings
-                        .setMergeGapMinutes(settings.mergeGapMinutes + 1),
-                  ),
-                ],
-              ),
+              MergeGapControl(settings: settings),
+              const Divider(),
+              _header(context, t.nightDiveHours),
+              NightHoursControl(settings: settings),
               const Divider(),
               _header(context, t.tools),
               ListTile(
