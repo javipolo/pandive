@@ -21,9 +21,13 @@ extension DivemateDbQueries on DivemateDb {
     final q = search?.trim();
     if (q != null && q.isNotEmpty) {
       where.write(' AND (Place LIKE ? OR Country LIKE ? OR Comments LIKE ? '
-          'OR Buddy LIKE ? OR CAST(Number AS TEXT) = ?)');
+          'OR Buddy LIKE ? OR CAST(Number AS TEXT) = ? '
+          // También compañeros enlazados por BuddyIDs (no solo el texto Buddy).
+          "OR EXISTS (SELECT 1 FROM Buddy B WHERE "
+          "(',' || IFNULL(BuddyIDs,'') || ',') LIKE ('%,' || B.ID || ',%') "
+          'AND (B.FirstName LIKE ? OR B.LastName LIKE ?)))');
       final like = '%$q%';
-      params.addAll([like, like, like, like, q]);
+      params.addAll([like, like, like, like, q, like, like]);
     }
     final rows = _db.select(
       'SELECT $_diveColumns FROM Logbook WHERE $where '

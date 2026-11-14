@@ -25,6 +25,7 @@ class PandiveApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: appTheme(Brightness.light),
           darkTheme: appTheme(Brightness.dark),
+          themeMode: settings.themeMode,
           locale: settings.locale, // null = idioma del sistema
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

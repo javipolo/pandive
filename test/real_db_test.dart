@@ -262,6 +262,52 @@ void main() {
     }
   });
 
+  test('listDives busca también por compañero enlazado (BuddyIDs)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_bsearch_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final bid = w.findOrCreateBuddy('Marina');
+      w.createDive(dateTime: DateTime(2030, 6, 1, 10, 0), buddyIds: '$bid');
+      w.createDive(dateTime: DateTime(2030, 6, 2, 10, 0)); // sin compañero
+      expect(w.listDives(search: 'mari'), hasLength(1));
+      expect(w.listDives(search: 'nadie'), isEmpty);
+    } finally {
+      w.close();
+    }
+  });
+
+  test('LogbookStats.fromDives agrega una selección', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_fstats_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      w.createDive(
+          dateTime: DateTime(2029, 1, 1, 10, 0),
+          maxDepth: 20,
+          avgDepth: 12,
+          durationMin: 40,
+          waterTemp: 18);
+      w.createDive(
+          dateTime: DateTime(2030, 1, 1, 10, 0),
+          maxDepth: 30,
+          avgDepth: 15,
+          durationMin: 60,
+          waterTemp: 22);
+      final s = LogbookStats.fromDives(w.listDives());
+      expect(s.totalDives, 2);
+      expect(s.totalMinutes, 100);
+      expect(s.maxDepth, 30);
+      expect(s.avgDepth, closeTo(13.5, 0.01));
+      expect(s.avgWaterTemp, closeTo(20, 0.01));
+      expect(s.divesPerYear, {2029: 1, 2030: 1});
+    } finally {
+      w.close();
+    }
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

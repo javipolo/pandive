@@ -1,5 +1,4 @@
-/// Pestaña de inmersiones: lista agrupada por mes + añadir + selección en lote
-/// (borrar / fusionar). La búsqueda llega desde la barra superior (query).
+/// Pestaña de inmersiones: lista por mes, añadir, selección en lote, búsqueda.
 library;
 
 import 'package:flutter/material.dart';
@@ -8,9 +7,10 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
-import 'package:pandive/core/widgets/selection_bar.dart';
 import 'package:pandive/features/dives/widgets/add_dive_sheet.dart';
+import 'package:pandive/features/dives/widgets/dives_selection_bar.dart';
 import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
+import 'package:pandive/features/stats/screens/selection_stats_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 import 'dive_detail_screen.dart';
 
@@ -57,6 +57,16 @@ class _DivesTabState extends State<DivesTab> {
         if (_sel.isEmpty) _select = false;
       });
 
+  void _toggleGroup(List<int> ids) => setState(() {
+        _select = true;
+        ids.every(_sel.contains) ? _sel.removeAll(ids) : _sel.addAll(ids);
+        if (_sel.isEmpty) _select = false;
+      });
+
+  void _showStats() => Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) =>
+          SelectionStatsScreen(dives: [for (final i in _sel) _dives[i]])));
+
   Future<void> _onOpen(int index) async {
     if (_select) return _toggle(index);
     await Navigator.of(context).push(MaterialPageRoute(
@@ -69,9 +79,7 @@ class _DivesTabState extends State<DivesTab> {
   Future<void> _deleteSel() async {
     final t = AppLocalizations.of(context);
     if (!await confirmDialog(context, t.deleteConfirm(_sel.length),
-        confirmLabel: t.delete)) {
-      return;
-    }
+        confirmLabel: t.delete)) return;
     widget.db.deleteDives([for (final i in _sel) _dives[i].id]);
     _exitSel();
     _reload();
@@ -80,17 +88,15 @@ class _DivesTabState extends State<DivesTab> {
   Future<void> _mergeSel() async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final gap = widget.settings.mergeGapMinutes;
     final ids = [for (final i in _sel) _dives[i].id];
     if (!await confirmDialog(context, t.mergeConfirm(ids.length),
-        confirmLabel: t.merge)) {
-      return;
-    }
+        confirmLabel: t.merge)) return;
     try {
-      widget.db.mergeDives(ids, maxGapMin: widget.settings.mergeGapMinutes);
+      widget.db.mergeDives(ids, maxGapMin: gap);
     } on MergeTooFarException catch (e) {
       messenger.showSnackBar(SnackBar(
-          content: Text(
-              t.mergeTooFar(e.gapMinutes, widget.settings.mergeGapMinutes))));
+          content: Text(t.mergeTooFar(e.gapMinutes, gap))));
       return;
     }
     _exitSel();
@@ -111,22 +117,16 @@ class _DivesTabState extends State<DivesTab> {
           : FloatingActionButton.extended(
               onPressed: _add,
               icon: const Icon(Icons.add),
-              label: Text(t.newDive),
-            ),
+              label: Text(t.newDive)),
       body: Column(children: [
         if (_select)
-          SelectionBar(count: _sel.length, onClose: _exitSel, actions: [
-            IconButton(
-              tooltip: t.merge,
-              icon: const Icon(Icons.merge),
-              onPressed: _sel.length >= 2 ? _mergeSel : null,
-            ),
-            IconButton(
-              tooltip: t.delete,
-              icon: const Icon(Icons.delete_outline),
-              onPressed: _deleteSel,
-            ),
-          ]),
+          DivesSelectionBar(
+            count: _sel.length,
+            onClose: _exitSel,
+            onStats: _showStats,
+            onMerge: _sel.length >= 2 ? _mergeSel : null,
+            onDelete: _deleteSel,
+          ),
         Expanded(
           child: _dives.isEmpty
               ? Center(child: Text(t.noResults))
@@ -138,7 +138,9 @@ class _DivesTabState extends State<DivesTab> {
                     _select = true;
                     _sel.add(i);
                   }),
+                  onToggleGroup: _toggleGroup,
                   selected: _sel,
+                  selectionMode: _select,
                   collapseAll: widget.collapseAll,
                 ),
         ),

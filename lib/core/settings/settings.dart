@@ -2,7 +2,7 @@
 /// de la base de datos activa. Persistido con shared_preferences.
 library;
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends ChangeNotifier {
@@ -12,6 +12,7 @@ class Settings extends ChangeNotifier {
   static const _kMergeGap = 'merge_gap';
   static const _kNightStart = 'night_start';
   static const _kNightEnd = 'night_end';
+  static const _kTheme = 'theme_mode';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -57,6 +58,18 @@ class Settings extends ChangeNotifier {
 
   Future<void> setMergeGapMinutes(int minutes) async {
     await _prefs.setInt(_kMergeGap, minutes.clamp(1, 240));
+    notifyListeners();
+  }
+
+  /// Tema: claro / oscuro / seguir el sistema (por defecto).
+  ThemeMode get themeMode => switch (_prefs.getString(_kTheme)) {
+        'light' => ThemeMode.light,
+        'dark' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
+
+  Future<void> setThemeMode(ThemeMode m) async {
+    await _prefs.setString(_kTheme, m.name);
     notifyListeners();
   }
 

@@ -77,6 +77,23 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               const Divider(),
+              _header(context, t.theme),
+              RadioGroup<ThemeMode>(
+                groupValue: settings.themeMode,
+                onChanged: (v) => v == null ? null : settings.setThemeMode(v),
+                child: Column(
+                  children: [
+                    for (final opt in <(ThemeMode, String)>[
+                      (ThemeMode.system, t.themeSystem),
+                      (ThemeMode.light, t.themeLight),
+                      (ThemeMode.dark, t.themeDark),
+                    ])
+                      RadioListTile<ThemeMode>(
+                          value: opt.$1, title: Text(opt.$2)),
+                  ],
+                ),
+              ),
+              const Divider(),
               _header(context, t.textSize),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),

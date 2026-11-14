@@ -14,7 +14,9 @@ class MonthGroupedDives extends StatefulWidget {
   final Settings settings;
   final void Function(int index) onOpen;
   final void Function(int index)? onLongPress;
+  final void Function(List<int> indices)? onToggleGroup;
   final Set<int> selected;
+  final bool selectionMode;
   final bool collapseAll;
   const MonthGroupedDives({
     super.key,
@@ -22,7 +24,9 @@ class MonthGroupedDives extends StatefulWidget {
     required this.settings,
     required this.onOpen,
     this.onLongPress,
+    this.onToggleGroup,
     this.selected = const {},
+    this.selectionMode = false,
     this.collapseAll = false,
   });
 
@@ -64,8 +68,21 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
       final label =
           k == '—' ? '—' : monthFmt.format(widget.dives[idxs.first].date!);
       final collapsed = _collapsed.contains(k);
-      rows.add(_header(context, label, idxs.length, collapsed,
-          () => setState(() => collapsed ? _collapsed.remove(k) : _collapsed.add(k))));
+      void toggleCollapse() => setState(
+          () => collapsed ? _collapsed.remove(k) : _collapsed.add(k));
+      final groupSel = widget.selectionMode && widget.onToggleGroup != null;
+      final allSel = idxs.every(widget.selected.contains);
+      rows.add(_header(
+        context,
+        label,
+        idxs.length,
+        collapsed,
+        groupSel ? () => widget.onToggleGroup!(idxs) : toggleCollapse,
+        onLongPress: widget.onToggleGroup == null
+            ? null
+            : () => widget.onToggleGroup!(idxs),
+        selectedGroup: groupSel && allSel,
+      ));
       if (!collapsed) {
         for (final i in idxs) {
           rows.add(DiveRow(
@@ -83,20 +100,25 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
   }
 
   Widget _header(BuildContext context, String label, int count, bool collapsed,
-      VoidCallback onTap) {
+      VoidCallback onTap,
+      {VoidCallback? onLongPress, bool selectedGroup = false}) {
     final cs = Theme.of(context).colorScheme;
     return Material(
-      color: cs.primaryContainer,
+      color: selectedGroup ? cs.primary : cs.primaryContainer,
       child: ListTile(
         dense: true,
+        leading: selectedGroup
+            ? Icon(Icons.check_circle, color: cs.onPrimary)
+            : null,
         title: Text('${label.toUpperCase()}  ($count)',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
-                color: cs.onPrimaryContainer)),
+                color: selectedGroup ? cs.onPrimary : cs.onPrimaryContainer)),
         trailing: Icon(collapsed ? Icons.expand_more : Icons.expand_less,
-            color: cs.onPrimaryContainer),
+            color: selectedGroup ? cs.onPrimary : cs.onPrimaryContainer),
         onTap: onTap,
+        onLongPress: onLongPress,
       ),
     );
   }

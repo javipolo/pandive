@@ -11,7 +11,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/main.dart` -> arranque: init locale, carga settings, lanza la app
 - `lib/core/app.dart` -> MaterialApp, escala de texto global, AppRoot (elige pantalla)
 - `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)
-- `lib/core/settings/settings.dart` -> preferencias: escala de texto, ruta de DB activa, idioma
+- `lib/core/settings/settings.dart` -> preferencias: escala de texto, ruta DB, idioma, tema, horario nocturno, hueco fusión
 - `lib/l10n/app_en.arb` / `app_es.arb` -> traducciones (plantilla EN + ES); `AppLocalizations` se genera con `flutter gen-l10n`
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
 
@@ -83,6 +83,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/month_grouped_dives.dart` -> lista de buceos agrupada por mes (colapsable, selección)
 - `lib/features/dives/widgets/dive_row.dart` -> fila de buceo estilo DiveMate (nº grande + 2 líneas)
 - `lib/features/dives/widgets/add_dive_sheet.dart` -> hoja "añadir": alta manual o transferencia
+- `lib/features/dives/widgets/dives_selection_bar.dart` -> barra de selección (stats/fusionar/borrar)
 - `lib/features/dives/widgets/tags_picker_field.dart` -> campo de etiquetas elegidas (chips)
 - `lib/features/dives/screens/profile_fullscreen_screen.dart` -> perfil a pantalla completa (apaisado)
 - `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas
@@ -99,7 +100,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios con conteo y mapa
 
 ### stats (estadísticas)
-- `lib/features/stats/screens/stats_screen.dart` -> tarjetas de stats + barras por año
+- `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook
+- `lib/features/stats/screens/selection_stats_screen.dart` -> stats solo de una selección de buceos
+- `lib/features/stats/widgets/stats_view.dart` -> vista reutilizable (tarjetas + barras por año)
 - `lib/features/stats/widgets/year_bars.dart` -> barras de inmersiones por año
 
 ### dive_computer (ordenador de buceo)
