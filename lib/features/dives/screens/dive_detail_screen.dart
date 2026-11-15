@@ -80,7 +80,7 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
     final dive = _dives[_index];
     return Scaffold(
       appBar: AppBar(
-        title: Text(dive.number != null ? t.diveNumber(dive.number!) : t.dive),
+        title: Text(dive.place ?? t.dive),
         actions: [
           IconButton(
               tooltip: t.edit, icon: const Icon(Icons.edit), onPressed: _edit),

@@ -28,13 +28,13 @@ class LabeledValue extends StatelessWidget {
   }
 }
 
-/// Dos columnas alineadas (izquierda | derecha).
-Widget twoCol(Widget? a, Widget? b) => Row(
+/// Dos columnas alineadas (izquierda | derecha), con proporción configurable.
+Widget twoCol(Widget? a, Widget? b, {int leftFlex = 1, int rightFlex = 1}) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: a ?? const SizedBox()),
+        Expanded(flex: leftFlex, child: a ?? const SizedBox()),
         const SizedBox(width: 16),
-        Expanded(child: b ?? const SizedBox()),
+        Expanded(flex: rightFlex, child: b ?? const SizedBox()),
       ],
     );
 

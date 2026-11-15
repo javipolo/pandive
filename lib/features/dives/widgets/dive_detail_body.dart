@@ -56,13 +56,12 @@ class DiveDetailBody extends StatelessWidget {
       controller: controller,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       children: [
-        Text(dive.place ?? site?.name ?? t.dive,
-            style: Theme.of(context).textTheme.headlineSmall),
-        sectionLine(),
         twoCol(
           LabeledValue(t.fieldNumber, dive.number?.toString()),
           LabeledValue(t.fieldDate,
               dive.date == null ? null : DateFormat('dd/MM/yyyy HH:mm', locale).format(dive.date!)),
+          leftFlex: 1,
+          rightFlex: 3,
         ),
         sectionLine(),
         LabeledValue(t.fieldSite, dive.place ?? site?.name),
@@ -72,20 +71,20 @@ class DiveDetailBody extends StatelessWidget {
         LabeledValue(t.fieldBuddy, buddies),
         sectionLine(),
         if (profile != null && !profile.isEmpty) _profile(context, t, profile),
-        twoCol(LabeledValue(t.diveType, dive.diveType),
-            LabeledValue(t.statMaxDepth, _m(dive.maxDepth))),
         twoCol(
+            LabeledValue(t.diveType, dive.diveType),
             LabeledValue(t.statDuration,
-                dive.durationMin == null ? null : '${dive.durationMin!.round()} min'),
+                dive.durationMin == null ? null : '${dive.durationMin!.round()} min')),
+        twoCol(LabeledValue(t.statMaxDepth, _m(dive.maxDepth)),
             LabeledValue(t.statAvgDepth, _m(avg))),
         twoCol(LabeledValue(t.statTempMin, _c(minTemp)),
             LabeledValue(t.statTempAvg, _c(avgTemp))),
         sectionLine(),
-        twoCol(LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
-            LabeledValue(t.rmvLabel, f1(rmv, 'l/min'))),
         twoCol(
+            LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
             LabeledValue(
-                t.ppheMax, (ata == null || fHe <= 0) ? null : ff(fHe * ata)),
+                t.ppheMax, (ata == null || fHe <= 0) ? null : ff(fHe * ata))),
+        twoCol(LabeledValue(t.rmvLabel, f1(rmv, 'l/min')),
             LabeledValue(t.sacBarLabel, f1(sac, 'bar/min'))),
         sectionLine(),
         twoCol(
