@@ -48,14 +48,29 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
   void didUpdateWidget(MonthGroupedDives old) {
     super.didUpdateWidget(old);
     if (old.collapseAll != widget.collapseAll) {
-      _collapsed
-        ..clear()
-        ..addAll(widget.collapseAll ? widget.dives.map(_yKey) : const []);
+      _collapsed.clear();
+      if (widget.collapseAll) {
+        // Colapsar todo = años y meses.
+        _collapsed
+          ..addAll(widget.dives.map(_yKey))
+          ..addAll(widget.dives.map(_mKey));
+      }
     }
   }
 
   void _toggle(String k) =>
       setState(() => _collapsed.contains(k) ? _collapsed.remove(k) : _collapsed.add(k));
+
+  // Colapsar un año colapsa también sus meses; expandirlo solo muestra el año.
+  void _toggleYear(String yk, List<String> months) => setState(() {
+        if (_collapsed.contains(yk)) {
+          _collapsed.remove(yk);
+        } else {
+          _collapsed
+            ..add(yk)
+            ..addAll(months);
+        }
+      });
 
   bool get _groupSel => widget.selectionMode && widget.onToggleGroup != null;
 
@@ -87,15 +102,15 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
     for (final yk in yearKeys) {
       final yIdxs = yearIdx[yk]!;
       final yCollapsed = _collapsed.contains(yk);
-      rows.add(_header(yk, yk == 'Y:—' ? '—' : yk.substring(2), yIdxs,
-          yCollapsed, true));
+      rows.add(_header(yk == 'Y:—' ? '—' : yk.substring(2), yIdxs, yCollapsed,
+          true, () => _toggleYear(yk, yearMonths[yk]!)));
       if (yCollapsed) continue;
       for (final mk in yearMonths[yk]!) {
         final mIdxs = monthIdx[mk]!;
         final mCollapsed = _collapsed.contains(mk);
         final label =
             mk == 'M:—' ? '—' : monthFmt.format(widget.dives[mIdxs.first].date!);
-        rows.add(_header(mk, label, mIdxs, mCollapsed, false));
+        rows.add(_header(label, mIdxs, mCollapsed, false, () => _toggle(mk)));
         if (mCollapsed) continue;
         for (final i in mIdxs) {
           rows.add(DiveRow(
@@ -112,8 +127,8 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
     return ListView(children: rows);
   }
 
-  Widget _header(
-      String key, String label, List<int> idxs, bool collapsed, bool isYear) {
+  Widget _header(String label, List<int> idxs, bool collapsed, bool isYear,
+      VoidCallback onCollapse) {
     final allSel = idxs.every(widget.selected.contains);
     return DiveGroupHeader(
       label: label,
@@ -121,7 +136,7 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
       collapsed: collapsed,
       isYear: isYear,
       selectedGroup: _groupSel && allSel,
-      onTap: _groupSel ? () => widget.onToggleGroup!(idxs) : () => _toggle(key),
+      onTap: _groupSel ? () => widget.onToggleGroup!(idxs) : onCollapse,
       onLongPress:
           widget.onToggleGroup == null ? null : () => widget.onToggleGroup!(idxs),
     );
