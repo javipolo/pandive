@@ -159,6 +159,8 @@
   "scanError": "Scan error: {error}",
   "@scanError": { "placeholders": { "error": {} } },
 
+  "sync": "Synchronize",
+  "syncUpToDate": "Already up to date",
   "downloadAll": "Download all dives",
   "actionDownload": "Download dives",
   "actionDownloadSub": "Gets the new dives from the computer",

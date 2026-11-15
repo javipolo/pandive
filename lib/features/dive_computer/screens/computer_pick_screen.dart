@@ -10,6 +10,7 @@ import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/screens/scan_screen.dart';
+import 'package:pandive/features/dive_computer/screens/sync_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class ComputerPickScreen extends StatefulWidget {
@@ -50,6 +51,8 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
 
   void _menu(DiveComputerRef ref, String v) {
     switch (v) {
+      case 'sync':
+        _sync(ref);
       case 'all':
         _download(ref, all: true);
       case 'mark':
@@ -58,6 +61,14 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
         widget.db.removeComputer(ref.address);
         _reload();
     }
+  }
+
+  Future<void> _sync(DiveComputerRef ref) async {
+    final d =
+        ScannedDevice(name: ref.name, id: ref.address, rssi: 0, likely: true);
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) =>
+            SyncScreen(db: widget.db, settings: widget.settings, device: d)));
   }
 
   @override
@@ -88,6 +99,7 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
                 trailing: PopupMenuButton<String>(
                   onSelected: (v) => _menu(c, v),
                   itemBuilder: (_) => [
+                    PopupMenuItem(value: 'sync', child: Text(t.sync)),
                     PopupMenuItem(value: 'all', child: Text(t.downloadAll)),
                     PopupMenuItem(
                         value: 'mark', child: Text(t.actionMarkImported)),

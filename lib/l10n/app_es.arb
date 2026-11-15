@@ -148,6 +148,8 @@
   "diveChip": "Buceo",
   "scanError": "Error de escaneo: {error}",
 
+  "sync": "Sincronizar",
+  "syncUpToDate": "Ya está sincronizado",
   "downloadAll": "Descargar todas las inmersiones",
   "actionDownload": "Descargar inmersiones",
   "actionDownloadSub": "Trae los buceos nuevos del ordenador",
