@@ -19,10 +19,10 @@ String periodKey(DateTime d, StatsPeriod p) {
     case StatsPeriod.year:
       return '${d.year}';
     case StatsPeriod.month:
-      return '${d.year}-${_p2(d.month)}';
+      return '${_p2(d.year % 100)}-${_p2(d.month)}'; // año corto: 26-01
     case StatsPeriod.week:
       final (y, w) = isoWeek(d);
-      return '$y-W${_p2(w)}';
+      return '${_p2(y % 100)}-W${_p2(w)}'; // 26-W05
   }
 }
 

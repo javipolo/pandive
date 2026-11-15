@@ -14,6 +14,7 @@ import 'package:pandive/features/dives/widgets/dive_row.dart';
 class MonthGroupedDives extends StatefulWidget {
   final List<Dive> dives;
   final Settings settings;
+  final Set<int> caveIds;
   final void Function(int index) onOpen;
   final void Function(int index)? onLongPress;
   final void Function(List<int> indices)? onToggleGroup;
@@ -24,6 +25,7 @@ class MonthGroupedDives extends StatefulWidget {
     super.key,
     required this.dives,
     required this.settings,
+    this.caveIds = const {},
     required this.onOpen,
     this.onLongPress,
     this.onToggleGroup,
@@ -116,6 +118,7 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
           rows.add(DiveRow(
             dive: widget.dives[i],
             settings: widget.settings,
+            isCave: widget.caveIds.contains(widget.dives[i].id),
             selected: widget.selected.contains(i),
             onTap: () => widget.onOpen(i),
             onLongPress:

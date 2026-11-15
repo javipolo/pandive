@@ -38,7 +38,7 @@ void main() {
     expect(bucketByPeriod(dates, StatsPeriod.year),
         [('2024', 3), ('2025', 1)]);
     expect(bucketByPeriod(dates, StatsPeriod.month),
-        [('2024-01', 2), ('2024-03', 1), ('2025-06', 1)]);
+        [('24-01', 2), ('24-03', 1), ('25-06', 1)]);
     // 1 enero 2024 = semana ISO 2024-W02; mismo bucket para 10 y 20 ene.
     final wk = bucketByPeriod(dates, StatsPeriod.week);
     expect(wk.length, 4); // 10 y 20 ene caen en semanas distintas

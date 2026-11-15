@@ -19,6 +19,16 @@ extension DivemateDbTags on DivemateDb {
     return _db.lastInsertRowId;
   }
 
+  /// IDs de inmersiones que tienen un tag por nombre (case-insensitive).
+  Set<int> diveIdsWithTag(String name) {
+    final rows = _db.select(
+      'SELECT D.DiveId FROM PandiveDiveTag D JOIN PandiveTag T ON T.Id = D.TagId '
+      'WHERE T.Name = ? COLLATE NOCASE',
+      [name],
+    );
+    return {for (final r in rows) r['DiveId'] as int};
+  }
+
   List<Tag> tagsForDive(int diveId) {
     final rows = _db.select(
       'SELECT T.Id, T.Name FROM PandiveTag T '

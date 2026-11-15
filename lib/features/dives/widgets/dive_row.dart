@@ -12,6 +12,7 @@ import 'package:pandive/l10n/app_localizations.dart';
 class DiveRow extends StatelessWidget {
   final Dive dive;
   final Settings settings;
+  final bool isCave;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final bool selected;
@@ -20,6 +21,7 @@ class DiveRow extends StatelessWidget {
     super.key,
     required this.dive,
     required this.settings,
+    this.isCave = false,
     required this.onTap,
     this.onLongPress,
     this.selected = false,
@@ -67,7 +69,9 @@ class DiveRow extends StatelessWidget {
                           fontWeight: FontWeight.bold, color: cs.primary),
                     ),
                   ),
-                  if (hour != null)
+                  if (isCave)
+                    const Text('🦇', style: TextStyle(fontSize: 16))
+                  else if (hour != null)
                     Icon(
                       night ? Icons.nightlight_round : Icons.wb_sunny,
                       size: 18,

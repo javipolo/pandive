@@ -33,6 +33,7 @@ class DivesTab extends StatefulWidget {
 
 class _DivesTabState extends State<DivesTab> {
   late List<Dive> _dives = widget.db.listDives(search: widget.query);
+  late Set<int> _cave = widget.db.diveIdsWithTag('cave');
   bool _select = false;
   final Set<int> _sel = {};
 
@@ -44,6 +45,7 @@ class _DivesTabState extends State<DivesTab> {
 
   void _reload() => setState(() {
         _dives = widget.db.listDives(search: widget.query);
+        _cave = widget.db.diveIdsWithTag('cave');
         _sel.removeWhere((i) => i >= _dives.length);
       });
 
@@ -133,6 +135,7 @@ class _DivesTabState extends State<DivesTab> {
               : MonthGroupedDives(
                   dives: _dives,
                   settings: widget.settings,
+                  caveIds: _cave,
                   onOpen: _onOpen,
                   onLongPress: (i) => setState(() {
                     _select = true;
