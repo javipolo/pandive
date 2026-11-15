@@ -1,4 +1,5 @@
-/// Cuerpo del detalle de una inmersión (datos, perfil, botellas, notas).
+/// Cuerpo del detalle de una inmersión: secciones compactas (nº/fecha, sitio,
+/// compañero, perfil + métricas, gases, deco, botellas, ordenador).
 library;
 
 import 'package:flutter/material.dart';
@@ -8,9 +9,9 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/sac.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
-import 'package:pandive/core/widgets/stat_card.dart';
 import 'package:pandive/features/dives/screens/profile_fullscreen_screen.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
+import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DiveDetailBody extends StatelessWidget {
@@ -20,118 +21,123 @@ class DiveDetailBody extends StatelessWidget {
   const DiveDetailBody(
       {super.key, required this.db, required this.dive, this.controller});
 
+  String? _m(double? v) => v == null ? null : '${v.toStringAsFixed(1)} m';
+  String? _c(double? v) => v == null ? null : '${v.toStringAsFixed(1)} °C';
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
+    final site = dive.placeId != null ? db.getSite(dive.placeId!) : null;
     final profile = db.diveProfile(dive.id);
-    final cylinders = db.cylinders(dive.id);
+    final cyls = db.cylinders(dive.id);
+    final buddies = db.diveBuddies(dive.id).map((b) => b.name).join(', ');
     final tags = db.tagsForDive(dive.id);
-    // Prof. media: la de la DB o, si falta, la calculada del perfil.
-    final avgDepth = dive.avgDepth ?? _profileAvg(profile);
-    final avgTemp = db.diveAvgTemp(dive.id);
-    final dateFmt = DateFormat(
-        'EEEE d MMMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
+
+    final avg = dive.avgDepth ?? _avg(profile?.depths.where((d) => d > 0));
+    final temps = profile?.temps.whereType<double>().toList() ?? const <double>[];
+    final maxTemp = temps.isEmpty ? null : temps.reduce((a, b) => a > b ? a : b);
+    final avgTemp = db.diveAvgTemp(dive.id) ?? _avg(temps);
+
+    final fO2 = (cyls.isNotEmpty && cyls.first.o2 != null
+            ? cyls.first.o2!
+            : (dive.o2 ?? 21)) /
+        100;
+    final fHe = (cyls.isNotEmpty ? (cyls.first.he ?? 0) : 0) / 100;
+    final ata = dive.maxDepth != null ? dive.maxDepth! / 10 + 1 : null;
+    final rmv = computeSac(cyls, divetimeMin: dive.durationMin, avgDepthM: avg);
+    final sac =
+        computeSacBar(cyls, divetimeMin: dive.durationMin, avgDepthM: avg);
+
+    String? f1(double? v, String u) => v == null ? null : '${v.toStringAsFixed(1)} $u';
 
     return ListView(
       controller: controller,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       children: [
-        if (dive.place != null)
-          Text(dive.place!, style: Theme.of(context).textTheme.headlineSmall),
-        if (dive.country != null)
-          Text(dive.country!, style: Theme.of(context).textTheme.titleMedium),
-        if (dive.date != null) ...[
-          const SizedBox(height: 4),
-          Text(dateFmt.format(dive.date!),
-              style: Theme.of(context).textTheme.bodyMedium),
-        ],
-        const SizedBox(height: 20),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: _statCards(
-            context,
-            t,
-            computeSac(cylinders,
-                divetimeMin: dive.durationMin, avgDepthM: avgDepth),
-            avgDepth,
-            avgTemp,
-          ),
+        Text(dive.place ?? site?.name ?? t.dive,
+            style: Theme.of(context).textTheme.headlineSmall),
+        sectionLine(),
+        twoCol(
+          LabeledValue(t.fieldNumber, dive.number?.toString()),
+          LabeledValue(t.fieldDate,
+              dive.date == null ? null : DateFormat('dd/MM/yyyy HH:mm', locale).format(dive.date!)),
         ),
+        sectionLine(),
+        LabeledValue(t.fieldSite, dive.place ?? site?.name),
+        twoCol(LabeledValue(t.fieldCountry, dive.country ?? site?.country),
+            LabeledValue(t.fieldRegion, site?.region)),
+        sectionLine(),
+        LabeledValue(t.fieldBuddy, buddies),
+        sectionLine(),
+        if (profile != null && !profile.isEmpty) _profile(context, t, profile),
+        twoCol(LabeledValue(t.diveType, dive.diveType),
+            LabeledValue(t.statMaxDepth, _m(dive.maxDepth))),
+        twoCol(
+            LabeledValue(t.statDuration,
+                dive.durationMin == null ? null : '${dive.durationMin!.round()} min'),
+            LabeledValue(t.statAvgDepth, _m(avg))),
+        twoCol(LabeledValue(t.statTempMax, _c(maxTemp)),
+            LabeledValue(t.statTempAvg, _c(avgTemp))),
+        sectionLine(),
+        twoCol(LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
+            LabeledValue(t.rmvLabel, f1(rmv, 'l/min'))),
+        twoCol(
+            LabeledValue(
+                t.ppheMax, (ata == null || fHe <= 0) ? null : ff(fHe * ata)),
+            LabeledValue(t.sacBarLabel, f1(sac, 'bar/min'))),
+        sectionLine(),
+        twoCol(
+            LabeledValue(t.decoLabel,
+                dive.deco == null ? null : (dive.deco == 1 ? t.decoYes : t.decoNo)),
+            LabeledValue(t.statWeight,
+                dive.weight == null ? null : '${dive.weight!.toStringAsFixed(1)} kg')),
+        sectionLine(),
+        Text(t.tanks, style: Theme.of(context).textTheme.titleMedium),
+        ...cyls.map((c) => CylinderTile(cylinder: c)),
+        sectionLine(),
+        LabeledValue(t.statComputer, dive.computer),
         if (tags.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 6,
-            runSpacing: 4,
-            children: [for (final tag in tags) Chip(label: Text(tag.name))],
-          ),
-        ],
-        if (profile != null && !profile.isEmpty) ...[
-          const SizedBox(height: 24),
-          Text(t.profile, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Stack(
-            children: [
-              SizedBox(height: 260, child: ProfileChart(profile: profile)),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: IconButton.filledTonal(
-                  icon: const Icon(Icons.fullscreen),
-                  tooltip: t.fullscreen,
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ProfileFullscreenScreen(
-                      profile: profile,
-                      title: dive.place ?? t.dive,
-                    ),
-                  )),
-                ),
-              ),
-            ],
-          ),
-        ],
-        if (cylinders.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          Text(t.cylinders, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          ...cylinders.map((c) => CylinderTile(cylinder: c)),
+          const SizedBox(height: 12),
+          Wrap(spacing: 6, runSpacing: 4, children: [
+            for (final tag in tags) Chip(label: Text(tag.name)),
+          ]),
         ],
         if (dive.comments != null) ...[
-          const SizedBox(height: 24),
-          Text(t.notes, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(dive.comments!, style: Theme.of(context).textTheme.bodyLarge),
+          sectionLine(),
+          LabeledValue(t.notes, dive.comments),
         ],
-        const SizedBox(height: 32),
       ],
     );
   }
 
-  List<Widget> _statCards(BuildContext context, AppLocalizations t, double? sac,
-      double? avgDepth, double? avgTemp) {
-    final items = <(String, String)>[
-      if (dive.maxDepth != null) (t.statMaxDepth, '${dive.maxDepth!.toStringAsFixed(1)} m'),
-      if (sac != null) (t.sacLabel, '${sac.toStringAsFixed(1)} l/min'),
-      if (avgDepth != null) (t.statAvgDepth, '${avgDepth.toStringAsFixed(1)} m'),
-      if (dive.durationMin != null) (t.statDuration, '${dive.durationMin!.round()} min'),
-      if (dive.waterTemp != null) (t.statTempMin, '${dive.waterTemp!.toStringAsFixed(1)} °C'),
-      if (avgTemp != null) (t.statTempAvg, '${avgTemp.toStringAsFixed(1)} °C'),
-      if (dive.airTemp != null) (t.statAirTemp, '${dive.airTemp!.toStringAsFixed(0)} °C'),
-      if (dive.surfaceInterval != null) (t.statSurfaceInt, dive.surfaceInterval!),
-      if (dive.weight != null) (t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),
-      if (dive.rating != null && dive.rating! > 0) (t.statRating, '★' * dive.rating!),
-      if (dive.diveType != null) (t.diveType, dive.diveType!),
-      if (dive.computer != null) (t.statComputer, dive.computer!),
-      if (dive.buddy != null) (t.statBuddy, dive.buddy!),
-    ];
-    return [for (final it in items) StatCard(label: it.$1, value: it.$2)];
+  Widget _profile(BuildContext context, AppLocalizations t, DiveProfile p) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Stack(children: [
+          SizedBox(height: 240, child: ProfileChart(profile: p)),
+          Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton.filledTonal(
+              icon: const Icon(Icons.fullscreen),
+              tooltip: t.fullscreen,
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => ProfileFullscreenScreen(
+                    profile: p, title: dive.place ?? t.dive),
+              )),
+            ),
+          ),
+        ]),
+        const SizedBox(height: 8),
+      ],
+    );
   }
 
-  /// Media de las profundidades del perfil (muestras en el agua, > 0).
-  double? _profileAvg(DiveProfile? p) {
-    if (p == null || p.isEmpty) return null;
-    final xs = p.depths.where((d) => d > 0).toList();
-    if (xs.isEmpty) return null;
-    return xs.reduce((a, b) => a + b) / xs.length;
+  String ff(double v) => v.toStringAsFixed(2);
+  double? _avg(Iterable<double>? xs) {
+    final l = xs?.toList() ?? const [];
+    return l.isEmpty ? null : l.reduce((a, b) => a + b) / l.length;
   }
 }

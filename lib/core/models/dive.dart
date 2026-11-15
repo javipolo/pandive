@@ -24,6 +24,8 @@ class Dive {
   final String? comments; // Logbook.Comments
   final String? surfaceInterval; // Logbook.Surfint
   final int? profileInterval; // Logbook.ProfileInt (s)
+  final int? deco; // Logbook.Deco (1=deco, 0=no deco)
+  final double? o2; // Logbook.O2 (% de la mezcla principal)
 
   const Dive({
     required this.id,
@@ -48,5 +50,7 @@ class Dive {
     this.comments,
     this.surfaceInterval,
     this.profileInterval,
+    this.deco,
+    this.o2,
   });
 }

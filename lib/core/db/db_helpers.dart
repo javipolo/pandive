@@ -36,6 +36,8 @@ Dive _diveFromRow(Row r) {
     comments: _str(r['Comments']),
     surfaceInterval: _str(r['Surfint']),
     profileInterval: r['ProfileInt'] as int?,
+    deco: r['Deco'] as int?,
+    o2: _num(r['O2']),
   );
 }
 

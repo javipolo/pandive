@@ -110,7 +110,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas
 - `lib/core/widgets/save_action.dart` -> botón Guardar de AppBar
 - `lib/core/db/db_tags.dart` -> etiquetas (tags) y enlace por inmersión
-- `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle (datos, perfil, botellas, SAC)
+- `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle por secciones (nº/fecha, sitio, perfil+métricas, gases, deco, botellas)
+- `lib/features/dives/widgets/dive_detail_fields.dart` -> celda etiqueta/valor, fila 2 columnas, separador de sección
 - `lib/features/dives/widgets/dive_form.dart` -> campos escalares editables (+ controllers)
 - `lib/features/dives/widgets/site_picker_field.dart` -> campo de sitio elegido
 - `lib/features/dives/widgets/buddies_picker_field.dart` -> campo de compañeros elegidos (chips)

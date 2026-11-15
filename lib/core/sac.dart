@@ -30,3 +30,21 @@ double? computeSac(
   final ata = avgDepthM / 10.0 + 1.0;
   return litresConsumed / (divetimeMin * ata);
 }
+
+/// SAC en bar/min: caída de presión (sumada) normalizada por tiempo y presión
+/// ambiente media. Independiente del tamaño de la botella.
+double? computeSacBar(
+  List<Cylinder> tanks, {
+  required double? divetimeMin,
+  required double? avgDepthM,
+}) {
+  if (divetimeMin == null || divetimeMin <= 0) return null;
+  if (avgDepthM == null || avgDepthM <= 0) return null;
+  var dp = 0.0;
+  for (final t in tanks) {
+    final ps = t.pressureStart, pe = t.pressureEnd;
+    if (ps != null && pe != null && ps - pe > 0) dp += ps - pe;
+  }
+  if (dp <= 0) return null;
+  return dp / (divetimeMin * (avgDepthM / 10.0 + 1.0));
+}

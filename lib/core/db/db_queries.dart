@@ -6,7 +6,7 @@ extension DivemateDbQueries on DivemateDb {
       'ID, Number, Divedate, Entrytime, Place, Country, PlaceID, '
       'Divetime, Depth, DepthAvg, Watertemp, Airtemp, PresS, PresE, Weight, '
       'Rating, Computer, Buddy, Divemaster, Divetype, Comments, Surfint, '
-      'ProfileInt';
+      'ProfileInt, Deco, O2';
 
   /// Lista de inmersiones del owner, más recientes primero. Excluye borradas
   /// (Status = 2). [search] filtra por sitio, país, notas, buddy o nº.
