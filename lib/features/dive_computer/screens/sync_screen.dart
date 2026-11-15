@@ -19,8 +19,13 @@ class SyncScreen extends StatefulWidget {
   final ScannedDevice device;
   final DivemateDb db;
   final Settings settings;
+  final int count; // nº de inmersiones recientes a comprobar
   const SyncScreen(
-      {super.key, required this.db, required this.settings, required this.device});
+      {super.key,
+      required this.db,
+      required this.settings,
+      required this.device,
+      this.count = 5});
 
   @override
   State<SyncScreen> createState() => _SyncScreenState();
@@ -56,34 +61,27 @@ class _SyncScreenState extends State<SyncScreen> {
           .modelNotRecognized(widget.device.name));
     }
     final computer = '${m.$1} ${m.$2}';
-    for (final n in const [1, 10, 25, 50, 100, 0]) {
-      final res = await _svc.download(
-          vendor: m.$1, product: m.$2, address: widget.device.id,
-          fingerprint: '', maxDives: n);
-      if (!res.ok) return _Result(error: res.error ?? 'Error');
-      final dives = res.dives;
-      final idx = dives.indexWhere(
-          (d) => d.datetime != null && widget.db.hasDiveAt(d.datetime!));
-      if (idx >= 0) {
-        var added = 0;
-        for (final d in dives.take(idx)) {
-          if (widget.db.importDownloaded(d, computer: computer)) added++;
-        }
-        widget.db.setFingerprintFor(widget.device.id, dives[idx].fingerprint);
-        return _Result(added: added);
-      }
-      if (n == 0 || dives.length < n) {
-        var added = 0;
-        for (final d in dives) {
-          if (widget.db.importDownloaded(d, computer: computer)) added++;
-        }
-        if (dives.isNotEmpty) {
-          widget.db.setFingerprintFor(widget.device.id, dives.first.fingerprint);
-        }
-        return _Result(added: added);
-      }
+    // Una sola descarga de las últimas X (el ordenador sale de modo transfer
+    // tras descargar, así que no se puede iterar en varias pasadas).
+    final res = await _svc.download(
+        vendor: m.$1, product: m.$2, address: widget.device.id,
+        fingerprint: '', maxDives: widget.count);
+    if (!res.ok) return _Result(error: res.error ?? 'Error');
+    final dives = res.dives;
+    // Primer buceo (de nuevo a viejo) que ya está en la DB = frontera.
+    final idx = dives.indexWhere(
+        (d) => d.datetime != null && widget.db.hasDiveAt(d.datetime!));
+    if (idx < 0) {
+      // Ninguno de las últimas X está en la DB: hay que subir el número o
+      // descargar todo. No tocamos el fingerprint para no dejar huecos.
+      return _Result(noMatch: true);
     }
-    return _Result(added: 0);
+    var added = 0;
+    for (final d in dives.take(idx)) {
+      if (widget.db.importDownloaded(d, computer: computer)) added++;
+    }
+    widget.db.setFingerprintFor(widget.device.id, dives[idx].fingerprint);
+    return _Result(added: added);
   }
 
   @override
@@ -107,9 +105,12 @@ class _SyncScreenState extends State<SyncScreen> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.check_circle, size: 56),
+                Icon(r.noMatch ? Icons.help_outline : Icons.check_circle, size: 56),
                 const SizedBox(height: 12),
-                Text(r.added > 0 ? t.savedNew(r.added) : t.syncUpToDate,
+                Text(
+                    r.noMatch
+                        ? t.syncNoMatch(widget.count)
+                        : (r.added > 0 ? t.savedNew(r.added) : t.syncUpToDate),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 16),
@@ -127,6 +128,7 @@ class _SyncScreenState extends State<SyncScreen> {
 
 class _Result {
   final int added;
+  final bool noMatch;
   final String? error;
-  const _Result({this.added = 0, this.error});
+  const _Result({this.added = 0, this.noMatch = false, this.error});
 }

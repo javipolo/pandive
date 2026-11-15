@@ -149,7 +149,9 @@
   "scanError": "Error de escaneo: {error}",
 
   "sync": "Sincronizar",
+  "syncSub": "Baja las últimas y añade solo las nuevas",
   "syncUpToDate": "Ya está sincronizado",
+  "syncNoMatch": "Ninguna de las últimas {count} inmersiones está en tu logbook. Sube el número o usa Descargar todas.",
   "downloadAll": "Descargar todas las inmersiones",
   "actionDownload": "Descargar inmersiones",
   "actionDownloadSub": "Trae los buceos nuevos del ordenador",

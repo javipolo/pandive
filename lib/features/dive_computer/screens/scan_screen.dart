@@ -3,13 +3,12 @@
 library;
 
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
+import 'package:pandive/features/dive_computer/screens/sync_screen.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -87,18 +86,20 @@ class _ScanScreenState extends State<ScanScreen> {
       }
     }
     if (!mounted) return;
-    final baseline = await showDiveComputerActionSheet(context);
-    if (baseline == null || !mounted) return;
-    await Navigator.of(context).push(
-      MaterialPageRoute(
+    final action = await showDiveComputerActionSheet(context);
+    if (action == null || !mounted) return;
+    if (action == 'sync') {
+      final n = await askSyncCount(context);
+      if (n == null || !mounted) return;
+      await Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => SyncScreen(
+              db: widget.db, settings: widget.settings, device: d, count: n)));
+      return;
+    }
+    await Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => DownloadScreen(
-          device: d,
-          db: widget.db,
-          settings: widget.settings,
-          baseline: baseline,
-        ),
-      ),
-    );
+            device: d, db: widget.db, settings: widget.settings,
+            baseline: action == 'mark')));
   }
   @override
   Widget build(BuildContext context) {

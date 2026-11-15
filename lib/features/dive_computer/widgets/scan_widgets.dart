@@ -29,11 +29,11 @@ class ScannedDeviceTile extends StatelessWidget {
   }
 }
 
-/// Hoja de acciones al tocar un ordenador: descargar o marcar como importado.
-/// Devuelve false = descargar, true = marcar (baseline), null = cancelar.
-Future<bool?> showDiveComputerActionSheet(BuildContext context) {
+/// Hoja de acciones al tocar un ordenador. Devuelve 'download', 'sync', 'mark'
+/// o null (cancelar).
+Future<String?> showDiveComputerActionSheet(BuildContext context) {
   final t = AppLocalizations.of(context);
-  return showModalBottomSheet<bool>(
+  return showModalBottomSheet<String>(
     context: context,
     showDragHandle: true,
     builder: (_) => SafeArea(
@@ -42,15 +42,49 @@ Future<bool?> showDiveComputerActionSheet(BuildContext context) {
           leading: const Icon(Icons.download),
           title: Text(t.actionDownload),
           subtitle: Text(t.actionDownloadSub),
-          onTap: () => Navigator.pop(context, false),
+          onTap: () => Navigator.pop(context, 'download'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.sync),
+          title: Text(t.sync),
+          subtitle: Text(t.syncSub),
+          onTap: () => Navigator.pop(context, 'sync'),
         ),
         ListTile(
           leading: const Icon(Icons.flag_outlined),
           title: Text(t.actionMarkImported),
           subtitle: Text(t.actionMarkImportedSub),
-          onTap: () => Navigator.pop(context, true),
+          onTap: () => Navigator.pop(context, 'mark'),
         ),
       ]),
+    ),
+  );
+}
+
+/// Pregunta cuántas inmersiones recientes comprobar al sincronizar.
+Future<int?> askSyncCount(BuildContext context) {
+  final t = AppLocalizations.of(context);
+  var n = 5;
+  return showDialog<int>(
+    context: context,
+    builder: (_) => StatefulBuilder(
+      builder: (c, setDlg) => AlertDialog(
+        title: Text(t.sync),
+        content: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          IconButton(
+              icon: const Icon(Icons.remove),
+              onPressed: () => setDlg(() => n = (n - 1).clamp(1, 50))),
+          Text('$n', style: Theme.of(c).textTheme.titleLarge),
+          IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => setDlg(() => n = (n + 1).clamp(1, 50))),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c), child: Text(t.cancel)),
+          FilledButton(
+              onPressed: () => Navigator.pop(c, n), child: Text(t.sync)),
+        ],
+      ),
     ),
   );
 }

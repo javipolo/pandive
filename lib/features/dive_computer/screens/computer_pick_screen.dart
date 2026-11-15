@@ -11,6 +11,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/screens/scan_screen.dart';
 import 'package:pandive/features/dive_computer/screens/sync_screen.dart';
+import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class ComputerPickScreen extends StatefulWidget {
@@ -64,11 +65,13 @@ class _ComputerPickScreenState extends State<ComputerPickScreen> {
   }
 
   Future<void> _sync(DiveComputerRef ref) async {
+    final n = await askSyncCount(context);
+    if (n == null || !mounted) return;
     final d =
         ScannedDevice(name: ref.name, id: ref.address, rssi: 0, likely: true);
     await Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) =>
-            SyncScreen(db: widget.db, settings: widget.settings, device: d)));
+        builder: (_) => SyncScreen(
+            db: widget.db, settings: widget.settings, device: d, count: n)));
   }
 
   @override
