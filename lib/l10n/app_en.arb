@@ -121,6 +121,9 @@
   "statsFirst": "First",
   "statsLast": "Last",
   "perYear": "Per year",
+  "byYear": "Year",
+  "byMonth": "Month",
+  "byWeek": "Week",
 
   "computers": "Dive computers",
   "searchComputer": "Search for a new one",

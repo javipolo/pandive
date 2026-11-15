@@ -96,7 +96,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/screens/edit_dive_screen.dart` -> editar campos editables
 - `lib/features/dives/screens/new_dive_screen.dart` -> formulario de alta manual
 - `lib/features/dives/widgets/cylinder_tile.dart` -> tarjeta de botella en el detalle
-- `lib/features/dives/widgets/month_grouped_dives.dart` -> lista de buceos agrupada por mes (colapsable, selección)
+- `lib/features/dives/widgets/month_grouped_dives.dart` -> lista de buceos por año y mes (colapsable, selección)
+- `lib/features/dives/widgets/dive_group_header.dart` -> cabecera de grupo (año/mes) colapsable/seleccionable
 - `lib/features/dives/widgets/dive_row.dart` -> fila de buceo estilo DiveMate (nº grande + 2 líneas)
 - `lib/features/dives/widgets/add_dive_sheet.dart` -> hoja "añadir": alta manual o transferencia
 - `lib/features/dives/widgets/dives_selection_bar.dart` -> barra de selección (stats/fusionar/borrar)
@@ -120,8 +121,9 @@ con `screens/` y, si hace falta, `widgets/`).
 ### stats (estadísticas)
 - `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook
 - `lib/features/stats/screens/selection_stats_screen.dart` -> stats solo de una selección de buceos
-- `lib/features/stats/widgets/stats_view.dart` -> vista reutilizable (tarjetas + barras por año)
-- `lib/features/stats/widgets/year_bars.dart` -> barras de inmersiones por año
+- `lib/features/stats/widgets/stats_view.dart` -> vista reutilizable (tarjetas + barras, selector año/mes/semana)
+- `lib/features/stats/widgets/year_bars.dart` -> PeriodBars: barras etiqueta/valor
+- `lib/features/stats/widgets/stats_buckets.dart` -> agrupar fechas por año/mes/semana (ISO)
 
 ### dive_computer (ordenador de buceo)
 - `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo

@@ -16,7 +16,10 @@ class SelectionStatsScreen extends StatelessWidget {
     final t = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(t.statsSelectedTitle)),
-      body: StatsView(stats: LogbookStats.fromDives(dives)),
+      body: StatsView(
+        stats: LogbookStats.fromDives(dives),
+        dates: [for (final d in dives) if (d.date != null) d.date!],
+      ),
     );
   }
 }

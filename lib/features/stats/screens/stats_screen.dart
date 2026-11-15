@@ -17,13 +17,19 @@ class StatsTab extends StatefulWidget {
 
 class _StatsTabState extends State<StatsTab> {
   late LogbookStats _stats;
+  late List<DateTime> _dates;
 
   @override
   void initState() {
     super.initState();
     _stats = widget.db.computeStats();
+    _dates = [
+      for (final d in widget.db.listDives())
+        if (d.date != null) d.date!,
+    ];
   }
 
   @override
-  Widget build(BuildContext context) => StatsView(stats: _stats);
+  Widget build(BuildContext context) =>
+      StatsView(stats: _stats, dates: _dates);
 }

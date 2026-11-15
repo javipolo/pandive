@@ -113,6 +113,9 @@
   "statsFirst": "Primera",
   "statsLast": "Última",
   "perYear": "Por año",
+  "byYear": "Año",
+  "byMonth": "Mes",
+  "byWeek": "Semana",
 
   "computers": "Ordenadores de buceo",
   "searchComputer": "Buscar uno nuevo",

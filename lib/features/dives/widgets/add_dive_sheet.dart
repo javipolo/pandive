@@ -19,14 +19,14 @@ Future<void> showAddDiveSheet(
     builder: (_) => SafeArea(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ListTile(
-          leading: const Icon(Icons.edit_outlined),
-          title: Text(t.newDiveManual),
-          onTap: () => Navigator.pop(context, 'new'),
-        ),
-        ListTile(
           leading: const Icon(Icons.bluetooth),
           title: Text(t.diveTransfer),
           onTap: () => Navigator.pop(context, 'transfer'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.edit_outlined),
+          title: Text(t.newDiveManual),
+          onTap: () => Navigator.pop(context, 'new'),
         ),
       ]),
     ),

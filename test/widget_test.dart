@@ -2,6 +2,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/backup_util.dart';
+import 'package:pandive/features/stats/widgets/stats_buckets.dart';
 
 void main() {
   test('gasLabel identifica mezclas', () {
@@ -25,5 +26,22 @@ void main() {
     final prune = idsToPrune(items);
     // Las 3 más antiguas (id0,id1,id2) se borran.
     expect(prune.toSet(), {'id0', 'id1', 'id2'});
+  });
+
+  test('bucketByPeriod agrupa por año/mes/semana', () {
+    final dates = [
+      DateTime(2024, 1, 10),
+      DateTime(2024, 1, 20),
+      DateTime(2024, 3, 2),
+      DateTime(2025, 6, 6),
+    ];
+    expect(bucketByPeriod(dates, StatsPeriod.year),
+        [('2024', 3), ('2025', 1)]);
+    expect(bucketByPeriod(dates, StatsPeriod.month),
+        [('2024-01', 2), ('2024-03', 1), ('2025-06', 1)]);
+    // 1 enero 2024 = semana ISO 2024-W02; mismo bucket para 10 y 20 ene.
+    final wk = bucketByPeriod(dates, StatsPeriod.week);
+    expect(wk.length, 4); // 10 y 20 ene caen en semanas distintas
+    expect(wk.fold<int>(0, (s, e) => s + e.$2), 4);
   });
 }

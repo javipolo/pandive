@@ -1,5 +1,6 @@
-/// Lista de inmersiones agrupada por mes, con cabeceras colapsables.
-/// El colapsar/expandir todo lo controla la barra superior (collapseAll).
+/// Lista de inmersiones agrupada por año y, dentro, por mes. Cabeceras
+/// colapsables y seleccionables en lote (año entero o mes). "Colapsar todo"
+/// (barra superior) colapsa los años.
 library;
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/dives/widgets/dive_group_header.dart';
 import 'package:pandive/features/dives/widgets/dive_row.dart';
 
 class MonthGroupedDives extends StatefulWidget {
@@ -37,9 +39,10 @@ class MonthGroupedDives extends StatefulWidget {
 class _MonthGroupedDivesState extends State<MonthGroupedDives> {
   final Set<String> _collapsed = {};
 
-  String _key(Dive d) => d.date == null
-      ? '—'
-      : '${d.date!.year}-${d.date!.month.toString().padLeft(2, '0')}';
+  String _yKey(Dive d) => d.date == null ? 'Y:—' : 'Y:${d.date!.year}';
+  String _mKey(Dive d) => d.date == null
+      ? 'M:—'
+      : 'M:${d.date!.year}-${d.date!.month.toString().padLeft(2, '0')}';
 
   @override
   void didUpdateWidget(MonthGroupedDives old) {
@@ -47,44 +50,54 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
     if (old.collapseAll != widget.collapseAll) {
       _collapsed
         ..clear()
-        ..addAll(widget.collapseAll ? widget.dives.map(_key) : const []);
+        ..addAll(widget.collapseAll ? widget.dives.map(_yKey) : const []);
     }
   }
 
+  void _toggle(String k) =>
+      setState(() => _collapsed.contains(k) ? _collapsed.remove(k) : _collapsed.add(k));
+
+  bool get _groupSel => widget.selectionMode && widget.onToggleGroup != null;
+
   @override
   Widget build(BuildContext context) {
-    final monthFmt =
-        DateFormat('MMMM yyyy', Localizations.localeOf(context).languageCode);
-    final keys = <String>[];
-    final groups = <String, List<int>>{};
+    final yearKeys = <String>[];
+    final yearMonths = <String, List<String>>{};
+    final monthIdx = <String, List<int>>{};
+    final yearIdx = <String, List<int>>{};
     for (var i = 0; i < widget.dives.length; i++) {
-      final k = _key(widget.dives[i]);
-      (groups[k] ??= (keys..add(k), <int>[]).$2).add(i);
+      final d = widget.dives[i];
+      final yk = _yKey(d), mk = _mKey(d);
+      if (!yearMonths.containsKey(yk)) {
+        yearKeys.add(yk);
+        yearMonths[yk] = [];
+        yearIdx[yk] = [];
+      }
+      yearIdx[yk]!.add(i);
+      if (!monthIdx.containsKey(mk)) {
+        yearMonths[yk]!.add(mk);
+        monthIdx[mk] = [];
+      }
+      monthIdx[mk]!.add(i);
     }
 
+    final monthFmt =
+        DateFormat('MMMM', Localizations.localeOf(context).languageCode);
     final rows = <Widget>[];
-    for (final k in keys) {
-      final idxs = groups[k]!;
-      final label =
-          k == '—' ? '—' : monthFmt.format(widget.dives[idxs.first].date!);
-      final collapsed = _collapsed.contains(k);
-      void toggleCollapse() => setState(
-          () => collapsed ? _collapsed.remove(k) : _collapsed.add(k));
-      final groupSel = widget.selectionMode && widget.onToggleGroup != null;
-      final allSel = idxs.every(widget.selected.contains);
-      rows.add(_header(
-        context,
-        label,
-        idxs.length,
-        collapsed,
-        groupSel ? () => widget.onToggleGroup!(idxs) : toggleCollapse,
-        onLongPress: widget.onToggleGroup == null
-            ? null
-            : () => widget.onToggleGroup!(idxs),
-        selectedGroup: groupSel && allSel,
-      ));
-      if (!collapsed) {
-        for (final i in idxs) {
+    for (final yk in yearKeys) {
+      final yIdxs = yearIdx[yk]!;
+      final yCollapsed = _collapsed.contains(yk);
+      rows.add(_header(yk, yk == 'Y:—' ? '—' : yk.substring(2), yIdxs,
+          yCollapsed, true));
+      if (yCollapsed) continue;
+      for (final mk in yearMonths[yk]!) {
+        final mIdxs = monthIdx[mk]!;
+        final mCollapsed = _collapsed.contains(mk);
+        final label =
+            mk == 'M:—' ? '—' : monthFmt.format(widget.dives[mIdxs.first].date!);
+        rows.add(_header(mk, label, mIdxs, mCollapsed, false));
+        if (mCollapsed) continue;
+        for (final i in mIdxs) {
           rows.add(DiveRow(
             dive: widget.dives[i],
             settings: widget.settings,
@@ -99,27 +112,18 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
     return ListView(children: rows);
   }
 
-  Widget _header(BuildContext context, String label, int count, bool collapsed,
-      VoidCallback onTap,
-      {VoidCallback? onLongPress, bool selectedGroup = false}) {
-    final cs = Theme.of(context).colorScheme;
-    return Material(
-      color: selectedGroup ? cs.primary : cs.primaryContainer,
-      child: ListTile(
-        dense: true,
-        leading: selectedGroup
-            ? Icon(Icons.check_circle, color: cs.onPrimary)
-            : null,
-        title: Text('${label.toUpperCase()}  ($count)',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-                color: selectedGroup ? cs.onPrimary : cs.onPrimaryContainer)),
-        trailing: Icon(collapsed ? Icons.expand_more : Icons.expand_less,
-            color: selectedGroup ? cs.onPrimary : cs.onPrimaryContainer),
-        onTap: onTap,
-        onLongPress: onLongPress,
-      ),
+  Widget _header(
+      String key, String label, List<int> idxs, bool collapsed, bool isYear) {
+    final allSel = idxs.every(widget.selected.contains);
+    return DiveGroupHeader(
+      label: label,
+      count: idxs.length,
+      collapsed: collapsed,
+      isYear: isYear,
+      selectedGroup: _groupSel && allSel,
+      onTap: _groupSel ? () => widget.onToggleGroup!(idxs) : () => _toggle(key),
+      onLongPress:
+          widget.onToggleGroup == null ? null : () => widget.onToggleGroup!(idxs),
     );
   }
 }
