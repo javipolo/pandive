@@ -7,12 +7,16 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class DownloadProgress extends StatelessWidget {
   final double progress; // 0.0–1.0 (0 = indeterminado al principio)
-  const DownloadProgress({super.key, required this.progress});
+  /// Si true, no se muestra %: el total de memoria no refleja cuánto falta
+  /// cuando se descargan solo N buceos (sync / marcar importado).
+  final bool indeterminate;
+  const DownloadProgress(
+      {super.key, required this.progress, this.indeterminate = false});
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final determinate = progress > 0;
+    final determinate = !indeterminate && progress > 0;
     final pct = (progress * 100).round();
     return Center(
       child: Column(
