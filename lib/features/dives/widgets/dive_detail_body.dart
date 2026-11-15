@@ -61,7 +61,7 @@ class DiveDetailBody extends StatelessWidget {
           LabeledValue(t.fieldDate,
               dive.date == null ? null : DateFormat('dd/MM/yyyy HH:mm', locale).format(dive.date!)),
           leftFlex: 1,
-          rightFlex: 3,
+          rightFlex: 2,
         ),
         sectionLine(),
         LabeledValue(t.fieldSite, dive.place ?? site?.name),
