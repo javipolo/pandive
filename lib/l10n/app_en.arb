@@ -77,6 +77,8 @@
   "statAvgDepth": "Avg depth",
   "statDuration": "Duration",
   "statWaterTemp": "Water temp",
+  "statTempMin": "Min temp",
+  "statTempAvg": "Avg temp",
   "statAirTemp": "Air temp",
   "statSurfaceInt": "Surface int.",
   "statWeight": "Weight",

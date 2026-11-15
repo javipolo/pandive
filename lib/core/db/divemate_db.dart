@@ -47,6 +47,7 @@ class DivemateDb {
     // Persistir prof. media (exportable) y SAC (columna propia) donde falten.
     if (!readOnly) {
       inst.fillMissingAvgDepth();
+      inst.fillMissingTemps();
       inst.fillMissingSac();
     }
     return inst;

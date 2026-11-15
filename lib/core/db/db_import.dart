@@ -32,6 +32,10 @@ void _ensureSyncTable(Database db) {
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveSac REAL');
   } catch (_) {/* ya existe */}
+  // Temperatura media (del perfil); la mínima va en Watertemp (convención DiveMate).
+  try {
+    db.execute('ALTER TABLE Logbook ADD COLUMN PandiveAvgTemp REAL');
+  } catch (_) {/* ya existe */}
   // Ordenadores de buceo guardados (reconexión por MAC sin reescanear).
   db.execute('CREATE TABLE IF NOT EXISTS PandiveComputer '
       '(Address TEXT PRIMARY KEY, Name TEXT, Vendor TEXT, Product TEXT, '
@@ -89,16 +93,22 @@ extension DivemateDbImport on DivemateDb {
       final xs = [for (final s in d.samples) if (s.depth > 0) s.depth];
       if (xs.isNotEmpty) avgDepth = xs.reduce((a, b) => a + b) / xs.length;
     }
+    // Temperaturas de las muestras: mínima (Watertemp) y media (PandiveAvgTemp).
+    final temps = [for (final s in d.samples) if (s.temp != null) s.temp!];
+    final minTemp =
+        d.tempMin ?? (temps.isEmpty ? null : temps.reduce((a, b) => a < b ? a : b));
+    final avgTemp =
+        temps.isEmpty ? null : temps.reduce((a, b) => a + b) / temps.length;
 
     _db.execute(
       'INSERT INTO Logbook (Number, Divedate, Entrytime, DiverID, UUID, Updated, '
-      'Status, Depth, DepthAvg, Divetime, Watertemp, Computer, O2, ProfileInt, '
-      'Profile, Profile2) VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?)',
+      'Status, Depth, DepthAvg, Divetime, Watertemp, PandiveAvgTemp, Computer, '
+      'O2, ProfileInt, Profile, Profile2) VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?)',
       [
         nextDiveNumber(), date, time, owner, _uuid(), now,
         d.maxDepth, avgDepth,
         d.divetimeSec != null ? d.divetimeSec! / 60.0 : null,
-        d.tempMin, computer, o2, interval, prof, prof2,
+        minTemp, avgTemp, computer, o2, interval, prof, prof2,
       ],
     );
     final id = _db.lastInsertRowId;

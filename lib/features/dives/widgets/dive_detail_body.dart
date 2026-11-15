@@ -28,6 +28,7 @@ class DiveDetailBody extends StatelessWidget {
     final tags = db.tagsForDive(dive.id);
     // Prof. media: la de la DB o, si falta, la calculada del perfil.
     final avgDepth = dive.avgDepth ?? _profileAvg(profile);
+    final avgTemp = db.diveAvgTemp(dive.id);
     final dateFmt = DateFormat(
         'EEEE d MMMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
 
@@ -54,6 +55,7 @@ class DiveDetailBody extends StatelessWidget {
             computeSac(cylinders,
                 divetimeMin: dive.durationMin, avgDepthM: avgDepth),
             avgDepth,
+            avgTemp,
           ),
         ),
         if (tags.isNotEmpty) ...[
@@ -105,14 +107,15 @@ class DiveDetailBody extends StatelessWidget {
     );
   }
 
-  List<Widget> _statCards(
-      BuildContext context, AppLocalizations t, double? sac, double? avgDepth) {
+  List<Widget> _statCards(BuildContext context, AppLocalizations t, double? sac,
+      double? avgDepth, double? avgTemp) {
     final items = <(String, String)>[
       if (dive.maxDepth != null) (t.statMaxDepth, '${dive.maxDepth!.toStringAsFixed(1)} m'),
       if (sac != null) (t.sacLabel, '${sac.toStringAsFixed(1)} l/min'),
       if (avgDepth != null) (t.statAvgDepth, '${avgDepth.toStringAsFixed(1)} m'),
       if (dive.durationMin != null) (t.statDuration, '${dive.durationMin!.round()} min'),
-      if (dive.waterTemp != null) (t.statWaterTemp, '${dive.waterTemp!.toStringAsFixed(0)} °C'),
+      if (dive.waterTemp != null) (t.statTempMin, '${dive.waterTemp!.toStringAsFixed(1)} °C'),
+      if (avgTemp != null) (t.statTempAvg, '${avgTemp.toStringAsFixed(1)} °C'),
       if (dive.airTemp != null) (t.statAirTemp, '${dive.airTemp!.toStringAsFixed(0)} °C'),
       if (dive.surfaceInterval != null) (t.statSurfaceInt, dive.surfaceInterval!),
       if (dive.weight != null) (t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),

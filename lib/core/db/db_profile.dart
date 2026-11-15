@@ -52,6 +52,44 @@ extension DivemateDbProfile on DivemateDb {
     );
   }
 
+  /// Temp media persistida (columna propia `PandiveAvgTemp`), o null.
+  double? diveAvgTemp(int logId) {
+    final r =
+        _db.select('SELECT PandiveAvgTemp FROM Logbook WHERE ID=?', [logId]);
+    return r.isEmpty ? null : _temp(r.first['PandiveAvgTemp']);
+  }
+
+  /// Rellena temp media (`PandiveAvgTemp`) y mínima (`Watertemp`, si falta o es
+  /// centinela) a partir del perfil de temperatura. Devuelve cuántas actualizó.
+  int fillMissingTemps() {
+    final owner = ownerId;
+    final filter = owner != null ? 'AND DiverID = $owner' : '';
+    final rows = _db.select(
+      'SELECT ID FROM Logbook WHERE (Status IS NULL OR Status != 2) $filter '
+      "AND ProfileInt > 0 AND Profile2 IS NOT NULL AND Profile2 <> '' "
+      'AND PandiveAvgTemp IS NULL',
+    );
+    var n = 0;
+    final now = _nowStamp();
+    for (final r in rows) {
+      final id = r['ID'] as int;
+      final p = diveProfile(id);
+      if (p == null) continue;
+      final ts = p.temps.whereType<double>().toList();
+      if (ts.isEmpty) continue;
+      final minT = ts.reduce((a, b) => a < b ? a : b);
+      final avgT = ts.reduce((a, b) => a + b) / ts.length;
+      _db.execute(
+        'UPDATE Logbook SET PandiveAvgTemp=?, Watertemp=CASE WHEN Watertemp '
+        'IS NULL OR Watertemp<=-50 OR Watertemp>=60 THEN ? ELSE Watertemp END, '
+        'Updated=? WHERE ID=?',
+        [avgT, minT, now, id],
+      );
+      n++;
+    }
+    return n;
+  }
+
   /// Rellena `DepthAvg` (prof. media) a partir del perfil en las inmersiones que
   /// no la tienen, para que quede persistida (y exportable a DiveMate: su SAC se
   /// deriva de DepthAvg + presiones + tiempo). Devuelve cuántas actualizó.

@@ -69,6 +69,8 @@
   "statAvgDepth": "Prof. media",
   "statDuration": "Duración",
   "statWaterTemp": "Temp. agua",
+  "statTempMin": "Temp. mín",
+  "statTempAvg": "Temp. media",
   "statAirTemp": "Temp. aire",
   "statSurfaceInt": "Interv. sup.",
   "statWeight": "Lastre",

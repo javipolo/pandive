@@ -461,6 +461,29 @@ void main() {
     }
   });
 
+  test('importDownloaded persiste temp mín (Watertemp) y media (PandiveAvgTemp)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_temp_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      w.importDownloaded(const DownloadedDive(
+        fingerprint: 'tt',
+        datetime: null,
+        samples: [
+          DiveSample(0, 5, 22),
+          DiveSample(10000, 10, 18),
+          DiveSample(20000, 8, 20),
+        ],
+      ));
+      final d = w.listDives().single;
+      expect(d.waterTemp, closeTo(18, 0.01)); // mínima
+      expect(w.diveAvgTemp(d.id), closeTo(20, 0.01)); // media (22+18+20)/3
+    } finally {
+      w.close();
+    }
+  });
+
   test('SAC se persiste en PandiveSac al guardar botellas', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_sac_${DateTime.now().microsecondsSinceEpoch}.ddb');
