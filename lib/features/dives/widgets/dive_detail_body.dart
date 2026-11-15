@@ -36,7 +36,8 @@ class DiveDetailBody extends StatelessWidget {
 
     final avg = dive.avgDepth ?? _avg(profile?.depths.where((d) => d > 0));
     final temps = profile?.temps.whereType<double>().toList() ?? const <double>[];
-    final maxTemp = temps.isEmpty ? null : temps.reduce((a, b) => a > b ? a : b);
+    final minTemp = dive.waterTemp ??
+        (temps.isEmpty ? null : temps.reduce((a, b) => a < b ? a : b));
     final avgTemp = db.diveAvgTemp(dive.id) ?? _avg(temps);
 
     final fO2 = (cyls.isNotEmpty && cyls.first.o2 != null
@@ -77,7 +78,7 @@ class DiveDetailBody extends StatelessWidget {
             LabeledValue(t.statDuration,
                 dive.durationMin == null ? null : '${dive.durationMin!.round()} min'),
             LabeledValue(t.statAvgDepth, _m(avg))),
-        twoCol(LabeledValue(t.statTempMax, _c(maxTemp)),
+        twoCol(LabeledValue(t.statTempMin, _c(minTemp)),
             LabeledValue(t.statTempAvg, _c(avgTemp))),
         sectionLine(),
         twoCol(LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
