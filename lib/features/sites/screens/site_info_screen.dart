@@ -9,7 +9,6 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
 import 'package:pandive/features/sites/screens/site_edit_screen.dart';
-import 'package:pandive/features/sites/widgets/site_dives_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SiteInfoScreen extends StatefulWidget {
@@ -91,29 +90,14 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
   }
 
   Widget _info(DiveSite s, AppLocalizations t) {
-    final rating = (s.rating != null && s.rating! > 0) ? '★' * s.rating! : null;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        twoCol(LabeledValue(t.fieldCountry, s.country),
-            LabeledValue(t.fieldRegion, s.region)),
+        twoCol(LabeledValue(t.fieldSite, s.name),
+            LabeledValue(t.fieldCountry, s.country)),
         sectionLine(),
         twoCol(LabeledValue(t.fieldStretchOfWater, s.waterName),
-            LabeledValue(t.fieldDifficulty, s.difficulty)),
-        sectionLine(),
-        twoCol(
-            LabeledValue(t.ratingLabel, rating),
-            LabeledValue(t.statMaxDepth,
-                s.maxDepth != null ? '${s.maxDepth!.toStringAsFixed(1)} m' : null)),
-        sectionLine(),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.scuba_diving),
-          title: Text(t.diveCountLabel(s.diveCount)),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => SiteDivesScreen(db: widget.db, site: s))),
-        ),
+            LabeledValue(t.fieldRegion, s.region)),
       ],
     );
   }

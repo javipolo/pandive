@@ -1,5 +1,4 @@
-/// Crear o editar un sitio de buceo. Campos: nombre, país, masa de agua,
-/// región, dificultad, valoración. (Sin lat/lon/agua/altitud/mapa/forecast por ahora.)
+/// Crear o editar un sitio de buceo. Campos: nombre, país, masa de agua, región.
 library;
 
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
-import 'package:pandive/core/widgets/star_rating.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SiteEditScreen extends StatefulWidget {
@@ -24,13 +22,10 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
   late final _country = TextEditingController(text: widget.site?.country ?? '');
   late final _water = TextEditingController(text: widget.site?.waterName ?? '');
   late final _region = TextEditingController(text: widget.site?.region ?? '');
-  late final _difficulty =
-      TextEditingController(text: widget.site?.difficulty ?? '');
-  late int _rating = widget.site?.rating ?? 0;
 
   @override
   void dispose() {
-    for (final c in [_name, _country, _water, _region, _difficulty]) {
+    for (final c in [_name, _country, _water, _region]) {
       c.dispose();
     }
     super.dispose();
@@ -45,8 +40,6 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
       'Country': _s(_country),
       'WaterName': _s(_water),
       'Region': _s(_region),
-      'Difficulty': _s(_difficulty),
-      'Rating': _rating,
     };
     if (widget.site == null) {
       widget.db.createSite(map);
@@ -78,12 +71,6 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
           LabeledField(controller: _country, label: t.fieldCountry),
           LabeledField(controller: _water, label: t.fieldStretchOfWater),
           LabeledField(controller: _region, label: t.fieldRegion),
-          LabeledField(controller: _difficulty, label: t.fieldDifficulty),
-          const SizedBox(height: 8),
-          StarRating(
-              value: _rating,
-              label: t.ratingLabel,
-              onChanged: (v) => setState(() => _rating = v)),
         ],
       ),
     );
