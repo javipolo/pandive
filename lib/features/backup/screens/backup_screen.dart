@@ -23,11 +23,13 @@ class _BackupScreenState extends State<BackupScreen> {
   final _svc = DriveBackupService();
   bool _busy = false;
 
+  bool _connecting = true; // reconectando en silencio al abrir
+
   @override
   void initState() {
     super.initState();
     _svc.signInSilently().then((_) {
-      if (mounted) setState(() {});
+      if (mounted) setState(() => _connecting = false);
     });
   }
 
@@ -49,6 +51,8 @@ class _BackupScreenState extends State<BackupScreen> {
         await _svc.signOut();
       } else {
         await _svc.signIn();
+        // Al conectar, activar el backup diario por defecto.
+        if (_svc.connected) await widget.settings.setAutoBackup(true);
       }
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('$e')));
@@ -66,8 +70,10 @@ class _BackupScreenState extends State<BackupScreen> {
         children: [
           ListTile(
             leading: const Icon(Icons.account_circle),
-            title: Text(connected ? (_svc.email ?? '') : t.notConnected),
-            trailing: _busy
+            title: Text(connected
+                ? (_svc.email ?? '')
+                : (_connecting ? t.connecting : t.notConnected)),
+            trailing: (_busy || _connecting)
                 ? const SizedBox(
                     width: 20, height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2))
