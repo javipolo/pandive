@@ -80,12 +80,12 @@ class DiveDetailBody extends StatelessWidget {
         twoCol(LabeledValue(t.statTempMin, _c(minTemp)),
             LabeledValue(t.statTempAvg, _c(avgTemp))),
         sectionLine(),
+        twoCol(LabeledValue(t.rmvLabel, f1(rmv, 'l/min')),
+            LabeledValue(t.sacBarLabel, f1(sac, 'bar/min'))),
         twoCol(
             LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
             LabeledValue(
                 t.ppheMax, (ata == null || fHe <= 0) ? null : ff(fHe * ata))),
-        twoCol(LabeledValue(t.rmvLabel, f1(rmv, 'l/min')),
-            LabeledValue(t.sacBarLabel, f1(sac, 'bar/min'))),
         sectionLine(),
         twoCol(
             LabeledValue(t.decoLabel,
