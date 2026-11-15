@@ -121,7 +121,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/tank_edit_sheet.dart` -> hoja para añadir/editar una botella
 
 ### sites (sitios)
-- `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar = ver buceos; menú editar/borrar
+- `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
+- `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, editar/borrar, swipe entre sitios)
+- `lib/features/sites/widgets/site_dives_screen.dart` -> buceos de un sitio concreto
 
 ### stats (estadísticas)
 - `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook

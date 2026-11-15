@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/sites/screens/site_edit_screen.dart';
+import 'package:pandive/features/sites/screens/site_info_screen.dart';
 import 'package:pandive/features/sites/widgets/site_dives_screen.dart';
 import 'package:pandive/features/sites/widgets/sites_grouped_list.dart';
 
@@ -32,11 +33,16 @@ class _SitesTabState extends State<SitesTab> {
     if (changed == true && mounted) _reload();
   }
 
-  Future<void> _view(DiveSite site) async {
+  void _dives(DiveSite site) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => SiteDivesScreen(db: widget.db, site: site)));
+  }
+
+  Future<void> _info(DiveSite site) async {
     final idx = _sites.indexWhere((s) => s.id == site.id);
     await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) =>
-          SiteDivesScreen(db: widget.db, sites: _sites, initialIndex: idx < 0 ? 0 : idx),
+      builder: (_) => SiteInfoScreen(
+          db: widget.db, sites: _sites, initialIndex: idx < 0 ? 0 : idx),
     ));
     if (mounted) _reload(); // editar/borrar dentro pudo cambiar cosas
   }
@@ -50,7 +56,8 @@ class _SitesTabState extends State<SitesTab> {
       ),
       body: SitesGroupedList(
           sites: _sites,
-          onTap: _view,
+          onTap: _dives,
+          onInfo: _info,
           externalQuery: widget.query,
           collapseAll: widget.collapseAll),
     );

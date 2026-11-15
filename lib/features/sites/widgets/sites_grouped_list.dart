@@ -11,6 +11,8 @@ import 'package:pandive/l10n/app_localizations.dart';
 class SitesGroupedList extends StatefulWidget {
   final List<DiveSite> sites;
   final void Function(DiveSite) onTap;
+  /// Si se pasa, el tile muestra un icono "ojo" a la derecha para ver la info.
+  final void Function(DiveSite)? onInfo;
   /// Si se pasa, el filtro viene de fuera (barra superior) y se oculta la barra
   /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
   final String? externalQuery;
@@ -19,6 +21,7 @@ class SitesGroupedList extends StatefulWidget {
     super.key,
     required this.sites,
     required this.onTap,
+    this.onInfo,
     this.externalQuery,
     this.collapseAll = false,
   });
@@ -128,7 +131,12 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
       title: Text(s.name ?? t.site,
           maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(sub),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: widget.onInfo == null
+          ? null
+          : IconButton(
+              icon: const Icon(Icons.visibility_outlined),
+              tooltip: t.site,
+              onPressed: () => widget.onInfo!(s)),
       onTap: () => widget.onTap(s),
     );
   }
