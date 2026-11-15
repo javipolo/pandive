@@ -11,10 +11,6 @@ import 'package:pandive/l10n/app_localizations.dart';
 class SitesGroupedList extends StatefulWidget {
   final List<DiveSite> sites;
   final void Function(DiveSite) onTap;
-  /// Si se pasan, el tile muestra un menú editar/borrar a la derecha (pestaña de
-  /// sitios). En el selector se omiten y el tile solo selecciona.
-  final void Function(DiveSite)? onEdit;
-  final void Function(DiveSite)? onDelete;
   /// Si se pasa, el filtro viene de fuera (barra superior) y se oculta la barra
   /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
   final String? externalQuery;
@@ -23,8 +19,6 @@ class SitesGroupedList extends StatefulWidget {
     super.key,
     required this.sites,
     required this.onTap,
-    this.onEdit,
-    this.onDelete,
     this.externalQuery,
     this.collapseAll = false,
   });
@@ -134,17 +128,8 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
       title: Text(s.name ?? t.site,
           maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(sub),
+      trailing: const Icon(Icons.chevron_right),
       onTap: () => widget.onTap(s),
-      trailing: widget.onEdit == null
-          ? null
-          : PopupMenuButton<String>(
-              onSelected: (v) =>
-                  v == 'edit' ? widget.onEdit!(s) : widget.onDelete!(s),
-              itemBuilder: (_) => [
-                PopupMenuItem(value: 'edit', child: Text(t.edit)),
-                PopupMenuItem(value: 'delete', child: Text(t.delete)),
-              ],
-            ),
     );
   }
 }

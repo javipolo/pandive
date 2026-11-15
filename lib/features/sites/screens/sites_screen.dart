@@ -25,38 +25,32 @@ class _SitesTabState extends State<SitesTab> {
 
   void _reload() => setState(() => _sites = widget.db.listSites());
 
-  Future<void> _edit(DiveSite? site) async {
+  Future<void> _new() async {
     final changed = await Navigator.of(context).push<bool>(MaterialPageRoute(
-      builder: (_) => SiteEditScreen(db: widget.db, site: site),
+      builder: (_) => SiteEditScreen(db: widget.db, site: null),
     ));
     if (changed == true && mounted) _reload();
   }
 
-  void _showDives(DiveSite site) {
-    final dives = widget.db.listDivesBySite(site.id);
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => SiteDivesScreen(
-          db: widget.db, title: site.name ?? '', dives: dives),
+  Future<void> _view(DiveSite site) async {
+    final idx = _sites.indexWhere((s) => s.id == site.id);
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) =>
+          SiteDivesScreen(db: widget.db, sites: _sites, initialIndex: idx < 0 ? 0 : idx),
     ));
-  }
-
-  void _delete(DiveSite site) {
-    widget.db.deleteSite(site.id);
-    _reload();
+    if (mounted) _reload(); // editar/borrar dentro pudo cambiar cosas
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _edit(null),
+        onPressed: _new,
         child: const Icon(Icons.add),
       ),
       body: SitesGroupedList(
           sites: _sites,
-          onTap: _showDives,
-          onEdit: _edit,
-          onDelete: _delete,
+          onTap: _view,
           externalQuery: widget.query,
           collapseAll: widget.collapseAll),
     );

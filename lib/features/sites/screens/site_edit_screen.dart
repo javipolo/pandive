@@ -8,7 +8,6 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/star_rating.dart';
-import 'package:pandive/features/sites/widgets/site_dives_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SiteEditScreen extends StatefulWidget {
@@ -57,14 +56,6 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
     Navigator.of(context).pop(true);
   }
 
-  void _showDives() {
-    final dives = widget.db.listDivesBySite(widget.site!.id);
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => SiteDivesScreen(
-          db: widget.db, title: widget.site!.name ?? '', dives: dives),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -93,15 +84,6 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
               value: _rating,
               label: t.ratingLabel,
               onChanged: (v) => setState(() => _rating = v)),
-          if (site != null) ...[
-            const Divider(height: 32),
-            ListTile(
-              leading: const Icon(Icons.scuba_diving),
-              title: Text(t.diveCountLabel(site.diveCount)),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: _showDives,
-            ),
-          ],
         ],
       ),
     );
