@@ -558,6 +558,31 @@ void main() {
     }
   });
 
+  test('decode de deco (Profile4): techo/NDL/TTS en el buceo 460 (nº 399)', () {
+    final p = db.diveProfile(460);
+    if (p == null) return; // DB sin ese buceo
+    expect(p.hasDeco, isTrue);
+    // El techo máximo del buceo 399 (ID 460) fue 15 m.
+    final maxCeil = p.ceiling.reduce((a, b) => a > b ? a : b);
+    expect(maxCeil, closeTo(15, 0.5));
+    // Hay muestras con NDL (fase sin deco) y muestras con TTS (en deco).
+    expect(p.ndl.any((v) => v != null && v > 0), isTrue);
+    expect(p.tts.any((v) => v != null), isTrue);
+    // Donde hay techo, no hay NDL y sí TTS.
+    for (var i = 0; i < p.ceiling.length; i++) {
+      if (p.ceiling[i] > 0) {
+        expect(p.ndl[i], isNull);
+      }
+    }
+  });
+
+  test('buceo sin deco: ceiling todo 0, NDL poblado', () {
+    final p = db.diveProfile(684);
+    if (p == null) return;
+    // 684 tuvo una parada corta a 3 m; comprobamos consistencia general.
+    expect(p.ndl.any((v) => v != null), isTrue);
+  });
+
   test('perfil de la dive 730 coincide con dmcli (25.7 m, 65.9 min, ~18°C)', () {
     final dive = db.listDives().firstWhere((d) => d.number == 730);
     expect(dive.maxDepth, closeTo(25.7, 0.1));

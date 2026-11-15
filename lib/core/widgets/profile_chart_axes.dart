@@ -61,15 +61,19 @@ LineTouchTooltipData profileTooltip(
   List<double> times,
   List<double> depths,
   List<double> prefix,
-  List<double?> temps,
-) {
+  List<double?> temps, {
+  List<double> ceiling = const [],
+  List<int?> ndl = const [],
+  List<int?> tts = const [],
+}) {
   return LineTouchTooltipData(
     fitInsideVertically: true,
     fitInsideHorizontally: true,
     getTooltipItems: (spots) => [
       for (final s in spots)
         if (s.barIndex == 0)
-          LineTooltipItem(_tip(s.spotIndex, times, depths, prefix, temps),
+          LineTooltipItem(
+              _tip(s.spotIndex, times, depths, prefix, temps, ceiling, ndl, tts),
               const TextStyle(color: Colors.white, fontSize: 12))
         else
           null,
@@ -78,11 +82,18 @@ LineTouchTooltipData profileTooltip(
 }
 
 String _tip(int i, List<double> times, List<double> depths, List<double> prefix,
-    List<double?> temps) {
+    List<double?> temps, List<double> ceiling, List<int?> ndl, List<int?> tts) {
   if (i < 0 || i >= depths.length) return '';
   final avg = prefix[i] / (i + 1);
   final temp = temps.length > i ? temps[i] : null;
+  var deco = '';
+  if (ceiling.length > i && ceiling[i] > 0) {
+    deco = '\nTTS ${tts.length > i ? tts[i] : '?'} min'
+        '\n⬆ ${ceiling[i].round()} m';
+  } else if (ndl.length > i && ndl[i] != null) {
+    deco = '\nNDL ${ndl[i]! >= 99 ? '99+' : ndl[i]} min';
+  }
   return '${times[i].round()} min\n${depths[i].toStringAsFixed(1)} m\n'
       '${temp != null ? '${temp.toStringAsFixed(1)} °C\n' : ''}'
-      '∅ ${avg.toStringAsFixed(1)} m';
+      '∅ ${avg.toStringAsFixed(1)} m$deco';
 }

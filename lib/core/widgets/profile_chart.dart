@@ -22,7 +22,6 @@ const _hidden = AxisTitles(sideTitles: SideTitles(showTitles: false));
 
 class _ProfileChartState extends State<ProfileChart> {
   int? _idx;
-
   @override
   Widget build(BuildContext context) {
     final profile = widget.profile;
@@ -47,7 +46,6 @@ class _ProfileChartState extends State<ProfileChart> {
     final depthSpots = [
       for (var i = 0; i < depths.length; i++) FlSpot(times[i], -depths[i]),
     ];
-
     final hasTemp = profile.hasTemp;
     var tLo = 0.0, tHi = 5.0;
     List<FlSpot> tempSpots = [];
@@ -79,7 +77,8 @@ class _ProfileChartState extends State<ProfileChart> {
       clipData: const FlClipData.all(),
       lineTouchData: LineTouchData(
         handleBuiltInTouches: true,
-        touchTooltipData: profileTooltip(times, depths, prefix, profile.temps),
+        touchTooltipData: profileTooltip(times, depths, prefix, profile.temps,
+            ceiling: profile.ceiling, ndl: profile.ndl, tts: profile.tts),
         touchCallback: (event, resp) {
           final spots = resp?.lineBarSpots;
           if (!event.isInterestedForInteractions || spots == null || spots.isEmpty) {
@@ -130,6 +129,20 @@ class _ProfileChartState extends State<ProfileChart> {
             color: Colors.red,
             barWidth: 2,
             dotData: const FlDotData(show: false),
+          ),
+        // Banda de techo de deco: relleno rojo desde la superficie hasta el techo.
+        if (profile.hasDeco)
+          LineChartBarData(
+            spots: [
+              for (var i = 0; i < profile.ceiling.length; i++)
+                FlSpot(times[i], -profile.ceiling[i]),
+            ],
+            isCurved: false,
+            color: Colors.transparent,
+            barWidth: 0,
+            dotData: const FlDotData(show: false),
+            aboveBarData:
+                BarAreaData(show: true, color: Colors.red.withValues(alpha: 0.30)),
           ),
       ],
     ));

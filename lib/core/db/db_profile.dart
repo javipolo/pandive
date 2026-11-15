@@ -10,7 +10,7 @@ extension DivemateDbProfile on DivemateDb {
   ///  - `ProfileInt`: intervalo de muestreo en segundos.
   DiveProfile? diveProfile(int logId) {
     final rows = _db.select(
-      'SELECT ProfileInt, Profile, Profile2 FROM Logbook WHERE ID = ?',
+      'SELECT ProfileInt, Profile, Profile2, Profile4 FROM Logbook WHERE ID = ?',
       [logId],
     );
     if (rows.isEmpty) return null;
@@ -44,11 +44,33 @@ extension DivemateDbProfile on DivemateDb {
       if (!anyTemp) temps = List<double?>.filled(depths.length, null);
     }
 
+    // Profile4 (9 chars/muestra = NDL/TTS/parada + techo), formato DiveMate.
+    // Fuera de deco: a==b==NDL, c=0. En deco: c=techo(m), a=TTS, b=parada(min).
+    final ceiling = List<double>.filled(depths.length, 0);
+    final ndl = List<int?>.filled(depths.length, null);
+    final tts = List<int?>.filled(depths.length, null);
+    final p4 = _str(r['Profile4']) ?? '';
+    if (p4.length % 9 == 0 && p4.length ~/ 9 == depths.length) {
+      for (var i = 0, k = 0; i < p4.length; i += 9, k++) {
+        final a = int.tryParse(p4.substring(i, i + 3)) ?? 0;
+        final c = int.tryParse(p4.substring(i + 6, i + 9)) ?? 0;
+        ceiling[k] = c.toDouble();
+        if (c > 0) {
+          tts[k] = a;
+        } else {
+          ndl[k] = a;
+        }
+      }
+    }
+
     return DiveProfile(
       intervalSeconds: interval,
       timesMinutes: times,
       depths: depths,
       temps: temps,
+      ceiling: ceiling,
+      ndl: ndl,
+      tts: tts,
     );
   }
 
