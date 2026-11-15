@@ -11,11 +11,14 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class ProfileChart extends StatefulWidget {
   final DiveProfile profile;
-  const ProfileChart({super.key, required this.profile});
+  final bool compact; // oculta los títulos de los ejes (gráfica pequeña)
+  const ProfileChart({super.key, required this.profile, this.compact = false});
 
   @override
   State<ProfileChart> createState() => _ProfileChartState();
 }
+
+const _hidden = AxisTitles(sideTitles: SideTitles(showTitles: false));
 
 class _ProfileChartState extends State<ProfileChart> {
   int? _idx;
@@ -101,12 +104,12 @@ class _ProfileChartState extends State<ProfileChart> {
             color: cs.outlineVariant.withValues(alpha: 0.4), strokeWidth: 1),
       ),
       titlesData: FlTitlesData(
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        leftTitles: depthAxis(context, t, depthStep),
-        rightTitles: hasTemp
+        topTitles: _hidden,
+        leftTitles: widget.compact ? _hidden : depthAxis(context, t, depthStep),
+        rightTitles: (hasTemp && !widget.compact)
             ? tempAxis(minY, tLo, tHi)
-            : const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        bottomTitles: timeAxis(context, t, maxTime),
+            : _hidden,
+        bottomTitles: widget.compact ? _hidden : timeAxis(context, t, maxTime),
       ),
       borderData:
           FlBorderData(show: true, border: Border.all(color: cs.outlineVariant)),

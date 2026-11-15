@@ -116,7 +116,7 @@ class DiveDetailBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(children: [
-          SizedBox(height: 240, child: ProfileChart(profile: p)),
+          SizedBox(height: 240, child: ProfileChart(profile: p, compact: true)),
           Positioned(
             right: 0,
             top: 0,
