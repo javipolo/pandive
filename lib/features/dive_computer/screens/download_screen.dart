@@ -112,9 +112,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return DownloadProgress(
-                progress: _progress,
-                indeterminate: widget.baseline || widget.maxDives > 0);
+            return DownloadProgress(progress: _progress);
           }
           final res = snap.data;
           final err = snap.hasError

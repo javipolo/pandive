@@ -207,6 +207,7 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
 
 typedef struct {
     strbuf_t *sb; dc_device_t *device; int count; int maxDives;
+    JNIEnv *env; jclass cls; jmethodID progMid; // progreso count/maxDives
 } dive_ctx_t;
 
 static int dive_cb(const unsigned char *data, unsigned int size,
@@ -262,6 +263,12 @@ static int dive_cb(const unsigned char *data, unsigned int size,
     sb_puts(dc->sb, "]}");
 
     dc_parser_destroy(parser);
+    // Progreso por buceo cuando hay límite (count/maxDives): el % por memoria
+    // no sirve si solo bajamos N buceos.
+    if (dc->maxDives > 0 && dc->progMid) {
+        (*dc->env)->CallStaticVoidMethod(dc->env, dc->cls, dc->progMid,
+                                         (jint) dc->count, (jint) dc->maxDives);
+    }
     // maxDives > 0: parar tras N (p.ej. 1 para "marcar como ya importado").
     if (dc->maxDives > 0 && dc->count >= dc->maxDives) return 0;
     return 1;
@@ -375,12 +382,18 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
     // Progreso: DC_EVENT_PROGRESS -> DiveComputer.reportProgress(cur, max)
     jclass dcCls = (*env)->FindClass(env, "org/drslump/pandive/DiveComputer");
     prog_ctx_t pc = { env, dcCls, NULL };
-    if (dcCls) pc.mid = (*env)->GetStaticMethodID(env, dcCls, "reportProgress", "(II)V");
-    if (pc.mid) dc_device_set_events(device, DC_EVENT_PROGRESS, event_cb, &pc);
+    jmethodID progMid = NULL;
+    if (dcCls) progMid = (*env)->GetStaticMethodID(env, dcCls, "reportProgress", "(II)V");
+    pc.mid = progMid;
+    // Con límite, el progreso se emite por buceo (count/N) desde dive_cb; sin
+    // límite usamos el progreso por memoria (DC_EVENT_PROGRESS).
+    if (progMid && maxDives == 0)
+        dc_device_set_events(device, DC_EVENT_PROGRESS, event_cb, &pc);
 
     sb_puts(&out, "{\"dives\":[");
     dive_ctx_t dctx = { .sb = &out, .device = device, .count = 0,
-                        .maxDives = maxDives };
+                        .maxDives = maxDives, .env = env, .cls = dcCls,
+                        .progMid = progMid };
     rc = dc_device_foreach(device, dive_cb, &dctx);
     sb_puts(&out, "]");
     if (rc != DC_STATUS_SUCCESS)
