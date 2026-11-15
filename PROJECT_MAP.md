@@ -35,6 +35,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
 - `lib/core/db/db_computers.dart` -> ordenadores de buceo guardados (por MAC)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
+- `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
 - `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos
 
 ### Core · modelos (`models.dart` es el barrel)
@@ -81,6 +82,7 @@ con `screens/` y, si hace falta, `widgets/`).
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, backup, herramientas, DB
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
+- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb) y Subsurface (.ssrf)
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
 - `lib/features/settings/widgets/night_hours_control.dart` -> franja horaria de inmersión nocturna (desde/hasta)

@@ -2,11 +2,11 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/screens/backup_screen.dart';
+import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';
 import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
 import 'package:pandive/features/settings/widgets/night_hours_control.dart';
@@ -30,13 +30,6 @@ class SettingsScreen extends StatelessWidget {
     final n = db.importHashtagsFromComments();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context).importHashtagsResult(n))));
-  }
-
-  void _exportDb() {
-    final path = settings.dbPath;
-    if (path != null) {
-      SharePlus.instance.share(ShareParams(files: [XFile(path)]));
-    }
   }
 
   Future<void> _confirmChangeDb(BuildContext context) async {
@@ -104,7 +97,12 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.ios_share),
                 title: Text(t.exportLogbook),
-                onTap: _exportDb,
+                onTap: () => exportDdb(settings),
+              ),
+              ListTile(
+                leading: const Icon(Icons.ios_share),
+                title: Text(t.exportSubsurface),
+                onTap: () => exportSubsurface(db),
               ),
               const Divider(),
               _header(context, t.backup),

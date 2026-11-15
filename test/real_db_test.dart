@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/export/subsurface_export.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:sqlite3/open.dart';
 
@@ -520,6 +521,38 @@ void main() {
       expect(c.vendor, 'Shearwater');
       w.removeComputer('AA:BB');
       expect(w.listComputers(), isEmpty);
+    } finally {
+      w.close();
+    }
+  });
+
+  test('buildSubsurfaceXml genera XML con sitio, botella y perfil', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_ss_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final sid = w.createSite({'Place': 'Cala', 'Country': 'España'});
+      w.importDownloaded(const DownloadedDive(
+        fingerprint: 'x',
+        datetime: null,
+        maxDepth: 20,
+        divetimeSec: 2400,
+        gasmixes: [GasMix(0.32, 0)],
+        samples: [DiveSample(0, 5, 21), DiveSample(10000, 20, 19)],
+      ));
+      final id = w.listDives().single.id;
+      w.updateDive(id, {'PlaceID': sid, 'Place': 'Cala', 'Country': 'España'});
+      w.setDiveTanks(
+          id, const [Cylinder(size: 12, pressureStart: 200, pressureEnd: 50)]);
+      final xml = buildSubsurfaceXml(w);
+      expect(xml, contains("<divelog program='pandive'"));
+      expect(xml, contains("name='Cala'"));
+      expect(xml, contains('divesiteid='));
+      expect(xml, contains('<cylinder'));
+      expect(xml, contains("start='200.0 bar'"));
+      expect(xml, contains('<sample '));
+      expect(xml, contains("sac='"));
     } finally {
       w.close();
     }
