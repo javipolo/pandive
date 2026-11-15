@@ -47,6 +47,7 @@
 
   "searchDives": "Buscar sitio, país, nota, nº…",
   "noResults": "Sin resultados",
+  "resultsFound": "{count} resultados",
   "newDive": "Nueva",
   "newDiveManual": "Nueva inmersión (manual)",
   "diveTransfer": "Transferir del ordenador",

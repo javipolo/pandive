@@ -10,6 +10,7 @@ import 'package:pandive/features/dives/screens/dives_screen.dart';
 import 'package:pandive/features/equipment/screens/equipment_tab.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
+import 'package:pandive/features/home/widgets/search_results_bar.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/features/sites/screens/sites_screen.dart';
 import 'package:pandive/features/stats/screens/stats_screen.dart';
@@ -21,7 +22,6 @@ class HomeScreen extends StatefulWidget {
   final Settings settings;
   final VoidCallback onChangeDb;
   final VoidCallback onReloadDb;
-
   const HomeScreen({
     super.key,
     required this.db,
@@ -29,7 +29,6 @@ class HomeScreen extends StatefulWidget {
     required this.onChangeDb,
     required this.onReloadDb,
   });
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -41,16 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
   String _query = '';
   bool _collapseAll = false;
   final _searchCtrl = TextEditingController();
-
   bool get _canSearch => _index <= 3; // todas menos estadísticas
   bool get _canCollapse => _index == 0 || _index == 1; // inmersiones / sitios
-
   @override
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
   }
-
   void _exitSearch() {
     _searchCtrl.clear();
     setState(() {
@@ -58,7 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _query = '';
     });
   }
-
   // Cambia de sección (barra inferior o menú lateral) y recarga datos.
   void _go(int i) {
     _searchCtrl.clear();
@@ -69,7 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _query = '';
     });
   }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -78,6 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       drawer: HomeDrawer(selectedIndex: _index, onSelected: _go),
       appBar: AppBar(
+        bottom: (_searching && _query.trim().isNotEmpty)
+            ? SearchResultsBar(db: widget.db, index: _index, query: _query)
+            : null,
         leading: _searching
             ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: _exitSearch)
             : null,

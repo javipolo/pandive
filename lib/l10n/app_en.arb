@@ -51,6 +51,8 @@
 
   "searchDives": "Search site, country, note, #…",
   "noResults": "No results",
+  "resultsFound": "{count} results found",
+  "@resultsFound": { "placeholders": { "count": {} } },
   "newDive": "New",
   "newDiveManual": "New dive (manual)",
   "diveTransfer": "Dive transfer (computer)",
