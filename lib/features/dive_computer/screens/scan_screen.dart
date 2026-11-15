@@ -8,7 +8,6 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
-import 'package:pandive/features/dive_computer/screens/sync_screen.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -92,8 +91,9 @@ class _ScanScreenState extends State<ScanScreen> {
       final n = await askSyncCount(context);
       if (n == null || !mounted) return;
       await Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => SyncScreen(
-              db: widget.db, settings: widget.settings, device: d, count: n)));
+          builder: (_) => DownloadScreen(
+              device: d, db: widget.db, settings: widget.settings,
+              all: true, maxDives: n, syncMode: true)));
       return;
     }
     await Navigator.of(context).push(MaterialPageRoute(

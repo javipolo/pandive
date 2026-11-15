@@ -148,7 +148,7 @@
   "diveChip": "Buceo",
   "scanError": "Error de escaneo: {error}",
 
-  "sync": "Sincronizar",
+  "sync": "Sincronizar y descargar",
   "syncSub": "Baja las últimas y añade solo las nuevas",
   "syncUpToDate": "Ya está sincronizado",
   "syncNoMatch": "Ninguna de las últimas {count} inmersiones está en tu logbook. Sube el número o usa Descargar todas.",

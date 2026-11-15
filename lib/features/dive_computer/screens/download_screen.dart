@@ -3,10 +3,8 @@
 library;
 
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/dive_computer.dart';
@@ -24,6 +22,8 @@ class DownloadScreen extends StatefulWidget {
   final Settings settings;
   final bool baseline;
   final bool all; // ignora el fingerprint: baja todas las inmersiones
+  final int maxDives; // 0 = sin límite; >0 = solo las N más recientes (sync)
+  final bool syncMode; // título "Sincronizar y descargar"
   const DownloadScreen({
     super.key,
     required this.device,
@@ -31,8 +31,9 @@ class DownloadScreen extends StatefulWidget {
     required this.settings,
     this.baseline = false,
     this.all = false,
+    this.maxDives = 0,
+    this.syncMode = false,
   });
-
   @override
   State<DownloadScreen> createState() => _DownloadScreenState();
 }
@@ -47,7 +48,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
   List<DownloadItem>? _items; // nuevos del aparato + pendientes
   List<DownloadedDive> _deviceDives = const []; // lo que devolvió el aparato
   int _existing = 0;
-
   @override
   void initState() {
     super.initState();
@@ -78,7 +78,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
       fingerprint: (widget.baseline || widget.all)
           ? ''
           : (widget.db.fingerprintFor(widget.device.id) ?? ''),
-      maxDives: widget.baseline ? 1 : 0,
+      maxDives: widget.baseline ? 1 : widget.maxDives,
     );
     if (widget.baseline && res.ok && res.dives.isNotEmpty) {
       widget.db.setFingerprintFor(widget.device.id, res.dives.first.fingerprint);
@@ -89,12 +89,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
     setState(() => _saving = true);
     final computer = _model != null ? '${_model.$1} ${_model.$2}' : null;
     final added = applyDownloadSelection(
-      db: widget.db,
-      deviceId: widget.device.id,
-      items: _items!,
-      selected: selected,
-      deviceDives: _deviceDives,
-      computer: computer,
+      db: widget.db, deviceId: widget.device.id, items: _items!,
+      selected: selected, deviceDives: _deviceDives, computer: computer,
     );
     if (!mounted) return;
     final t = AppLocalizations.of(context);
@@ -109,7 +105,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final name = _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
-    final prefix = widget.baseline ? t.markPrefix : t.downloadPrefix;
+    final prefix = widget.syncMode ? t.sync : (widget.baseline ? t.markPrefix : t.downloadPrefix);
     return Scaffold(
       appBar: AppBar(title: Text('$prefix · $name')),
       body: FutureBuilder<DownloadResult>(
@@ -124,8 +120,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
               : (res == null || !res.ok ? (res?.error ?? 'Error') : null);
           if (err != null) {
             return ScanErrorView(
-                message: err,
-                onRetry: () => setState(() => _future = _download()));
+                message: err, onRetry: () => setState(() => _future = _download()));
           }
           if (widget.baseline) {
             return BaselineDone(onDone: () => Navigator.of(context).pop());

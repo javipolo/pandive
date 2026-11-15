@@ -39,16 +39,16 @@ Future<String?> showDiveComputerActionSheet(BuildContext context) {
     builder: (_) => SafeArea(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         ListTile(
-          leading: const Icon(Icons.download),
-          title: Text(t.actionDownload),
-          subtitle: Text(t.actionDownloadSub),
-          onTap: () => Navigator.pop(context, 'download'),
-        ),
-        ListTile(
           leading: const Icon(Icons.sync),
           title: Text(t.sync),
           subtitle: Text(t.syncSub),
           onTap: () => Navigator.pop(context, 'sync'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.download),
+          title: Text(t.actionDownload),
+          subtitle: Text(t.actionDownloadSub),
+          onTap: () => Navigator.pop(context, 'download'),
         ),
         ListTile(
           leading: const Icon(Icons.flag_outlined),

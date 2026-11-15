@@ -159,7 +159,7 @@
   "scanError": "Scan error: {error}",
   "@scanError": { "placeholders": { "error": {} } },
 
-  "sync": "Synchronize",
+  "sync": "Synchronize and download",
   "syncSub": "Download the last few and import only the new ones",
   "syncUpToDate": "Already up to date",
   "syncNoMatch": "None of the last {count} dives are in your logbook. Increase the number or use Download all dives.",
