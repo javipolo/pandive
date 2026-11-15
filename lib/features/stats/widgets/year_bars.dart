@@ -20,8 +20,13 @@ class PeriodBars extends StatelessWidget {
               children: [
                 SizedBox(
                   width: 72,
-                  child: Text(label,
-                      style: Theme.of(context).textTheme.bodyMedium),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(label,
+                        maxLines: 1,
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
                 ),
                 Expanded(
                   child: LayoutBuilder(
@@ -38,9 +43,13 @@ class PeriodBars extends StatelessWidget {
                 ),
                 SizedBox(
                   width: 40,
-                  child: Text('$count',
-                      textAlign: TextAlign.right,
-                      style: Theme.of(context).textTheme.bodyMedium),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text('$count',
+                        maxLines: 1,
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ),
                 ),
               ],
             ),
