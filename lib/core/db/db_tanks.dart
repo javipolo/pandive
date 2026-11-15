@@ -20,6 +20,22 @@ extension DivemateDbTanks on DivemateDb {
     recomputeSac(logId);
   }
 
+  /// Índice de gas por muestra (de PandiveGas), o null si no hay datos.
+  List<int?>? gasPerSample(int diveId) {
+    final r = _db.select('SELECT Json FROM PandiveGas WHERE DiveId=?', [diveId]);
+    if (r.isEmpty) return null;
+    final s = _str(r.first['Json']);
+    if (s == null) return null;
+    try {
+      return [
+        for (final e in jsonDecode(s) as List)
+          e == null ? null : (e as num).toInt(),
+      ];
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// SAC/RMV persistido de una inmersión (columna propia), o null.
   double? diveSac(int logId) {
     final r = _db.select('SELECT PandiveSac FROM Logbook WHERE ID=?', [logId]);

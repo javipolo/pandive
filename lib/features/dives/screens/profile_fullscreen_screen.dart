@@ -6,14 +6,17 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
+import 'package:pandive/features/dives/widgets/gas_segments.dart';
 
 class ProfileFullscreenScreen extends StatelessWidget {
   final DiveProfile profile;
   final String title;
+  final List<GasChange> gasChanges;
   const ProfileFullscreenScreen({
     super.key,
     required this.profile,
     required this.title,
+    this.gasChanges = const [],
   });
 
   @override
@@ -22,7 +25,7 @@ class ProfileFullscreenScreen extends StatelessWidget {
       appBar: AppBar(title: Text(title)),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
-        child: ProfileChart(profile: profile),
+        child: ProfileChart(profile: profile, gasChanges: gasChanges),
       ),
     );
   }

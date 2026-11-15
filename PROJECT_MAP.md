@@ -24,7 +24,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_profile.dart` -> decode del perfil (profundidad/temperatura)
 - `lib/core/db/db_stats.dart` -> sitios de buceo y estadísticas agregadas
 - `lib/core/db/db_writes.dart` -> escritura: editar y crear inmersiones
-- `lib/core/db/db_import.dart` -> importar inmersiones descargadas (encode perfil + dedupe)
+- `lib/core/db/db_import.dart` -> importar inmersiones descargadas (dedupe, Profile4 deco, gas)
+- `lib/core/db/db_encode.dart` -> encode de perfiles al formato DiveMate (Profile/Profile2/Profile4)
 - `lib/core/db/db_create.dart` -> crear una .ddb vacía nueva (esquema DiveMate + buceador)
 - `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
 - `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy
@@ -105,6 +106,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/dives_selection_bar.dart` -> barra de selección (stats/fusionar/borrar)
 - `lib/features/dives/widgets/dive_editor_form.dart` -> cuerpo común alta/edición (sitio/buddies/tags/tipo/campos/botellas)
 - `lib/features/dives/widgets/dive_type_picker_field.dart` -> campo + hoja selectora de tipo de buceo
+- `lib/features/dives/widgets/gas_segments.dart` -> cambios de gas (color/etiqueta) para la gráfica ampliada
 - `lib/features/dives/widgets/tags_picker_field.dart` -> campo de etiquetas elegidas (chips)
 - `lib/features/dives/screens/profile_fullscreen_screen.dart` -> perfil a pantalla completa (apaisado)
 - `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas

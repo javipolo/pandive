@@ -29,6 +29,7 @@ part 'db_merge.dart';
 part 'db_pending.dart';
 part 'db_dive_types.dart';
 part 'db_computers.dart';
+part 'db_encode.dart';
 
 class DivemateDb {
   final Database _db;

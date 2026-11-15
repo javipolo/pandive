@@ -5,7 +5,12 @@ class DiveSample {
   final int timeMs;
   final double depth;
   final double? temp;
-  const DiveSample(this.timeMs, this.depth, this.temp);
+  final int? ndl; // min sin deco
+  final int? tts; // min hasta superficie (en deco)
+  final double ceiling; // techo de deco (m), 0 si ninguno
+  final int? gasIndex; // mezcla activa (índice), null si desconocido
+  const DiveSample(this.timeMs, this.depth, this.temp,
+      {this.ndl, this.tts, this.ceiling = 0, this.gasIndex});
 }
 
 class GasMix {
@@ -43,7 +48,10 @@ class DownloadedDive {
         'avgdepth': avgDepth,
         'tempmin': tempMin,
         'gasmixes': [for (final g in gasmixes) {'o2': g.o2, 'he': g.he}],
-        'samples': [for (final s in samples) [s.timeMs, s.depth, s.temp]],
+        'samples': [
+          for (final s in samples)
+            [s.timeMs, s.depth, s.temp, s.ndl, s.tts, s.ceiling, s.gasIndex],
+        ],
       };
 
   factory DownloadedDive.fromJson(Map<String, dynamic> j) {
@@ -60,8 +68,15 @@ class DownloadedDive {
       ],
       samples: [
         for (final s in (j['samples'] as List? ?? []))
-          DiveSample((s[0] as num).toInt(), (s[1] as num).toDouble(),
-              s[2] == null ? null : (s[2] as num).toDouble()),
+          DiveSample(
+            (s[0] as num).toInt(),
+            (s[1] as num).toDouble(),
+            s[2] == null ? null : (s[2] as num).toDouble(),
+            ndl: s.length > 3 && s[3] != null ? (s[3] as num).toInt() : null,
+            tts: s.length > 4 && s[4] != null ? (s[4] as num).toInt() : null,
+            ceiling: s.length > 5 && s[5] != null ? (s[5] as num).toDouble() : 0,
+            gasIndex: s.length > 6 && s[6] != null ? (s[6] as num).toInt() : null,
+          ),
       ],
     );
   }

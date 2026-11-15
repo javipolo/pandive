@@ -4,22 +4,24 @@ library;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart_axes.dart';
+import 'package:pandive/features/dives/widgets/gas_segments.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class ProfileChart extends StatefulWidget {
   final DiveProfile profile;
   final bool compact; // oculta los títulos de los ejes (gráfica pequeña)
-  const ProfileChart({super.key, required this.profile, this.compact = false});
-
+  final List<GasChange> gasChanges; // marcas de cambio de gas (ampliada)
+  const ProfileChart(
+      {super.key,
+      required this.profile,
+      this.compact = false,
+      this.gasChanges = const []});
   @override
   State<ProfileChart> createState() => _ProfileChartState();
 }
-
 const _hidden = AxisTitles(sideTitles: SideTitles(showTitles: false));
-
 class _ProfileChartState extends State<ProfileChart> {
   int? _idx;
   @override
@@ -35,14 +37,12 @@ class _ProfileChartState extends State<ProfileChart> {
     final depthStep = niceStep(maxDepth, 5);
     final minY = -(((maxDepth / depthStep).ceil()) * depthStep).toDouble();
     const maxY = 0.0;
-
     final prefix = <double>[];
     var acc = 0.0;
     for (final d in depths) {
       acc += d;
       prefix.add(acc);
     }
-
     final depthSpots = [
       for (var i = 0; i < depths.length; i++) FlSpot(times[i], -depths[i]),
     ];
@@ -68,7 +68,6 @@ class _ProfileChartState extends State<ProfileChart> {
             FlSpot(times[i], tempY(profile.temps[i]!)),
       ];
     }
-
     return LineChart(LineChartData(
       minX: 0,
       maxX: maxTime,
@@ -90,6 +89,7 @@ class _ProfileChartState extends State<ProfileChart> {
         },
       ),
       extraLinesData: ExtraLinesData(verticalLines: [
+        ...gasVerticalLines(widget.gasChanges),
         if (_idx != null && _idx! < times.length)
           VerticalLine(x: times[_idx!], color: cs.primary, strokeWidth: 2),
       ]),

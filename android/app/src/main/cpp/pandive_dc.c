@@ -153,18 +153,27 @@ static dc_status_t io_write(void *ud, const void *data, size_t size, size_t *act
 typedef struct {
     strbuf_t *sb;
     int first;
-    int haveTime, haveDepth, haveTemp;
+    int haveTime, haveDepth, haveTemp, haveDeco;
     unsigned int timeMs;
-    double depth, temp;
+    double depth, temp, ceiling;
+    int ndlMin, ttsMin, gas; // gas se arrastra entre muestras; -1 = desconocido
 } sample_ctx_t;
 
+// Muestra: [timeMs, depth, temp|null, ndl|null, tts|null, ceiling, gas|null]
 static void flush_sample(sample_ctx_t *c) {
     if (!c->haveTime) return;
     if (!c->first) sb_puts(c->sb, ",");
     c->first = 0;
     sb_fmt(c->sb, "[%u,%.2f,", c->timeMs, c->haveDepth ? c->depth : 0.0);
-    if (c->haveTemp) sb_fmt(c->sb, "%.1f]", c->temp); else sb_puts(c->sb, "null]");
-    c->haveDepth = c->haveTemp = 0;
+    if (c->haveTemp) sb_fmt(c->sb, "%.1f,", c->temp); else sb_puts(c->sb, "null,");
+    if (c->haveDeco && c->ceiling > 0)
+        sb_fmt(c->sb, "null,%d,%.1f,", c->ttsMin, c->ceiling);
+    else if (c->haveDeco)
+        sb_fmt(c->sb, "%d,null,0,", c->ndlMin);
+    else
+        sb_puts(c->sb, "null,null,0,");
+    if (c->gas >= 0) sb_fmt(c->sb, "%d]", c->gas); else sb_puts(c->sb, "null]");
+    c->haveDepth = c->haveTemp = c->haveDeco = 0;
 }
 
 static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, void *ud) {
@@ -176,6 +185,19 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
         c->depth = value->depth; c->haveDepth = 1;
     } else if (type == DC_SAMPLE_TEMPERATURE) {
         c->temp = value->temperature; c->haveTemp = 1;
+    } else if (type == DC_SAMPLE_DECO) {
+        c->haveDeco = 1;
+        if (value->deco.type == DC_DECO_DECOSTOP) {
+            c->ceiling = value->deco.depth;
+            c->ttsMin = (int) ((value->deco.tts + 30) / 60);
+            c->ndlMin = 0;
+        } else { // NDL (y safety/deep stop: sin techo obligatorio)
+            c->ceiling = 0;
+            c->ndlMin = (int) ((value->deco.time + 30) / 60);
+            c->ttsMin = 0;
+        }
+    } else if (type == DC_SAMPLE_GASMIX) {
+        c->gas = (int) value->gasmix;
     }
 }
 
@@ -234,7 +256,7 @@ static int dive_cb(const unsigned char *data, unsigned int size,
     }
 
     sb_puts(dc->sb, ",\"samples\":[");
-    sample_ctx_t sc = { .sb = dc->sb, .first = 1 };
+    sample_ctx_t sc = { .sb = dc->sb, .first = 1, .gas = -1 };
     dc_parser_samples_foreach(parser, sample_cb, &sc);
     flush_sample(&sc);
     sb_puts(dc->sb, "]}");

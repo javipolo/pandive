@@ -40,6 +40,9 @@ void _ensureSyncTable(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveComputer '
       '(Address TEXT PRIMARY KEY, Name TEXT, Vendor TEXT, Product TEXT, '
       'Updated TEXT)');
+  // Índice de gas por muestra (JSON array) para descargas con cambios de gas.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveGas '
+      '(DiveId INTEGER PRIMARY KEY, Json TEXT)');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.
@@ -86,6 +89,7 @@ extension DivemateDbImport on DivemateDb {
     final date = dt != null ? '${dt.year}-${p(dt.month)}-${p(dt.day)}' : null;
     final time = dt != null ? '${p(dt.hour)}:${p(dt.minute)}:00' : null;
     final (interval, prof, prof2) = _encodeProfile(d.samples);
+    final prof4 = _encodeProfile4(d.samples);
     final o2 = d.gasmixes.isNotEmpty ? d.gasmixes.first.o2 * 100 : null;
     // Prof. media: la del aparato o, si falta, calculada de las muestras.
     var avgDepth = d.avgDepth;
@@ -103,12 +107,13 @@ extension DivemateDbImport on DivemateDb {
     _db.execute(
       'INSERT INTO Logbook (Number, Divedate, Entrytime, DiverID, UUID, Updated, '
       'Status, Depth, DepthAvg, Divetime, Watertemp, PandiveAvgTemp, Computer, '
-      'O2, ProfileInt, Profile, Profile2) VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?)',
+      'O2, ProfileInt, Profile, Profile2, Profile4) '
+      'VALUES (?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?,?)',
       [
         nextDiveNumber(), date, time, owner, _uuid(), now,
         d.maxDepth, avgDepth,
         d.divetimeSec != null ? d.divetimeSec! / 60.0 : null,
-        minTemp, avgTemp, computer, o2, interval, prof, prof2,
+        minTemp, avgTemp, computer, o2, interval, prof, prof2, prof4,
       ],
     );
     final id = _db.lastInsertRowId;
@@ -121,28 +126,11 @@ extension DivemateDbImport on DivemateDb {
         [id, i, i, g.o2 * 100, g.he * 100, _uuid(), now],
       );
     }
+    // Gas por muestra (si el ordenador registró cambios de mezcla).
+    if (d.samples.any((s) => s.gasIndex != null)) {
+      _db.execute('INSERT OR REPLACE INTO PandiveGas (DiveId, Json) VALUES (?,?)',
+          [id, jsonEncode([for (final s in d.samples) s.gasIndex])]);
+    }
     return true;
   }
-}
-
-/// Codifica las muestras al formato DiveMate: Profile (12 chars/muestra, 4
-/// primeros = decímetros), Profile2 (11 chars, 4 primeros = centi-°C), e
-/// intervalo en segundos. Asume muestreo uniforme (como el ordenador).
-(int, String?, String?) _encodeProfile(List<DiveSample> samples) {
-  if (samples.length < 2) return (0, null, null);
-  final totalMs = samples.last.timeMs - samples.first.timeMs;
-  var interval = (totalMs / (samples.length - 1) / 1000).round();
-  if (interval <= 0) interval = 10;
-
-  final prof = StringBuffer();
-  final prof2 = StringBuffer();
-  for (final s in samples) {
-    final dm = (s.depth * 10).round().clamp(0, 9999);
-    prof.write(dm.toString().padLeft(4, '0'));
-    prof.write('00000000'); // 12 chars por registro
-    final centi = s.temp != null ? (s.temp! * 100).round().clamp(0, 9999) : 0;
-    prof2.write(centi.toString().padLeft(4, '0'));
-    prof2.write('0000000'); // 11 chars por registro
-  }
-  return (interval, prof.toString(), prof2.toString());
 }

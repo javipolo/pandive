@@ -12,6 +12,7 @@ import 'package:pandive/core/widgets/profile_chart.dart';
 import 'package:pandive/features/dives/screens/profile_fullscreen_screen.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
+import 'package:pandive/features/dives/widgets/gas_segments.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DiveDetailBody extends StatelessWidget {
@@ -112,6 +113,8 @@ class DiveDetailBody extends StatelessWidget {
   }
 
   Widget _profile(BuildContext context, AppLocalizations t, DiveProfile p) {
+    final gasChanges = buildGasChanges(
+        db.gasPerSample(dive.id), p.timesMinutes, db.cylinders(dive.id));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -125,7 +128,9 @@ class DiveDetailBody extends StatelessWidget {
               tooltip: t.fullscreen,
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => ProfileFullscreenScreen(
-                    profile: p, title: dive.place ?? t.dive),
+                    profile: p,
+                    title: dive.place ?? t.dive,
+                    gasChanges: gasChanges),
               )),
             ),
           ),
