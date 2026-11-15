@@ -35,8 +35,8 @@ apk: ## Genera APK de depuración (sideload)
 	$(FLUTTER) build apk --debug $(DART_DEFINES)
 
 .PHONY: apk-release
-apk-release: ## Genera APK de release (requiere keystore)
-	$(FLUTTER) build apk --release $(DART_DEFINES)
+apk-release: ## Genera APK de release arm64 (sideload)
+	$(FLUTTER) build apk --release --target-platform android-arm64 $(DART_DEFINES)
 
 APK := build/app/outputs/flutter-apk/app-debug.apk
 
