@@ -41,11 +41,19 @@ Future<void> shareProfileImage(
   );
   overlay.insert(entry);
   try {
-    // Esperar a que la tarjeta se pinte antes de capturarla.
-    await WidgetsBinding.instance.endOfFrame;
-    await Future<void>.delayed(const Duration(milliseconds: 80));
-    final boundary =
-        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    // Esperar a que la tarjeta se pinte del todo antes de capturarla (si hay
+    // otra gráfica grande visible, el primer frame no basta).
+    RenderRepaintBoundary? boundary;
+    for (var i = 0; i < 12; i++) {
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      final ro = key.currentContext?.findRenderObject();
+      if (ro is RenderRepaintBoundary) {
+        boundary = ro;
+        if (!ro.debugNeedsPaint) break;
+      }
+    }
+    if (boundary == null) return;
     final image = await boundary.toImage(pixelRatio: 2);
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     if (data == null) return;

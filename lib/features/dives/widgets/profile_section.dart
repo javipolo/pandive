@@ -37,7 +37,7 @@ class ProfileSection extends StatelessWidget {
             top: 0,
             child: Row(children: [
               IconButton.filledTonal(
-                icon: const Icon(Icons.ios_share),
+                icon: const Icon(Icons.share),
                 tooltip: t.share,
                 onPressed: () => shareProfileImage(context,
                     profile: profile, title: title, gasChanges: gasChanges),
