@@ -80,7 +80,6 @@ flutter:
   generate: true   # genera AppLocalizations desde lib/l10n/*.arb
   assets:
     - assets/logo/pandive_logo.png
-    - assets/logo/pandive_new_logo.png
 
 # Icono de la app (oso panda buceando). Genera con:
 #   dart run flutter_launcher_icons
