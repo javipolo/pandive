@@ -35,14 +35,15 @@ class HomeDrawer extends StatelessWidget {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(color: cs.primaryContainer),
-              child: Row(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.asset('assets/logo/pandive_new_logo.png',
-                        height: 88, width: 88, fit: BoxFit.cover),
+                        height: 84, width: 84, fit: BoxFit.cover),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(height: 8),
                   Text('Pandive',
                       style: Theme.of(context).textTheme.headlineSmall),
                 ],
