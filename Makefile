@@ -69,8 +69,18 @@ devices: ## Lista devices/emuladores detectados
 	$(FLUTTER) devices
 
 .PHONY: clean
-clean: ## Limpia artefactos de build de Flutter
+clean: ## Limpia artefactos de build (Flutter + Gradle), conserva los .so nativos
 	$(FLUTTER) clean
+	@rm -rf .dart_tool build \
+		android/.gradle android/build android/app/build \
+		android/app/.cxx
+	@echo "Limpio (jniLibs nativos conservados; usa 'make distclean' para borrarlos)"
+
+.PHONY: distclean
+distclean: clean ## clean + borra libdivecomputer compilado (.so + headers); fuerza re-cross-compile
+	@rm -rf android/app/src/main/jniLibs \
+		android/app/src/main/cpp/include/libdivecomputer
+	@echo "Artefactos nativos borrados: reconstruye con 'make dc-libs'"
 
 .PHONY: ldc-android
 ldc-android: ## Cross-compila libdivecomputer para Android (NDK)
