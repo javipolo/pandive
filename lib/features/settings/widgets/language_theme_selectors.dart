@@ -26,6 +26,9 @@ class LanguageThemeSelectors extends StatelessWidget {
               (null, t.languageSystem),
               ('es', t.languageSpanish),
               ('en', t.languageEnglish),
+              ('fr', t.languageFrench),
+              ('ca', t.languageCatalan),
+              ('eu', t.languageBasque),
             ])
               RadioListTile<String?>(value: o.$1, title: Text(o.$2)),
           ]),
