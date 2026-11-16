@@ -37,6 +37,24 @@ extension DivemateDbQueries on DivemateDb {
     return rows.map(_diveFromRow).toList();
   }
 
+  /// Inmersiones borradas (Status = 2) del owner, más recientes primero.
+  /// Para la papelera / undelete.
+  List<Dive> listDeletedDives() {
+    final owner = ownerId;
+    final where = StringBuffer('Status = 2');
+    final params = <Object?>[];
+    if (owner != null) {
+      where.write(' AND DiverID = ?');
+      params.add(owner);
+    }
+    final rows = _db.select(
+      'SELECT $_diveColumns FROM Logbook WHERE $where '
+      'ORDER BY Divedate DESC, Entrytime DESC, Number DESC',
+      params,
+    );
+    return rows.map(_diveFromRow).toList();
+  }
+
   /// Una inmersión por su ID.
   Dive? getDive(int id) {
     final rows = _db.select(

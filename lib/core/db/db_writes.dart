@@ -20,6 +20,14 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
+  /// Restaura inmersiones borradas (Status=2 -> 1). Inverso de deleteDives.
+  void restoreDives(List<int> ids) {
+    final now = _nowStamp();
+    for (final id in ids) {
+      _db.execute('UPDATE Logbook SET Status=1, Updated=? WHERE ID=?', [now, id]);
+    }
+  }
+
   /// Crea una inmersión nueva (alta manual). Devuelve el ID generado. Genera
   /// Number (si no se pasa), UUID v4, Updated y Status=1, con DiverID del owner.
   /// Las botellas se añaden aparte con setDiveTanks.

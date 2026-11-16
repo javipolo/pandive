@@ -6,13 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
+import 'package:pandive/features/settings/screens/trash_screen.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class ToolsScreen extends StatelessWidget {
   final Settings settings;
   final DivemateDb db;
-  const ToolsScreen({super.key, required this.settings, required this.db});
+  final VoidCallback onReloadDb;
+  const ToolsScreen({
+    super.key,
+    required this.settings,
+    required this.db,
+    required this.onReloadDb,
+  });
 
   void _importHashtags(BuildContext context) {
     final n = db.importHashtagsFromComments();
@@ -41,6 +48,13 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.ios_share),
             title: Text(t.exportSubsurface),
             onTap: () => exportSubsurface(db),
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_outline),
+            title: Text(t.trash),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) =>
+                    TrashScreen(db: db, onReloadDb: onReloadDb))),
           ),
           ListTile(
             leading: const Icon(Icons.bug_report_outlined),
