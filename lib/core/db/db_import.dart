@@ -71,15 +71,17 @@ extension DivemateDbImport on DivemateDb {
     );
   }
 
-  /// ¿Ya existe una inmersión del owner en esa fecha/hora? (dedupe simple).
+  /// ¿Ya existe una inmersión (no borrada) del owner en esa fecha/hora? (dedupe).
+  /// Ignora las borradas (Status=2) para que un buceo borrado pueda re-descargarse.
   bool hasDiveAt(DateTime dt) {
     final owner = ownerId;
     String p(int v) => v.toString().padLeft(2, '0');
     final date = '${dt.year}-${p(dt.month)}-${p(dt.day)}';
     final time = '${p(dt.hour)}:${p(dt.minute)}:00';
+    final live = '(Status IS NULL OR Status != 2)';
     final sql = owner != null
-        ? 'SELECT 1 FROM Logbook WHERE DiverID=? AND Divedate=? AND Entrytime=? LIMIT 1'
-        : 'SELECT 1 FROM Logbook WHERE Divedate=? AND Entrytime=? LIMIT 1';
+        ? 'SELECT 1 FROM Logbook WHERE DiverID=? AND Divedate=? AND Entrytime=? AND $live LIMIT 1'
+        : 'SELECT 1 FROM Logbook WHERE Divedate=? AND Entrytime=? AND $live LIMIT 1';
     final params = owner != null ? [owner, date, time] : [date, time];
     return _db.select(sql, params).isNotEmpty;
   }
