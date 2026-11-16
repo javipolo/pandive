@@ -80,7 +80,7 @@ class _DivesTabState extends State<DivesTab> {
 
   Future<void> _deleteSel() async {
     final t = AppLocalizations.of(context);
-    if (!await confirmDialog(context, t.deleteConfirm(_sel.length),
+    if (!await confirmDialog(context, t.deleteDivesConfirm(_sel.length),
         confirmLabel: t.delete)) return;
     widget.db.deleteDives([for (final i in _sel) _dives[i].id]);
     _exitSel();
