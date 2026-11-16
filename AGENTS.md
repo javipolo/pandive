@@ -20,8 +20,9 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 - **Mantenimiento del mapa**: cada vez que crees, muevas o borres un fichero en
   `lib/`, actualiza `PROJECT_MAP.md` en el mismo turno.
 - **Control de comandos**: NO ejecutes `flutter build` ni lances emuladores
-  automáticamente. Solo `flutter analyze` (o `make analyze`) tras un cambio
-  grande para verificar. El usuario compila y prueba (sideload del APK).
+  automáticamente, EXCEPTO el build obligatorio tras cada commit (`make
+  apk-release`, ver Workflow). Fuera de ese caso, solo `flutter analyze` (o
+  `make analyze`) tras un cambio grande para verificar.
 - **i18n obligatorio**: TODO texto visible al usuario va traducido. Nunca
   hardcodees cadenas en la UI; usa claves de `AppLocalizations`
   (`final t = AppLocalizations.of(context); ... t.miClave`). Al añadir cualquier
@@ -47,6 +48,9 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 - Commit messages: short imperative subject (`feat:`, `fix:`, `docs:`, `chore:`),
   body only if it adds something. End with the Co-Authored-By trailer the harness
   specifies.
+- **Build after every commit.** Right after committing, run `make apk-release`
+  (arm64 release APK for sideload) so the user finds it ready. This overrides the
+  "no `flutter build`" rule below, but only for the post-commit build.
 
 ## Commands (see `Makefile`)
 
