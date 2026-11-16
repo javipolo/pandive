@@ -38,10 +38,12 @@ class HomeDrawer extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset('assets/logo/pandive_new_logo.png',
-                        height: 84, width: 84, fit: BoxFit.cover),
+                  ClipOval(
+                    child: Transform.scale(
+                      scale: 1.2, // recorta el marco negro fuera del círculo
+                      child: Image.asset('assets/logo/pandive_new_logo.png',
+                          height: 88, width: 88, fit: BoxFit.cover),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text('Pandive',
