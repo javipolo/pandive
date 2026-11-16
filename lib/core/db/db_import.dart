@@ -47,6 +47,9 @@ void _ensureSyncTable(Database db) {
   // Índice de gas por muestra (JSON array) para descargas con cambios de gas.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveGas '
       '(DiveId INTEGER PRIMARY KEY, Json TEXT)');
+  // Parámetros extra por muestra (ppo2/cns/presión/rbt) como JSON de arrays.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveSampleExtra '
+      '(DiveId INTEGER PRIMARY KEY, Json TEXT)');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.
@@ -138,6 +141,7 @@ extension DivemateDbImport on DivemateDb {
       _db.execute('INSERT OR REPLACE INTO PandiveGas (DiveId, Json) VALUES (?,?)',
           [id, jsonEncode([for (final s in d.samples) s.gasIndex])]);
     }
+    storeSampleExtra(id, d.samples);
     return true;
   }
 }

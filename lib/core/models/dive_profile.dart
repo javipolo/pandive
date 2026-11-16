@@ -9,6 +9,10 @@ class DiveProfile {
   final List<double> ceiling; // techo de deco (m), 0 si no hay (alineado)
   final List<int?> ndl; // min sin deco (null en deco)
   final List<int?> tts; // min hasta superficie (null fuera de deco)
+  final List<double?> ppo2; // bar
+  final List<double?> cns; // %
+  final List<double?> pressure; // presión botella (bar)
+  final List<int?> rbt; // min
 
   const DiveProfile({
     required this.intervalSeconds,
@@ -18,6 +22,10 @@ class DiveProfile {
     this.ceiling = const [],
     this.ndl = const [],
     this.tts = const [],
+    this.ppo2 = const [],
+    this.cns = const [],
+    this.pressure = const [],
+    this.rbt = const [],
   });
 
   bool get hasTemp => temps.any((t) => t != null);

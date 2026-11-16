@@ -57,7 +57,6 @@ class _ProfileChartState extends State<ProfileChart> {
         tLo = ((tHi + tLo) / 2 - 2.5).floorToDouble();
         tHi = tLo + 5;
       }
-      // Margen de un "step" arriba y abajo para que la línea no toque bordes.
       final pad = ((tHi - tLo) / 5).ceil().toDouble();
       tLo -= pad;
       tHi += pad;
@@ -77,7 +76,8 @@ class _ProfileChartState extends State<ProfileChart> {
       lineTouchData: LineTouchData(
         handleBuiltInTouches: true,
         touchTooltipData: profileTooltip(times, depths, prefix, profile.temps,
-            ceiling: profile.ceiling, ndl: profile.ndl, tts: profile.tts),
+            ceiling: profile.ceiling, ndl: profile.ndl, tts: profile.tts,
+            extra: profile),
         touchCallback: (event, resp) {
           final spots = resp?.lineBarSpots;
           if (!event.isInterestedForInteractions || spots == null || spots.isEmpty) {

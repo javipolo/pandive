@@ -154,12 +154,17 @@ typedef struct {
     strbuf_t *sb;
     int first;
     int haveTime, haveDepth, haveTemp, haveDeco;
+    int havePpo2, haveCns, havePres, haveRbt;
     unsigned int timeMs;
-    double depth, temp, ceiling;
-    int ndlMin, ttsMin, gas; // gas se arrastra entre muestras; -1 = desconocido
+    double depth, temp, ceiling, ppo2, cns, pressure;
+    int ndlMin, ttsMin, gas, rbt; // gas se arrastra; -1 = desconocido
 } sample_ctx_t;
 
-// Muestra: [timeMs, depth, temp|null, ndl|null, tts|null, ceiling, gas|null]
+// Muestra: [t, depth, temp, ndl, tts, ceiling, gas, ppo2, cns, pressure, rbt]
+static void _n(sample_ctx_t *c, int have, double v) {
+    if (have) sb_fmt(c->sb, "%.2f,", v); else sb_puts(c->sb, "null,");
+}
+
 static void flush_sample(sample_ctx_t *c) {
     if (!c->haveTime) return;
     if (!c->first) sb_puts(c->sb, ",");
@@ -172,8 +177,13 @@ static void flush_sample(sample_ctx_t *c) {
         sb_fmt(c->sb, "%d,null,0,", c->ndlMin);
     else
         sb_puts(c->sb, "null,null,0,");
-    if (c->gas >= 0) sb_fmt(c->sb, "%d]", c->gas); else sb_puts(c->sb, "null]");
+    if (c->gas >= 0) sb_fmt(c->sb, "%d,", c->gas); else sb_puts(c->sb, "null,");
+    _n(c, c->havePpo2, c->ppo2);
+    _n(c, c->haveCns, c->cns);
+    _n(c, c->havePres, c->pressure);
+    if (c->haveRbt) sb_fmt(c->sb, "%d]", c->rbt); else sb_puts(c->sb, "null]");
     c->haveDepth = c->haveTemp = c->haveDeco = 0;
+    c->havePpo2 = c->haveCns = c->havePres = c->haveRbt = 0;
 }
 
 static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, void *ud) {
@@ -185,6 +195,14 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
         c->depth = value->depth; c->haveDepth = 1;
     } else if (type == DC_SAMPLE_TEMPERATURE) {
         c->temp = value->temperature; c->haveTemp = 1;
+    } else if (type == DC_SAMPLE_PPO2) {
+        c->ppo2 = value->ppo2.value; c->havePpo2 = 1;
+    } else if (type == DC_SAMPLE_CNS) {
+        c->cns = value->cns * 100.0; c->haveCns = 1; // fracción -> %
+    } else if (type == DC_SAMPLE_PRESSURE) {
+        c->pressure = value->pressure.value; c->havePres = 1;
+    } else if (type == DC_SAMPLE_RBT) {
+        c->rbt = (int) value->rbt; c->haveRbt = 1;
     } else if (type == DC_SAMPLE_DECO) {
         c->haveDeco = 1;
         if (value->deco.type == DC_DECO_DECOSTOP) {

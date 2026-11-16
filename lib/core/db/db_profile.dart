@@ -63,6 +63,7 @@ extension DivemateDbProfile on DivemateDb {
       }
     }
 
+    final ex = sampleExtra(logId, depths.length);
     return DiveProfile(
       intervalSeconds: interval,
       timesMinutes: times,
@@ -71,6 +72,10 @@ extension DivemateDbProfile on DivemateDb {
       ceiling: ceiling,
       ndl: ndl,
       tts: tts,
+      ppo2: ex.ppo2,
+      cns: ex.cns,
+      pressure: ex.pressure,
+      rbt: ex.rbt,
     );
   }
 
