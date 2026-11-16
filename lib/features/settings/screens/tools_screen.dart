@@ -58,7 +58,8 @@ class ToolsScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.bug_report_outlined),
-            title: const Text('Debug: punto de sync'),
+            title: Text(t.debugSyncPoint),
+            subtitle: Text(t.debugSyncPointHint),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => DebugSyncScreen(db: db))),
           ),

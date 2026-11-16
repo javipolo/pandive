@@ -20,6 +20,8 @@
   "trash": "Trash",
   "trashEmpty": "No deleted dives",
   "diveRestored": "Dive restored",
+  "debugSyncPoint": "DEBUG: Reset sync point to a dive",
+  "debugSyncPointHint": "Rewinds the computer so dives after it re-download",
   "restoreConfirm": "Restore {name}? It overwrites your current logbook.",
   "@restoreConfirm": { "placeholders": { "name": {} } },
   "latest": "Latest",

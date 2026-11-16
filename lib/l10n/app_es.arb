@@ -20,6 +20,8 @@
   "trash": "Papelera",
   "trashEmpty": "No hay inmersiones borradas",
   "diveRestored": "Inmersión restaurada",
+  "debugSyncPoint": "DEBUG: Reiniciar punto de sync a un buceo",
+  "debugSyncPointHint": "Rebobina el ordenador para re-descargar los buceos posteriores",
   "restoreConfirm": "¿Restaurar {name}? Sobrescribe tu logbook actual.",
   "latest": "Última",
   "database": "Base de datos",

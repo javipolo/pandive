@@ -39,10 +39,11 @@ class _DebugSyncScreenState extends State<DebugSyncScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final fmt =
         DateFormat('dd/MM/yyyy', Localizations.localeOf(context).languageCode);
     return Scaffold(
-      appBar: AppBar(title: const Text('Debug sync')),
+      appBar: AppBar(title: Text(t.debugSyncPoint)),
       body: _device == null
           ? const Center(child: Padding(
               padding: EdgeInsets.all(24),
