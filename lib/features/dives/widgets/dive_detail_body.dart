@@ -8,11 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/sac.dart';
-import 'package:pandive/core/widgets/profile_chart.dart';
-import 'package:pandive/features/dives/screens/profile_fullscreen_screen.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
-import 'package:pandive/features/dives/widgets/gas_segments.dart';
+import 'package:pandive/features/dives/widgets/profile_section.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DiveDetailBody extends StatelessWidget {
@@ -71,7 +69,8 @@ class DiveDetailBody extends StatelessWidget {
         sectionLine(),
         LabeledValue(t.fieldBuddy, buddies),
         sectionLine(),
-        if (profile != null && !profile.isEmpty) _profile(context, t, profile),
+        if (profile != null && !profile.isEmpty)
+          ProfileSection(db: db, dive: dive, profile: profile),
         twoCol(
             LabeledValue(t.diveType, dive.diveType),
             LabeledValue(t.statDuration,
@@ -108,34 +107,6 @@ class DiveDetailBody extends StatelessWidget {
           sectionLine(),
           LabeledValue(t.notes, dive.comments),
         ],
-      ],
-    );
-  }
-
-  Widget _profile(BuildContext context, AppLocalizations t, DiveProfile p) {
-    final gasChanges = buildGasChanges(
-        db.gasPerSample(dive.id), p.timesMinutes, db.cylinders(dive.id));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(children: [
-          SizedBox(height: 240, child: ProfileChart(profile: p, compact: true)),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: IconButton.filledTonal(
-              icon: const Icon(Icons.fullscreen),
-              tooltip: t.fullscreen,
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => ProfileFullscreenScreen(
-                    profile: p,
-                    title: dive.place ?? t.dive,
-                    gasChanges: gasChanges),
-              )),
-            ),
-          ),
-        ]),
-        const SizedBox(height: 8),
       ],
     );
   }
