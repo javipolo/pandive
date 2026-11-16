@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/screens/backup_screen.dart';
+import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';
 import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
@@ -103,6 +104,12 @@ class SettingsScreen extends StatelessWidget {
                 leading: const Icon(Icons.ios_share),
                 title: Text(t.exportSubsurface),
                 onTap: () => exportSubsurface(db),
+              ),
+              ListTile(
+                leading: const Icon(Icons.bug_report_outlined),
+                title: const Text('Debug: punto de sync'),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => DebugSyncScreen(db: db))),
               ),
               const Divider(),
               _header(context, t.backup),

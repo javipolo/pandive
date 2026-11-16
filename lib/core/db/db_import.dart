@@ -36,6 +36,10 @@ void _ensureSyncTable(Database db) {
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveAvgTemp REAL');
   } catch (_) {/* ya existe */}
+  // Fingerprint del ordenador por buceo (para fijar puntos de sync / debug).
+  try {
+    db.execute('ALTER TABLE Logbook ADD COLUMN PandiveFp TEXT');
+  } catch (_) {/* ya existe */}
   // Ordenadores de buceo guardados (reconexión por MAC sin reescanear).
   db.execute('CREATE TABLE IF NOT EXISTS PandiveComputer '
       '(Address TEXT PRIMARY KEY, Name TEXT, Vendor TEXT, Product TEXT, '
@@ -117,6 +121,9 @@ extension DivemateDbImport on DivemateDb {
       ],
     );
     final id = _db.lastInsertRowId;
+    if (d.fingerprint.isNotEmpty) {
+      _db.execute('UPDATE Logbook SET PandiveFp=? WHERE ID=?', [d.fingerprint, id]);
+    }
 
     for (var i = 0; i < d.gasmixes.length; i++) {
       final g = d.gasmixes[i];

@@ -30,6 +30,7 @@ part 'db_pending.dart';
 part 'db_dive_types.dart';
 part 'db_computers.dart';
 part 'db_encode.dart';
+part 'db_sync.dart';
 
 class DivemateDb {
   final Database _db;

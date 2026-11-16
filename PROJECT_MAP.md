@@ -26,6 +26,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_writes.dart` -> escritura: editar y crear inmersiones
 - `lib/core/db/db_import.dart` -> importar inmersiones descargadas (dedupe, Profile4 deco, gas)
 - `lib/core/db/db_encode.dart` -> encode de perfiles al formato DiveMate (Profile/Profile2/Profile4)
+- `lib/core/db/db_sync.dart` -> fingerprint por buceo + punto de sync (debug)
 - `lib/core/db/db_create.dart` -> crear una .ddb vacía nueva (esquema DiveMate + buceador)
 - `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
 - `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy
@@ -82,6 +83,7 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, backup, herramientas, DB
+- `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
 - `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb) y Subsurface (.ssrf)
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
