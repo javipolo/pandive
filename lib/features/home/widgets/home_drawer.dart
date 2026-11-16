@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/screens/backup_screen.dart';
+import 'package:pandive/features/settings/screens/about_screen.dart';
 import 'package:pandive/features/settings/screens/tools_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -50,6 +51,7 @@ class HomeDrawer extends StatelessWidget {
                     settings: settings, db: db, onReloadDb: onReloadDb)),
             _push(context, Icons.cloud_upload_outlined, t.backup,
                 (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
+            _push(context, Icons.info_outline, t.about, (_) => const AboutScreen()),
           ],
         ),
       ),
