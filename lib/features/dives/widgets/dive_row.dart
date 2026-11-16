@@ -52,6 +52,11 @@ class DiveRow extends StatelessWidget {
       onLongPress: onLongPress,
       child: Container(
         color: selected ? cs.primaryContainer.withValues(alpha: 0.5) : null,
+        foregroundDecoration: BoxDecoration(
+          border: Border(
+              bottom: BorderSide(
+                  color: cs.outlineVariant.withValues(alpha: 0.5), width: 1)),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [

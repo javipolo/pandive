@@ -3,7 +3,6 @@
 library;
 
 import 'package:flutter/material.dart';
-
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/text/collate.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -118,26 +117,34 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
           collapsed ? _collapsed.remove(country) : _collapsed.add(country)),
     );
   }
-
   Widget _tile(BuildContext context, AppLocalizations t, DiveSite s) {
     final sub = [
       if (s.region != null) s.region!,
       t.diveCountLabel(s.diveCount),
     ].join(' · ');
     final nm = (s.name ?? '').trim();
-    return ListTile(
-      leading: CircleAvatar(
-          child: Text(nm.isEmpty ? '?' : nm.substring(0, 1).toUpperCase())),
-      title: Text(s.name ?? t.site,
-          maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(sub),
-      trailing: widget.onInfo == null
-          ? null
-          : IconButton(
-              icon: const Icon(Icons.visibility_outlined),
-              tooltip: t.site,
-              onPressed: () => widget.onInfo!(s)),
-      onTap: () => widget.onTap(s),
+    final cs = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      position: DecorationPosition.foreground,
+      decoration: BoxDecoration(
+        border: Border(
+            bottom: BorderSide(
+                color: cs.outlineVariant.withValues(alpha: 0.5), width: 1)),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+            child: Text(nm.isEmpty ? '?' : nm.substring(0, 1).toUpperCase())),
+        title: Text(s.name ?? t.site,
+            maxLines: 1, overflow: TextOverflow.ellipsis),
+        subtitle: Text(sub),
+        trailing: widget.onInfo == null
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.visibility_outlined),
+                tooltip: t.site,
+                onPressed: () => widget.onInfo!(s)),
+        onTap: () => widget.onTap(s),
+      ),
     );
   }
 }
