@@ -9,7 +9,8 @@ con `screens/` y, si hace falta, `widgets/`).
 ## Core / Config
 
 - `lib/main.dart` -> arranque: init locale, carga settings, lanza la app
-- `lib/core/app.dart` -> MaterialApp, escala de texto global, AppRoot (elige pantalla)
+- `lib/core/app.dart` -> MaterialApp, escala de texto global
+- `lib/core/app_root.dart` -> AppRoot: elige pantalla; crea DB vacía en el primer arranque, o pantalla de carga (Cambiar DB / error)
 - `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)
 - `lib/core/settings/settings.dart` -> preferencias: escala de texto, ruta DB, idioma, tema, horario nocturno, hueco fusión
 - `lib/l10n/app_en.arb` / `app_es.arb` -> traducciones (plantilla EN + ES); `AppLocalizations` se genera con `flutter gen-l10n`
