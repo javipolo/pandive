@@ -26,7 +26,7 @@ class RestoreList extends StatefulWidget {
 }
 
 class _RestoreListState extends State<RestoreList> {
-  late Future<List<BackupEntry>> _future = widget.svc.listBackups();
+  late final Future<List<BackupEntry>> _future = widget.svc.listBackups();
 
   Future<void> _restore(BackupEntry e) async {
     final t = AppLocalizations.of(context);
@@ -71,8 +71,9 @@ class _RestoreListState extends State<RestoreList> {
               return ListTile(
                 leading: Icon(e.isLatest ? Icons.star : Icons.history),
                 title: Text(e.isLatest ? t.latest : e.name),
-                subtitle:
-                    e.modified == null ? null : Text(fmt.format(e.modified!)),
+                subtitle: e.modified == null
+                    ? null
+                    : Text(fmt.format(e.modified!.toLocal())),
                 onTap: () => _restore(e),
               );
             },
