@@ -39,7 +39,7 @@ class _RestoreListState extends State<RestoreList> {
     final ok = await widget.svc.restore(e.id, widget.settings);
     if (!mounted) return;
     messenger.showSnackBar(
-        SnackBar(content: Text(ok ? t.backupDone : t.backupFailed)));
+        SnackBar(content: Text(ok ? t.restoreDone : t.backupFailed)));
     if (ok) {
       widget.onReloadDb();
       nav.popUntil((r) => r.isFirst); // volver al inicio con la DB recargada

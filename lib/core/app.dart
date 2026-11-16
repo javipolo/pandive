@@ -119,6 +119,7 @@ class _AppRootState extends State<AppRoot> {
       );
     }
     return HomeScreen(
+      key: ValueKey(db), // nueva DB (reload/restore) -> reconstruye pestañas
       db: db,
       settings: widget.settings,
       onChangeDb: () async {
