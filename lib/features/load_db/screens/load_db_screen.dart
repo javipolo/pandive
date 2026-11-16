@@ -99,7 +99,7 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(28),
-                child: Image.asset('assets/logo/pandive_logo.png',
+                child: Image.asset('assets/logo/pandive_splash.png',
                     width: 128, height: 128),
               ),
               const SizedBox(height: 16),
