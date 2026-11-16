@@ -40,9 +40,9 @@ class HomeDrawer extends StatelessWidget {
                 children: [
                   ClipOval(
                     child: Transform.scale(
-                      scale: 1.2, // recorta el marco negro fuera del círculo
+                      scale: 1.08, // recorta el marco negro fuera del óvalo
                       child: Image.asset('assets/logo/pandive_new_logo.png',
-                          height: 88, width: 88, fit: BoxFit.cover),
+                          height: 88, width: 116, fit: BoxFit.cover),
                     ),
                   ),
                   const SizedBox(height: 8),
