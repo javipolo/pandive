@@ -70,7 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final titles = [
       t.navDives, t.navSites, t.buddies, t.tags, t.equipment, t.navStats];
     return Scaffold(
-      drawer: HomeDrawer(selectedIndex: _index, onSelected: _go),
+      drawer: HomeDrawer(
+          selectedIndex: _index, onSelected: _go, db: widget.db,
+          settings: widget.settings, onReloadDb: widget.onReloadDb),
       appBar: AppBar(
         bottom: (_searching && _query.trim().isNotEmpty)
             ? SearchResultsBar(db: widget.db, index: _index, query: _query)
@@ -110,9 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => SettingsScreen(
                         settings: widget.settings,
-                        db: widget.db,
                         onChangeDb: widget.onChangeDb,
-                        onReloadDb: widget.onReloadDb,
                       ))),
             ),
           ],

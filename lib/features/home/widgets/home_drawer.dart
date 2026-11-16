@@ -4,13 +4,26 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/backup/screens/backup_screen.dart';
+import 'package:pandive/features/settings/screens/tools_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class HomeDrawer extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelected;
-  const HomeDrawer(
-      {super.key, required this.selectedIndex, required this.onSelected});
+  final DivemateDb db;
+  final Settings settings;
+  final VoidCallback onReloadDb;
+  const HomeDrawer({
+    super.key,
+    required this.selectedIndex,
+    required this.onSelected,
+    required this.db,
+    required this.settings,
+    required this.onReloadDb,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +44,26 @@ class HomeDrawer extends StatelessWidget {
             _item(context, 3, Icons.label_outline, t.tags),
             _item(context, 4, Icons.tune_outlined, t.equipment),
             _item(context, 5, Icons.bar_chart_outlined, t.navStats),
+            const Divider(),
+            _push(context, Icons.build_outlined, t.tools,
+                (_) => ToolsScreen(settings: settings, db: db)),
+            _push(context, Icons.cloud_upload_outlined, t.backup,
+                (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _push(BuildContext context, IconData icon, String label,
+      WidgetBuilder builder) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(label),
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.of(context).push(MaterialPageRoute(builder: builder));
+      },
     );
   }
 

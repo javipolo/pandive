@@ -3,11 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
-import 'package:pandive/features/backup/screens/backup_screen.dart';
-import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
-import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';
 import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
 import 'package:pandive/features/settings/widgets/night_hours_control.dart';
@@ -16,22 +12,12 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Settings settings;
-  final DivemateDb db;
   final VoidCallback onChangeDb;
-  final VoidCallback onReloadDb;
   const SettingsScreen({
     super.key,
     required this.settings,
-    required this.db,
     required this.onChangeDb,
-    required this.onReloadDb,
   });
-
-  void _importHashtags(BuildContext context) {
-    final n = db.importHashtagsFromComments();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(AppLocalizations.of(context).importHashtagsResult(n))));
-  }
 
   Future<void> _confirmChangeDb(BuildContext context) async {
     final t = AppLocalizations.of(context);
@@ -88,39 +74,6 @@ class SettingsScreen extends StatelessWidget {
               const Divider(),
               _header(context, t.nightDiveHours),
               NightHoursControl(settings: settings),
-              const Divider(),
-              _header(context, t.tools),
-              ListTile(
-                leading: const Icon(Icons.tag),
-                title: Text(t.importHashtags),
-                onTap: () => _importHashtags(context),
-              ),
-              ListTile(
-                leading: const Icon(Icons.ios_share),
-                title: Text(t.exportLogbook),
-                onTap: () => exportDdb(settings),
-              ),
-              ListTile(
-                leading: const Icon(Icons.ios_share),
-                title: Text(t.exportSubsurface),
-                onTap: () => exportSubsurface(db),
-              ),
-              ListTile(
-                leading: const Icon(Icons.bug_report_outlined),
-                title: const Text('Debug: punto de sync'),
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => DebugSyncScreen(db: db))),
-              ),
-              const Divider(),
-              _header(context, t.backup),
-              ListTile(
-                leading: const Icon(Icons.cloud_upload_outlined),
-                title: Text(t.backupDrive),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => BackupScreen(
-                        settings: settings, onReloadDb: onReloadDb))),
-              ),
               const Divider(),
               _header(context, t.database),
               ListTile(

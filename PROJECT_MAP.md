@@ -69,7 +69,7 @@ con `screens/` y, si hace falta, `widgets/`).
 ### home
 - `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
 - `lib/features/home/widgets/home_nav_bar.dart` -> barra inferior (Inmersiones/Sitios/Compañeros)
-- `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats)
+- `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats + Herramientas/Backup)
 
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb (con enum DbLoadError)
@@ -83,7 +83,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/backup/widgets/restore_list.dart` -> lista de backups de Drive para restaurar
 
 ### settings
-- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, backup, herramientas, DB
+- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, DB
+- `lib/features/settings/screens/tools_screen.dart` -> herramientas: importar hashtags, export DDB/Subsurface, debug sync (desde drawer)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
 - `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb) y Subsurface (.ssrf)
