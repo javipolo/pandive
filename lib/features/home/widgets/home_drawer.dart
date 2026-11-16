@@ -35,10 +35,17 @@ class HomeDrawer extends StatelessWidget {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(color: cs.primaryContainer),
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text('Pandive',
-                    style: Theme.of(context).textTheme.headlineSmall),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset('assets/logo/pandive_new_logo.png',
+                        height: 88, width: 88, fit: BoxFit.cover),
+                  ),
+                  const SizedBox(width: 16),
+                  Text('Pandive',
+                      style: Theme.of(context).textTheme.headlineSmall),
+                ],
               ),
             ),
             _item(context, 3, Icons.label_outline, t.tags),
