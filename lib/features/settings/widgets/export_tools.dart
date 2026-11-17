@@ -13,12 +13,15 @@ import 'package:pandive/core/export/subsurface_export.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/import_progress.dart';
 
-/// Comparte el .ddb activo (formato nativo DiveMate).
-void exportDdb(Settings settings) {
+/// Copia el .ddb activo a un temporal con nombre limpio y lo comparte (igual
+/// que la exportación a Subsurface; snapshot, no comparte el fichero en uso).
+Future<void> exportDdb(Settings settings) async {
   final path = settings.dbPath;
-  if (path != null) {
-    SharePlus.instance.share(ShareParams(files: [XFile(path)]));
-  }
+  if (path == null) return;
+  final dir = await getTemporaryDirectory();
+  final f = File('${dir.path}/pandive.ddb');
+  await File(path).copy(f.path);
+  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
 }
 
 /// Genera el XML Subsurface y lo comparte.
