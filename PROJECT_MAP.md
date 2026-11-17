@@ -75,7 +75,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats + Herramientas/Backup)
 
 ### load_db
-- `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb (con enum DbLoadError)
+- `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb o importar .ssrf (con enum DbLoadError)
+- `lib/features/load_db/widgets/load_db_buttons.dart` -> botones: abrir .ddb / crear nuevo / importar Subsurface
 
 ### tags (etiquetas)
 - `lib/features/tags/screens/tags_tab.dart` -> lista de tags (crear/renombrar/borrar, ver buceos)

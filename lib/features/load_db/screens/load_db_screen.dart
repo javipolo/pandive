@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/load_db/widgets/load_db_buttons.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 /// Error al abrir la DB activa, para mostrarlo localizado en la pantalla.
@@ -37,48 +39,53 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
   bool _busy = false;
   String? _localError;
 
-  Future<void> _pick() async {
+  // Ejecuta [action] con el flag de ocupado y captura errores localizados.
+  Future<void> _run(
+      Future<void> Function() action, String Function(String) err) async {
     setState(() {
       _busy = true;
       _localError = null;
     });
     try {
-      final res = await FilePicker.platform.pickFiles(withData: false);
-      if (res == null || res.files.single.path == null) {
-        setState(() => _busy = false);
-        return;
-      }
-      final picked = File(res.files.single.path!);
-      final docs = await getApplicationDocumentsDirectory();
-      final dest = File('${docs.path}/logbook.ddb');
-      await picked.copy(dest.path);
-      await widget.onLoaded(dest.path);
+      await action();
     } catch (e) {
-      setState(() {
-        _busy = false;
-        _localError = AppLocalizations.of(context).errorLoad('$e');
-      });
+      if (mounted) setState(() => (_busy = false, _localError = err('$e')));
     }
   }
-  Future<void> _createNew() async {
-    setState(() {
-      _busy = true;
-      _localError = null;
-    });
-    try {
-      final docs = await getApplicationDocumentsDirectory();
-      // Nombre único: no sobrescribe un logbook existente.
-      final dest = File(
-          '${docs.path}/logbook-${DateTime.now().millisecondsSinceEpoch}.ddb');
-      DivemateDb.createEmpty(dest.path).close();
-      await widget.onLoaded(dest.path);
-    } catch (e) {
-      setState(() {
-        _busy = false;
-        _localError = AppLocalizations.of(context).errorCreate('$e');
-      });
-    }
+
+  Future<String> _newDbPath() async {
+    final docs = (await getApplicationDocumentsDirectory()).path;
+    return '$docs/logbook-${DateTime.now().millisecondsSinceEpoch}.ddb';
   }
+
+  void _pick() => _run(() async {
+        final res = await FilePicker.platform.pickFiles(withData: false);
+        final path = res?.files.single.path;
+        if (path == null) return setState(() => _busy = false);
+        final docs = await getApplicationDocumentsDirectory();
+        final dest = File('${docs.path}/logbook.ddb');
+        await File(path).copy(dest.path);
+        await widget.onLoaded(dest.path);
+      }, (e) => AppLocalizations.of(context).errorLoad(e));
+
+  void _createNew() => _run(() async {
+        final dest = await _newDbPath();
+        DivemateDb.createEmpty(dest).close();
+        await widget.onLoaded(dest);
+      }, (e) => AppLocalizations.of(context).errorCreate(e));
+
+  // Importa un .ssrf creando un logbook nuevo y volcándolo en él.
+  void _importSsrf() => _run(() async {
+        final res = await FilePicker.platform.pickFiles(withData: false);
+        final path = res?.files.single.path;
+        if (path == null) return setState(() => _busy = false);
+        final xml = await File(path).readAsString();
+        final dest = await _newDbPath();
+        final db = DivemateDb.createEmpty(dest);
+        await importSubsurfaceXml(db, xml);
+        db.close();
+        await widget.onLoaded(dest);
+      }, (e) => AppLocalizations.of(context).errorCreate(e));
 
   @override
   Widget build(BuildContext context) {
@@ -124,22 +131,11 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              FilledButton.icon(
-                onPressed: _busy ? null : _pick,
-                icon: _busy
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.folder_open),
-                label: Text(t.pickFile),
-              ),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: _busy ? null : _createNew,
-                icon: const Icon(Icons.add),
-                label: Text(t.createNewDb),
+              LoadDbButtons(
+                busy: _busy,
+                onPick: _pick,
+                onCreate: _createNew,
+                onImport: _importSsrf,
               ),
             ],
           ),
