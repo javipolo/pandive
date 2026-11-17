@@ -13,11 +13,13 @@ import 'package:pandive/l10n/app_localizations.dart';
 class ProfileFullscreenScreen extends StatelessWidget {
   final DiveProfile profile;
   final String title;
+  final String? shareTitle; // título de la imagen compartida (con fecha)
   final List<GasChange> gasChanges;
   const ProfileFullscreenScreen({
     super.key,
     required this.profile,
     required this.title,
+    this.shareTitle,
     this.gasChanges = const [],
   });
 
@@ -30,7 +32,9 @@ class ProfileFullscreenScreen extends StatelessWidget {
           icon: const Icon(Icons.share),
           tooltip: t.share,
           onPressed: () => shareProfileImage(context,
-              profile: profile, title: title, gasChanges: gasChanges),
+              profile: profile,
+              title: shareTitle ?? title,
+              gasChanges: gasChanges),
         ),
         // Alinea el icono con el borde derecho del plot (antes del eje de temp.).
         const SizedBox(width: 56),

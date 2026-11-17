@@ -152,7 +152,7 @@ void main() {
     }
   });
 
-  test('importSubsurfaceXml importa sitio, botella, perfil, buddies y tags', () {
+  test('importSubsurfaceXml importa sitio, botella, perfil, buddies y tags', () async {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_ssrf_${DateTime.now().microsecondsSinceEpoch}.ddb');
     addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
@@ -178,7 +178,7 @@ void main() {
 </dive>
 </dives>
 </divelog>''';
-      expect(importSubsurfaceXml(w, xml), 1);
+      expect(await importSubsurfaceXml(w, xml), 1);
       expect(w.countDives(), 1);
       final d = w.listDives().first;
       expect(d.maxDepth, 30.5);
@@ -191,7 +191,7 @@ void main() {
       expect(w.tagsForDive(d.id).length, 2);
       expect(w.diveProfile(d.id)?.depths.length, 3);
       // dedupe: reimportar no añade
-      expect(importSubsurfaceXml(w, xml), 0);
+      expect(await importSubsurfaceXml(w, xml), 0);
     } finally {
       w.close();
     }

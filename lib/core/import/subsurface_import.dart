@@ -27,7 +27,8 @@ int _secs(String? s) {
   return sec;
 }
 
-int importSubsurfaceXml(DivemateDb db, String xml) {
+Future<int> importSubsurfaceXml(DivemateDb db, String xml,
+    {void Function(int done, int total)? onProgress}) async {
   final doc = XmlDocument.parse(xml);
   final sites = <String, ({String name, double? lat, double? lon})>{};
   for (final s in doc.findAllElements('site')) {
@@ -41,9 +42,15 @@ int importSubsurfaceXml(DivemateDb db, String xml) {
     );
   }
 
+  final dives = doc.findAllElements('dive').toList();
   var added = 0;
-  for (final dive in doc.findAllElements('dive')) {
-    if (_importOne(db, dive, sites)) added++;
+  for (var i = 0; i < dives.length; i++) {
+    if (_importOne(db, dives[i], sites)) added++;
+    // Ceder al bucle de eventos para refrescar el progreso de la UI.
+    if (i % 5 == 4 || i == dives.length - 1) {
+      onProgress?.call(i + 1, dives.length);
+      await Future<void>.delayed(Duration.zero);
+    }
   }
   return added;
 }

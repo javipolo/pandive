@@ -29,19 +29,16 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final cs = Theme.of(context).colorScheme;
     return Drawer(
       child: SafeArea(
         child: ListView(
           children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: cs.primaryContainer),
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Text('Pandive',
-                    style: Theme.of(context).textTheme.headlineSmall),
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+              child: Text('Pandive',
+                  style: Theme.of(context).textTheme.headlineSmall),
             ),
+            const Divider(height: 1),
             _item(context, 3, Icons.label_outline, t.tags),
             _item(context, 4, Icons.tune_outlined, t.equipment),
             _item(context, 5, Icons.bar_chart_outlined, t.navStats),

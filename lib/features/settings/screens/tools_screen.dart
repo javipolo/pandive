@@ -30,7 +30,7 @@ class ToolsScreen extends StatelessWidget {
   Future<void> _importSubsurface(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final t = AppLocalizations.of(context);
-    final n = await importSubsurface(db);
+    final n = await importSubsurface(context, db);
     if (n == null) return;
     onReloadDb();
     messenger.showSnackBar(

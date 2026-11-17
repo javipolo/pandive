@@ -257,6 +257,7 @@
   "emailCopied": "Email address copied",
   "exportLogbook": "Export to DiveMate (.ddb)",
   "exportSubsurface": "Export to Subsurface (.ssrf)",
+  "importing": "Importing…",
   "importSubsurface": "Import from Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} dives imported",
   "@importSubsurfaceResult": { "placeholders": { "count": {} } },
