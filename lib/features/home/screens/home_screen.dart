@@ -5,16 +5,11 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
-import 'package:pandive/features/buddies/screens/buddies_tab.dart';
-import 'package:pandive/features/dives/screens/dives_screen.dart';
-import 'package:pandive/features/equipment/screens/equipment_tab.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
+import 'package:pandive/features/home/widgets/home_tabs.dart';
 import 'package:pandive/features/home/widgets/search_results_bar.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
-import 'package:pandive/features/sites/screens/sites_screen.dart';
-import 'package:pandive/features/stats/screens/stats_screen.dart';
-import 'package:pandive/features/tags/screens/tags_tab.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -118,31 +113,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ],
       ),
-      body: IndexedStack(
+      body: HomeTabs(
+        db: widget.db,
+        settings: widget.settings,
         index: _index,
-        children: [
-          DivesTab(
-              key: ValueKey('dives-$_dataVersion'),
-              db: widget.db,
-              settings: widget.settings,
-              query: _index == 0 && _searching ? _query : '',
-              collapseAll: _collapseAll),
-          SitesTab(
-              key: ValueKey('sites-$_dataVersion'),
-              db: widget.db,
-              query: _index == 1 && _searching ? _query : '',
-              collapseAll: _collapseAll),
-          BuddiesTab(
-              key: ValueKey('buddies-$_dataVersion'),
-              db: widget.db,
-              query: _index == 2 && _searching ? _query : ''),
-          TagsTab(
-              key: ValueKey('tags-$_dataVersion'),
-              db: widget.db,
-              query: _index == 3 && _searching ? _query : ''),
-          EquipmentTab(key: ValueKey('equip-$_dataVersion'), db: widget.db),
-          StatsTab(key: ValueKey('stats-$_dataVersion'), db: widget.db),
-        ],
+        version: _dataVersion,
+        searching: _searching,
+        query: _query,
+        collapseAll: _collapseAll,
       ),
       bottomNavigationBar: HomeNavBar(selectedIndex: _index, onSelected: _go),
     );

@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
@@ -30,6 +31,7 @@ class ToolsScreen extends StatelessWidget {
         title: t.importHashtags, checkboxLabel: t.removeHashtags);
     if (remove == null) return;
     final n = db.importHashtagsFromComments(removeFromComments: remove);
+    bumpDataRevision();
     messenger.showSnackBar(
         SnackBar(content: Text(t.importHashtagsResult(n))));
   }
@@ -41,6 +43,7 @@ class ToolsScreen extends StatelessWidget {
         title: t.tagsToHashtags, checkboxLabel: t.removeTags);
     if (remove == null) return;
     final n = db.exportTagsToComments(removeTags: remove);
+    bumpDataRevision();
     messenger.showSnackBar(
         SnackBar(content: Text(t.tagsToHashtagsResult(n))));
   }

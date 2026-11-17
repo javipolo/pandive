@@ -95,8 +95,11 @@ int applyEnrich(DivemateDb db, Map<int, DiveMatch> matches, Set<int> selected,
       fields['Comments'] = m.notes;
     }
     if (fields.isNotEmpty) db.updateDive(id, fields);
-    final names = [if (buddy != null && buddy.trim().isNotEmpty) buddy, ...m.buddies];
-    if (names.isNotEmpty) db.addDiveBuddies(id, names);
+    // Solo el buddy elegido (no copiamos los del origen: incluirían a la propia
+    // persona como su propio compañero).
+    if (buddy != null && buddy.trim().isNotEmpty) {
+      db.addDiveBuddies(id, [buddy]);
+    }
     n++;
   }
   return n;

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/loading_dialog.dart';
@@ -67,11 +68,9 @@ class FillFromDdbScreen extends StatefulWidget {
   @override
   State<FillFromDdbScreen> createState() => _FillFromDdbScreenState();
 }
-
 class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
   final _buddy = TextEditingController();
   final _selected = <int>{}; // índices en widget.dives
-
   @override
   void dispose() {
     _buddy.dispose();
@@ -107,6 +106,7 @@ class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
     final ids = {for (final i in _selected) widget.dives[i].id};
     final n = applyEnrich(widget.db, widget.matches, ids, _buddy.text);
     if (!mounted) return;
+    bumpDataRevision(); // refresca las pestañas (misma DB abierta)
     Navigator.of(context).pop();
     messenger.showSnackBar(SnackBar(content: Text(t.fillResult(n))));
   }

@@ -219,7 +219,9 @@ void main() {
       final d = her.getDive(hid)!;
       expect(d.place, 'Cova Negra');
       final buds = her.diveBuddies(hid).map((b) => b.name).toSet();
-      expect(buds.containsAll({'Ana', 'Javi'}), isTrue);
+      // Solo el buddy elegido; no se copian los del origen (evita auto-buddy).
+      expect(buds.contains('Ana'), isTrue);
+      expect(buds.contains('Javi'), isFalse);
       // fuera de la ventana: no empareja
       expect(findSourceMatch(src, dt.add(const Duration(hours: 3))), isNull);
     } finally {
