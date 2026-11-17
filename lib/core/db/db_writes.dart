@@ -28,6 +28,15 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
+  /// Fija la fecha/hora de una inmersión (para ajustes en lote).
+  void setDiveDateTime(int id, DateTime dt) {
+    String p(int v) => v.toString().padLeft(2, '0');
+    updateDive(id, {
+      'Divedate': '${dt.year}-${p(dt.month)}-${p(dt.day)}',
+      'Entrytime': '${p(dt.hour)}:${p(dt.minute)}:00',
+    });
+  }
+
   /// Borra inmersiones DEFINITIVAMENTE (fila + datos asociados). Irreversible;
   /// permite volver a importarlas desde el ordenador/.ddb.
   void purgeDives(List<int> ids) {

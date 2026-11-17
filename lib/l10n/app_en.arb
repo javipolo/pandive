@@ -301,6 +301,8 @@
   "@selectedCount": { "placeholders": { "count": {} } },
   "deleteConfirm": "Delete {count}? This can't be undone.",
   "@deleteConfirm": { "placeholders": { "count": {} } },
+  "adjustTime": "Adjust time",
+  "originalTime": "Original time",
   "merge": "Merge",
   "mergeDivesTitle": "Merge dives",
   "mergeConfirm": "Merge {count} dives into one? The others will be deleted.",

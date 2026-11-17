@@ -93,28 +93,23 @@ DiveMatch? findSourceMatch(DivemateDb source, DateTime when,
   return best == null ? null : _matchFrom(source, best);
 }
 
-/// Aplica los [matches] a los buceos [selected] del logbook [db]: copia sitio y
-/// notas, y añade los buddies del origen más el [buddy] elegido. Devuelve el
-/// número de buceos actualizados.
+/// Aplica los [matches] a los buceos [selected] del logbook [db]: copia SOLO el
+/// sitio de buceo y añade el [buddy] elegido. No toca botellas, notas ni nada
+/// más del buceo. Devuelve el número de buceos actualizados.
 int applyEnrich(DivemateDb db, Map<int, DiveMatch> matches, Set<int> selected,
     String? buddy) {
   var n = 0;
   for (final id in selected) {
     final m = matches[id];
     if (m == null) continue;
-    final fields = <String, Object?>{};
     if (m.place != null && m.place!.trim().isNotEmpty) {
-      fields['PlaceID'] = db.findOrCreateSite(m.place!,
-          country: m.country, lat: m.lat, lon: m.lon);
-      fields['Place'] = m.place;
-      fields['Country'] = m.country;
+      db.updateDive(id, {
+        'PlaceID': db.findOrCreateSite(m.place!,
+            country: m.country, lat: m.lat, lon: m.lon),
+        'Place': m.place,
+        'Country': m.country,
+      });
     }
-    if (m.notes != null && m.notes!.trim().isNotEmpty) {
-      fields['Comments'] = m.notes;
-    }
-    if (fields.isNotEmpty) db.updateDive(id, fields);
-    // Solo el buddy elegido (no copiamos los del origen: incluirían a la propia
-    // persona como su propio compañero).
     if (buddy != null && buddy.trim().isNotEmpty) {
       db.addDiveBuddies(id, [buddy]);
     }

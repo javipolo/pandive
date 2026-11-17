@@ -11,6 +11,7 @@ class DivesSelectionBar extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onStats;
   final VoidCallback? onMerge;
+  final VoidCallback onAdjustTime;
   final VoidCallback onDelete;
 
   const DivesSelectionBar({
@@ -19,6 +20,7 @@ class DivesSelectionBar extends StatelessWidget {
     required this.onClose,
     required this.onStats,
     required this.onMerge,
+    required this.onAdjustTime,
     required this.onDelete,
   });
 
@@ -32,6 +34,10 @@ class DivesSelectionBar extends StatelessWidget {
           onPressed: onStats),
       IconButton(
           tooltip: t.merge, icon: const Icon(Icons.merge), onPressed: onMerge),
+      IconButton(
+          tooltip: t.adjustTime,
+          icon: const Icon(Icons.schedule),
+          onPressed: onAdjustTime),
       IconButton(
           tooltip: t.delete,
           icon: const Icon(Icons.delete_outline),

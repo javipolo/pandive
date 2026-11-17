@@ -268,6 +268,8 @@
 
   "selectedCount": "{count} sélectionnées",
   "deleteConfirm": "Supprimer {count} ? Cette action est irréversible.",
+  "adjustTime": "Ajuster l'heure",
+  "originalTime": "Heure d'origine",
   "merge": "Fusionner",
   "mergeDivesTitle": "Fusionner les plongées",
   "mergeConfirm": "Fusionner {count} plongées en une seule ? Les autres seront supprimées.",

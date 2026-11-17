@@ -269,6 +269,8 @@
 
   "selectedCount": "{count} seleccionades",
   "deleteConfirm": "Vols esborrar {count}? Això no es pot desfer.",
+  "adjustTime": "Ajusta l'hora",
+  "originalTime": "Hora original",
   "merge": "Combina",
   "mergeDivesTitle": "Combina immersions",
   "mergeConfirm": "Vols combinar {count} immersions en una? Les altres s'esborraran.",

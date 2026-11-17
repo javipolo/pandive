@@ -269,6 +269,8 @@
 
   "selectedCount": "{count} hautatuta",
   "deleteConfirm": "{count} ezabatu? Ezin da desegin.",
+  "adjustTime": "Doitu ordua",
+  "originalTime": "Jatorrizko ordua",
   "merge": "Batu",
   "mergeDivesTitle": "Batu murgilketak",
   "mergeConfirm": "{count} murgilketa bakarrean batu? Besteak ezabatuko dira.",
