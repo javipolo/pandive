@@ -28,6 +28,20 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
+  /// Borra inmersiones DEFINITIVAMENTE (fila + datos asociados). Irreversible;
+  /// permite volver a importarlas desde el ordenador/.ddb.
+  void purgeDives(List<int> ids) {
+    for (final id in ids) {
+      _db.execute('DELETE FROM Tank WHERE LogID=?', [id]);
+      for (final tbl in ['PandiveDiveTag', 'PandiveGas', 'PandiveSampleExtra']) {
+        try {
+          _db.execute('DELETE FROM $tbl WHERE DiveId=?', [id]);
+        } catch (_) {/* tabla ausente */}
+      }
+      _db.execute('DELETE FROM Logbook WHERE ID=?', [id]);
+    }
+  }
+
   /// Crea una inmersión nueva (alta manual). Devuelve el ID generado. Genera
   /// Number (si no se pasa), UUID v4, Updated y Status=1, con DiverID del owner.
   /// Las botellas se añaden aparte con setDiveTanks.

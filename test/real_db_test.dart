@@ -230,6 +230,25 @@ void main() {
     }
   });
 
+  test('purgeDives borra definitivamente y permite re-importar', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_purge_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final dt = DateTime(2024, 7, 1, 9, 0);
+      final id = w.createDive(dateTime: dt, place: 'X');
+      w.deleteDives([id]); // Status=2
+      expect(w.listDeletedDives().length, 1);
+      expect(w.hasDiveAt(dt), isFalse); // borrada no cuenta para dedupe
+      w.purgeDives([id]);
+      expect(w.listDeletedDives().length, 0);
+      expect(w.getDive(id), isNull);
+    } finally {
+      w.close();
+    }
+  });
+
   test('importHashtagsFromComments crea y asigna tags', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_tags_${DateTime.now().microsecondsSinceEpoch}.ddb');
