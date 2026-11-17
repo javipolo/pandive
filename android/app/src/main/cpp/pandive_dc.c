@@ -22,6 +22,17 @@
 
 #define LOG(...) __android_log_print(ANDROID_LOG_INFO, "PandiveDC", __VA_ARGS__)
 
+// Normaliza a minúsculas alfanuméricas (para comparar nombre/producto BLE).
+static void normalize_alnum(const char *s, char *out, size_t cap) {
+    size_t j = 0;
+    for (size_t i = 0; s[i] && j + 1 < cap; i++) {
+        unsigned char c = (unsigned char) s[i];
+        if (c >= 'A' && c <= 'Z') c = (unsigned char) (c - 'A' + 'a');
+        if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) out[j++] = (char) c;
+    }
+    out[j] = '\0';
+}
+
 // Vuelca hasta 32 bytes en hex (diagnóstico de protocolo).
 static void log_hex(const char *tag, const unsigned char *p, size_t n) {
     char hex[100];
@@ -87,20 +98,32 @@ Java_org_drslump_pandive_DiveComputer_nativeMatchName(JNIEnv *env, jobject thiz,
     const char *name = jname ? (*env)->GetStringUTFChars(env, jname, NULL) : NULL;
     char out[256];
     out[0] = '\0';
+    char nname[160];
+    normalize_alnum(name ? name : "", nname, sizeof(nname));
+    int best = -1; // -1 nada, 0 match de marca, >0 longitud del prefijo de producto
     dc_iterator_t *it = NULL;
     if (name && dc_descriptor_iterator(&it) == DC_STATUS_SUCCESS) {
         dc_descriptor_t *desc = NULL;
         while (dc_iterator_next(it, &desc) == DC_STATUS_SUCCESS) {
-            if (out[0] == '\0' &&
-                dc_descriptor_filter(desc, DC_TRANSPORT_BLE, name)) {
+            if (dc_descriptor_filter(desc, DC_TRANSPORT_BLE, name)) {
                 const char *v = dc_descriptor_get_vendor(desc);
                 const char *p = dc_descriptor_get_product(desc);
-                snprintf(out, sizeof(out), "%s\t%s", v ? v : "", p ? p : "");
+                // El filtro casa a nivel de marca; desambiguar por el nombre:
+                // preferir el descriptor cuyo producto sea prefijo del nombre.
+                char np[160];
+                normalize_alnum(p ? p : "", np, sizeof(np));
+                size_t nl = strlen(np);
+                int score = (nl > 0 && strncmp(nname, np, nl) == 0) ? (int) nl : 0;
+                if (score > best) {
+                    best = score;
+                    snprintf(out, sizeof(out), "%s\t%s", v ? v : "", p ? p : "");
+                }
             }
             dc_descriptor_free(desc);
         }
         dc_iterator_free(it);
     }
+    LOG("matchName '%s' -> '%s' (score %d)", name ? name : "", out, best);
     if (name) (*env)->ReleaseStringUTFChars(env, jname, name);
     return (*env)->NewStringUTF(env, out);
 }
@@ -417,6 +440,7 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
         sb_fmt(&out, "{\"error\":\"Modelo no soportado: %s %s\"}", vendor, product);
         goto done;
     }
+    LOG("open %s %s model=0x%x", vendor, product, dc_descriptor_get_model(desc));
 
     dc_context_t *ctx = NULL;
     if (dc_context_new(&ctx) != DC_STATUS_SUCCESS) {
