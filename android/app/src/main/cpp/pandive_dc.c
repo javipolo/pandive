@@ -33,15 +33,6 @@ static void normalize_alnum(const char *s, char *out, size_t cap) {
     out[j] = '\0';
 }
 
-// Vuelca hasta 32 bytes en hex (diagnóstico de protocolo).
-static void log_hex(const char *tag, const unsigned char *p, size_t n) {
-    char hex[100];
-    size_t m = n < 32 ? n : 32;
-    size_t k = 0;
-    for (size_t i = 0; i < m; i++) k += snprintf(hex + k, sizeof(hex) - k, "%02x ", p[i]);
-    LOG("%s %zuB: %s", tag, n, hex);
-}
-
 // ---------------------------------------------------------------------------
 // Capacidad
 // ---------------------------------------------------------------------------
@@ -204,12 +195,10 @@ static dc_status_t io_read(void *ud, void *data, size_t size, size_t *actual) {
         jbyteArray arr = (jbyteArray) (*env)->CallObjectMethod(env, io->conn, io->readM, to);
         if (arr == NULL) { *actual = 0; LOG("io_read timeout (%d ms)", to); return DC_STATUS_TIMEOUT; }
         jsize n = (*env)->GetArrayLength(env, arr);
-        LOG("io_read %d B", (int) n);
         if (n > (jsize) sizeof(io->buf)) n = sizeof(io->buf);
         (*env)->GetByteArrayRegion(env, arr, 0, n, (jbyte *) io->buf);
         (*env)->DeleteLocalRef(env, arr);
         io->buflen = n; io->bufpos = 0;
-        log_hex("io_read", io->buf, n);
     }
     size_t avail = io->buflen - io->bufpos;
     size_t copy = size < avail ? size : avail;
@@ -227,7 +216,6 @@ static dc_status_t io_write(void *ud, const void *data, size_t size, size_t *act
     jboolean ok = (*env)->CallBooleanMethod(env, io->conn, io->writeM, arr);
     (*env)->DeleteLocalRef(env, arr);
     *actual = size;
-    log_hex("io_write", (const unsigned char *) data, size);
     return ok ? DC_STATUS_SUCCESS : DC_STATUS_IO;
 }
 
@@ -468,10 +456,8 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
         dc_context_free(ctx); dc_descriptor_free(desc); goto done;
     }
 
-    LOG("dc_device_open...");
     dc_device_t *device = NULL;
     dc_status_t rc = dc_device_open(&device, ctx, desc, iostream);
-    LOG("dc_device_open rc=%d", rc);
     if (rc != DC_STATUS_SUCCESS) {
         sb_fmt(&out, "{\"error\":\"No se pudo abrir el dispositivo (%d)\"}", rc);
         dc_iostream_close(iostream); dc_context_free(ctx); dc_descriptor_free(desc); goto done;

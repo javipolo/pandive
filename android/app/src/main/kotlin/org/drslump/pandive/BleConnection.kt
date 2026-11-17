@@ -186,7 +186,6 @@ class BleConnection(private val context: Context, private val address: String) {
             var n: BluetoothGattCharacteristic? = null
             for (c in s.characteristics) {
                 val p = c.properties
-                Log.i(TAG, "  char ${c.uuid} props=$p cccd=${c.getDescriptor(CCCD) != null}")
                 if (w == null && (p and (BluetoothGattCharacteristic.PROPERTY_WRITE or
                         BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0) w = c
                 if (n == null && (p and (BluetoothGattCharacteristic.PROPERTY_NOTIFY or
