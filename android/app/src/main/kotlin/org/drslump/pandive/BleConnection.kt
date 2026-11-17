@@ -68,6 +68,7 @@ class BleConnection(private val context: Context, private val address: String) {
     private val connectLatch = CountDownLatch(1)
     @Volatile private var connectError: String? = null
     @Volatile private var ready = false
+    @Volatile private var setupStarted = false // evita doble descubrimiento
 
     private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
@@ -102,6 +103,8 @@ class BleConnection(private val context: Context, private val address: String) {
                 fail("Fallo al descubrir servicios ($status)")
                 return
             }
+            if (setupStarted) return // el stack puede descubrir dos veces
+            setupStarted = true
             if (selectHwTelit(g)) {
                 creditMode = true
                 // Paso 1: activar indicaciones en créditos TX (secuencia en onDescriptorWrite).
@@ -189,6 +192,7 @@ class BleConnection(private val context: Context, private val address: String) {
             var n: BluetoothGattCharacteristic? = null
             for (c in s.characteristics) {
                 val p = c.properties
+                Log.i(TAG, "  char ${c.uuid} props=$p cccd=${c.getDescriptor(CCCD) != null}")
                 if (w == null && (p and (BluetoothGattCharacteristic.PROPERTY_WRITE or
                         BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0) w = c
                 if (n == null && (p and (BluetoothGattCharacteristic.PROPERTY_NOTIFY or
