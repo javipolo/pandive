@@ -95,5 +95,21 @@ extension DivemateDbBuddies on DivemateDb {
     final all = listBuddies();
     return [for (final b in all) if (ids.contains(b.id)) b];
   }
+
+  /// Añade [names] como compañeros de la inmersión (crea los que falten) sin
+  /// quitar los existentes. Actualiza BuddyIDs y el texto Buddy.
+  void addDiveBuddies(int diveId, List<String> names) {
+    final map = {for (final b in diveBuddies(diveId)) b.id: b.name};
+    for (final n in names) {
+      final name = n.trim();
+      if (name.isEmpty) continue;
+      map[findOrCreateBuddy(name)] = name;
+    }
+    if (map.isEmpty) return;
+    updateDive(diveId, {
+      'BuddyIDs': map.keys.join(','),
+      'Buddy': map.values.join(', '),
+    });
+  }
 }
 

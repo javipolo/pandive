@@ -91,6 +91,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, DB
 - `lib/features/settings/screens/tools_screen.dart` -> herramientas: importar hashtags, export DDB/Subsurface, papelera, debug sync (desde drawer)
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
+- `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
+- `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)

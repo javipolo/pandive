@@ -8,6 +8,7 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/export/subsurface_export.dart';
 import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/features/settings/logic/enrich_logbook.dart';
 import 'package:sqlite3/open.dart';
 
 void main() {
@@ -194,6 +195,36 @@ void main() {
       expect(await importSubsurfaceXml(w, xml), 0);
     } finally {
       w.close();
+    }
+  });
+
+  test('enrich: empareja por fecha (±1h) y copia sitio + buddies', () {
+    final sf = File(
+        '${Directory.systemTemp.path}/pandive_src_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    final hf = File(
+        '${Directory.systemTemp.path}/pandive_her_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => sf.existsSync() ? sf.deleteSync() : null);
+    addTearDown(() => hf.existsSync() ? hf.deleteSync() : null);
+    final src = DivemateDb.createEmpty(sf.path);
+    final her = DivemateDb.createEmpty(hf.path);
+    try {
+      final dt = DateTime(2024, 6, 1, 10, 0);
+      final sid = src.createDive(dateTime: dt, place: 'Cova Negra', country: 'ES');
+      src.addDiveBuddies(sid, ['Javi']);
+      final hid = her.createDive(dateTime: dt.add(const Duration(minutes: 5)));
+      final m = findSourceMatch(src, her.getDive(hid)!.date!);
+      expect(m, isNotNull);
+      expect(m!.place, 'Cova Negra');
+      expect(applyEnrich(her, {hid: m}, {hid}, 'Ana'), 1);
+      final d = her.getDive(hid)!;
+      expect(d.place, 'Cova Negra');
+      final buds = her.diveBuddies(hid).map((b) => b.name).toSet();
+      expect(buds.containsAll({'Ana', 'Javi'}), isTrue);
+      // fuera de la ventana: no empareja
+      expect(findSourceMatch(src, dt.add(const Duration(hours: 3))), isNull);
+    } finally {
+      src.close();
+      her.close();
     }
   });
 
