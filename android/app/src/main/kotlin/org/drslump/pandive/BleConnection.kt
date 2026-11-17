@@ -285,9 +285,9 @@ class BleConnection(private val context: Context, private val address: String) {
         @Suppress("DEPRECATION")
         val sent = run { c.writeType = mode; c.value = data; g.writeCharacteristic(c) }
         if (!sent) return false
-        // Con respuesta: esperar a que termine (una sola operación GATT a la vez).
-        if (!noResp) return writeAck.poll(2000, TimeUnit.MILLISECONDS) == true
-        return true
+        // Android solo admite una operación GATT a la vez: esperar a que termine
+        // (también en no-response; evita perder paquetes). Timeout -> seguimos.
+        return writeAck.poll(2000, TimeUnit.MILLISECONDS) != false
     }
 
     @SuppressLint("MissingPermission")
