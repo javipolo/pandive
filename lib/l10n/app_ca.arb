@@ -243,7 +243,7 @@
   "aboutIntro": "Pandive és un quadern d'immersions. Has trobat un error o tens un suggeriment? Escriu-nos.",
   "contactEmail": "Envia un correu",
   "emailCopied": "Adreça de correu copiada",
-  "exportLogbook": "Exporta a DiveMate (.ddb)",
+  "exportLogbook": "Exporta el DDB. Compatible amb Pandive i DiveMate",
   "exportSubsurface": "Exporta a Subsurface (.ssrf)",
   "importing": "Important…",
   "importSubsurface": "Importa de Subsurface (.ssrf)",

@@ -243,7 +243,7 @@
   "aboutIntro": "Pandive es un cuaderno de buceo. ¿Has visto un fallo o tienes una sugerencia? Escríbenos.",
   "contactEmail": "Enviar correo",
   "emailCopied": "Dirección de correo copiada",
-  "exportLogbook": "Exportar a DiveMate (.ddb)",
+  "exportLogbook": "Exportar DDB. Compatible con Pandive y DiveMate",
   "exportSubsurface": "Exportar a Subsurface (.ssrf)",
   "importing": "Importando…",
   "importSubsurface": "Importar de Subsurface (.ssrf)",
