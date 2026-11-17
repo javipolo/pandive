@@ -172,7 +172,7 @@
 
   "showAllDevices": "Mostra tots els dispositius Bluetooth",
   "sync": "Baixa un nombre concret d'immersions",
-  "syncSub": "Tries quantes; baixa les últimes N (ignora les empremtes)",
+  "syncSub": "Baixa sempre les últimes N immersions",
   "syncUpToDate": "Ja està actualitzat",
   "syncNoMatch": "Cap de les darreres {count} immersions és al teu quadern d'immersions. Augmenta el número o utilitza Baixa totes les immersions.",
   "downloadAll": "Baixa totes les immersions",

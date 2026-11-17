@@ -172,7 +172,7 @@
 
   "showAllDevices": "Mostrar todos los dispositivos Bluetooth",
   "sync": "Descargar un número concreto de inmersiones",
-  "syncSub": "Eliges cuántas; baja las últimas N (ignora los fingerprints)",
+  "syncSub": "Baja siempre las últimas N inmersiones",
   "syncUpToDate": "Ya está sincronizado",
   "syncNoMatch": "Ninguna de las últimas {count} inmersiones está en tu logbook. Sube el número o usa Descargar todas.",
   "downloadAll": "Descargar todas las inmersiones",

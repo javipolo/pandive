@@ -171,7 +171,7 @@
 
   "showAllDevices": "Afficher tous les appareils Bluetooth",
   "sync": "Télécharger un nombre précis de plongées",
-  "syncSub": "Vous choisissez combien ; télécharge les N dernières (ignore les empreintes)",
+  "syncSub": "Télécharge toujours les N dernières plongées",
   "syncUpToDate": "Déjà à jour",
   "syncNoMatch": "Aucune des {count} dernières plongées n'est dans votre carnet de plongée. Augmentez le nombre ou utilisez Télécharger toutes les plongées.",
   "downloadAll": "Télécharger toutes les plongées",

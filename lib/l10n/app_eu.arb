@@ -172,7 +172,7 @@
 
   "showAllDevices": "Erakutsi Bluetooth gailu guztiak",
   "sync": "Murgilketa kopuru jakin bat deskargatu",
-  "syncSub": "Zuk aukeratzen duzu zenbat; azken N deskargatzen ditu (fingerprint-ak alde batera)",
+  "syncSub": "Beti azken N murgilketak deskargatzen ditu",
   "syncUpToDate": "Jada eguneratuta",
   "syncNoMatch": "Azken {count} murgilketetako bat ere ez dago zure murgilketa-koadernoan. Handitu zenbakia edo erabili Deskargatu murgilketa guztiak.",
   "downloadAll": "Deskargatu murgilketa guztiak",
