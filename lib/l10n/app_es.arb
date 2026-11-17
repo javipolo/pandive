@@ -233,6 +233,8 @@
   "emailCopied": "Dirección de correo copiada",
   "exportLogbook": "Exportar a DiveMate (.ddb)",
   "exportSubsurface": "Exportar a Subsurface (.ssrf)",
+  "importSubsurface": "Importar de Subsurface (.ssrf)",
+  "importSubsurfaceResult": "{count} inmersiones importadas",
   "importHashtags": "Importar #hashtags de los comentarios como etiquetas",
   "importHashtagsResult": "{count} etiquetas asignadas.",
   "equipment": "Equipo",

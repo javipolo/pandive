@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/export/subsurface_export.dart';
+import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:sqlite3/open.dart';
 
@@ -146,6 +147,51 @@ void main() {
       expect(w.fingerprintFor('AA:BB'), isNull);
       w.setFingerprintFor('AA:BB', 'cafe');
       expect(w.fingerprintFor('AA:BB'), 'cafe');
+    } finally {
+      w.close();
+    }
+  });
+
+  test('importSubsurfaceXml importa sitio, botella, perfil, buddies y tags', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_ssrf_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      const xml = '''
+<divelog program='test' version='3'>
+<divesites>
+<site uuid='0000000a' name='Cala Test' gps='41.1 2.2'/>
+</divesites>
+<dives>
+<dive number='1' date='2024-05-01' time='10:30:00' duration='42:00 min' divesiteid='0000000a' tags='cueva, deco'>
+<buddy>Ana, Luis</buddy>
+<cylinder size='12.0 l' o2='32.0%' start='200.0 bar' end='50.0 bar' />
+<divecomputer model='OSTC'>
+<depth max='30.5 m' mean='15.2 m' />
+<temperature water='18.0 C' />
+<sample time='0:00' depth='0.0 m' temp='20.0 C' />
+<sample time='0:10' depth='5.0 m' />
+<sample time='0:20' depth='10.0 m' />
+</divecomputer>
+<notes>buceo de prueba</notes>
+</dive>
+</dives>
+</divelog>''';
+      expect(importSubsurfaceXml(w, xml), 1);
+      expect(w.countDives(), 1);
+      final d = w.listDives().first;
+      expect(d.maxDepth, 30.5);
+      expect(d.place, 'Cala Test');
+      expect(d.durationMin, 42.0);
+      final cyl = w.cylinders(d.id);
+      expect(cyl.length, 1);
+      expect(cyl.first.o2, 32.0);
+      expect(w.diveBuddies(d.id).length, 2);
+      expect(w.tagsForDive(d.id).length, 2);
+      expect(w.diveProfile(d.id)?.depths.length, 3);
+      // dedupe: reimportar no añade
+      expect(importSubsurfaceXml(w, xml), 0);
     } finally {
       w.close();
     }

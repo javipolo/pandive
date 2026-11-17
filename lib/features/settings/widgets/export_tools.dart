@@ -3,11 +3,13 @@ library;
 
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/export/subsurface_export.dart';
+import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/core/settings/settings.dart';
 
 /// Comparte el .ddb activo (formato nativo DiveMate).
@@ -25,4 +27,14 @@ Future<void> exportSubsurface(DivemateDb db) async {
   final f = File('${dir.path}/pandive.ssrf');
   await f.writeAsString(xml);
   await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
+}
+
+/// Elige un .ssrf e importa sus inmersiones. Devuelve cuántas añadió, o null si
+/// se canceló.
+Future<int?> importSubsurface(DivemateDb db) async {
+  final res = await FilePicker.platform.pickFiles(withData: false);
+  final path = res?.files.single.path;
+  if (path == null) return null;
+  final xml = await File(path).readAsString();
+  return importSubsurfaceXml(db, xml);
 }

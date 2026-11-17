@@ -27,6 +27,16 @@ class ToolsScreen extends StatelessWidget {
         content: Text(AppLocalizations.of(context).importHashtagsResult(n))));
   }
 
+  Future<void> _importSubsurface(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final t = AppLocalizations.of(context);
+    final n = await importSubsurface(db);
+    if (n == null) return;
+    onReloadDb();
+    messenger.showSnackBar(
+        SnackBar(content: Text(t.importSubsurfaceResult(n))));
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -48,6 +58,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.ios_share),
             title: Text(t.exportSubsurface),
             onTap: () => exportSubsurface(db),
+          ),
+          ListTile(
+            leading: const Icon(Icons.file_download_outlined),
+            title: Text(t.importSubsurface),
+            onTap: () => _importSubsurface(context),
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),

@@ -233,6 +233,8 @@
   "emailCopied": "Helbide elektronikoa kopiatu da",
   "exportLogbook": "Esportatu DiveMate-ra (.ddb)",
   "exportSubsurface": "Esportatu Subsurface-ra (.ssrf)",
+  "importSubsurface": "Subsurface-tik inportatu (.ssrf)",
+  "importSubsurfaceResult": "{count} murgilketa inportatu dira",
   "importHashtags": "Inportatu #traolak iruzkinetatik etiketa gisa",
   "importHashtagsResult": "{count} etiketa esleituta.",
   "equipment": "Ekipamendua",

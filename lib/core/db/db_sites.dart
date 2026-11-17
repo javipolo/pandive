@@ -59,13 +59,14 @@ extension DivemateDbSites on DivemateDb {
   }
 
   /// Busca un sitio por nombre (+país opcional) o lo crea. Devuelve su ID.
-  int findOrCreateSite(String name, {String? country}) {
+  int findOrCreateSite(String name, {String? country, double? lat, double? lon}) {
     final rows = _db.select(
       'SELECT ID FROM Place WHERE Place = ? COLLATE NOCASE '
       "AND IFNULL(Country,'') = IFNULL(?, '')",
       [name.trim(), country],
     );
     if (rows.isNotEmpty) return rows.first['ID'] as int;
-    return createSite({'Place': name.trim(), 'Country': country});
+    return createSite(
+        {'Place': name.trim(), 'Country': country, 'Lat': lat, 'Lon': lon});
   }
 }

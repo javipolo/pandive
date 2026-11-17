@@ -58,6 +58,8 @@ dependencies:
   extension_google_sign_in_as_googleapis_auth: ^3.0.0
   crypto: ^3.0.8
   share_plus: ^12.0.2
+  # Parseo del XML de Subsurface (.ssrf) al importar
+  xml: ^6.5.0
 
 dev_dependencies:
   flutter_test:
