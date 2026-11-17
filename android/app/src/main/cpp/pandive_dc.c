@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <unistd.h>
 #include <android/log.h>
 
 #include <libdivecomputer/common.h>
@@ -141,6 +142,27 @@ static dc_status_t io_set_timeout(void *ud, int timeout) {
     return DC_STATUS_SUCCESS;
 }
 
+static dc_status_t io_sleep(void *ud, unsigned int ms) {
+    (void) ud;
+    usleep(ms * 1000);
+    return DC_STATUS_SUCCESS;
+}
+
+static dc_status_t io_configure(void *ud, unsigned int baudrate,
+        unsigned int databits, dc_parity_t parity, dc_stopbits_t stopbits,
+        dc_flowcontrol_t flowcontrol) {
+    (void) ud; (void) baudrate; (void) databits; (void) parity;
+    (void) stopbits; (void) flowcontrol;
+    return DC_STATUS_SUCCESS; // no aplica a BLE; no-op para drivers que lo piden
+}
+
+static dc_status_t io_purge(void *ud, dc_direction_t direction) {
+    (void) direction;
+    ble_io_t *io = ud;
+    io->buflen = io->bufpos = 0;
+    return DC_STATUS_SUCCESS;
+}
+
 static dc_status_t io_read(void *ud, void *data, size_t size, size_t *actual) {
     ble_io_t *io = ud;
     JNIEnv *env = io->env;
@@ -148,8 +170,9 @@ static dc_status_t io_read(void *ud, void *data, size_t size, size_t *actual) {
         // sin datos en el búfer local: pedir un paquete al BLE
         int to = io->timeout > 0 ? io->timeout : 3000;
         jbyteArray arr = (jbyteArray) (*env)->CallObjectMethod(env, io->conn, io->readM, to);
-        if (arr == NULL) { *actual = 0; return DC_STATUS_TIMEOUT; }
+        if (arr == NULL) { *actual = 0; LOG("io_read timeout (%d ms)", to); return DC_STATUS_TIMEOUT; }
         jsize n = (*env)->GetArrayLength(env, arr);
+        LOG("io_read %d B", (int) n);
         if (n > (jsize) sizeof(io->buf)) n = sizeof(io->buf);
         (*env)->GetByteArrayRegion(env, arr, 0, n, (jbyte *) io->buf);
         (*env)->DeleteLocalRef(env, arr);
@@ -171,6 +194,7 @@ static dc_status_t io_write(void *ud, const void *data, size_t size, size_t *act
     jboolean ok = (*env)->CallBooleanMethod(env, io->conn, io->writeM, arr);
     (*env)->DeleteLocalRef(env, arr);
     *actual = size;
+    LOG("io_write %zu B ok=%d", size, (int) ok);
     return ok ? DC_STATUS_SUCCESS : DC_STATUS_IO;
 }
 
@@ -398,6 +422,9 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
 
     dc_custom_cbs_t cbs = {0};
     cbs.set_timeout = io_set_timeout;
+    cbs.configure = io_configure;
+    cbs.purge = io_purge;
+    cbs.sleep = io_sleep;
     cbs.read = io_read;
     cbs.write = io_write;
 
@@ -407,8 +434,10 @@ Java_org_drslump_pandive_DiveComputer_nativeDownload(
         dc_context_free(ctx); dc_descriptor_free(desc); goto done;
     }
 
+    LOG("dc_device_open...");
     dc_device_t *device = NULL;
     dc_status_t rc = dc_device_open(&device, ctx, desc, iostream);
+    LOG("dc_device_open rc=%d", rc);
     if (rc != DC_STATUS_SUCCESS) {
         sb_fmt(&out, "{\"error\":\"No se pudo abrir el dispositivo (%d)\"}", rc);
         dc_iostream_close(iostream); dc_context_free(ctx); dc_descriptor_free(desc); goto done;
