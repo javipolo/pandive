@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/screens/trash_screen.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
@@ -21,10 +22,26 @@ class ToolsScreen extends StatelessWidget {
     required this.onReloadDb,
   });
 
-  void _importHashtags(BuildContext context) {
-    final n = db.importHashtagsFromComments();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(AppLocalizations.of(context).importHashtagsResult(n))));
+  Future<void> _importHashtags(BuildContext context) async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final remove = await showOptionDialog(context,
+        title: t.importHashtags, checkboxLabel: t.removeHashtags);
+    if (remove == null) return;
+    final n = db.importHashtagsFromComments(removeFromComments: remove);
+    messenger.showSnackBar(
+        SnackBar(content: Text(t.importHashtagsResult(n))));
+  }
+
+  Future<void> _tagsToHashtags(BuildContext context) async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final remove = await showOptionDialog(context,
+        title: t.tagsToHashtags, checkboxLabel: t.removeTags);
+    if (remove == null) return;
+    final n = db.exportTagsToComments(removeTags: remove);
+    messenger.showSnackBar(
+        SnackBar(content: Text(t.tagsToHashtagsResult(n))));
   }
 
   Future<void> _importSubsurface(BuildContext context) async {
@@ -48,6 +65,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.tag),
             title: Text(t.importHashtags),
             onTap: () => _importHashtags(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.sell_outlined),
+            title: Text(t.tagsToHashtags),
+            onTap: () => _tagsToHashtags(context),
           ),
           ListTile(
             leading: const Icon(Icons.ios_share),

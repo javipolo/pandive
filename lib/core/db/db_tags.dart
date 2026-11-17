@@ -43,10 +43,12 @@ extension DivemateDbTags on DivemateDb {
 
   /// Recorre los comentarios de todas las inmersiones, extrae #hashtags y los
   /// asigna como tags (creándolos si hace falta). No borra tags existentes.
-  /// Devuelve el nº de asignaciones (dive, tag) nuevas. Útil para migrar.
-  int importHashtagsFromComments() {
+  /// Si [removeFromComments], quita los #hashtags del comentario. Devuelve el
+  /// nº de asignaciones (dive, tag) nuevas.
+  int importHashtagsFromComments({bool removeFromComments = false}) {
     final re = RegExp(r'#(\w+)', unicode: true);
     var added = 0;
+    final now = _nowStamp();
     for (final d in listDives()) {
       final c = d.comments;
       if (c == null) continue;
@@ -61,6 +63,42 @@ extension DivemateDbTags on DivemateDb {
         );
         have.add(name.toLowerCase());
         added++;
+      }
+      if (removeFromComments && re.hasMatch(c)) {
+        final stripped =
+            c.replaceAll(re, '').replaceAll(RegExp(r'\s{2,}'), ' ').trim();
+        _db.execute('UPDATE Logbook SET Comments=?, Updated=? WHERE ID=?',
+            [stripped.isEmpty ? null : stripped, now, d.id]);
+      }
+    }
+    return added;
+  }
+
+  /// Añade los tags de cada inmersión como #hashtags al comentario (si no
+  /// están ya). Si [removeTags], desvincula los tags tras convertirlos.
+  /// Devuelve el nº de #hashtags añadidos.
+  int exportTagsToComments({bool removeTags = false}) {
+    final re = RegExp(r'#(\w+)', unicode: true);
+    var added = 0;
+    final now = _nowStamp();
+    for (final d in listDives()) {
+      final tags = tagsForDive(d.id);
+      if (tags.isEmpty) continue;
+      final c = d.comments ?? '';
+      final have = {for (final m in re.allMatches(c)) m.group(1)!.toLowerCase()};
+      final toAdd = [
+        for (final t in tags)
+          if (!have.contains(t.name.toLowerCase())) '#${t.name}'
+      ];
+      if (toAdd.isNotEmpty) {
+        final base = c.trim();
+        final newC = (base.isEmpty ? '' : '$base ') + toAdd.join(' ');
+        _db.execute('UPDATE Logbook SET Comments=?, Updated=? WHERE ID=?',
+            [newC, now, d.id]);
+        added += toAdd.length;
+      }
+      if (removeTags) {
+        _db.execute('DELETE FROM PandiveDiveTag WHERE DiveId=?', [d.id]);
       }
     }
     return added;
