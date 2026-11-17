@@ -168,7 +168,8 @@
   "diveChip": "Buceo",
   "scanError": "Error de escaneo: {error}",
 
-  "sync": "Sincronizar y descargar",
+  "showAllDevices": "Mostrar todos los dispositivos Bluetooth",
+  "sync": "Descargar inmersiones recientes",
   "syncSub": "Baja las últimas y añade solo las nuevas",
   "syncUpToDate": "Ya está sincronizado",
   "syncNoMatch": "Ninguna de las últimas {count} inmersiones está en tu logbook. Sube el número o usa Descargar todas.",

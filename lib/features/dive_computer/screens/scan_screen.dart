@@ -27,6 +27,7 @@ class _ScanScreenState extends State<ScanScreen> {
   String? _error;
   bool _scanning = false;
   bool _permissionOk = false;
+  bool _showAll = false; // mostrar todos los dispositivos BLE, no solo buceo
   @override
   void initState() {
     super.initState();
@@ -65,11 +66,10 @@ class _ScanScreenState extends State<ScanScreen> {
     super.dispose();
   }
   List<ScannedDevice> get _sorted {
-    final list = _devices.values.toList();
-    list.sort((a, b) {
-      if (a.likely != b.likely) return a.likely ? -1 : 1;
-      return b.rssi.compareTo(a.rssi);
-    });
+    final list = _devices.values.where((d) => _showAll || d.likely).toList();
+    list.sort((a, b) => a.likely != b.likely
+        ? (a.likely ? -1 : 1)
+        : b.rssi.compareTo(a.rssi));
     return list;
   }
   Future<void> _onTap(ScannedDevice d) async {
@@ -88,18 +88,12 @@ class _ScanScreenState extends State<ScanScreen> {
     if (!mounted) return;
     final action = await showDiveComputerActionSheet(context);
     if (action == null || !mounted) return;
-    if (action == 'sync') {
-      final n = await askSyncCount(context);
-      if (n == null || !mounted) return;
-      await Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => DownloadScreen(
-              device: d, db: widget.db, settings: widget.settings,
-              all: true, maxDives: n, syncMode: true)));
-      return;
-    }
+    final n = action == 'sync' ? await askSyncCount(context) : 0;
+    if (n == null || !mounted) return;
     await Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => DownloadScreen(
             device: d, db: widget.db, settings: widget.settings,
+            all: action == 'sync', maxDives: n, syncMode: action == 'sync',
             baseline: action == 'mark')));
   }
   @override
@@ -112,11 +106,10 @@ class _ScanScreenState extends State<ScanScreen> {
         actions: [
           if (_scanning)
             const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                  width: 20, height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2)),
-            )
+                padding: EdgeInsets.all(16),
+                child: SizedBox(
+                    width: 20, height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2)))
           else
             IconButton(
                 icon: const Icon(Icons.refresh), tooltip: t.rescan, onPressed: _start),
@@ -126,12 +119,18 @@ class _ScanScreenState extends State<ScanScreen> {
           ? ScanErrorView(message: _error!, onRetry: _start)
           : Column(
               children: [
-                if (_permissionOk)
+                if (_permissionOk) ...[
                   Padding(
                     padding: const EdgeInsets.all(12),
                     child: Text(_scanning ? t.scanningHint : t.scanStopped,
                         style: Theme.of(context).textTheme.bodyMedium),
                   ),
+                  CheckboxListTile(
+                    dense: true,
+                    value: _showAll,
+                    title: Text(t.showAllDevices),
+                    onChanged: (v) => setState(() => _showAll = v ?? false)),
+                ],
                 Expanded(
                   child: devices.isEmpty
                       ? Center(child: Text(t.noDevicesYet))

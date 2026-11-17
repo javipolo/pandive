@@ -167,7 +167,8 @@
   "diveChip": "Plongée",
   "scanError": "Erreur de scan : {error}",
 
-  "sync": "Synchroniser et télécharger",
+  "showAllDevices": "Afficher tous les appareils Bluetooth",
+  "sync": "Télécharger les plongées récentes",
   "syncSub": "Télécharge les dernières et importe uniquement les nouvelles",
   "syncUpToDate": "Déjà à jour",
   "syncNoMatch": "Aucune des {count} dernières plongées n'est dans votre carnet de plongée. Augmentez le nombre ou utilisez Télécharger toutes les plongées.",

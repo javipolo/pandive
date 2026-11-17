@@ -168,7 +168,8 @@
   "diveChip": "Immersió",
   "scanError": "Error d'escaneig: {error}",
 
-  "sync": "Sincronitza i baixa",
+  "showAllDevices": "Mostra tots els dispositius Bluetooth",
+  "sync": "Baixa les immersions recents",
   "syncSub": "Baixa les darreres i importa només les noves",
   "syncUpToDate": "Ja està actualitzat",
   "syncNoMatch": "Cap de les darreres {count} immersions és al teu quadern d'immersions. Augmenta el número o utilitza Baixa totes les immersions.",

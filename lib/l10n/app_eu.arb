@@ -168,7 +168,8 @@
   "diveChip": "Murgilketa",
   "scanError": "Eskaneatze-errorea: {error}",
 
-  "sync": "Sinkronizatu eta deskargatu",
+  "showAllDevices": "Erakutsi Bluetooth gailu guztiak",
+  "sync": "Deskargatu azken murgilketak",
   "syncSub": "Deskargatu azkenak eta inportatu berriak bakarrik",
   "syncUpToDate": "Jada eguneratuta",
   "syncNoMatch": "Azken {count} murgilketetako bat ere ez dago zure murgilketa-koadernoan. Handitu zenbakia edo erabili Deskargatu murgilketa guztiak.",

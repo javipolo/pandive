@@ -182,7 +182,8 @@
   "scanError": "Scan error: {error}",
   "@scanError": { "placeholders": { "error": {} } },
 
-  "sync": "Synchronize and download",
+  "showAllDevices": "Show all Bluetooth devices",
+  "sync": "Download recent dives",
   "syncSub": "Download the last few and import only the new ones",
   "syncUpToDate": "Already up to date",
   "syncNoMatch": "None of the last {count} dives are in your logbook. Increase the number or use Download all dives.",
