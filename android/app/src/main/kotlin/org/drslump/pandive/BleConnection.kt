@@ -35,11 +35,30 @@ class BleConnection(private val context: Context, private val address: String) {
             "1aa44039-1667-4b29-87cc-dfecaaf31d97", // Shearwater Perdix 3
             "544e326b-5b72-c6b0-1c46-41c1bc448118", // Mares BlueLink
         ).map { it.lowercase() }
+
+        // Heinrichs Weikamp (OSTC) con módulo BLE Telit/Stollmann: servicio
+        // "Terminal I/O" con control de flujo por créditos.
+        private val HW_TELIT_SERVICE =
+            UUID.fromString("0000fefb-0000-1000-8000-00805f9b34fb")
+        private val T_DATA_TX = UUID.fromString("00000001-0000-1000-8000-008025000000")
+        private val T_DATA_RX = UUID.fromString("00000002-0000-1000-8000-008025000000")
+        private val T_CRED_TX = UUID.fromString("00000003-0000-1000-8000-008025000000")
+        private val T_CRED_RX = UUID.fromString("00000004-0000-1000-8000-008025000000")
+        private const val MAX_CREDIT = 254
+        private const val MIN_CREDIT = 32
     }
 
     private var gatt: BluetoothGatt? = null
     private var writeChar: BluetoothGattCharacteristic? = null
     private var notifyChar: BluetoothGattCharacteristic? = null
+
+    // Modo crédito (Telit/HW): características dedicadas de datos y créditos.
+    private var creditMode = false
+    private var dataTx: BluetoothGattCharacteristic? = null // device->host (notify)
+    private var dataRx: BluetoothGattCharacteristic? = null // host->device (write)
+    private var credTx: BluetoothGattCharacteristic? = null // device->host (indicate)
+    private var credRx: BluetoothGattCharacteristic? = null // host->device (write)
+    @Volatile private var hwCredit = 0
 
     private val incoming = LinkedBlockingQueue<ByteArray>()
     private val connectLatch = CountDownLatch(1)
@@ -79,6 +98,12 @@ class BleConnection(private val context: Context, private val address: String) {
                 fail("Fallo al descubrir servicios ($status)")
                 return
             }
+            if (selectHwTelit(g)) {
+                creditMode = true
+                // Paso 1: activar indicaciones en créditos TX (secuencia en onDescriptorWrite).
+                writeCccd(g, credTx!!, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
+                return
+            }
             if (!selectCharacteristics(g)) {
                 fail("No se encontró característica de lectura/escritura")
                 return
@@ -89,22 +114,52 @@ class BleConnection(private val context: Context, private val address: String) {
         @Deprecated("API < 33")
         override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic) {
             @Suppress("DEPRECATION")
-            c.value?.let { incoming.put(it.copyOf()) }
+            c.value?.let { onData(c, it.copyOf()) }
         }
 
         override fun onCharacteristicChanged(
             g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray
         ) {
-            incoming.put(value.copyOf())
+            onData(c, value.copyOf())
         }
 
         override fun onDescriptorWrite(
             g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int
         ) {
-            if (d.uuid == CCCD) {
-                ready = status == BluetoothGatt.GATT_SUCCESS
-                if (!ready) connectError = "No se pudieron activar notificaciones ($status)"
+            if (d.uuid != CCCD) return
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                fail("No se pudieron activar notificaciones ($status)")
+                return
+            }
+            if (!creditMode) {
+                ready = true
                 connectLatch.countDown()
+                return
+            }
+            // Secuencia Telit: créditos (indicate) -> datos (notify) -> crédito inicial.
+            if (d.characteristic.uuid == T_CRED_TX) {
+                writeCccd(g, dataTx!!, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+            } else if (d.characteristic.uuid == T_DATA_TX) {
+                hwCredit = MAX_CREDIT
+                writeCredit(g, MAX_CREDIT)
+                ready = true
+                connectLatch.countDown()
+            }
+        }
+    }
+
+    // Enruta un paquete recibido: datos a la cola; créditos (Telit) suman saldo.
+    private fun onData(c: BluetoothGattCharacteristic, value: ByteArray) {
+        if (creditMode && c.uuid == T_CRED_TX) {
+            if (value.isNotEmpty()) hwCredit += value[0].toInt() and 0xFF
+            return
+        }
+        incoming.put(value)
+        if (creditMode) {
+            hwCredit--
+            if (hwCredit <= MIN_CREDIT) {
+                hwCredit += MAX_CREDIT - MIN_CREDIT
+                gatt?.let { writeCredit(it, MAX_CREDIT - MIN_CREDIT) }
             }
         }
     }
@@ -136,6 +191,40 @@ class BleConnection(private val context: Context, private val address: String) {
             }
         }
         return false
+    }
+
+    // Detecta el servicio Telit/HW (OSTC) y sus 4 características por UUID.
+    private fun selectHwTelit(g: BluetoothGatt): Boolean {
+        val s = g.getService(HW_TELIT_SERVICE) ?: return false
+        dataTx = s.getCharacteristic(T_DATA_TX)
+        dataRx = s.getCharacteristic(T_DATA_RX)
+        credTx = s.getCharacteristic(T_CRED_TX)
+        credRx = s.getCharacteristic(T_CRED_RX)
+        val ok = dataTx != null && dataRx != null && credTx != null && credRx != null
+        if (ok) Log.i(TAG, "OSTC Telit: control de flujo por créditos")
+        return ok
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun writeCccd(
+        g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray
+    ) {
+        g.setCharacteristicNotification(c, true)
+        val cccd = c.getDescriptor(CCCD) ?: return fail("sin descriptor CCCD")
+        @Suppress("DEPRECATION")
+        run { cccd.value = value; g.writeDescriptor(cccd) }
+    }
+
+    // Envía [n] créditos UART al módulo (característica de créditos RX).
+    @SuppressLint("MissingPermission")
+    private fun writeCredit(g: BluetoothGatt, n: Int) {
+        val c = credRx ?: return
+        @Suppress("DEPRECATION")
+        run {
+            c.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            c.value = byteArrayOf(n.toByte())
+            g.writeCharacteristic(c)
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -172,7 +261,7 @@ class BleConnection(private val context: Context, private val address: String) {
     @SuppressLint("MissingPermission")
     fun bleWrite(data: ByteArray): Boolean {
         val g = gatt ?: return false
-        val c = writeChar ?: return false
+        val c = (if (creditMode) dataRx else writeChar) ?: return false
         val mode = if (c.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0)
             BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
         else BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
