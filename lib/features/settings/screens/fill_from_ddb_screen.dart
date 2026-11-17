@@ -1,19 +1,68 @@
-/// Rellena datos de buceos propios cruzando con el .ddb de un compañero:
-/// empareja por fecha/hora (±1h) y copia sitio, notas y buddies + uno elegido.
+/// Rellena datos de buceos propios con los de un compañero (ya emparejados):
+/// selección estilo lista de buceos + buddy a añadir + confirmación.
 library;
 
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
+import 'package:path_provider/path_provider.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/widgets/confirm_dialog.dart';
+import 'package:pandive/core/widgets/loading_dialog.dart';
+import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
 import 'package:pandive/features/settings/logic/enrich_logbook.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+// Elige el .ddb de un compañero, empareja (con spinner) y abre la pantalla.
+Future<void> openFillFromDdb(
+    BuildContext context, DivemateDb db, Settings settings) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final nav = Navigator.of(context);
+  final t = AppLocalizations.of(context);
+  final res = await FilePicker.platform.pickFiles(withData: false);
+  final path = res?.files.single.path;
+  if (path == null || !context.mounted) return;
+  showLoadingDialog(context, t.readingDdb);
+  try {
+    final dir = await getTemporaryDirectory();
+    final tmp = File('${dir.path}/source.ddb');
+    await File(path).copy(tmp.path);
+    final source = DivemateDb.open(tmp.path, readOnly: true);
+    if (!source.looksValid) {
+      source.close();
+      nav.pop();
+      messenger.showSnackBar(SnackBar(content: Text(t.invalidDb)));
+      return;
+    }
+    final r = await computeMatches(db, source);
+    source.close();
+    nav.pop(); // cerrar spinner
+    if (r.dives.isEmpty) {
+      messenger.showSnackBar(SnackBar(content: Text(t.noMatches)));
+      return;
+    }
+    nav.push(MaterialPageRoute(
+        builder: (_) => FillFromDdbScreen(
+            db: db, settings: settings, dives: r.dives, matches: r.matches)));
+  } catch (e) {
+    nav.pop();
+    messenger.showSnackBar(SnackBar(content: Text(t.errorLoad('$e'))));
+  }
+}
 
 class FillFromDdbScreen extends StatefulWidget {
   final DivemateDb db;
-  final DivemateDb source;
-  const FillFromDdbScreen({super.key, required this.db, required this.source});
+  final Settings settings;
+  final List<Dive> dives; // buceos propios con coincidencia
+  final Map<int, DiveMatch> matches;
+  const FillFromDdbScreen({
+    super.key,
+    required this.db,
+    required this.settings,
+    required this.dives,
+    required this.matches,
+  });
 
   @override
   State<FillFromDdbScreen> createState() => _FillFromDdbScreenState();
@@ -21,77 +70,81 @@ class FillFromDdbScreen extends StatefulWidget {
 
 class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
   final _buddy = TextEditingController();
-  final _matches = <int, DiveMatch>{};
-  final _selected = <int>{};
-  late final List<Dive> _dives;
-
-  @override
-  void initState() {
-    super.initState();
-    _dives = [
-      for (final d in widget.db.listDives())
-        if (d.date != null) d,
-    ].where((d) {
-      final m = findSourceMatch(widget.source, d.date!);
-      if (m != null) {
-        _matches[d.id] = m;
-        _selected.add(d.id);
-      }
-      return m != null;
-    }).toList();
-  }
+  final _selected = <int>{}; // índices en widget.dives
 
   @override
   void dispose() {
     _buddy.dispose();
-    widget.source.close();
     super.dispose();
   }
 
-  void _apply() {
-    final n = applyEnrich(widget.db, _matches, _selected, _buddy.text);
+  void _toggle(int i) => setState(
+      () => _selected.contains(i) ? _selected.remove(i) : _selected.add(i));
+
+  void _toggleGroup(List<int> idx) => setState(() {
+        if (idx.every(_selected.contains)) {
+          _selected.removeAll(idx);
+        } else {
+          _selected.addAll(idx);
+        }
+      });
+
+  void _toggleAll() => setState(() {
+        if (_selected.length == widget.dives.length) {
+          _selected.clear();
+        } else {
+          _selected.addAll(List.generate(widget.dives.length, (i) => i));
+        }
+      });
+
+  Future<void> _apply() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!await confirmDialog(context, t.fillConfirm(_selected.length),
+        confirmLabel: t.fillFromDdb)) {
+      return;
+    }
+    final ids = {for (final i in _selected) widget.dives[i].id};
+    final n = applyEnrich(widget.db, widget.matches, ids, _buddy.text);
+    if (!mounted) return;
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).fillResult(n))));
+    messenger.showSnackBar(SnackBar(content: Text(t.fillResult(n))));
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final fmt = DateFormat('dd/MM/yyyy', Localizations.localeOf(context).languageCode);
     return Scaffold(
       appBar: AppBar(title: Text(t.fillFromDdb), actions: [
-        if (_matches.isNotEmpty)
-          IconButton(
-              icon: const Icon(Icons.check),
-              tooltip: t.confirm,
-              onPressed: _selected.isEmpty ? null : _apply),
+        IconButton(
+            icon: const Icon(Icons.select_all),
+            tooltip: t.selectAll,
+            onPressed: _toggleAll),
+        IconButton(
+            icon: const Icon(Icons.check),
+            tooltip: t.fillFromDdb,
+            onPressed: _selected.isEmpty ? null : _apply),
       ]),
-      body: _matches.isEmpty
-          ? Center(child: Text(t.noMatches))
-          : Column(children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _buddy,
-                  decoration: InputDecoration(
-                      labelText: t.buddyToAdd, border: const OutlineInputBorder()),
-                ),
-              ),
-              Expanded(
-                child: ListView(children: [
-                  for (final d in _dives)
-                    CheckboxListTile(
-                      value: _selected.contains(d.id),
-                      onChanged: (v) => setState(() =>
-                          v == true ? _selected.add(d.id) : _selected.remove(d.id)),
-                      title: Text(
-                          '${d.date != null ? fmt.format(d.date!) : '—'}  ·  ${_matches[d.id]!.place ?? t.site}'),
-                      subtitle: Text('#${d.number ?? d.id}'),
-                    ),
-                ]),
-              ),
-            ]),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: TextField(
+            controller: _buddy,
+            decoration: InputDecoration(
+                labelText: t.buddyToAdd, border: const OutlineInputBorder()),
+          ),
+        ),
+        Expanded(
+          child: MonthGroupedDives(
+            dives: widget.dives,
+            settings: widget.settings,
+            selected: _selected,
+            selectionMode: true,
+            onOpen: _toggle,
+            onToggleGroup: _toggleGroup,
+          ),
+        ),
+      ]),
     );
   }
 }

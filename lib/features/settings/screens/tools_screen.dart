@@ -1,11 +1,7 @@
 /// Herramientas: importar hashtags, exportar logbook y utilidades de debug.
 library;
 
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
@@ -59,27 +55,6 @@ class ToolsScreen extends StatelessWidget {
         SnackBar(content: Text(t.importSubsurfaceResult(n))));
   }
 
-  // Abre un .ddb de un compañero y abre la pantalla para rellenar datos.
-  Future<void> _fillFromDdb(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final t = AppLocalizations.of(context);
-    final res = await FilePicker.platform.pickFiles(withData: false);
-    final path = res?.files.single.path;
-    if (path == null) return;
-    final dir = await getTemporaryDirectory();
-    final tmp = File('${dir.path}/source.ddb');
-    await File(path).copy(tmp.path);
-    final source = DivemateDb.open(tmp.path, readOnly: true);
-    if (!source.looksValid) {
-      source.close();
-      messenger.showSnackBar(SnackBar(content: Text(t.invalidDb)));
-      return;
-    }
-    if (!context.mounted) return source.close();
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => FillFromDdbScreen(db: db, source: source)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -118,7 +93,7 @@ class ToolsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.group_add_outlined),
             title: Text(t.fillFromDdb),
-            onTap: () => _fillFromDdb(context),
+            onTap: () => openFillFromDdb(context, db, settings),
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),

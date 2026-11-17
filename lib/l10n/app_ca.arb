@@ -23,6 +23,8 @@
   "diveRestored": "Immersió restaurada",
   "deleteDivesConfirm": "Vols esborrar {count}? Les podràs restaurar més tard des de la Paperera.",
   "sectionExportImport": "Exporta / Importa",
+  "readingDdb": "Llegint el .ddb del company…",
+  "fillConfirm": "Omplir {count} immersions?",
   "fillFromDdb": "Omplir immersions des del quadern d'un company",
   "buddyToAdd": "Company a afegir",
   "noMatches": "No s'han trobat immersions coincidents",

@@ -23,6 +23,28 @@ class DiveMatch {
   });
 }
 
+/// Empareja los buceos de [her] con [source] (cede al bucle de eventos para que
+/// la UI siga viva). Devuelve los buceos propios con coincidencia y sus datos.
+Future<({List<Dive> dives, Map<int, DiveMatch> matches})> computeMatches(
+    DivemateDb her, DivemateDb source,
+    {Duration tol = const Duration(hours: 1)}) async {
+  final matches = <int, DiveMatch>{};
+  final dives = <Dive>[];
+  final all = her.listDives();
+  for (var i = 0; i < all.length; i++) {
+    final d = all[i];
+    if (d.date != null) {
+      final m = findSourceMatch(source, d.date!, tol: tol);
+      if (m != null) {
+        matches[d.id] = m;
+        dives.add(d);
+      }
+    }
+    if (i % 10 == 9) await Future<void>.delayed(Duration.zero);
+  }
+  return (dives: dives, matches: matches);
+}
+
 /// Busca en [source] el buceo del mismo día más cercano en hora a [when]
 /// (dentro de [tol]); devuelve sus datos copiables, o null si no hay.
 DiveMatch? findSourceMatch(DivemateDb source, DateTime when,

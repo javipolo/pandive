@@ -23,6 +23,8 @@
   "diveRestored": "Inmersión restaurada",
   "deleteDivesConfirm": "¿Eliminar {count}? Podrás restaurarlas luego desde la Papelera.",
   "sectionExportImport": "Exportar / Importar",
+  "readingDdb": "Leyendo el .ddb del compañero…",
+  "fillConfirm": "¿Rellenar {count} buceos?",
   "fillFromDdb": "Rellenar buceos desde el logbook de un compañero",
   "buddyToAdd": "Buddy a añadir",
   "noMatches": "No se encontraron buceos coincidentes",

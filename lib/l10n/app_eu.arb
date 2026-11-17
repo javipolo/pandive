@@ -23,6 +23,8 @@
   "diveRestored": "Murgilketa leheneratuta",
   "deleteDivesConfirm": "{count} ezabatu? Gero Zakarrontzitik leheneratu ditzakezu.",
   "sectionExportImport": "Esportatu / Inportatu",
+  "readingDdb": "Kidearen .ddb irakurtzen…",
+  "fillConfirm": "{count} murgilketa bete?",
   "fillFromDdb": "Bete murgilketak kide baten koadernotik",
   "buddyToAdd": "Gehitzeko kidea",
   "noMatches": "Ez da bat datorren murgilketarik aurkitu",
