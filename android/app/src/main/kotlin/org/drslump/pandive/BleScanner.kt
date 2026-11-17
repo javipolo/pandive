@@ -29,6 +29,7 @@ class BleScanner(private val context: Context) : EventChannel.StreamHandler {
         "suunto", "eon", "d5",                                     // Suunto
         "shearwater", "garmin", "descent", "oceanic", "aqualung",
         "scubapro", "galileo", "ratio", "divesoft",
+        "ostc", "hw ", "heinrichs", "mclean", "cressi", "deepblu", "cosmiq",
     )
 
     private val callback = object : ScanCallback() {

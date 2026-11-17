@@ -67,6 +67,34 @@ Java_org_drslump_pandive_DiveComputer_nativeSupportedList(JNIEnv *env, jobject t
     return r;
 }
 
+// Dado el nombre anunciado por BLE, devuelve "Vendor\tProduct" del primer
+// descriptor de libdivecomputer que lo reconoce (dc_descriptor_filter), o "".
+// Así se soportan todos los ordenadores de libdivecomputer sin lista propia.
+JNIEXPORT jstring JNICALL
+Java_org_drslump_pandive_DiveComputer_nativeMatchName(JNIEnv *env, jobject thiz,
+                                                      jstring jname) {
+    (void) thiz;
+    const char *name = jname ? (*env)->GetStringUTFChars(env, jname, NULL) : NULL;
+    char out[256];
+    out[0] = '\0';
+    dc_iterator_t *it = NULL;
+    if (name && dc_descriptor_iterator(&it) == DC_STATUS_SUCCESS) {
+        dc_descriptor_t *desc = NULL;
+        while (dc_iterator_next(it, &desc) == DC_STATUS_SUCCESS) {
+            if (out[0] == '\0' &&
+                dc_descriptor_filter(desc, DC_TRANSPORT_BLE, name)) {
+                const char *v = dc_descriptor_get_vendor(desc);
+                const char *p = dc_descriptor_get_product(desc);
+                snprintf(out, sizeof(out), "%s\t%s", v ? v : "", p ? p : "");
+            }
+            dc_descriptor_free(desc);
+        }
+        dc_iterator_free(it);
+    }
+    if (name) (*env)->ReleaseStringUTFChars(env, jname, name);
+    return (*env)->NewStringUTF(env, out);
+}
+
 // ---------------------------------------------------------------------------
 // Buffer de texto dinámico (para construir el JSON)
 // ---------------------------------------------------------------------------

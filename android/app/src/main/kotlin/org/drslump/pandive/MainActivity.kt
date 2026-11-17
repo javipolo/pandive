@@ -21,6 +21,8 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "supportedCount" -> result.success(DiveComputer.nativeSupportedCount())
                     "supportedList" -> result.success(DiveComputer.nativeSupportedList())
+                    "matchName" -> result.success(
+                        DiveComputer.nativeMatchName(call.argument<String>("name") ?: ""))
                     "download" -> handleDownload(call, result)
                     else -> result.notImplemented()
                 }

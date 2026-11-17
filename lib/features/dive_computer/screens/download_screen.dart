@@ -41,7 +41,7 @@ class DownloadScreen extends StatefulWidget {
 class _DownloadScreenState extends State<DownloadScreen> {
   final _svc = DiveComputerService();
   late Future<DownloadResult> _future;
-  late final (String, String)? _model;
+  (String, String)? _model;
   StreamSubscription<double>? _progressSub;
   double _progress = 0;
   bool _saving = false;
@@ -52,7 +52,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
   void initState() {
     super.initState();
     WakelockPlus.enable();
-    _model = modelForDeviceName(widget.device.name);
     _progressSub = _svc.progress().listen((p) {
       if (mounted) setState(() => _progress = p);
     });
@@ -65,8 +64,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
     super.dispose();
   }
   Future<DownloadResult> _download() async {
-    final m = _model;
+    final m = _model ??= await _svc.matchModel(widget.device.name);
     if (m == null) {
+      if (!mounted) return DownloadResult(error: '');
       return DownloadResult(
           error: AppLocalizations.of(context)
               .modelNotRecognized(widget.device.name));
@@ -87,7 +87,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
   Future<void> _save(Set<String> selected) async {
     setState(() => _saving = true);
-    final computer = _model != null ? '${_model.$1} ${_model.$2}' : null;
+    final m = _model;
+    final computer = m != null ? '${m.$1} ${m.$2}' : null;
     final added = applyDownloadSelection(
       db: widget.db, deviceId: widget.device.id, items: _items!,
       selected: selected, deviceDives: _deviceDives, computer: computer,
@@ -104,7 +105,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final name = _model != null ? '${_model.$1} ${_model.$2}' : widget.device.name;
+    final m = _model;
+    final name = m != null ? '${m.$1} ${m.$2}' : widget.device.name;
     final prefix = widget.syncMode ? t.sync : (widget.baseline ? t.markPrefix : t.downloadPrefix);
     return Scaffold(
       appBar: AppBar(title: Text('$prefix · $name')),

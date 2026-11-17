@@ -80,7 +80,8 @@ class _ScanScreenState extends State<ScanScreen> {
       final save = await showSaveComputerDialog(context, d.name);
       if (save == null || !mounted) return;
       if (save) {
-        final m = modelForDeviceName(d.name);
+        final m = await _svc.matchModel(d.name);
+        if (!mounted) return;
         widget.db.addComputer(d.id, d.name, vendor: m?.$1, product: m?.$2);
       }
     }

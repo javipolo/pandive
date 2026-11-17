@@ -47,6 +47,21 @@ class DiveComputerService {
     });
   }
 
+  /// Resuelve (vendor, product) para un nombre BLE usando el matcher propio de
+  /// libdivecomputer (cubre todos los modelos). Fallback: lista local.
+  Future<(String, String)?> matchModel(String name) async {
+    try {
+      final s = await _channel.invokeMethod<String>('matchName', {'name': name});
+      if (s != null && s.contains('\t')) {
+        final parts = s.split('\t');
+        if (parts[0].isNotEmpty && parts[1].isNotEmpty) {
+          return (parts[0], parts[1]);
+        }
+      }
+    } catch (_) {/* nativo no disponible */}
+    return modelForDeviceName(name);
+  }
+
   /// Nº de modelos de ordenador soportados por libdivecomputer.
   Future<int> supportedCount() async {
     final n = await _channel.invokeMethod<int>('supportedCount');

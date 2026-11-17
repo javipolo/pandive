@@ -17,6 +17,7 @@ object DiveComputer {
 
     external fun nativeSupportedCount(): Int
     external fun nativeSupportedList(): String
+    external fun nativeMatchName(name: String): String
     external fun nativeDownload(
         vendor: String, product: String, conn: BleConnection, fingerprint: String,
         maxDives: Int,
