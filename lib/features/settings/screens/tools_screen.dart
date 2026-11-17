@@ -61,16 +61,7 @@ class ToolsScreen extends StatelessWidget {
       appBar: AppBar(title: Text(t.tools)),
       body: ListView(
         children: [
-          ListTile(
-            leading: const Icon(Icons.tag),
-            title: Text(t.importHashtags),
-            onTap: () => _importHashtags(context),
-          ),
-          ListTile(
-            leading: const Icon(Icons.sell_outlined),
-            title: Text(t.tagsToHashtags),
-            onTap: () => _tagsToHashtags(context),
-          ),
+          _header(context, t.sectionExportImport),
           ListTile(
             leading: const Icon(Icons.ios_share),
             title: Text(t.exportLogbook),
@@ -86,6 +77,18 @@ class ToolsScreen extends StatelessWidget {
             title: Text(t.importSubsurface),
             onTap: () => _importSubsurface(context),
           ),
+          _header(context, t.tags),
+          ListTile(
+            leading: const Icon(Icons.tag),
+            title: Text(t.importHashtags),
+            onTap: () => _importHashtags(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.sell_outlined),
+            title: Text(t.tagsToHashtags),
+            onTap: () => _tagsToHashtags(context),
+          ),
+          _header(context, t.sectionOther),
           ListTile(
             leading: const Icon(Icons.delete_outline),
             title: Text(t.trash),
@@ -93,10 +96,10 @@ class ToolsScreen extends StatelessWidget {
                 builder: (_) =>
                     TrashScreen(db: db, onReloadDb: onReloadDb))),
           ),
+          _header(context, t.sectionDebug),
           ListTile(
             leading: const Icon(Icons.bug_report_outlined),
             title: Text(t.debugSyncPoint),
-            subtitle: Text(t.debugSyncPointHint),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => DebugSyncScreen(db: db))),
           ),
@@ -104,4 +107,12 @@ class ToolsScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _header(BuildContext context, String text) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+        child: Text(text,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold)),
+      );
 }
