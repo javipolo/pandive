@@ -23,7 +23,8 @@ Future<void> openFillFromDdb(BuildContext context, DivemateDb db) async {
   final path = res?.files.single.path;
   if (path == null || !context.mounted) return;
   showLoadingDialog(context, t.readingDdb);
-  await Future<void>.delayed(Duration.zero); // deja pintar el spinner primero
+  // Espera a que el spinner se pinte antes del trabajo pesado (evita el lag).
+  await WidgetsBinding.instance.endOfFrame;
   try {
     final dir = await getTemporaryDirectory();
     final tmp = File('${dir.path}/source.ddb');

@@ -28,21 +28,48 @@ class DiveMatch {
 Future<({List<Dive> dives, Map<int, DiveMatch> matches})> computeMatches(
     DivemateDb her, DivemateDb source,
     {Duration tol = const Duration(hours: 1)}) async {
+  // Indexa el origen por día una sola vez (evita re-consultar por cada buceo).
+  final byDay = <String, List<Dive>>{};
+  for (final d in source.listDives()) {
+    final dt = d.date;
+    if (dt != null) (byDay['${dt.year}-${dt.month}-${dt.day}'] ??= []).add(d);
+  }
   final matches = <int, DiveMatch>{};
   final dives = <Dive>[];
   final all = her.listDives();
   for (var i = 0; i < all.length; i++) {
-    final d = all[i];
-    if (d.date != null) {
-      final m = findSourceMatch(source, d.date!, tol: tol);
-      if (m != null) {
-        matches[d.id] = m;
-        dives.add(d);
+    final dt = all[i].date;
+    if (dt != null) {
+      Dive? best;
+      Duration? bd;
+      for (final s in byDay['${dt.year}-${dt.month}-${dt.day}'] ?? const []) {
+        final diff = s.date!.difference(dt).abs();
+        if (diff <= tol && (bd == null || diff < bd)) {
+          best = s;
+          bd = diff;
+        }
+      }
+      if (best != null) {
+        matches[all[i].id] = _matchFrom(source, best);
+        dives.add(all[i]);
       }
     }
-    if (i % 10 == 9) await Future<void>.delayed(Duration.zero);
+    if (i % 20 == 19) await Future<void>.delayed(Duration.zero);
   }
   return (dives: dives, matches: matches);
+}
+
+/// Construye los datos copiables desde un buceo del .ddb de origen.
+DiveMatch _matchFrom(DivemateDb source, Dive best) {
+  final site = best.placeId != null ? source.getSite(best.placeId!) : null;
+  return DiveMatch(
+    place: site?.name ?? best.place,
+    country: site?.country ?? best.country,
+    lat: site?.lat,
+    lon: site?.lon,
+    notes: best.comments,
+    buddies: source.diveBuddies(best.id).map((b) => b.name).toList(),
+  );
 }
 
 /// Busca en [source] el buceo del mismo día más cercano en hora a [when]
@@ -63,16 +90,7 @@ DiveMatch? findSourceMatch(DivemateDb source, DateTime when,
       bestDiff = diff;
     }
   }
-  if (best == null) return null;
-  final site = best.placeId != null ? source.getSite(best.placeId!) : null;
-  return DiveMatch(
-    place: site?.name ?? best.place,
-    country: site?.country ?? best.country,
-    lat: site?.lat,
-    lon: site?.lon,
-    notes: best.comments,
-    buddies: source.diveBuddies(best.id).map((b) => b.name).toList(),
-  );
+  return best == null ? null : _matchFrom(source, best);
 }
 
 /// Aplica los [matches] a los buceos [selected] del logbook [db]: copia sitio y
