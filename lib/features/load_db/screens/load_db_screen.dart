@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
-import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/widgets/import_progress.dart';
 import 'package:pandive/features/load_db/widgets/load_db_buttons.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -82,7 +82,8 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
         final xml = await File(path).readAsString();
         final dest = await _newDbPath();
         final db = DivemateDb.createEmpty(dest);
-        await importSubsurfaceXml(db, xml);
+        if (!mounted) return db.close();
+        await importSsrfWithProgress(context, db, xml);
         db.close();
         await widget.onLoaded(dest);
       }, (e) => AppLocalizations.of(context).errorCreate(e));

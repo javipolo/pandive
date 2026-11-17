@@ -41,6 +41,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
+- `lib/core/widgets/import_progress.dart` -> diálogo de progreso reutilizable para importar .ssrf
 - `lib/core/db/db_import_ext.dart` -> inserta inmersión externa (perfil, botellas, sitio, buddies, tags)
 - `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos
 
