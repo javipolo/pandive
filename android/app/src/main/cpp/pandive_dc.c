@@ -22,6 +22,15 @@
 
 #define LOG(...) __android_log_print(ANDROID_LOG_INFO, "PandiveDC", __VA_ARGS__)
 
+// Vuelca hasta 32 bytes en hex (diagnóstico de protocolo).
+static void log_hex(const char *tag, const unsigned char *p, size_t n) {
+    char hex[100];
+    size_t m = n < 32 ? n : 32;
+    size_t k = 0;
+    for (size_t i = 0; i < m; i++) k += snprintf(hex + k, sizeof(hex) - k, "%02x ", p[i]);
+    LOG("%s %zuB: %s", tag, n, hex);
+}
+
 // ---------------------------------------------------------------------------
 // Capacidad
 // ---------------------------------------------------------------------------
@@ -177,6 +186,7 @@ static dc_status_t io_read(void *ud, void *data, size_t size, size_t *actual) {
         (*env)->GetByteArrayRegion(env, arr, 0, n, (jbyte *) io->buf);
         (*env)->DeleteLocalRef(env, arr);
         io->buflen = n; io->bufpos = 0;
+        log_hex("io_read", io->buf, n);
     }
     size_t avail = io->buflen - io->bufpos;
     size_t copy = size < avail ? size : avail;
@@ -194,7 +204,7 @@ static dc_status_t io_write(void *ud, const void *data, size_t size, size_t *act
     jboolean ok = (*env)->CallBooleanMethod(env, io->conn, io->writeM, arr);
     (*env)->DeleteLocalRef(env, arr);
     *actual = size;
-    LOG("io_write %zu B ok=%d", size, (int) ok);
+    log_hex("io_write", (const unsigned char *) data, size);
     return ok ? DC_STATUS_SUCCESS : DC_STATUS_IO;
 }
 
