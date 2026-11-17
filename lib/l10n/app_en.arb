@@ -27,6 +27,7 @@
   "readingDdb": "Reading the buddy's .ddb…",
   "fillConfirm": "Fill {count} dives?",
   "@fillConfirm": { "placeholders": { "count": {} } },
+  "fillAction": "Fill",
   "fillFromDdb": "Fill dives from a buddy's logbook",
   "buddyToAdd": "Buddy to add",
   "noMatches": "No matching dives found",

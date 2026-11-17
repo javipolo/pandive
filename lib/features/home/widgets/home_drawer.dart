@@ -57,8 +57,7 @@ class HomeDrawer extends StatelessWidget {
             _item(context, 5, Icons.bar_chart_outlined, t.navStats),
             const Divider(),
             _push(context, Icons.build_outlined, t.tools,
-                (_) => ToolsScreen(
-                    settings: settings, db: db, onReloadDb: onReloadDb)),
+                (_) => ToolsScreen(settings: settings, db: db)),
             _push(context, Icons.cloud_upload_outlined, t.backup,
                 (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
             _push(context, Icons.info_outline, t.about, (_) => const AboutScreen()),

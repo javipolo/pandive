@@ -25,6 +25,7 @@
   "sectionExportImport": "Esportatu / Inportatu",
   "readingDdb": "Kidearen .ddb irakurtzen…",
   "fillConfirm": "{count} murgilketa bete?",
+  "fillAction": "Bete",
   "fillFromDdb": "Bete murgilketak kide baten koadernotik",
   "buddyToAdd": "Gehitzeko kidea",
   "noMatches": "Ez da bat datorren murgilketarik aurkitu",

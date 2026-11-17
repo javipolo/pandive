@@ -16,13 +16,7 @@ import 'package:pandive/l10n/app_localizations.dart';
 class ToolsScreen extends StatelessWidget {
   final Settings settings;
   final DivemateDb db;
-  final VoidCallback onReloadDb;
-  const ToolsScreen({
-    super.key,
-    required this.settings,
-    required this.db,
-    required this.onReloadDb,
-  });
+  const ToolsScreen({super.key, required this.settings, required this.db});
 
   Future<void> _importHashtags(BuildContext context) async {
     final t = AppLocalizations.of(context);
@@ -53,7 +47,7 @@ class ToolsScreen extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final n = await importSubsurface(context, db);
     if (n == null) return;
-    onReloadDb();
+    bumpDataRevision();
     messenger.showSnackBar(
         SnackBar(content: Text(t.importSubsurfaceResult(n))));
   }
@@ -96,14 +90,13 @@ class ToolsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.group_add_outlined),
             title: Text(t.fillFromDdb),
-            onTap: () => openFillFromDdb(context, db, settings),
+            onTap: () => openFillFromDdb(context, db),
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),
             title: Text(t.trash),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) =>
-                    TrashScreen(db: db, onReloadDb: onReloadDb))),
+                builder: (_) => TrashScreen(db: db))),
           ),
           _header(context, t.sectionDebug),
           ListTile(

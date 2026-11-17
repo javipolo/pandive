@@ -9,15 +9,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/data_revision.dart';
-import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/loading_dialog.dart';
-import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
 import 'package:pandive/features/settings/logic/enrich_logbook.dart';
+import 'package:pandive/features/settings/widgets/fill_dive_checklist.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 // Elige el .ddb de un compañero, empareja (con spinner) y abre la pantalla.
-Future<void> openFillFromDdb(
-    BuildContext context, DivemateDb db, Settings settings) async {
+Future<void> openFillFromDdb(BuildContext context, DivemateDb db) async {
   final messenger = ScaffoldMessenger.of(context);
   final nav = Navigator.of(context);
   final t = AppLocalizations.of(context);
@@ -25,6 +23,7 @@ Future<void> openFillFromDdb(
   final path = res?.files.single.path;
   if (path == null || !context.mounted) return;
   showLoadingDialog(context, t.readingDdb);
+  await Future<void>.delayed(Duration.zero); // deja pintar el spinner primero
   try {
     final dir = await getTemporaryDirectory();
     final tmp = File('${dir.path}/source.ddb');
@@ -44,8 +43,8 @@ Future<void> openFillFromDdb(
       return;
     }
     nav.push(MaterialPageRoute(
-        builder: (_) => FillFromDdbScreen(
-            db: db, settings: settings, dives: r.dives, matches: r.matches)));
+        builder: (_) =>
+            FillFromDdbScreen(db: db, dives: r.dives, matches: r.matches)));
   } catch (e) {
     nav.pop();
     messenger.showSnackBar(SnackBar(content: Text(t.errorLoad('$e'))));
@@ -54,16 +53,10 @@ Future<void> openFillFromDdb(
 
 class FillFromDdbScreen extends StatefulWidget {
   final DivemateDb db;
-  final Settings settings;
   final List<Dive> dives; // buceos propios con coincidencia
   final Map<int, DiveMatch> matches;
-  const FillFromDdbScreen({
-    super.key,
-    required this.db,
-    required this.settings,
-    required this.dives,
-    required this.matches,
-  });
+  const FillFromDdbScreen(
+      {super.key, required this.db, required this.dives, required this.matches});
 
   @override
   State<FillFromDdbScreen> createState() => _FillFromDdbScreenState();
@@ -100,7 +93,7 @@ class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     if (!await confirmDialog(context, t.fillConfirm(_selected.length),
-        confirmLabel: t.fillFromDdb)) {
+        confirmLabel: t.fillAction)) {
       return;
     }
     final ids = {for (final i in _selected) widget.dives[i].id};
@@ -114,17 +107,9 @@ class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final n = _selected.length;
     return Scaffold(
-      appBar: AppBar(title: Text(t.fillFromDdb), actions: [
-        IconButton(
-            icon: const Icon(Icons.select_all),
-            tooltip: t.selectAll,
-            onPressed: _toggleAll),
-        IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: t.fillFromDdb,
-            onPressed: _selected.isEmpty ? null : _apply),
-      ]),
+      appBar: AppBar(title: Text(t.fillFromDdb)),
       body: Column(children: [
         Padding(
           padding: const EdgeInsets.all(16),
@@ -134,17 +119,31 @@ class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
                 labelText: t.buddyToAdd, border: const OutlineInputBorder()),
           ),
         ),
+        CheckboxListTile(
+          value: n == 0 ? false : (n == widget.dives.length ? true : null),
+          tristate: true,
+          onChanged: (_) => _toggleAll(),
+          title: Text(t.selectAll),
+        ),
+        const Divider(height: 1),
         Expanded(
-          child: MonthGroupedDives(
+          child: FillDiveChecklist(
             dives: widget.dives,
-            settings: widget.settings,
+            matches: widget.matches,
             selected: _selected,
-            selectionMode: true,
-            onOpen: _toggle,
+            onToggle: _toggle,
             onToggleGroup: _toggleGroup,
           ),
         ),
       ]),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: FilledButton.icon(
+          icon: const Icon(Icons.group_add_outlined),
+          label: Text('${t.fillAction} ($n)'),
+          onPressed: n == 0 ? null : _apply,
+        ),
+      ),
     );
   }
 }

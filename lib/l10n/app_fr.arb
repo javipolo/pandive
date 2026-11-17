@@ -25,6 +25,7 @@
   "sectionExportImport": "Export / Import",
   "readingDdb": "Lecture du .ddb du binôme…",
   "fillConfirm": "Remplir {count} plongées ?",
+  "fillAction": "Remplir",
   "fillFromDdb": "Remplir des plongées depuis le carnet d'un binôme",
   "buddyToAdd": "Binôme à ajouter",
   "noMatches": "Aucune plongée correspondante",

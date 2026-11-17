@@ -25,6 +25,7 @@
   "sectionExportImport": "Exportar / Importar",
   "readingDdb": "Leyendo el .ddb del compañero…",
   "fillConfirm": "¿Rellenar {count} buceos?",
+  "fillAction": "Rellenar",
   "fillFromDdb": "Rellenar buceos desde el logbook de un compañero",
   "buddyToAdd": "Buddy a añadir",
   "noMatches": "No se encontraron buceos coincidentes",
