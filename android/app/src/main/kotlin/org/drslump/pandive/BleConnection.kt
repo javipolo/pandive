@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.util.Log
 import java.util.UUID
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -61,6 +62,9 @@ class BleConnection(private val context: Context, private val address: String) {
     @Volatile private var hwCredit = 0
 
     private val incoming = LinkedBlockingQueue<ByteArray>()
+    // Confirmación de escritura (with-response): Android solo admite una
+    // operación GATT a la vez, así que esperamos onCharacteristicWrite.
+    private val writeAck = ArrayBlockingQueue<Boolean>(1)
     private val connectLatch = CountDownLatch(1)
     @Volatile private var connectError: String? = null
     @Volatile private var ready = false
@@ -146,6 +150,12 @@ class BleConnection(private val context: Context, private val address: String) {
                 connectLatch.countDown()
             }
         }
+
+        override fun onCharacteristicWrite(
+            g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int
+        ) {
+            writeAck.offer(status == BluetoothGatt.GATT_SUCCESS)
+        }
     }
 
     // Enruta un paquete recibido: datos a la cola; créditos (Telit) suman saldo.
@@ -182,7 +192,8 @@ class BleConnection(private val context: Context, private val address: String) {
                 if (w == null && (p and (BluetoothGattCharacteristic.PROPERTY_WRITE or
                         BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0) w = c
                 if (n == null && (p and (BluetoothGattCharacteristic.PROPERTY_NOTIFY or
-                        BluetoothGattCharacteristic.PROPERTY_INDICATE)) != 0) n = c
+                        BluetoothGattCharacteristic.PROPERTY_INDICATE)) != 0 &&
+                        c.getDescriptor(CCCD) != null) n = c
             }
             if (w != null && n != null) {
                 writeChar = w; notifyChar = n
@@ -262,11 +273,17 @@ class BleConnection(private val context: Context, private val address: String) {
     fun bleWrite(data: ByteArray): Boolean {
         val g = gatt ?: return false
         val c = (if (creditMode) dataRx else writeChar) ?: return false
-        val mode = if (c.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0)
-            BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-        else BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        val noResp = c.properties and
+            BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0
+        val mode = if (noResp) BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            else BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        writeAck.clear()
         @Suppress("DEPRECATION")
-        return run { c.writeType = mode; c.value = data; g.writeCharacteristic(c) }
+        val sent = run { c.writeType = mode; c.value = data; g.writeCharacteristic(c) }
+        if (!sent) return false
+        // Con respuesta: esperar a que termine (una sola operación GATT a la vez).
+        if (!noResp) return writeAck.poll(2000, TimeUnit.MILLISECONDS) == true
+        return true
     }
 
     @SuppressLint("MissingPermission")
