@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';
@@ -15,7 +16,6 @@ import 'package:pandive/features/dive_computer/widgets/download_progress.dart';
 import 'package:pandive/features/dive_computer/widgets/download_result_list.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 import 'package:pandive/l10n/app_localizations.dart';
-
 class DownloadScreen extends StatefulWidget {
   final ScannedDevice device;
   final DivemateDb db;
@@ -37,7 +37,6 @@ class DownloadScreen extends StatefulWidget {
   @override
   State<DownloadScreen> createState() => _DownloadScreenState();
 }
-
 class _DownloadScreenState extends State<DownloadScreen> {
   final _svc = DiveComputerService();
   late Future<DownloadResult> _future;
@@ -95,9 +94,10 @@ class _DownloadScreenState extends State<DownloadScreen> {
     );
     if (!mounted) return;
     final t = AppLocalizations.of(context);
+    bumpDataRevision(); // refresca pestañas (sin reabrir DB)
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(t.savedNew(added))));
-    Navigator.of(context).pop(added > 0);
+    Navigator.of(context).popUntil((r) => r.isFirst); // vuelve a inicio
   }
   // Por defecto: nuevos marcados, pendientes desmarcados.
   Set<String> get _defaultSel =>
