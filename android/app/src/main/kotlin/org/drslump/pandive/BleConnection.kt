@@ -73,17 +73,11 @@ class BleConnection(private val context: Context, private val address: String) {
     private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "Conectado; prioridad alta + 2M PHY + MTU")
+                Log.i(TAG, "Conectado; prioridad alta + MTU")
                 // Intervalo de conexión corto -> descarga más rápida.
                 g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
-                // PHY 2M dobla el ancho de banda si el aparato lo soporta.
-                try {
-                    g.setPreferredPhy(
-                        BluetoothDevice.PHY_LE_2M_MASK,
-                        BluetoothDevice.PHY_LE_2M_MASK,
-                        BluetoothDevice.PHY_OPTION_NO_PREFERRED,
-                    )
-                } catch (_: Exception) {}
+                // Nota: NO forzamos 2M PHY; algunos módulos (Mares) fallan la
+                // transferencia de datos aunque el control (ACK) funcione.
                 if (!g.requestMtu(247)) g.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (!ready) {
