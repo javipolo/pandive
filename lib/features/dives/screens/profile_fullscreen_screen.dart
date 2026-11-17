@@ -25,23 +25,19 @@ class ProfileFullscreenScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(title), actions: [
+        IconButton(
+          icon: const Icon(Icons.share),
+          tooltip: t.share,
+          onPressed: () => shareProfileImage(context,
+              profile: profile, title: title, gasChanges: gasChanges),
+        ),
+        // Alinea el icono con el borde derecho del plot (antes del eje de temp.).
+        const SizedBox(width: 56),
+      ]),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
-        child: Stack(children: [
-          ProfileChart(profile: profile, gasChanges: gasChanges),
-          // Justo a la izquierda del eje de temperatura (margen derecho ~62).
-          Positioned(
-            top: 0,
-            right: 64,
-            child: IconButton.filledTonal(
-              icon: const Icon(Icons.share),
-              tooltip: t.share,
-              onPressed: () => shareProfileImage(context,
-                  profile: profile, title: title, gasChanges: gasChanges),
-            ),
-          ),
-        ]),
+        child: ProfileChart(profile: profile, gasChanges: gasChanges),
       ),
     );
   }
