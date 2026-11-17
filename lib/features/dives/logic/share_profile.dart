@@ -23,10 +23,13 @@ Future<void> shareProfileImage(
   final overlay = Overlay.of(context);
   final theme = Theme.of(context);
   final key = GlobalKey();
+  // Colocar la tarjeta justo debajo del viewport (invisible) con un offset
+  // pequeño: un offset enorme corrompe el layer al capturar (imagen "tileada").
+  final below = MediaQuery.sizeOf(context).height + 20;
   final entry = OverlayEntry(
     builder: (_) => Positioned(
-      left: -10000,
-      top: 0,
+      left: 0,
+      top: below,
       child: Material(
         child: RepaintBoundary(
           key: key,
@@ -41,20 +44,15 @@ Future<void> shareProfileImage(
   );
   overlay.insert(entry);
   try {
-    // Esperar a que la tarjeta se pinte del todo antes de capturarla (si hay
-    // otra gráfica grande visible, el primer frame no basta).
-    RenderRepaintBoundary? boundary;
-    for (var i = 0; i < 12; i++) {
+    // Esperar frames reales para que termine el layout + la animación de entrada
+    // de la gráfica (no vale debugNeedsPaint: en release siempre es false).
+    for (var i = 0; i < 10; i++) {
       await WidgetsBinding.instance.endOfFrame;
       await Future<void>.delayed(const Duration(milliseconds: 40));
-      final ro = key.currentContext?.findRenderObject();
-      if (ro is RenderRepaintBoundary) {
-        boundary = ro;
-        if (!ro.debugNeedsPaint) break;
-      }
     }
-    if (boundary == null) return;
-    final image = await boundary.toImage(pixelRatio: 2);
+    final ro = key.currentContext?.findRenderObject();
+    if (ro is! RenderRepaintBoundary) return;
+    final image = await ro.toImage(pixelRatio: 2);
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     if (data == null) return;
     final dir = await getTemporaryDirectory();
