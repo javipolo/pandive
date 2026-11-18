@@ -62,22 +62,6 @@ class DiveComputerService {
     return modelForDeviceName(name);
   }
 
-  /// Nº de modelos de ordenador soportados por libdivecomputer.
-  Future<int> supportedCount() async {
-    final n = await _channel.invokeMethod<int>('supportedCount');
-    return n ?? 0;
-  }
-
-  /// Lista "Vendor Product" de modelos soportados.
-  Future<List<String>> supportedList() async {
-    final s = await _channel.invokeMethod<String>('supportedList') ?? '';
-    return s
-        .split('\n')
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty)
-        .toList();
-  }
-
   /// Pide los permisos de Bluetooth necesarios. Devuelve true si concedidos.
   /// En Android 12+ usa BLUETOOTH_SCAN/CONNECT; en <=11, localización.
   Future<bool> requestBlePermissions() async {

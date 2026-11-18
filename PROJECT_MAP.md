@@ -150,7 +150,6 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/stats/widgets/stats_buckets.dart` -> agrupar fechas por año/mes/semana (ISO)
 
 ### dive_computer (ordenador de buceo)
-- `lib/features/dive_computer/screens/dive_computer_screen.dart` -> modelos soportados + lanzar escaneo
 - `lib/features/dive_computer/screens/computer_pick_screen.dart` -> "Dive transfer": tocar=descargar; menú (descargar todo/marcar/borrar); Buscar
 - `lib/features/dive_computer/screens/scan_screen.dart` -> escaneo BLE; al elegir, ofrece guardar (checkbox)
 - `lib/features/dive_computer/screens/download_screen.dart` -> descarga inmersiones de un dispositivo y las muestra

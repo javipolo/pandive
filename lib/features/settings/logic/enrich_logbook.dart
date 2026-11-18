@@ -9,18 +9,9 @@ import 'package:pandive/core/models/models.dart';
 class DiveMatch {
   final String? place;
   final String? country;
-  final String? notes;
   final double? lat;
   final double? lon;
-  final List<String> buddies;
-  const DiveMatch({
-    this.place,
-    this.country,
-    this.notes,
-    this.lat,
-    this.lon,
-    this.buddies = const [],
-  });
+  const DiveMatch({this.place, this.country, this.lat, this.lon});
 }
 
 /// Empareja los buceos de [her] con [source] (cede al bucle de eventos para que
@@ -67,8 +58,6 @@ DiveMatch _matchFrom(DivemateDb source, Dive best) {
     country: site?.country ?? best.country,
     lat: site?.lat,
     lon: site?.lon,
-    notes: best.comments,
-    buddies: source.diveBuddies(best.id).map((b) => b.name).toList(),
   );
 }
 
