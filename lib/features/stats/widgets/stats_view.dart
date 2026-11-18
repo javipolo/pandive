@@ -1,12 +1,12 @@
-/// Vista de estadísticas: tarjetas + barras por periodo (año/mes/semana), con
-/// selector. Reutilizada por la pestaña global y por las stats de una selección.
+/// Vista de estadísticas en secciones (como el detalle de buceo) + barras por
+/// periodo. Reutilizada por la pestaña global y por las stats de una selección.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
-import 'package:pandive/core/widgets/stat_card.dart';
+import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
 import 'package:pandive/features/stats/widgets/stats_buckets.dart';
 import 'package:pandive/features/stats/widgets/year_bars.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -23,45 +23,68 @@ class StatsView extends StatefulWidget {
 class _StatsViewState extends State<StatsView> {
   StatsPeriod _period = StatsPeriod.year;
 
-  List<Widget> _cards(AppLocalizations t, DateFormat fmt) {
-    final s = widget.stats;
-    return [
-      StatCard(label: t.statsDives, value: '${s.totalDives}'),
-      StatCard(
-          label: t.statsTotalTime,
-          value: '${s.totalHours.toStringAsFixed(0)} h'),
-      if (s.avgDiveMinutes != null)
-        StatCard(
-            label: t.statsAvgDive, value: '${s.avgDiveMinutes!.round()} min'),
-      if (s.maxDepth != null)
-        StatCard(
-            label: t.statMaxDepth, value: '${s.maxDepth!.toStringAsFixed(1)} m'),
-      if (s.avgDepth != null)
-        StatCard(
-            label: t.statAvgDepth, value: '${s.avgDepth!.toStringAsFixed(1)} m'),
-      if (s.avgWaterTemp != null)
-        StatCard(
-            label: t.statsAvgTemp,
-            value: '${s.avgWaterTemp!.toStringAsFixed(1)} °C'),
-      if (s.firstDive != null)
-        StatCard(label: t.statsFirst, value: fmt.format(s.firstDive!)),
-      if (s.lastDive != null)
-        StatCard(label: t.statsLast, value: fmt.format(s.lastDive!)),
-    ];
+  String _u(double? v, String unit, {int dec = 1}) =>
+      v == null ? '—' : '${v.toStringAsFixed(dec)} $unit';
+  String _min(double? v) => v == null ? '—' : '${v.round()} min';
+
+  String _totalLong(double m) {
+    final tot = m.round();
+    return '${tot ~/ 1440}d ${(tot % 1440) ~/ 60}h ${tot % 60}m';
+  }
+
+  String _totalShort(double m) {
+    final tot = m.round();
+    return '${tot ~/ 60}h ${tot % 60}m';
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final fmt =
-        DateFormat('MMM yyyy', Localizations.localeOf(context).languageCode);
-    final bars = bucketByPeriod(widget.dates, _period);
+    final lang = Localizations.localeOf(context).languageCode;
+    final fullFmt = DateFormat.yMMMMd(lang);
+    final s = widget.stats;
+    LabeledValue date(String label, DateTime? d) =>
+        LabeledValue(label, d == null ? null : fullFmt.format(d));
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Wrap(spacing: 12, runSpacing: 12, children: _cards(t, fmt)),
+        twoCol(
+          LabeledValue(t.statsDives, '${s.totalDives}'),
+          s.buddiesCount == null
+              ? null
+              : LabeledValue(t.buddies, '${s.buddiesCount}'),
+        ),
+        sectionLine(),
+        twoCol(date(t.statsFirst, s.firstDive), date(t.statsLast, s.lastDive)),
+        twoCol(
+          LabeledValue(t.statsTotalTime, _totalLong(s.totalMinutes)),
+          LabeledValue(t.statsTotalHours, _totalShort(s.totalMinutes)),
+        ),
+        twoCol(
+          LabeledValue(t.statsMaxDive, _min(s.maxDiveMinutes)),
+          LabeledValue(t.statsAvgDive, _min(s.avgDiveMinutes)),
+        ),
+        sectionLine(),
+        twoCol(
+          LabeledValue(t.statMaxDepth, _u(s.maxDepth, 'm')),
+          LabeledValue(t.statAvgDepth, _u(s.avgDepth, 'm')),
+        ),
+        if (s.sacAvg != null) ...[
+          sectionLine(),
+          threeCol(
+            LabeledValue(t.statsSacMax, _u(s.sacMax, 'l/min')),
+            LabeledValue(t.statsSacMin, _u(s.sacMin, 'l/min')),
+            LabeledValue(t.statsSacAvg, _u(s.sacAvg, 'l/min')),
+          ),
+        ],
+        sectionLine(),
+        threeCol(
+          LabeledValue(t.statsTempMax, _u(s.tempMax, '°C')),
+          LabeledValue(t.statsTempMin, _u(s.tempMin, '°C')),
+          LabeledValue(t.statsAvgTemp, _u(s.avgWaterTemp, '°C')),
+        ),
         if (widget.dates.isNotEmpty) ...[
-          const SizedBox(height: 24),
+          sectionLine(),
           SegmentedButton<StatsPeriod>(
             segments: [
               ButtonSegment(value: StatsPeriod.year, label: Text(t.byYear)),
@@ -69,10 +92,10 @@ class _StatsViewState extends State<StatsView> {
               ButtonSegment(value: StatsPeriod.week, label: Text(t.byWeek)),
             ],
             selected: {_period},
-            onSelectionChanged: (s) => setState(() => _period = s.first),
+            onSelectionChanged: (sel) => setState(() => _period = sel.first),
           ),
           const SizedBox(height: 12),
-          PeriodBars(data: bars),
+          PeriodBars(data: bucketByPeriod(widget.dates, _period)),
         ],
       ],
     );

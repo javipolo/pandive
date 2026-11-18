@@ -5,10 +5,17 @@ import 'dive.dart';
 
 class LogbookStats {
   final int totalDives;
+  final int? buddiesCount;
   final double totalMinutes;
+  final double? maxDiveMinutes;
   final double? avgDiveMinutes;
   final double? maxDepth; // MAX(Depth)
   final double? avgDepth; // AVG(DepthAvg)
+  final double? sacMax; // l/min
+  final double? sacMin;
+  final double? sacAvg;
+  final double? tempMax;
+  final double? tempMin;
   final double? avgWaterTemp;
   final DateTime? firstDive;
   final DateTime? lastDive;
@@ -16,10 +23,17 @@ class LogbookStats {
 
   const LogbookStats({
     required this.totalDives,
+    this.buddiesCount,
     required this.totalMinutes,
+    this.maxDiveMinutes,
     this.avgDiveMinutes,
     this.maxDepth,
     this.avgDepth,
+    this.sacMax,
+    this.sacMin,
+    this.sacAvg,
+    this.tempMax,
+    this.tempMin,
     this.avgWaterTemp,
     this.firstDive,
     this.lastDive,
@@ -57,12 +71,19 @@ class LogbookStats {
     }
     double? avg(List<double> xs) =>
         xs.isEmpty ? null : xs.reduce((a, b) => a + b) / xs.length;
+    double? maxOf(List<double> xs) =>
+        xs.isEmpty ? null : xs.reduce((a, b) => a > b ? a : b);
+    double? minOf(List<double> xs) =>
+        xs.isEmpty ? null : xs.reduce((a, b) => a < b ? a : b);
     return LogbookStats(
       totalDives: dives.length,
       totalMinutes: sumMin,
+      maxDiveMinutes: maxOf(durations),
       avgDiveMinutes: avg(durations),
       maxDepth: maxD,
       avgDepth: avg(depths),
+      tempMax: maxOf(temps),
+      tempMin: minOf(temps),
       avgWaterTemp: avg(temps),
       firstDive: first,
       lastDive: last,

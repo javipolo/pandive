@@ -62,7 +62,6 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/widgets/profile_chart.dart` -> gráfico de perfil (prof + temp eje dcho, línea táctil)
 - `lib/core/widgets/profile_chart_axes.dart` -> ejes y tooltip del gráfico de perfil
 - `lib/core/widgets/save_action.dart` -> botón Guardar de AppBar
-- `lib/core/widgets/stat_card.dart` -> tarjeta etiqueta/valor
 - `lib/core/widgets/labeled_field.dart` -> campo de texto con etiqueta/borde
 - `lib/core/widgets/star_rating.dart` -> selector de valoración por estrellas
 - `lib/core/widgets/date_time_field.dart` -> selector de fecha+hora (ListTile)
@@ -132,7 +131,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle por secciones (nº/fecha, sitio, perfil+métricas, gases, deco, botellas)
 - `lib/features/dives/widgets/profile_section.dart` -> sección perfil: gráfica compacta + botones compartir / pantalla completa
 - `lib/features/dives/logic/share_profile.dart` -> genera PNG del perfil (con sitio) y lo comparte (share_plus)
-- `lib/features/dives/widgets/dive_detail_fields.dart` -> celda etiqueta/valor, fila 2 columnas, separador de sección
+- `lib/features/dives/widgets/dive_detail_fields.dart` -> celda etiqueta/valor, filas 2/3 columnas, separador de sección
 - `lib/features/dives/widgets/dive_form.dart` -> campos escalares editables (+ controllers)
 - `lib/features/dives/widgets/site_picker_field.dart` -> campo de sitio elegido
 - `lib/features/dives/widgets/buddies_picker_field.dart` -> campo de compañeros elegidos (chips)

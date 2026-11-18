@@ -38,4 +38,16 @@ Widget twoCol(Widget? a, Widget? b, {int leftFlex = 1, int rightFlex = 1}) => Ro
       ],
     );
 
+/// Tres columnas alineadas (izquierda | centro | derecha).
+Widget threeCol(Widget? a, Widget? b, Widget? c) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: a ?? const SizedBox()),
+        const SizedBox(width: 16),
+        Expanded(child: b ?? const SizedBox()),
+        const SizedBox(width: 16),
+        Expanded(child: c ?? const SizedBox()),
+      ],
+    );
+
 Widget sectionLine() => const Divider(height: 20, thickness: 0.6);

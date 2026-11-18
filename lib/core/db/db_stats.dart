@@ -44,15 +44,29 @@ extension DivemateDbStats on DivemateDb {
       filter.write(' AND DiverID = ?');
       params.add(owner);
     }
+    // Solo lecturas de temperatura plausibles (p.ej. -300 = "sin lectura").
+    const tempOk = 'Watertemp > -50 AND Watertemp < 60';
+    // PandiveSac es columna propia; puede faltar (p.ej. DB abierta solo lectura).
+    final hasSac = _db
+        .select("SELECT 1 FROM pragma_table_info('Logbook') "
+            "WHERE name='PandiveSac'")
+        .isNotEmpty;
+    final sacCols = hasSac
+        ? 'MAX(CASE WHEN PandiveSac > 0 THEN PandiveSac END) sacmax, '
+            'MIN(CASE WHEN PandiveSac > 0 THEN PandiveSac END) sacmin, '
+            'AVG(CASE WHEN PandiveSac > 0 THEN PandiveSac END) sacavg, '
+        : 'NULL sacmax, NULL sacmin, NULL sacavg, ';
     final agg = _db.select(
       'SELECT COUNT(*) n, '
       '       COALESCE(SUM(Divetime),0) mins, '
+      '       MAX(Divetime) maxmin, '
       '       AVG(Divetime) avgmin, '
       '       MAX(Depth) maxd, '
       '       AVG(NULLIF(DepthAvg,0)) avgd, '
-      // Excluye centinelas/implausibles (p.ej. -300 = "sin lectura").
-      '       AVG(CASE WHEN Watertemp > -50 AND Watertemp < 60 '
-      '           THEN Watertemp END) avgtemp, '
+      '       $sacCols'
+      '       MAX(CASE WHEN $tempOk THEN Watertemp END) tmax, '
+      '       MIN(CASE WHEN $tempOk THEN Watertemp END) tmin, '
+      '       AVG(CASE WHEN $tempOk THEN Watertemp END) avgtemp, '
       '       MIN(Divedate) first, MAX(Divedate) last '
       'FROM Logbook WHERE $filter',
       params,
@@ -69,12 +83,20 @@ extension DivemateDbStats on DivemateDb {
       if (y != null) perYear[y] = (r['c'] as int?) ?? 0;
     }
 
+    final buddies = listBuddies().where((b) => b.diveCount > 0).length;
     return LogbookStats(
       totalDives: (agg['n'] as int?) ?? 0,
+      buddiesCount: buddies,
       totalMinutes: _num(agg['mins']) ?? 0,
+      maxDiveMinutes: _num(agg['maxmin']),
       avgDiveMinutes: _num(agg['avgmin']),
       maxDepth: _num(agg['maxd']),
       avgDepth: _num(agg['avgd']),
+      sacMax: _num(agg['sacmax']),
+      sacMin: _num(agg['sacmin']),
+      sacAvg: _num(agg['sacavg']),
+      tempMax: _num(agg['tmax']),
+      tempMin: _num(agg['tmin']),
       avgWaterTemp: _num(agg['avgtemp']),
       firstDive: _parseDate(_str(agg['first']), null),
       lastDive: _parseDate(_str(agg['last']), null),
