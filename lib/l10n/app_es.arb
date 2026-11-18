@@ -241,6 +241,7 @@
 
   "selectedCount": "{count} seleccionadas",
   "deleteConfirm": "¿Eliminar {count}? No se puede deshacer.",
+  "exportSelection": "Exportar selección (.ddb)",
   "adjustTime": "Ajustar hora",
   "originalTime": "Hora original",
   "merge": "Fusionar",

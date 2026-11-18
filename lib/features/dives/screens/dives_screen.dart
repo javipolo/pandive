@@ -1,13 +1,12 @@
 /// Pestaña de inmersiones: lista por mes, añadir, selección en lote, búsqueda.
 library;
-
 import 'package:flutter/material.dart';
-
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/dives/logic/adjust_time.dart';
+import 'package:pandive/features/dives/logic/export_selection.dart';
 import 'package:pandive/features/dives/widgets/add_dive_sheet.dart';
 import 'package:pandive/features/dives/widgets/dives_selection_bar.dart';
 import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
@@ -102,6 +101,10 @@ class _DivesTabState extends State<DivesTab> {
       _reload();
     }
   }
+  Future<void> _exportSel() async {
+    await exportSelectionDdb(widget.db, [for (final i in _sel) _dives[i]]);
+    _exitSel();
+  }
   Future<void> _add() async {
     await showAddDiveSheet(context, widget.db, widget.settings);
     if (mounted) _reload();
@@ -124,8 +127,8 @@ class _DivesTabState extends State<DivesTab> {
             onStats: _showStats,
             onMerge: _sel.length >= 2 ? _mergeSel : null,
             onAdjustTime: _adjustTimeSel,
-            onDelete: _deleteSel,
-          ),
+            onExport: _exportSel,
+            onDelete: _deleteSel),
         Expanded(
           child: _dives.isEmpty
               ? Center(child: Text(t.noResults))
@@ -134,15 +137,12 @@ class _DivesTabState extends State<DivesTab> {
                   settings: widget.settings,
                   caveIds: _cave,
                   onOpen: _onOpen,
-                  onLongPress: (i) => setState(() {
-                    _select = true;
-                    _sel.add(i);
-                  }),
+                  onLongPress: (i) =>
+                      setState(() => (_select = true, _sel.add(i))),
                   onToggleGroup: _toggleGroup,
                   selected: _sel,
                   selectionMode: _select,
-                  collapseAll: widget.collapseAll,
-                ),
+                  collapseAll: widget.collapseAll),
         ),
       ]),
     );
