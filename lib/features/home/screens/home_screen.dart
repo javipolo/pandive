@@ -2,13 +2,11 @@
 library;
 
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';
-import 'package:pandive/features/settings/logic/opened_ddb_actions.dart';
+import 'package:pandive/features/settings/screens/preview_ddb_screen.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/home/widgets/home_tabs.dart';
@@ -54,8 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) _onOpened(p);
     });
   }
-  void _onOpened(String path) => handleOpenedDdb(
-      context, widget.db, widget.settings, widget.onReplaceDb, path);
+  void _onOpened(String path) => Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => PreviewDdbScreen(
+          path: path,
+          settings: widget.settings,
+          db: widget.db,
+          onReplace: widget.onReplaceDb)));
   @override
   void dispose() {
     _openSub?.cancel();

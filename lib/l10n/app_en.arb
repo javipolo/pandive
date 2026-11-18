@@ -39,7 +39,6 @@
   "@purgeBuddiesResult": { "placeholders": { "count": {} } },
   "previewDdb": "Preview (read-only)",
   "replaceDb": "Use this as my database",
-  "replaceDbWarning": "Replaces your current data",
   "replaceDbConfirm": "Replace your current logbook with this file? Your current data will no longer be used.",
   "fillFromDdb": "Fill dives from a buddy's logbook",
   "buddyToAdd": "Buddy to add",

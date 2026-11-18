@@ -34,7 +34,6 @@
   "purgeBuddiesResult": "{count} companys eliminats",
   "previewDdb": "Previsualitza (només lectura)",
   "replaceDb": "Usa com la meva base de dades",
-  "replaceDbWarning": "Reemplaça les teves dades actuals",
   "replaceDbConfirm": "Reemplaçar el teu quadern actual per aquest fitxer? Les teves dades actuals deixaran d'usar-se.",
   "fillFromDdb": "Omplir immersions des del quadern d'un company",
   "buddyToAdd": "Company a afegir",

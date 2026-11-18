@@ -34,7 +34,6 @@
   "purgeBuddiesResult": "{count} buddies eliminados",
   "previewDdb": "Previsualizar (solo lectura)",
   "replaceDb": "Usar como mi base de datos",
-  "replaceDbWarning": "Reemplaza tus datos actuales",
   "replaceDbConfirm": "¿Reemplazar tu cuaderno actual por este fichero? Tus datos actuales dejarán de usarse.",
   "fillFromDdb": "Rellenar buceos desde el logbook de un compañero",
   "buddyToAdd": "Buddy a añadir",
