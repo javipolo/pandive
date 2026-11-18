@@ -244,6 +244,7 @@
   "deleteConfirm": "{count} ezabatu? Ezin da desegin.",
   "exportName": "Koadernoaren izena",
   "exportSelection": "Esportatu hautaketa (.ddb)",
+  "adjustTimeExplain": "Lehen murgilketaren data/ordu berria ezarriko duzu; desplazamendu bera hautatutako {count} murgilketei aplikatuko zaie. Jarraitu?",
   "adjustTime": "Doitu ordua",
   "originalTime": "Jatorrizko ordua",
   "merge": "Batu",

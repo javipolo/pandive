@@ -244,6 +244,7 @@
   "deleteConfirm": "¿Eliminar {count}? No se puede deshacer.",
   "exportName": "Nombre del cuaderno",
   "exportSelection": "Exportar selección (.ddb)",
+  "adjustTimeExplain": "Vas a fijar la fecha/hora nueva del primer buceo; el mismo desfase se aplica a los {count} buceos seleccionados. ¿Continuar?",
   "adjustTime": "Ajustar hora",
   "originalTime": "Hora original",
   "merge": "Fusionar",

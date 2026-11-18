@@ -244,6 +244,7 @@
   "deleteConfirm": "Vols esborrar {count}? Això no es pot desfer.",
   "exportName": "Nom del quadern",
   "exportSelection": "Exporta la selecció (.ddb)",
+  "adjustTimeExplain": "Fixaràs la nova data/hora de la primera immersió; el mateix desfasament s'aplica a les {count} immersions seleccionades. Continuar?",
   "adjustTime": "Ajusta l'hora",
   "originalTime": "Hora original",
   "merge": "Combina",

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 Future<bool> adjustDivesTime(
@@ -15,6 +16,12 @@ Future<bool> adjustDivesTime(
   if (withDate.isEmpty) return false;
   final orig = withDate.first.date!;
   final t = AppLocalizations.of(context);
+  // Aviso previo: explica el ajuste en lote antes de abrir el calendario.
+  if (!await confirmDialog(context, t.adjustTimeExplain(withDate.length),
+      confirmLabel: t.continueLabel)) {
+    return false;
+  }
+  if (!context.mounted) return false;
   final help = '${t.originalTime}: '
       '${MaterialLocalizations.of(context).formatMediumDate(orig)} '
       '${TimeOfDay.fromDateTime(orig).format(context)}';

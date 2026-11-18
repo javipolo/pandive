@@ -273,6 +273,8 @@
   "@deleteConfirm": { "placeholders": { "count": {} } },
   "exportName": "Logbook name",
   "exportSelection": "Export selection (.ddb)",
+  "adjustTimeExplain": "You'll set the new date/time for the first dive; the same shift is applied to all {count} selected dives. Continue?",
+  "@adjustTimeExplain": { "placeholders": { "count": {} } },
   "adjustTime": "Adjust time",
   "originalTime": "Original time",
   "merge": "Merge",
