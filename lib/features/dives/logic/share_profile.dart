@@ -92,7 +92,7 @@ class _ProfileCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.headlineSmall),
               ),
-              Text('Pandive',
+              Text('PanDive',
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium

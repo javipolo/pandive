@@ -43,7 +43,7 @@ class HomeDrawer extends StatelessWidget {
               child: SafeArea(
                 bottom: false,
                 child: Text(
-                  'Pandive',
+                  'PanDive',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,

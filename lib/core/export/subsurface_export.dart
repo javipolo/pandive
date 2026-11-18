@@ -91,7 +91,7 @@ void _writeCylinder(StringBuffer b, Cylinder c) {
 
 void _writeComputer(StringBuffer b, DivemateDb db, Dive d) {
   final p = db.diveProfile(d.id);
-  final model = _esc(d.computer ?? 'Pandive');
+  final model = _esc(d.computer ?? 'PanDive');
   b.writeln("  <divecomputer model='$model'>");
   if (d.maxDepth != null) {
     final mean = d.avgDepth != null ? " mean='${d.avgDepth!.toStringAsFixed(2)} m'" : '';

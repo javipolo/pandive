@@ -19,7 +19,7 @@ class PandiveApp extends StatelessWidget {
       animation: settings,
       builder: (context, _) {
         return MaterialApp(
-          title: 'Pandive',
+          title: 'PanDive',
           debugShowCheckedModeBanner: false,
           theme: appTheme(Brightness.light),
           darkTheme: appTheme(Brightness.dark),

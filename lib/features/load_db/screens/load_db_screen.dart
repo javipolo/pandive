@@ -98,7 +98,7 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
           null => null,
         };
     return Scaffold(
-      appBar: AppBar(title: const Text('Pandive')),
+      appBar: AppBar(title: const Text('PanDive')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

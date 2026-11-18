@@ -16,7 +16,7 @@ class AboutScreen extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
     final copied = AppLocalizations.of(context).emailCopied;
     final uri = Uri(
-        scheme: 'mailto', path: _email, queryParameters: {'subject': 'Pandive'});
+        scheme: 'mailto', path: _email, queryParameters: {'subject': 'PanDive'});
     final ok = await launchUrl(uri);
     if (!ok) {
       await Clipboard.setData(const ClipboardData(text: _email));
@@ -41,7 +41,7 @@ class AboutScreen extends StatelessWidget {
                   width: 96, height: 96),
             ),
             const SizedBox(height: 12),
-            Text('Pandive', style: tt.headlineSmall),
+            Text('PanDive', style: tt.headlineSmall),
             const SizedBox(height: 16),
             Text(t.aboutIntro, textAlign: TextAlign.center, style: tt.bodyMedium),
             const SizedBox(height: 24),
