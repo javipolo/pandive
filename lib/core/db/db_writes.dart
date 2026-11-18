@@ -49,6 +49,22 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
+  /// Borra filas huérfanas: botellas y datos por buceo cuyo LogID/DiveId no
+  /// corresponde a ninguna inmersión. Devuelve cuántas botellas eliminó.
+  int purgeOrphanData() {
+    final n = (_db.select('SELECT COUNT(*) c FROM Tank '
+            'WHERE LogID NOT IN (SELECT ID FROM Logbook)').first['c'] as int?) ??
+        0;
+    _db.execute('DELETE FROM Tank WHERE LogID NOT IN (SELECT ID FROM Logbook)');
+    for (final tbl in ['PandiveDiveTag', 'PandiveGas', 'PandiveSampleExtra']) {
+      try {
+        _db.execute(
+            'DELETE FROM $tbl WHERE DiveId NOT IN (SELECT ID FROM Logbook)');
+      } catch (_) {/* tabla ausente */}
+    }
+    return n;
+  }
+
   /// Borra inmersiones DEFINITIVAMENTE (fila + datos asociados). Irreversible;
   /// permite volver a importarlas desde el ordenador/.ddb.
   void purgeDives(List<int> ids) {

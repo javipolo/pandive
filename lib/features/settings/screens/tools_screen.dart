@@ -18,7 +18,6 @@ class ToolsScreen extends StatelessWidget {
   final Settings settings;
   final DivemateDb db;
   const ToolsScreen({super.key, required this.settings, required this.db});
-
   Future<void> _importHashtags(BuildContext context) async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -30,7 +29,6 @@ class ToolsScreen extends StatelessWidget {
     messenger.showSnackBar(
         SnackBar(content: Text(t.importHashtagsResult(n))));
   }
-
   Future<void> _purgeBuddies(BuildContext context) async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -42,7 +40,17 @@ class ToolsScreen extends StatelessWidget {
     bumpDataRevision();
     messenger.showSnackBar(SnackBar(content: Text(t.purgeBuddiesResult(n))));
   }
-
+  Future<void> _purgeOrphanTanks(BuildContext context) async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!await confirmDialog(context, t.purgeOrphanTanksConfirm,
+        confirmLabel: t.delete)) {
+      return;
+    }
+    final n = db.purgeOrphanData();
+    bumpDataRevision();
+    messenger.showSnackBar(SnackBar(content: Text(t.purgeOrphanTanksResult(n))));
+  }
   Future<void> _tagsToHashtags(BuildContext context) async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -54,7 +62,6 @@ class ToolsScreen extends StatelessWidget {
     messenger.showSnackBar(
         SnackBar(content: Text(t.tagsToHashtagsResult(n))));
   }
-
   Future<void> _importSubsurface(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final t = AppLocalizations.of(context);
@@ -109,6 +116,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.person_remove_outlined),
             title: Text(t.purgeBuddies),
             onTap: () => _purgeBuddies(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.cleaning_services_outlined),
+            title: Text(t.purgeOrphanTanks),
+            onTap: () => _purgeOrphanTanks(context),
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),
