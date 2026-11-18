@@ -148,6 +148,7 @@
   "scanningHint": "Buscando… enciende el ordenador y activa su Bluetooth.",
   "scanStopped": "Escaneo detenido.",
   "noDevicesYet": "Ningún dispositivo todavía",
+  "enableBluetooth": "Activar Bluetooth",
   "btDisabled": "El Bluetooth está apagado. Actívalo para usar el ordenador de buceo.",
   "btPermsMissing": "Faltan permisos de Bluetooth. Concédelos en Ajustes para poder buscar el ordenador de buceo.",
   "retry": "Reintentar",

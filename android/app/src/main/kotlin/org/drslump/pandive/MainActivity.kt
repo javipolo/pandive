@@ -31,6 +31,7 @@ class MainActivity : FlutterActivity() {
                     "matchName" -> result.success(
                         DiveComputer.nativeMatchName(call.argument<String>("name") ?: ""))
                     "btEnabled" -> result.success(isBluetoothOn())
+                    "enableBt" -> { requestEnableBt(); result.success(null) }
                     "download" -> handleDownload(call, result)
                     else -> result.notImplemented()
                 }
@@ -82,6 +83,14 @@ class MainActivity : FlutterActivity() {
             }
             main.post { result.success(json) }
         }.start()
+    }
+
+    // Lanza el diálogo del sistema para encender el Bluetooth.
+    @Suppress("DEPRECATION")
+    private fun requestEnableBt() {
+        try {
+            startActivity(Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE))
+        } catch (_: Exception) {}
     }
 
     // ¿Está el Bluetooth encendido?

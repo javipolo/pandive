@@ -24,28 +24,31 @@ class _ScanScreenState extends State<ScanScreen> {
   bool _scanning = false;
   bool _permissionOk = false;
   bool _showAll = false; // mostrar todos los dispositivos BLE, no solo buceo
+  bool _btOff = false;
   @override
   void initState() {
     super.initState();
     _start();
   }
+  Future<void> _enableBt() async {
+    await _svc.requestEnableBluetooth();
+    _start();
+  }
   Future<void> _start() async {
     setState(() {
       _error = null;
+      _btOff = false;
       _devices.clear();
     });
     final ok = await _svc.requestBlePermissions();
     if (!mounted) return;
     final t = AppLocalizations.of(context);
     if (!ok) {
-      setState(() {
-        _permissionOk = false;
-        _error = t.btPermsMissing;
-      });
+      setState(() => (_permissionOk = false, _error = t.btPermsMissing));
       return;
     }
     if (!await _svc.isBluetoothOn()) {
-      if (mounted) setState(() => _error = t.btDisabled);
+      if (mounted) setState(() => (_error = t.btDisabled, _btOff = true));
       return;
     }
     setState(() {
@@ -116,35 +119,32 @@ class _ScanScreenState extends State<ScanScreen> {
         ],
       ),
       body: _error != null
-          ? ScanErrorView(message: _error!, onRetry: _start)
-          : Column(
-              children: [
-                if (_permissionOk) ...[
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(_scanning ? t.scanningHint : t.scanStopped,
-                        style: Theme.of(context).textTheme.bodyMedium),
-                  ),
-                  CheckboxListTile(
+          ? ScanErrorView(
+              message: _error!,
+              onRetry: _start,
+              onEnableBt: _btOff ? _enableBt : null)
+          : Column(children: [
+              if (_permissionOk) ...[
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(_scanning ? t.scanningHint : t.scanStopped,
+                      style: Theme.of(context).textTheme.bodyMedium)),
+                CheckboxListTile(
                     dense: true,
                     value: _showAll,
                     title: Text(t.showAllDevices),
                     onChanged: (v) => setState(() => _showAll = v ?? false)),
-                ],
-                Expanded(
-                  child: devices.isEmpty
-                      ? Center(child: Text(t.noDevicesYet))
-                      : ListView.separated(
-                          itemCount: devices.length,
-                          separatorBuilder: (_, _) => const Divider(height: 1),
-                          itemBuilder: (context, i) => ScannedDeviceTile(
-                            device: devices[i],
-                            onTap: () => _onTap(devices[i]),
-                          ),
-                        ),
-                ),
               ],
-            ),
+              Expanded(
+                child: devices.isEmpty
+                    ? Center(child: Text(t.noDevicesYet))
+                    : ListView.separated(
+                        itemCount: devices.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (c, i) => ScannedDeviceTile(
+                            device: devices[i], onTap: () => _onTap(devices[i]))),
+              ),
+            ]),
     );
   }
 }

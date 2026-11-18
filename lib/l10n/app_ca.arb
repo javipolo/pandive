@@ -148,6 +148,7 @@
   "scanningHint": "S'està cercant… encén l'ordinador i activa'n el Bluetooth.",
   "scanStopped": "Escaneig aturat.",
   "noDevicesYet": "Encara no hi ha dispositius",
+  "enableBluetooth": "Activa el Bluetooth",
   "btDisabled": "El Bluetooth està apagat. Activa'l per usar l'ordinador de busseig.",
   "btPermsMissing": "Falten permisos de Bluetooth. Concedeix-los a la Configuració per cercar l'ordinador de busseig.",
   "retry": "Torna-ho a provar",

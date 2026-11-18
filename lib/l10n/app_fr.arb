@@ -147,6 +147,7 @@
   "scanningHint": "Recherche… allumez l'ordinateur et activez son Bluetooth.",
   "scanStopped": "Recherche arrêtée.",
   "noDevicesYet": "Aucun appareil pour l'instant",
+  "enableBluetooth": "Activer le Bluetooth",
   "btDisabled": "Le Bluetooth est désactivé. Activez-le pour utiliser l'ordinateur.",
   "btPermsMissing": "Autorisations Bluetooth manquantes. Accordez-les dans les Paramètres pour rechercher l'ordinateur de plongée.",
   "retry": "Réessayer",

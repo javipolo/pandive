@@ -119,10 +119,13 @@ Future<bool?> showSaveComputerDialog(BuildContext context, String name) {
 class ScanErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
-  const ScanErrorView({super.key, required this.message, required this.onRetry});
+  final VoidCallback? onEnableBt; // si se pasa, muestra "Activar Bluetooth"
+  const ScanErrorView(
+      {super.key, required this.message, required this.onRetry, this.onEnableBt});
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -133,9 +136,12 @@ class ScanErrorView extends StatelessWidget {
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            FilledButton(
-                onPressed: onRetry,
-                child: Text(AppLocalizations.of(context).retry)),
+            if (onEnableBt != null)
+              FilledButton.icon(
+                  onPressed: onEnableBt,
+                  icon: const Icon(Icons.bluetooth),
+                  label: Text(t.enableBluetooth)),
+            OutlinedButton(onPressed: onRetry, child: Text(t.retry)),
           ],
         ),
       ),

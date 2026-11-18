@@ -162,6 +162,7 @@
   "scanningHint": "Searching… turn the computer on and enable its Bluetooth.",
   "scanStopped": "Scan stopped.",
   "noDevicesYet": "No devices yet",
+  "enableBluetooth": "Turn on Bluetooth",
   "btDisabled": "Bluetooth is off. Turn it on to use the dive computer.",
   "btPermsMissing": "Bluetooth permissions missing. Grant them in Settings to search for the dive computer.",
   "retry": "Retry",
