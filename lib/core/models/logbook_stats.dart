@@ -17,6 +17,9 @@ class LogbookStats {
   final double? tempMax;
   final double? tempMin;
   final double? avgWaterTemp;
+  final int? decoDives; // nº buceos con deco
+  final int? maxTts; // min
+  final double? maxCeiling; // m (más profundo = mayor)
   final DateTime? firstDive;
   final DateTime? lastDive;
   final Map<int, int> divesPerYear; // año -> nº inmersiones
@@ -35,6 +38,9 @@ class LogbookStats {
     this.tempMax,
     this.tempMin,
     this.avgWaterTemp,
+    this.decoDives,
+    this.maxTts,
+    this.maxCeiling,
     this.firstDive,
     this.lastDive,
     this.divesPerYear = const {},
@@ -50,9 +56,11 @@ class LogbookStats {
     final depths = <double>[];
     final temps = <double>[];
     double? maxD;
+    int deco = 0;
     DateTime? first, last;
     final perYear = <int, int>{};
     for (final d in dives) {
+      if (d.deco == 1) deco++;
       if (d.durationMin != null) {
         sumMin += d.durationMin!;
         durations.add(d.durationMin!);
@@ -85,6 +93,7 @@ class LogbookStats {
       tempMax: maxOf(temps),
       tempMin: minOf(temps),
       avgWaterTemp: avg(temps),
+      decoDives: deco,
       firstDive: first,
       lastDive: last,
       divesPerYear: perYear,

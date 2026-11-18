@@ -49,6 +49,10 @@ void main() {
     expect(s.divesPerYear[2013], 9);
     expect(s.divesPerYear[2014], 69);
     expect(s.divesPerYear[2015], 86);
+    // Deco: hay buceos con deco; TTS/ceiling máx. salen del decode de Profile4.
+    expect(s.decoDives, greaterThan(0));
+    expect(s.maxTts, greaterThan(0));
+    expect(s.maxCeiling, greaterThan(0));
   });
 
   test('lista sitios con conteo de inmersiones', () {

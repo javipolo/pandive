@@ -83,6 +83,14 @@ class _StatsViewState extends State<StatsView> {
           LabeledValue(t.statsTempMin, _u(s.tempMin, '°C')),
           LabeledValue(t.statsAvgTemp, _u(s.avgWaterTemp, '°C')),
         ),
+        if ((s.decoDives ?? 0) > 0) ...[
+          sectionLine(),
+          threeCol(
+            LabeledValue(t.statsDecoDives, '${s.decoDives}'),
+            LabeledValue(t.statsMaxTts, _min(s.maxTts?.toDouble())),
+            LabeledValue(t.statsMaxCeiling, _u(s.maxCeiling, 'm')),
+          ),
+        ],
         if (widget.dates.isNotEmpty) ...[
           sectionLine(),
           SegmentedButton<StatsPeriod>(

@@ -83,6 +83,24 @@ extension DivemateDbStats on DivemateDb {
       if (y != null) perYear[y] = (r['c'] as int?) ?? 0;
     }
 
+    // Deco: cuenta por columna; TTS/ceiling máx. decodificando Profile4 solo de
+    // los buceos con deco (barato frente a decodificar todo el logbook).
+    int decoDives = 0;
+    int maxTts = 0;
+    double maxCeiling = 0;
+    for (final r
+        in _db.select('SELECT ID FROM Logbook WHERE $filter AND Deco = 1', params)) {
+      decoDives++;
+      final p = diveProfile(r['ID'] as int);
+      if (p == null) continue;
+      for (final c in p.ceiling) {
+        if (c > maxCeiling) maxCeiling = c;
+      }
+      for (final x in p.tts) {
+        if (x != null && x > maxTts) maxTts = x;
+      }
+    }
+
     final buddies = listBuddies().where((b) => b.diveCount > 0).length;
     return LogbookStats(
       totalDives: (agg['n'] as int?) ?? 0,
@@ -98,6 +116,9 @@ extension DivemateDbStats on DivemateDb {
       tempMax: _num(agg['tmax']),
       tempMin: _num(agg['tmin']),
       avgWaterTemp: _num(agg['avgtemp']),
+      decoDives: decoDives,
+      maxTts: maxTts > 0 ? maxTts : null,
+      maxCeiling: maxCeiling > 0 ? maxCeiling : null,
       firstDive: _parseDate(_str(agg['first']), null),
       lastDive: _parseDate(_str(agg['last']), null),
       divesPerYear: perYear,
