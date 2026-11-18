@@ -37,16 +37,29 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Abrir un .ddb desde un gestor de ficheros / "abrir con". -->
+            <!-- Abrir un .ddb por extensión (file/content) desde un gestor. -->
             <intent-filter android:label="PanDive">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="content"/>
                 <data android:scheme="file"/>
-                <data android:mimeType="application/octet-stream"/>
                 <data android:host="*"/>
+                <data android:mimeType="*/*"/>
                 <data android:pathPattern=".*\\.ddb"/>
+                <data android:pathPattern=".*\\..*\\.ddb"/>
+                <data android:pathPattern=".*\\..*\\..*\\.ddb"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ddb"/>
+            </intent-filter>
+            <!-- Abrir un .ddb por tipo MIME (content sin ruta usable). -->
+            <intent-filter android:label="PanDive">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="content"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:mimeType="application/x-sqlite3"/>
+                <data android:mimeType="application/vnd.sqlite3"/>
             </intent-filter>
             <!-- Compartir un .ddb con PanDive. -->
             <intent-filter>
