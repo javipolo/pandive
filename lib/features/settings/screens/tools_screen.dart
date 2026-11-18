@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/data_revision.dart';
+import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
@@ -28,6 +29,18 @@ class ToolsScreen extends StatelessWidget {
     bumpDataRevision();
     messenger.showSnackBar(
         SnackBar(content: Text(t.importHashtagsResult(n))));
+  }
+
+  Future<void> _purgeBuddies(BuildContext context) async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!await confirmDialog(context, t.purgeBuddiesConfirm,
+        confirmLabel: t.delete)) {
+      return;
+    }
+    final n = db.purgeUnusedBuddies();
+    bumpDataRevision();
+    messenger.showSnackBar(SnackBar(content: Text(t.purgeBuddiesResult(n))));
   }
 
   Future<void> _tagsToHashtags(BuildContext context) async {
@@ -91,6 +104,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.group_add_outlined),
             title: Text(t.fillFromDdb),
             onTap: () => openFillFromDdb(context, db),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_remove_outlined),
+            title: Text(t.purgeBuddies),
+            onTap: () => _purgeBuddies(context),
           ),
           ListTile(
             leading: const Icon(Icons.delete_outline),

@@ -30,6 +30,15 @@ extension DivemateDbBuddies on DivemateDb {
       ..sort((a, b) => compareFold(a.name, b.name));
   }
 
+  /// Borra los buddies sin ninguna inmersión. Devuelve cuántos eliminó.
+  int purgeUnusedBuddies() {
+    final unused = [for (final b in listBuddies()) if (b.diveCount == 0) b.id];
+    for (final id in unused) {
+      deleteBuddy(id);
+    }
+    return unused.length;
+  }
+
   /// Busca un buddy por nombre (case-insensitive) o lo crea. Devuelve su ID.
   int findOrCreateBuddy(String name) {
     final n = name.trim();
