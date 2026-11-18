@@ -37,16 +37,23 @@ extension DivemateDbWrites on DivemateDb {
     });
   }
 
+  /// Elimina filas asociadas (botellas, gas, extras, tags) de un LogID. Se usa
+  /// al crear una inmersión nueva por si SQLite reutiliza un ID y hereda filas
+  /// huérfanas de un buceo anterior.
+  void clearDiveAssoc(int id) {
+    _db.execute('DELETE FROM Tank WHERE LogID=?', [id]);
+    for (final tbl in ['PandiveDiveTag', 'PandiveGas', 'PandiveSampleExtra']) {
+      try {
+        _db.execute('DELETE FROM $tbl WHERE DiveId=?', [id]);
+      } catch (_) {/* tabla ausente */}
+    }
+  }
+
   /// Borra inmersiones DEFINITIVAMENTE (fila + datos asociados). Irreversible;
   /// permite volver a importarlas desde el ordenador/.ddb.
   void purgeDives(List<int> ids) {
     for (final id in ids) {
-      _db.execute('DELETE FROM Tank WHERE LogID=?', [id]);
-      for (final tbl in ['PandiveDiveTag', 'PandiveGas', 'PandiveSampleExtra']) {
-        try {
-          _db.execute('DELETE FROM $tbl WHERE DiveId=?', [id]);
-        } catch (_) {/* tabla ausente */}
-      }
+      clearDiveAssoc(id);
       _db.execute('DELETE FROM Logbook WHERE ID=?', [id]);
     }
   }
@@ -89,6 +96,8 @@ extension DivemateDbWrites on DivemateDb {
         airTemp, weight, rating, buddy, buddyIds, comments,
       ],
     );
-    return _db.lastInsertRowId;
+    final id = _db.lastInsertRowId;
+    clearDiveAssoc(id); // por si se reutiliza un ID con filas huérfanas
+    return id;
   }
 }

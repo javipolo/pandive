@@ -65,6 +65,7 @@ extension DivemateDbImportExt on DivemateDb {
       ],
     );
     final id = _db.lastInsertRowId;
+    clearDiveAssoc(id); // evita heredar filas de un ID reutilizado
     if (cylinders.isNotEmpty) setDiveTanks(id, cylinders);
     final tags = [
       for (final n in tagNames)

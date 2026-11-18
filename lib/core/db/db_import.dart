@@ -126,6 +126,7 @@ extension DivemateDbImport on DivemateDb {
       ],
     );
     final id = _db.lastInsertRowId;
+    clearDiveAssoc(id); // evita heredar botellas/gas de un ID reutilizado
     if (d.fingerprint.isNotEmpty) {
       _db.execute('UPDATE Logbook SET PandiveFp=? WHERE ID=?', [d.fingerprint, id]);
     }

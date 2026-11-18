@@ -230,6 +230,22 @@ void main() {
     }
   });
 
+  test('clearDiveAssoc limpia botellas (evita herencia por reuso de ID)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_assoc_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final id = w.createDive(dateTime: DateTime(2024, 8, 1, 10));
+      w.setDiveTanks(id, [const Cylinder(size: 24, o2: 31, pressureStart: 110)]);
+      expect(w.cylinders(id).length, 1);
+      w.clearDiveAssoc(id);
+      expect(w.cylinders(id).length, 0);
+    } finally {
+      w.close();
+    }
+  });
+
   test('purgeDives borra definitivamente y permite re-importar', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_purge_${DateTime.now().microsecondsSinceEpoch}.ddb');
