@@ -240,6 +240,7 @@
 
   "selectedCount": "{count} sélectionnées",
   "deleteConfirm": "Supprimer {count} ? Cette action est irréversible.",
+  "exportName": "Nom du carnet",
   "exportSelection": "Exporter la sélection (.ddb)",
   "adjustTime": "Ajuster l'heure",
   "originalTime": "Heure d'origine",

@@ -102,7 +102,7 @@ class _DivesTabState extends State<DivesTab> {
     }
   }
   Future<void> _exportSel() async {
-    await exportSelectionDdb(widget.db, [for (final i in _sel) _dives[i]]);
+    await exportSelectionDdb(context, widget.db, [for (final i in _sel) _dives[i]]);
     _exitSel();
   }
   Future<void> _add() async {

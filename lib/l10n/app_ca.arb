@@ -241,6 +241,7 @@
 
   "selectedCount": "{count} seleccionades",
   "deleteConfirm": "Vols esborrar {count}? Això no es pot desfer.",
+  "exportName": "Nom del quadern",
   "exportSelection": "Exporta la selecció (.ddb)",
   "adjustTime": "Ajusta l'hora",
   "originalTime": "Hora original",

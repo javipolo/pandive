@@ -241,6 +241,7 @@
 
   "selectedCount": "{count} hautatuta",
   "deleteConfirm": "{count} ezabatu? Ezin da desegin.",
+  "exportName": "Koadernoaren izena",
   "exportSelection": "Esportatu hautaketa (.ddb)",
   "adjustTime": "Doitu ordua",
   "originalTime": "Jatorrizko ordua",

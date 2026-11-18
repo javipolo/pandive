@@ -270,6 +270,7 @@
   "@selectedCount": { "placeholders": { "count": {} } },
   "deleteConfirm": "Delete {count}? This can't be undone.",
   "@deleteConfirm": { "placeholders": { "count": {} } },
+  "exportName": "Logbook name",
   "exportSelection": "Export selection (.ddb)",
   "adjustTime": "Adjust time",
   "originalTime": "Original time",

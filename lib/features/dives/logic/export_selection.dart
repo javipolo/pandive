@@ -4,16 +4,26 @@ library;
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/widgets/text_prompt_dialog.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
-/// Crea un .ddb temporal con [dives] (solo fecha/hora y lugar) y lo comparte.
-Future<void> exportSelectionDdb(DivemateDb source, List<Dive> dives) async {
+/// Pide un nombre y crea un .ddb temporal con [dives] (solo fecha/hora y lugar)
+/// y lo comparte. El fichero se llama `name - PanDive.ddb`.
+Future<void> exportSelectionDdb(
+    BuildContext context, DivemateDb source, List<Dive> dives) async {
+  final name =
+      await showTextPrompt(context, title: AppLocalizations.of(context).exportName);
+  if (name == null) return;
   final dir = await getTemporaryDirectory();
-  final f = File('${dir.path}/pandive-shared.ddb');
+  final safe = name.trim().replaceAll(RegExp(r'[\\/:*?"<>|]'), '').trim();
+  final base = safe.isEmpty ? 'PanDive' : '$safe - PanDive';
+  final f = File('${dir.path}/$base.ddb');
   if (f.existsSync()) f.deleteSync();
   final out = DivemateDb.createEmpty(f.path);
   try {
