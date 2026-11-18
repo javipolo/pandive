@@ -62,6 +62,10 @@ class DiveComputerService {
     return modelForDeviceName(name);
   }
 
+  /// ¿Está el Bluetooth encendido en el teléfono?
+  Future<bool> isBluetoothOn() async =>
+      await _channel.invokeMethod<bool>('btEnabled') ?? false;
+
   /// Pide los permisos de Bluetooth necesarios. Devuelve true si concedidos.
   /// En Android 12+ usa BLUETOOTH_SCAN/CONNECT; en <=11, localización.
   Future<bool> requestBlePermissions() async {

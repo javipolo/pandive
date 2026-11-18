@@ -1,7 +1,6 @@
 /// Escaneo BLE: busca ordenadores de buceo cercanos y los lista.
 /// Fase 2 hito B. La descarga (al tocar un dispositivo) llega en el hito C.
 library;
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pandive/core/db/divemate_db.dart';
@@ -10,16 +9,13 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/download_screen.dart';
 import 'package:pandive/features/dive_computer/widgets/scan_widgets.dart';
 import 'package:pandive/l10n/app_localizations.dart';
-
 class ScanScreen extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   const ScanScreen({super.key, required this.db, required this.settings});
-
   @override
   State<ScanScreen> createState() => _ScanScreenState();
 }
-
 class _ScanScreenState extends State<ScanScreen> {
   final _svc = DiveComputerService();
   final Map<String, ScannedDevice> _devices = {};
@@ -46,6 +42,10 @@ class _ScanScreenState extends State<ScanScreen> {
         _permissionOk = false;
         _error = t.btPermsMissing;
       });
+      return;
+    }
+    if (!await _svc.isBluetoothOn()) {
+      if (mounted) setState(() => _error = t.btDisabled);
       return;
     }
     setState(() {

@@ -30,6 +30,7 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "matchName" -> result.success(
                         DiveComputer.nativeMatchName(call.argument<String>("name") ?: ""))
+                    "btEnabled" -> result.success(isBluetoothOn())
                     "download" -> handleDownload(call, result)
                     else -> result.notImplemented()
                 }
@@ -81,6 +82,12 @@ class MainActivity : FlutterActivity() {
             }
             main.post { result.success(json) }
         }.start()
+    }
+
+    // ¿Está el Bluetooth encendido?
+    private fun isBluetoothOn(): Boolean {
+        val mgr = getSystemService(BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager
+        return mgr?.adapter?.isEnabled == true
     }
 
     // App ya abierta: llega un nuevo .ddb -> avisar a Flutter (o dejar pendiente).

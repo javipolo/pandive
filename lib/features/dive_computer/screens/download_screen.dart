@@ -1,7 +1,6 @@
 /// Descarga inmersiones, deja elegir cuáles guardar y avanza el fingerprint.
 /// En modo [baseline] solo lee la más reciente para marcarla como importada.
 library;
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -51,9 +50,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   void initState() {
     super.initState();
     WakelockPlus.enable();
-    _progressSub = _svc.progress().listen((p) {
-      if (mounted) setState(() => _progress = p);
-    });
+    _progressSub = _svc.progress().listen(
+        (p) => mounted ? setState(() => _progress = p) : null);
     _future = _download();
   }
   @override
@@ -63,20 +61,22 @@ class _DownloadScreenState extends State<DownloadScreen> {
     super.dispose();
   }
   Future<DownloadResult> _download() async {
+    if (!await _svc.isBluetoothOn()) {
+      if (!mounted) return DownloadResult(error: '');
+      return DownloadResult(error: AppLocalizations.of(context).btDisabled);
+    }
     final m = _model ??= await _svc.matchModel(widget.device.name);
     if (m == null) {
       if (!mounted) return DownloadResult(error: '');
       return DownloadResult(
-          error: AppLocalizations.of(context)
-              .modelNotRecognized(widget.device.name));
+          error: AppLocalizations.of(context).modelNotRecognized(widget.device.name));
     }
     final res = await _svc.download(
       vendor: m.$1,
       product: m.$2,
       address: widget.device.id,
       fingerprint: (widget.baseline || widget.all)
-          ? ''
-          : (widget.db.fingerprintFor(widget.device.id) ?? ''),
+          ? '' : (widget.db.fingerprintFor(widget.device.id) ?? ''),
       maxDives: widget.baseline ? 1 : widget.maxDives,
     );
     if (widget.baseline && res.ok && res.dives.isNotEmpty) {

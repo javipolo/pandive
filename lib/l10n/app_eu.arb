@@ -148,6 +148,7 @@
   "scanningHint": "Bilatzen… piztu ordenagailua eta gaitu bere Bluetooth-a.",
   "scanStopped": "Eskaneatzea geldituta.",
   "noDevicesYet": "Gailurik ez oraindik",
+  "btDisabled": "Bluetooth itzalita dago. Piztu murgilketa-ordenagailua erabiltzeko.",
   "btPermsMissing": "Bluetooth baimenak falta dira. Eman itzazu Ezarpenetan murgilketa-ordenagailua bilatzeko.",
   "retry": "Saiatu berriro",
   "diveChip": "Murgilketa",
