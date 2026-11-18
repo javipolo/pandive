@@ -68,9 +68,14 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
     final ok = _preview != null;
     return Scaffold(
-      appBar: AppBar(title: Text(t.previewDdb)),
+      appBar: AppBar(
+        title: Text(t.previewDdb),
+        backgroundColor: cs.error,
+        foregroundColor: cs.onError,
+      ),
       body: !ok
           ? Center(child: Text(t.invalidDb))
           : _dives.isEmpty
