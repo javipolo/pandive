@@ -44,6 +44,14 @@ class _TrashScreenState extends State<TrashScreen> {
     _refresh();
   }
 
+  void _toggleAll() => setState(() {
+        if (_selected.length == _dives.length) {
+          _selected.clear();
+        } else {
+          _selected.addAll(_dives.map((d) => d.id));
+        }
+      });
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -51,7 +59,13 @@ class _TrashScreenState extends State<TrashScreen> {
         'd MMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
     final n = _selected.length;
     return Scaffold(
-      appBar: AppBar(title: Text(t.trash)),
+      appBar: AppBar(title: Text(t.trash), actions: [
+        if (_dives.isNotEmpty)
+          IconButton(
+              icon: const Icon(Icons.select_all),
+              tooltip: t.selectAll,
+              onPressed: _toggleAll),
+      ]),
       body: _dives.isEmpty
           ? Center(child: Text(t.trashEmpty))
           : ListView.separated(
