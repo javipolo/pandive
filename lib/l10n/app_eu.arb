@@ -249,7 +249,7 @@
   "aboutIntro": "Pandive murgilketa-koadernoa da. Akatsen bat ikusi duzu edo iradokizunen bat duzu? Idatz iezaguzu.",
   "contactEmail": "Bidali mezua",
   "emailCopied": "Helbide elektronikoa kopiatu da",
-  "exportLogbook": "Esportatu DDB. Pandive eta DiveMate-rekin bateragarria",
+  "exportLogbook": "Export DDB. Pandive / DiveMate",
   "exportSubsurface": "Esportatu Subsurface-ra (.ssrf)",
   "importing": "Inportatzen…",
   "importSubsurface": "Subsurface-tik inportatu (.ssrf)",

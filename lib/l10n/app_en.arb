@@ -278,7 +278,7 @@
   "aboutIntro": "Pandive is a dive logbook. Found a bug or have a suggestion? Get in touch.",
   "contactEmail": "Send email",
   "emailCopied": "Email address copied",
-  "exportLogbook": "Export DDB. Works with Pandive and DiveMate",
+  "exportLogbook": "Export DDB. Pandive / DiveMate",
   "exportSubsurface": "Export to Subsurface (.ssrf)",
   "importing": "Importing…",
   "importSubsurface": "Import from Subsurface (.ssrf)",
