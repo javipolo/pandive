@@ -14,16 +14,18 @@ import 'package:pandive/core/widgets/loading_dialog.dart';
 import 'package:pandive/features/settings/logic/enrich_logbook.dart';
 import 'package:pandive/features/settings/widgets/fill_dive_checklist.dart';
 import 'package:pandive/l10n/app_localizations.dart';
-// Elige el .ddb de un compañero, empareja (con spinner) y abre la pantalla.
-Future<void> openFillFromDdb(BuildContext context, DivemateDb db) async {
+Future<void> openFillFromDdb(BuildContext context, DivemateDb db,
+    {String? sourcePath}) async {
   final messenger = ScaffoldMessenger.of(context);
   final nav = Navigator.of(context);
   final t = AppLocalizations.of(context);
-  final res = await FilePicker.platform.pickFiles(withData: false);
-  final path = res?.files.single.path;
+  var path = sourcePath;
+  if (path == null) {
+    final res = await FilePicker.platform.pickFiles(withData: false);
+    path = res?.files.single.path;
+  }
   if (path == null || !context.mounted) return;
   showLoadingDialog(context, t.readingDdb);
-  // Espera a que el spinner se pinte antes del trabajo pesado (evita el lag).
   await WidgetsBinding.instance.endOfFrame;
   try {
     final dir = await getTemporaryDirectory();
@@ -51,14 +53,12 @@ Future<void> openFillFromDdb(BuildContext context, DivemateDb db) async {
     messenger.showSnackBar(SnackBar(content: Text(t.errorLoad('$e'))));
   }
 }
-
 class FillFromDdbScreen extends StatefulWidget {
   final DivemateDb db;
   final List<Dive> dives; // buceos propios con coincidencia
   final Map<int, DiveMatch> matches;
   const FillFromDdbScreen(
       {super.key, required this.db, required this.dives, required this.matches});
-
   @override
   State<FillFromDdbScreen> createState() => _FillFromDdbScreenState();
 }

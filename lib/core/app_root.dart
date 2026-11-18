@@ -4,6 +4,8 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 
 import 'db/divemate_db.dart';
@@ -119,6 +121,16 @@ class _AppRootState extends State<AppRoot> {
         _tryOpen(null);
       },
       onReloadDb: () => _tryOpen(widget.settings.dbPath),
+      onReplaceDb: _replaceDb,
     );
+  }
+
+  // Reemplaza la DB activa por el .ddb en [src] (copia a documentos y abre).
+  Future<void> _replaceDb(String src) async {
+    final docs = await getApplicationDocumentsDirectory();
+    final dest = '${docs.path}/logbook-${DateTime.now().millisecondsSinceEpoch}.ddb';
+    await File(src).copy(dest);
+    await widget.settings.setDbPath(dest);
+    _tryOpen(dest);
   }
 }

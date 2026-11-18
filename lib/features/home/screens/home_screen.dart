@@ -1,10 +1,14 @@
 /// Pantalla principal con navegación por pestañas: inmersiones, sitios, stats.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/settings/logic/opened_ddb_actions.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/home/widgets/home_tabs.dart';
@@ -17,12 +21,14 @@ class HomeScreen extends StatefulWidget {
   final Settings settings;
   final VoidCallback onChangeDb;
   final VoidCallback onReloadDb;
+  final void Function(String path) onReplaceDb;
   const HomeScreen({
     super.key,
     required this.db,
     required this.settings,
     required this.onChangeDb,
     required this.onReloadDb,
+    required this.onReplaceDb,
   });
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -35,10 +41,24 @@ class _HomeScreenState extends State<HomeScreen> {
   String _query = '';
   bool _collapseAll = false;
   final _searchCtrl = TextEditingController();
+  StreamSubscription<String>? _openSub;
   bool get _canSearch => _index <= 3; // todas menos estadísticas
   bool get _canCollapse => _index == 0 || _index == 1; // inmersiones / sitios
   @override
+  void initState() {
+    super.initState();
+    OpenedFile.consume().then((p) {
+      if (p != null && mounted) _onOpened(p);
+    });
+    _openSub = OpenedFile.events().listen((p) {
+      if (mounted) _onOpened(p);
+    });
+  }
+  void _onOpened(String path) => handleOpenedDdb(
+      context, widget.db, widget.settings, widget.onReplaceDb, path);
+  @override
   void dispose() {
+    _openSub?.cancel();
     _searchCtrl.dispose();
     super.dispose();
   }
