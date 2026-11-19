@@ -40,8 +40,7 @@ class _StatsViewState extends State<StatsView> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final lang = Localizations.localeOf(context).languageCode;
-    final fullFmt = DateFormat.yMMMMd(lang);
+    final fullFmt = DateFormat('dd/MM/yyyy');
     final s = widget.stats;
     LabeledValue date(String label, DateTime? d) =>
         LabeledValue(label, d == null ? null : fullFmt.format(d));
