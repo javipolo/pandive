@@ -17,6 +17,19 @@ Uint8List rotate90(Uint8List bytes) {
   return img.encodeJpg(img.copyRotate(decoded, angle: 90), quality: 92);
 }
 
+/// Reduce a un máximo de 2200 px por lado (una vez al entrar), para que rotar
+/// después sea rápido. Suficiente resolución para un documento/carnet.
+Uint8List downscaleForCrop(Uint8List bytes) {
+  final d = img.decodeImage(bytes);
+  if (d == null) return bytes;
+  const maxSide = 2200;
+  if (d.width <= maxSide && d.height <= maxSide) return bytes;
+  final resized = d.width >= d.height
+      ? img.copyResize(d, width: maxSide)
+      : img.copyResize(d, height: maxSide);
+  return img.encodeJpg(resized, quality: 90);
+}
+
 class CropScreen extends StatefulWidget {
   final Uint8List bytes;
   const CropScreen({super.key, required this.bytes});
@@ -29,7 +42,22 @@ class _CropScreenState extends State<CropScreen> {
   final _controller = CropController();
   late Uint8List _bytes = widget.bytes;
   int _rot = 0;
-  bool _busy = false;
+  bool _busy = true; // empieza ocupado: reduce la imagen al entrar
+
+  @override
+  void initState() {
+    super.initState();
+    _prepare();
+  }
+
+  Future<void> _prepare() async {
+    final out = await compute(downscaleForCrop, _bytes);
+    if (!mounted) return;
+    setState(() {
+      _bytes = out;
+      _busy = false;
+    });
+  }
 
   Future<void> _rotate() async {
     setState(() => _busy = true);
