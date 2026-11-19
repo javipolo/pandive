@@ -1,7 +1,7 @@
 /// Lista simple de inmersiones (p.ej. las de un tag/buddy/sitio) -> detalle.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';

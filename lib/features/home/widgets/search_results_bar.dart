@@ -1,7 +1,7 @@
 /// Línea pequeña bajo la barra de búsqueda con el nº de resultados del tab.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/l10n/app_localizations.dart';

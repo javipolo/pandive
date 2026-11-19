@@ -2,7 +2,7 @@
 library;
 
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';

@@ -2,7 +2,7 @@
 /// de la base de datos activa. Persistido con shared_preferences.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends ChangeNotifier {

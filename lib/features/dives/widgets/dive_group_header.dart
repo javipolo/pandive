@@ -2,7 +2,7 @@
 /// seleccionable en lote.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class DiveGroupHeader extends StatelessWidget {
   final String label;

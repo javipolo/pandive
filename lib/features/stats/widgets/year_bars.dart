@@ -1,7 +1,7 @@
 /// Barras horizontales etiqueta/valor (inmersiones por periodo).
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PeriodBars extends StatelessWidget {
   final List<(String, int)> data; // ordenado

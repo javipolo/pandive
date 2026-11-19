@@ -1,7 +1,7 @@
 /// Control de tamaño de letra: slider + botones −/+ (paso 0.1).
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/settings/settings.dart';
 

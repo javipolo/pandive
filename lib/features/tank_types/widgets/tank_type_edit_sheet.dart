@@ -1,7 +1,7 @@
 /// Hoja para crear/editar un tipo de botella: nombre, litros y material.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';

@@ -1,7 +1,7 @@
 /// Selector de valoración por estrellas (0-5). Tocar la misma estrella la quita.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class StarRating extends StatelessWidget {
   final int value;

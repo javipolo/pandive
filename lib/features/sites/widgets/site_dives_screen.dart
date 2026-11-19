@@ -1,7 +1,7 @@
 /// Lista de inmersiones de un sitio concreto (al tocar el nombre en la lista).
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';

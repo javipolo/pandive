@@ -1,7 +1,7 @@
 /// Campo que muestra las etiquetas (tags) elegidas y permite editarlas.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/l10n/app_localizations.dart';

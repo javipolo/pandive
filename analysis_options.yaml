@@ -14,6 +14,10 @@ analyzer:
     - build/**
     - android/**
     - linux/**
+    # Ficheros generados por `flutter gen-l10n` (no editar a mano): aún importan
+    # Global*Localizations de flutter_localizations, marcado deprecated por el
+    # SDK pero sin alternativa estable (material_ui colisiona con el export).
+    - lib/l10n/app_localizations*.dart
 
 linter:
   # The lint rules applied to this project can be customized in the

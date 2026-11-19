@@ -1,7 +1,7 @@
 /// Pestaña "Equipo": hub de configuración de tipos de buceo y de botella.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/features/dive_types/screens/dive_types_screen.dart';

@@ -1,7 +1,7 @@
 /// Barra de navegación inferior de la pantalla principal (6 pestañas).
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
 

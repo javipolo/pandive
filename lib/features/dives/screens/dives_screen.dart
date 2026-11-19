@@ -1,6 +1,6 @@
 /// Pestaña de inmersiones: lista por mes, añadir, selección en lote, búsqueda.
 library;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
@@ -72,7 +72,9 @@ class _DivesTabState extends State<DivesTab> {
   Future<void> _deleteSel() async {
     final t = AppLocalizations.of(context);
     if (!await confirmDialog(context, t.deleteDivesConfirm(_sel.length),
-        confirmLabel: t.delete)) return;
+        confirmLabel: t.delete)) {
+      return;
+    }
     widget.db.deleteDives([for (final i in _sel) _dives[i].id]);
     _exitSel();
     _reload();
@@ -83,7 +85,9 @@ class _DivesTabState extends State<DivesTab> {
     final gap = widget.settings.mergeGapMinutes;
     final ids = [for (final i in _sel) _dives[i].id];
     if (!await confirmDialog(context, t.mergeConfirm(ids.length),
-        confirmLabel: t.merge)) return;
+        confirmLabel: t.merge)) {
+      return;
+    }
     try {
       widget.db.mergeDives(ids, maxGapMin: gap);
     } on MergeTooFarException catch (e) {

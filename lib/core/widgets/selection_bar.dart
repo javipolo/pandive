@@ -1,7 +1,7 @@
 /// Barra superior de acciones en modo selección (operaciones en lote).
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
 

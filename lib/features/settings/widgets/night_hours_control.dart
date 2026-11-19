@@ -2,7 +2,7 @@
 /// con el valor siempre visible.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/l10n/app_localizations.dart';

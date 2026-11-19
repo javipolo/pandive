@@ -2,7 +2,7 @@
 /// en vertical ocupa toda la pantalla, y si giras el móvil, apaisado (mejor).
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';

@@ -1,7 +1,7 @@
 /// Ajustes de la app: idioma y tamaño de letra.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';

@@ -2,7 +2,7 @@
 /// que se añadirán automáticamente al elegir el tipo en un buceo.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
@@ -22,7 +22,7 @@ class DiveTypeEditScreen extends StatefulWidget {
 
 class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
   late final _name = TextEditingController(text: widget.type?.name ?? '');
-  late List<Cylinder> _tanks = [...?widget.type?.tanks];
+  late final List<Cylinder> _tanks = [...?widget.type?.tanks];
   late final _presets = widget.db.listTankPresets();
 
   @override

@@ -2,7 +2,7 @@
 /// tipo de buceo, campos escalares y botellas. Reutilizado por new/edit.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/dives/widgets/buddies_picker_field.dart';

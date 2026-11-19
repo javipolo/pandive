@@ -1,7 +1,7 @@
 /// Botones de la pantalla de carga: abrir .ddb, crear nuevo, importar .ssrf.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
 

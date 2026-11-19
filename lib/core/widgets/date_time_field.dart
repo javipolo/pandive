@@ -1,7 +1,7 @@
 /// Selector de fecha+hora como ListTile; gestiona sus propios diálogos.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 class DateTimeField extends StatelessWidget {

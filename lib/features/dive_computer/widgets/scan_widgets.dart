@@ -1,7 +1,7 @@
 /// Widgets de la pantalla de escaneo BLE: fila de dispositivo y vista de error.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/l10n/app_localizations.dart';

@@ -2,7 +2,7 @@
 /// fila de dos columnas y separador de sección.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class LabeledValue extends StatelessWidget {
   final String label;

@@ -1,7 +1,7 @@
 /// Barra de selección de inmersiones: estadísticas, fusionar y borrar.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/widgets/selection_bar.dart';
 import 'package:pandive/l10n/app_localizations.dart';

@@ -2,7 +2,7 @@
 /// Fase 2 hito B. La descarga (al tocar un dispositivo) llega en el hito C.
 library;
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/dive_computer.dart';
 import 'package:pandive/core/settings/settings.dart';

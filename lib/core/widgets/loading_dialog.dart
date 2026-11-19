@@ -2,7 +2,7 @@
 /// Navigator.pop cuando termina la operación.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void showLoadingDialog(BuildContext context, String message) {
   showDialog<void>(

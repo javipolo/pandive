@@ -2,7 +2,7 @@
 /// (casilla por mes tristate + casilla por buceo). Para "Rellenar desde .ddb".
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';

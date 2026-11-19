@@ -2,7 +2,7 @@
 /// En modo [baseline] solo lee la más reciente para marcarla como importada.
 library;
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/data_revision.dart';

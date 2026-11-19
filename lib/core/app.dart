@@ -2,7 +2,7 @@
 /// pantalla inicial según haya o no una base de datos cargada.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
 import 'app_root.dart';

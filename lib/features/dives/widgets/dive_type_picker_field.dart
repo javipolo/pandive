@@ -2,7 +2,7 @@
 /// botellas-plantilla. Muestra una hoja con los tipos configurados.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/l10n/app_localizations.dart';

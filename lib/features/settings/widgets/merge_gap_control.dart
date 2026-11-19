@@ -1,7 +1,7 @@
 /// Control del hueco máx. de fusión: slider + −/+ con el valor siempre visible.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/settings/settings.dart';
 

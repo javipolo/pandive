@@ -1,7 +1,7 @@
 /// Gestión de tipos de buceo: lista, crear, editar, borrar.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';

@@ -1,7 +1,7 @@
 /// Campo de texto con etiqueta y borde, reutilizado en los formularios.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 class LabeledField extends StatelessWidget {
