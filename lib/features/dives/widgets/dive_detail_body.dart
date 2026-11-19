@@ -51,6 +51,24 @@ class DiveDetailBody extends StatelessWidget {
 
     String? f1(double? v, String u) => v == null ? null : '${v.toStringAsFixed(1)} $u';
 
+    final isDeco = dive.deco == 1 || (profile?.hasDeco ?? false);
+    int maxTts = 0;
+    double maxCeiling = 0;
+    int ceilSamples = 0;
+    if (isDeco && profile != null) {
+      for (final c in profile.ceiling) {
+        if (c > 0) {
+          ceilSamples++;
+          if (c > maxCeiling) maxCeiling = c;
+        }
+      }
+      for (final x in profile.tts) {
+        if (x != null && x > maxTts) maxTts = x;
+      }
+    }
+    final maxCeilMin =
+        ceilSamples > 0 ? ceilSamples * (profile!.intervalSeconds) / 60.0 : null;
+
     return ListView(
       controller: controller,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -86,12 +104,21 @@ class DiveDetailBody extends StatelessWidget {
             LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
             LabeledValue(
                 t.ppheMax, (ata == null || fHe <= 0) ? null : ff(fHe * ata))),
-        sectionLine(),
-        twoCol(
-            LabeledValue(t.decoLabel,
-                dive.deco == null ? null : (dive.deco == 1 ? t.decoYes : t.decoNo)),
-            LabeledValue(t.statWeight,
-                dive.weight == null ? null : '${dive.weight!.toStringAsFixed(1)} kg')),
+        if (dive.weight != null) ...[
+          sectionLine(),
+          LabeledValue(
+              t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),
+        ],
+        if (isDeco) ...[
+          sectionLine(),
+          LabeledValue(t.decoLabel, t.decoYes),
+          twoCol(
+              LabeledValue(
+                  t.statsMaxTts, maxTts > 0 ? '$maxTts min' : null),
+              LabeledValue(t.statsMaxCeiling,
+                  maxCeiling > 0 ? '${maxCeiling.toStringAsFixed(1)} m' : null)),
+          LabeledValue(t.statsMaxCeilingTime, f1(maxCeilMin, 'min')),
+        ],
         sectionLine(),
         Text(t.tanks, style: Theme.of(context).textTheme.titleMedium),
         ...cyls.map((c) => CylinderTile(cylinder: c)),
