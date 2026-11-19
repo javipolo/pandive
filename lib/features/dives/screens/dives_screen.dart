@@ -59,7 +59,8 @@ class _DivesTabState extends State<DivesTab> {
       });
   void _showStats() => Navigator.of(context).push(MaterialPageRoute(
       builder: (_) =>
-          SelectionStatsScreen(dives: [for (final i in _sel) _dives[i]])));
+          SelectionStatsScreen(
+              db: widget.db, dives: [for (final i in _sel) _dives[i]])));
   Future<void> _onOpen(int index) async {
     if (_select) return _toggle(index);
     await Navigator.of(context).push(MaterialPageRoute(

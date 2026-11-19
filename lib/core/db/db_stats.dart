@@ -35,14 +35,19 @@ extension DivemateDbStats on DivemateDb {
         .toList();
   }
 
-  /// Estadísticas agregadas del owner.
-  LogbookStats computeStats() {
+  /// Estadísticas agregadas del owner. Si [ids] no es null, solo esas
+  /// inmersiones (para las stats de una selección); misma plantilla y cálculos.
+  LogbookStats computeStats({Iterable<int>? ids}) {
     final owner = ownerId;
     final filter = StringBuffer('(Status IS NULL OR Status != 2)');
     final params = <Object?>[];
     if (owner != null) {
       filter.write(' AND DiverID = ?');
       params.add(owner);
+    }
+    if (ids != null) {
+      final list = ids.toList();
+      filter.write(' AND ID IN (${list.isEmpty ? '-1' : list.join(',')})');
     }
     // Solo lecturas de temperatura plausibles (p.ej. -300 = "sin lectura").
     const tempOk = 'Watertemp > -50 AND Watertemp < 60';
@@ -107,7 +112,16 @@ extension DivemateDbStats on DivemateDb {
       }
     }
 
-    final buddies = listBuddies().where((b) => b.diveCount > 0).length;
+    // Buddies distintos referenciados por las inmersiones del filtro.
+    final buddyIds = <int>{};
+    for (final r in _db.select(
+        'SELECT BuddyIDs FROM Logbook WHERE $filter', params)) {
+      for (final e in (_str(r['BuddyIDs']) ?? '').split(',')) {
+        final v = int.tryParse(e.trim());
+        if (v != null) buddyIds.add(v);
+      }
+    }
+    final buddies = buddyIds.length;
     return LogbookStats(
       totalDives: (agg['n'] as int?) ?? 0,
       buddiesCount: buddies,

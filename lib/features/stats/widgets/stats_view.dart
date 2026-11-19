@@ -21,7 +21,18 @@ class StatsView extends StatefulWidget {
 }
 
 class _StatsViewState extends State<StatsView> {
-  StatsPeriod _period = StatsPeriod.year;
+  late StatsPeriod _period = _initialPeriod();
+
+  // Span inicial según el rango de fechas: >=13 meses año, 3-12 meses mes,
+  // <3 meses semana. El usuario puede cambiarlo luego.
+  StatsPeriod _initialPeriod() {
+    if (widget.dates.isEmpty) return StatsPeriod.year;
+    final sorted = [...widget.dates]..sort();
+    final days = sorted.last.difference(sorted.first).inDays;
+    if (days >= 395) return StatsPeriod.year; // ~13 meses
+    if (days >= 91) return StatsPeriod.month; // ~3 meses
+    return StatsPeriod.week;
+  }
 
   String _u(double? v, String unit, {int dec = 1}) =>
       v == null ? '—' : '${v.toStringAsFixed(dec)} $unit';

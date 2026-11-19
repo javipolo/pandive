@@ -1,15 +1,18 @@
 /// Estadísticas calculadas solo sobre una selección de inmersiones.
+/// Usa la misma plantilla y cálculos que las stats globales (computeStats).
 library;
 
 import 'package:flutter/material.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/stats/widgets/stats_view.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SelectionStatsScreen extends StatelessWidget {
+  final DivemateDb db;
   final List<Dive> dives;
-  const SelectionStatsScreen({super.key, required this.dives});
+  const SelectionStatsScreen({super.key, required this.db, required this.dives});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +20,7 @@ class SelectionStatsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(t.statsSelectedTitle)),
       body: StatsView(
-        stats: LogbookStats.fromDives(dives),
+        stats: db.computeStats(ids: [for (final d in dives) d.id]),
         dates: [for (final d in dives) if (d.date != null) d.date!],
       ),
     );

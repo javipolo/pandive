@@ -397,7 +397,7 @@ void main() {
     }
   });
 
-  test('LogbookStats.fromDives agrega una selección', () {
+  test('computeStats(ids:) agrega una selección', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_fstats_${DateTime.now().microsecondsSinceEpoch}.ddb');
     addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
@@ -415,7 +415,7 @@ void main() {
           avgDepth: 15,
           durationMin: 60,
           waterTemp: 22);
-      final s = LogbookStats.fromDives(w.listDives());
+      final s = w.computeStats(ids: [for (final d in w.listDives()) d.id]);
       expect(s.totalDives, 2);
       expect(s.totalMinutes, 100);
       expect(s.maxDepth, 30);
