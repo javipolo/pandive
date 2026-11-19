@@ -63,7 +63,8 @@ dependencies:
   material_ui: ^1.11.1
   cupertino_ui: ^1.1.7
   image_picker: ^1.2.4
-  image_cropper: ^13.0.0
+  crop_your_image: ^2.0.1
+  image: ^4.1.0 # recorte/rotación propia (ver dependency_overrides)
   pdfx: ^2.11.0
   pdf: ^3.12.0
 

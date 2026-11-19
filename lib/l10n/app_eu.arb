@@ -299,5 +299,8 @@
   "docPickPage": "Aukeratu orria",
   "docPageN": "{n}. orria",
   "docBannerExpired": "{count} iraungita",
-  "docBannerSoon": "{count} laster iraungiko dira"
+  "docBannerSoon": "{count} laster iraungiko dira",
+  "cropTitle": "Doitu",
+  "cropRotate": "Biratu",
+  "cropFailed": "Ezin izan da irudia moztu"
 }

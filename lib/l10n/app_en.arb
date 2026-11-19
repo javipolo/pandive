@@ -477,5 +477,8 @@
     "placeholders": {
       "count": {}
     }
-  }
+  },
+  "cropTitle": "Adjust",
+  "cropRotate": "Rotate",
+  "cropFailed": "Could not crop the image"
 }

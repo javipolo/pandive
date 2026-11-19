@@ -152,6 +152,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/documents/screens/documents_screen.dart` -> lista con estado de caducidad + alta + export múltiple a PDF
 - `lib/features/documents/screens/document_detail_screen.dart` -> ver imagen grande, editar, borrar, compartir (PDF)
 - `lib/features/documents/screens/document_edit_screen.dart` -> alta/edición de metadatos (título/notas/caducidad)
+- `lib/features/documents/screens/crop_screen.dart` -> recorte propio (crop_your_image): rotar 90°, rectángulo libre, confirmar
 - `lib/features/documents/logic/document_store.dart` -> carpeta documents/ en disco (guardar/borrar/ruta)
 - `lib/features/documents/logic/document_import.dart` -> elegir origen (cámara/galería/PDF), render PDF, recorte, guardar
 - `lib/features/documents/logic/document_export.dart` -> genera un PDF con los seleccionados y lo comparte

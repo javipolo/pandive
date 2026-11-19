@@ -299,5 +299,8 @@
   "docPickPage": "Elegir página",
   "docPageN": "Página {n}",
   "docBannerExpired": "{count} caducados",
-  "docBannerSoon": "{count} por caducar"
+  "docBannerSoon": "{count} por caducar",
+  "cropTitle": "Ajustar",
+  "cropRotate": "Rotar",
+  "cropFailed": "No se pudo recortar la imagen"
 }

@@ -299,5 +299,8 @@
   "docPickPage": "Tria pàgina",
   "docPageN": "Pàgina {n}",
   "docBannerExpired": "{count} caducats",
-  "docBannerSoon": "{count} per caducar"
+  "docBannerSoon": "{count} per caducar",
+  "cropTitle": "Ajustar",
+  "cropRotate": "Gira",
+  "cropFailed": "No s'ha pogut retallar la imatge"
 }

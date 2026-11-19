@@ -1,38 +1,41 @@
 /// Importar la imagen de un documento: elegir origen (cámara / galería / PDF),
-/// (si PDF, renderizar la página elegida), recortar y guardar como JPG. Devuelve
-/// el nombre de fichero guardado, o null si se cancela.
+/// (si PDF, renderizar la página elegida), recortar con nuestra pantalla y
+/// guardar como JPG. Devuelve el nombre de fichero guardado, o null si se
+/// cancela.
 library;
 
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 
 import 'package:pandive/features/documents/logic/document_store.dart';
+import 'package:pandive/features/documents/screens/crop_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 enum _Src { camera, gallery, pdf }
 
 Future<String?> importDocumentImage(BuildContext context) async {
   final src = await _pickSource(context);
-  if (src == null) return null;
-  final rawPath = switch (src) {
-    _Src.camera => await _fromPicker(ImageSource.camera),
-    _Src.gallery => await _fromPicker(ImageSource.gallery),
-    _Src.pdf => context.mounted ? await _fromPdf(context) : null,
-  };
-  if (rawPath == null) return null;
-  final cropped = await ImageCropper().cropImage(
-    sourcePath: rawPath,
-    uiSettings: [AndroidUiSettings(hideBottomControls: false)],
-  );
+  if (src == null || !context.mounted) return null;
+  final Uint8List? raw;
+  switch (src) {
+    case _Src.camera:
+      raw = await _fromPicker(ImageSource.camera);
+    case _Src.gallery:
+      raw = await _fromPicker(ImageSource.gallery);
+    case _Src.pdf:
+      raw = await _fromPdf(context);
+  }
+  if (raw == null || !context.mounted) return null;
+  final data = raw;
+  final nav = Navigator.of(context);
+  final cropped = await nav.push<Uint8List>(
+      MaterialPageRoute(builder: (_) => CropScreen(bytes: data)));
   if (cropped == null) return null;
-  final bytes = await File(cropped.path).readAsBytes();
-  return saveDocImage(bytes);
+  return saveDocImage(cropped);
 }
 
 Future<_Src?> _pickSource(BuildContext context) {
@@ -59,12 +62,13 @@ Future<_Src?> _pickSource(BuildContext context) {
   );
 }
 
-Future<String?> _fromPicker(ImageSource source) async {
+Future<Uint8List?> _fromPicker(ImageSource source) async {
   final x = await ImagePicker().pickImage(source: source, imageQuality: 92);
-  return x?.path;
+  if (x == null) return null;
+  return x.readAsBytes();
 }
 
-Future<String?> _fromPdf(BuildContext context) async {
+Future<Uint8List?> _fromPdf(BuildContext context) async {
   final res = await FilePicker.platform
       .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
   final path = res?.files.single.path;
@@ -79,15 +83,13 @@ Future<String?> _fromPdf(BuildContext context) async {
     }
   }
   final page = await doc.getPage(pageNum);
-  final img = await page.render(
-      width: page.width * 2, height: page.height * 2, format: PdfPageImageFormat.png);
+  final rendered = await page.render(
+      width: page.width * 2,
+      height: page.height * 2,
+      format: PdfPageImageFormat.png);
   await page.close();
   await doc.close();
-  if (img == null) return null;
-  final tmp = await getTemporaryDirectory();
-  final f = File('${tmp.path}/doc_${DateTime.now().millisecondsSinceEpoch}.png');
-  await f.writeAsBytes(img.bytes, flush: true);
-  return f.path;
+  return rendered?.bytes;
 }
 
 Future<int?> _pickPage(BuildContext context, int count) {
