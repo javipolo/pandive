@@ -63,12 +63,13 @@ class PlanCylindersField extends StatelessWidget {
               controller: c.litres, label: t.planCylLitres, number: true),
         ),
         Expanded(
-          child: TextButton.icon(
-            onPressed: () => onToggle(c),
-            icon: Icon(
-                c.reserve ? Icons.lock_outline : Icons.lock_open_outlined,
-                size: 18),
-            label: Text(c.reserve ? t.cylReserve : t.cylEmpties),
+          child: InkWell(
+            onTap: () => onToggle(c),
+            child: Row(children: [
+              Checkbox(
+                  value: !c.reserve, onChanged: (_) => onToggle(c)),
+              Flexible(child: Text(t.cylEmpties)),
+            ]),
           ),
         ),
         IconButton(
