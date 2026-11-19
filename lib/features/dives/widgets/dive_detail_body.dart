@@ -104,20 +104,21 @@ class DiveDetailBody extends StatelessWidget {
             LabeledValue(t.ppo2Max, ata == null ? null : ff(fO2 * ata)),
             LabeledValue(
                 t.ppheMax, (ata == null || fHe <= 0) ? null : ff(fHe * ata))),
-        if (dive.weight != null) ...[
+        if (dive.weight != null && dive.weight! > 0) ...[
           sectionLine(),
           LabeledValue(
               t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),
         ],
         if (isDeco) ...[
           sectionLine(),
-          LabeledValue(t.decoLabel, t.decoYes),
           twoCol(
+              LabeledValue(t.decoLabel, t.decoYes),
               LabeledValue(
-                  t.statsMaxTts, maxTts > 0 ? '$maxTts min' : null),
+                  t.statsMaxTts, maxTts > 0 ? '$maxTts min' : null)),
+          twoCol(
               LabeledValue(t.statsMaxCeiling,
-                  maxCeiling > 0 ? '${maxCeiling.toStringAsFixed(1)} m' : null)),
-          LabeledValue(t.statsMaxCeilingTime, f1(maxCeilMin, 'min')),
+                  maxCeiling > 0 ? '${maxCeiling.toStringAsFixed(1)} m' : null),
+              LabeledValue(t.statsMaxCeilingTime, f1(maxCeilMin, 'min'))),
         ],
         sectionLine(),
         Text(t.tanks, style: Theme.of(context).textTheme.titleMedium),
