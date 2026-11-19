@@ -263,5 +263,18 @@
   "mergeGapSetting": "Écart de surface max pour fusionner (min)",
   "nightDiveHours": "Heures de plongée de nuit",
   "nightFrom": "De",
-  "nightUntil": "Jusqu'à"
+  "nightUntil": "Jusqu'à",
+  "planTitle": "Planifier la plongée",
+  "planRmv": "RMV (l/min)",
+  "planDepth": "Prof. moyenne (m)",
+  "planTime": "Temps (min)",
+  "planVolume": "Volume des blocs (L)",
+  "planStartBar": "Pression initiale (bar)",
+  "planReserveBar": "Réserve (bar)",
+  "planGasNeeded": "Gaz nécessaire",
+  "planDrop": "Pression consommée",
+  "planEndPressure": "Pression finale",
+  "planMargin": "Marge sur la réserve",
+  "planMaxTime": "Temps max à cette prof.",
+  "planIncomplete": "Renseignez consommation, profondeur, temps, volume et pression initiale."
 }

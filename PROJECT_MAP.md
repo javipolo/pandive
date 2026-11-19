@@ -41,6 +41,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
 - `lib/core/db/db_computers.dart` -> ordenadores de buceo guardados (por MAC)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
+- `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
 - `lib/core/widgets/import_progress.dart` -> diálogo de progreso reutilizable para importar .ssrf
@@ -137,6 +138,11 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/buddies_picker_field.dart` -> campo de compañeros elegidos (chips)
 - `lib/features/dives/widgets/tanks_editor.dart` -> editor de botellas + SAC
 - `lib/features/dives/widgets/tank_edit_sheet.dart` -> hoja para añadir/editar una botella
+
+### plan (planificador de gas)
+- `lib/features/plan/screens/plan_dive_screen.dart` -> planificador interactivo: precarga medias, recalcula al vuelo
+- `lib/features/plan/widgets/plan_inputs.dart` -> campos (tipo de buceo, RMV, prof, tiempo, volumen, presión inicial, reserva)
+- `lib/features/plan/widgets/plan_results.dart` -> resultados (gas, presión final coloreada, margen, tiempo máx.)
 
 ### sites (sitios)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info

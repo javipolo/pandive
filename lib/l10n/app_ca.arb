@@ -264,5 +264,18 @@
   "mergeGapSetting": "Interval màxim de superfície per combinar (min)",
   "nightDiveHours": "Hores d'immersió nocturna",
   "nightFrom": "Des de",
-  "nightUntil": "Fins a"
+  "nightUntil": "Fins a",
+  "planTitle": "Planificar immersió",
+  "planRmv": "RMV (l/min)",
+  "planDepth": "Prof. mitjana (m)",
+  "planTime": "Temps (min)",
+  "planVolume": "Volum ampolles (L)",
+  "planStartBar": "Pressió inicial (bar)",
+  "planReserveBar": "Reserva (bar)",
+  "planGasNeeded": "Gas necessari",
+  "planDrop": "Pressió consumida",
+  "planEndPressure": "Pressió final",
+  "planMargin": "Marge sobre reserva",
+  "planMaxTime": "Temps màx. a aquesta prof.",
+  "planIncomplete": "Omple consum, profunditat, temps, volum i pressió inicial."
 }

@@ -264,5 +264,18 @@
   "mergeGapSetting": "Batzeko azaleko tarte maximoa (min)",
   "nightDiveHours": "Gau-murgilketaren orduak",
   "nightFrom": "Noiztik",
-  "nightUntil": "Noiz arte"
+  "nightUntil": "Noiz arte",
+  "planTitle": "Murgilketa planifikatu",
+  "planRmv": "RMV (l/min)",
+  "planDepth": "Batez besteko sakonera (m)",
+  "planTime": "Denbora (min)",
+  "planVolume": "Botilen bolumena (L)",
+  "planStartBar": "Hasierako presioa (bar)",
+  "planReserveBar": "Erreserba (bar)",
+  "planGasNeeded": "Behar den gasa",
+  "planDrop": "Erabilitako presioa",
+  "planEndPressure": "Amaierako presioa",
+  "planMargin": "Erreserbaren gaineko tartea",
+  "planMaxTime": "Gehienezko denbora sakonera honetan",
+  "planIncomplete": "Bete kontsumoa, sakonera, denbora, bolumena eta hasierako presioa."
 }

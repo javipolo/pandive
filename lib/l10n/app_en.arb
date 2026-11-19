@@ -296,5 +296,18 @@
   "mergeGapSetting": "Max surface gap to merge (min)",
   "nightDiveHours": "Night dive hours",
   "nightFrom": "From",
-  "nightUntil": "Until"
+  "nightUntil": "Until",
+  "planTitle": "Plan dive",
+  "planRmv": "RMV (l/min)",
+  "planDepth": "Avg depth (m)",
+  "planTime": "Time (min)",
+  "planVolume": "Cylinder volume (L)",
+  "planStartBar": "Start pressure (bar)",
+  "planReserveBar": "Reserve (bar)",
+  "planGasNeeded": "Gas needed",
+  "planDrop": "Pressure used",
+  "planEndPressure": "End pressure",
+  "planMargin": "Margin vs reserve",
+  "planMaxTime": "Max time at this depth",
+  "planIncomplete": "Fill in consumption, depth, time, volume and start pressure."
 }

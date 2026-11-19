@@ -264,5 +264,18 @@
   "mergeGapSetting": "Hueco máx. en superficie para fusionar (min)",
   "nightDiveHours": "Horario inmersión nocturna",
   "nightFrom": "Desde",
-  "nightUntil": "Hasta"
+  "nightUntil": "Hasta",
+  "planTitle": "Planificar buceo",
+  "planRmv": "RMV (l/min)",
+  "planDepth": "Prof. media (m)",
+  "planTime": "Tiempo (min)",
+  "planVolume": "Volumen botellas (L)",
+  "planStartBar": "Presión inicial (bar)",
+  "planReserveBar": "Reserva (bar)",
+  "planGasNeeded": "Gas necesario",
+  "planDrop": "Presión consumida",
+  "planEndPressure": "Presión final",
+  "planMargin": "Margen sobre reserva",
+  "planMaxTime": "Tiempo máx. a esta prof.",
+  "planIncomplete": "Rellena consumo, profundidad, tiempo, volumen y presión inicial."
 }

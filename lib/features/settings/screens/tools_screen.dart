@@ -10,6 +10,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
+import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
 import 'package:pandive/features/settings/screens/trash_screen.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -107,6 +108,12 @@ class ToolsScreen extends StatelessWidget {
             onTap: () => _tagsToHashtags(context),
           ),
           _header(context, t.sectionOther),
+          ListTile(
+            leading: const Icon(Icons.calculate_outlined),
+            title: Text(t.planTitle),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => PlanDiveScreen(db: db))),
+          ),
           ListTile(
             leading: const Icon(Icons.group_add_outlined),
             title: Text(t.fillFromDdb),
