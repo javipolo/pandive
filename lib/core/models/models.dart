@@ -8,6 +8,7 @@ export 'dive_computer_ref.dart';
 export 'dive_profile.dart';
 export 'dive_site.dart';
 export 'dive_type.dart';
+export 'document.dart';
 export 'downloaded_dive.dart';
 export 'logbook_stats.dart';
 export 'tag.dart';

@@ -1,6 +1,5 @@
 {
   "@@locale": "en",
-
   "navDives": "Dives",
   "navSites": "Sites",
   "navStats": "Stats",
@@ -18,25 +17,45 @@
   "restore": "Restore",
   "deletePermanently": "Delete permanently",
   "deletePermanentConfirm": "Permanently delete {count} dives? This cannot be undone.",
-  "@deletePermanentConfirm": { "placeholders": { "count": {} } },
+  "@deletePermanentConfirm": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "trash": "Trash",
   "trashEmpty": "No deleted dives",
   "trashIntro": "Deleted dives are kept here. Tap Restore to move one back to your logbook.",
   "deleteDivesConfirm": "Delete {count}? You can restore them later from Trash.",
-  "@deleteDivesConfirm": { "placeholders": { "count": {} } },
+  "@deleteDivesConfirm": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "sectionExportImport": "Export / Import",
   "readingDdb": "Reading the buddy's .ddb…",
   "fillConfirm": "Fill {count} dives?",
-  "@fillConfirm": { "placeholders": { "count": {} } },
+  "@fillConfirm": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "fillAction": "Fill",
   "purgeOrphanTanks": "Delete orphan tanks",
   "purgeOrphanTanksConfirm": "Delete all tanks not linked to any dive?",
   "purgeOrphanTanksResult": "{count} orphan tanks deleted",
-  "@purgeOrphanTanksResult": { "placeholders": { "count": {} } },
+  "@purgeOrphanTanksResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "purgeBuddies": "Delete buddies with no dives",
   "purgeBuddiesConfirm": "Delete all buddies that have no dives?",
   "purgeBuddiesResult": "{count} buddies deleted",
-  "@purgeBuddiesResult": { "placeholders": { "count": {} } },
+  "@purgeBuddiesResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "previewDdb": "Preview (read-only)",
   "replaceDb": "Use this as my database",
   "replaceDbConfirm": "Replace your current logbook with this file? Your current data will no longer be used.",
@@ -44,17 +63,24 @@
   "buddyToAdd": "Buddy to add",
   "noMatches": "No matching dives found",
   "fillResult": "{count} dives updated",
-  "@fillResult": { "placeholders": { "count": {} } },
+  "@fillResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "sectionOther": "Others",
   "sectionDebug": "DEBUG",
   "debugSyncPoint": "Reset sync point to a dive",
   "restoreConfirm": "Restore {name}? It overwrites your current logbook.",
-  "@restoreConfirm": { "placeholders": { "name": {} } },
+  "@restoreConfirm": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "latest": "Latest",
   "database": "Database",
   "changeDbWarning": "You'll stop using the current logbook and go back to the load screen to open or create another. The file isn't deleted.",
   "settings": "Settings",
-
   "settingsTitle": "Settings",
   "language": "Language",
   "languageSystem": "System default",
@@ -71,38 +97,62 @@
   "textSize": "Text size",
   "textSizeHint": "The deepest dive is useless if you can't read the numbers.",
   "reset": "Reset",
-
   "loadHeadline": "Load your logbook",
   "loadSubtitle": "Pick a DiveMate .ddb file to start.",
   "pickFile": "Choose .ddb file",
   "createNewDb": "Create new logbook (empty)",
   "invalidDb": "The file doesn't look like a valid DiveMate database.",
   "dbOpenFailed": "Could not open the database: {error}",
-  "@dbOpenFailed": { "placeholders": { "error": {} } },
+  "@dbOpenFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "errorLoad": "Load error: {error}",
-  "@errorLoad": { "placeholders": { "error": {} } },
+  "@errorLoad": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "errorCreate": "Create error: {error}",
-  "@errorCreate": { "placeholders": { "error": {} } },
-
+  "@errorCreate": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "noResults": "No results",
   "resultsFound": "{count} results found",
-  "@resultsFound": { "placeholders": { "count": {} } },
+  "@resultsFound": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "newDive": "New",
   "newDiveManual": "New dive (manual)",
   "diveTransfer": "Dive transfer (computer)",
   "dive": "Dive",
-
   "edit": "Edit",
   "editDiveNumber": "Edit #{number}",
-  "@editDiveNumber": { "placeholders": { "number": {} } },
+  "@editDiveNumber": {
+    "placeholders": {
+      "number": {}
+    }
+  },
   "editDive": "Edit dive",
   "newDiveNumber": "New dive #{number}",
-  "@newDiveNumber": { "placeholders": { "number": {} } },
+  "@newDiveNumber": {
+    "placeholders": {
+      "number": {}
+    }
+  },
   "save": "Save",
   "saving": "Saving…",
   "errorSave": "Save error: {error}",
-  "@errorSave": { "placeholders": { "error": {} } },
-
+  "@errorSave": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "profile": "Profile",
   "cylinders": "Cylinders",
   "notes": "Notes",
@@ -113,7 +163,6 @@
   "statTempAvg": "Avg temp",
   "statWeight": "Weight",
   "statComputer": "Computer",
-
   "fieldNumber": "Dive #",
   "fieldDate": "Date",
   "ppo2Max": "Max PPO2",
@@ -137,10 +186,8 @@
   "ratingLabel": "Rating",
   "liters": "Liters",
   "o2pct": "O₂ %",
-
   "searchSites": "Search site, country, region…",
   "site": "Site",
-
   "statsDives": "Dives",
   "statsTotalTime": "Total time",
   "statsAvgDive": "Avg dive",
@@ -161,7 +208,6 @@
   "byYear": "Year",
   "byMonth": "Month",
   "byWeek": "Week",
-
   "searchComputer": "Search for a new one",
   "saveComputer": "Save this dive computer",
   "noComputers": "No saved dive computers",
@@ -178,8 +224,11 @@
   "retry": "Retry",
   "diveChip": "Dive",
   "scanError": "Scan error: {error}",
-  "@scanError": { "placeholders": { "error": {} } },
-
+  "@scanError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "showAllDevices": "Show all Bluetooth devices",
   "sync": "Download a specific number of dives",
   "syncSub": "Always downloads the last N dives",
@@ -191,22 +240,47 @@
   "downloadPrefix": "Download",
   "markPrefix": "Mark imported",
   "modelNotRecognized": "Model not recognized from the name \"{name}\".",
-  "@modelNotRecognized": { "placeholders": { "name": {} } },
+  "@modelNotRecognized": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "connecting": "Connecting…",
   "downloadingHint": "Downloading from the computer.\nKeep it close and on.",
   "downloadedSummary": "{total} downloaded · {newCount} new ({existing} already in DB)",
-  "@downloadedSummary": { "placeholders": { "total": {}, "newCount": {}, "existing": {} } },
+  "@downloadedSummary": {
+    "placeholders": {
+      "total": {},
+      "newCount": {},
+      "existing": {}
+    }
+  },
   "allAlreadyInDb": "The {total} dives from the computer are already in your logbook.",
-  "@allAlreadyInDb": { "placeholders": { "total": {} } },
+  "@allAlreadyInDb": {
+    "placeholders": {
+      "total": {}
+    }
+  },
   "saveN": "Save {count}",
-  "@saveN": { "placeholders": { "count": {} } },
+  "@saveN": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "savedNew": "Saved {added} new.",
-  "@savedNew": { "placeholders": { "added": {} } },
+  "@savedNew": {
+    "placeholders": {
+      "added": {}
+    }
+  },
   "baselineDone": "Marked as already imported.\nFuture downloads will only bring new dives.",
   "done": "Done",
-
   "samplesCount": "{count} samples",
-  "@samplesCount": { "placeholders": { "count": {} } },
+  "@samplesCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "buddies": "Buddies",
   "addBuddy": "Add buddy",
   "newBuddy": "New buddy",
@@ -219,9 +293,17 @@
   "noBuddies": "No buddies yet",
   "selectBuddies": "Select buddies",
   "divesWith": "Dives with {name}",
-  "@divesWith": { "placeholders": { "name": {} } },
+  "@divesWith": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "diveCountLabel": "{count} dives",
-  "@diveCountLabel": { "placeholders": { "count": {} } },
+  "@diveCountLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "newSite": "New site",
   "editSite": "Edit site",
   "noSitesYet": "No sites yet",
@@ -232,7 +314,11 @@
   "tankName": "Name (left, deco…)",
   "addTank": "Add tank",
   "tankN": "Tank {n}",
-  "@tankN": { "placeholders": { "n": {} } },
+  "@tankN": {
+    "placeholders": {
+      "n": {}
+    }
+  },
   "material": "Material",
   "aluminium": "Aluminium",
   "steel": "Steel",
@@ -256,15 +342,27 @@
   "importing": "Importing…",
   "importSubsurface": "Import from Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} dives imported",
-  "@importSubsurfaceResult": { "placeholders": { "count": {} } },
+  "@importSubsurfaceResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "importHashtags": "Import #hashtags from comments as tags",
   "removeHashtags": "Remove hashtags from comments",
   "tagsToHashtags": "Tags to #hashtags in comments",
   "tagsToHashtagsResult": "{count} hashtags added",
-  "@tagsToHashtagsResult": { "placeholders": { "count": {} } },
+  "@tagsToHashtagsResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "removeTags": "Remove the tags afterwards",
   "importHashtagsResult": "{count} tags assigned.",
-  "@importHashtagsResult": { "placeholders": { "count": {} } },
+  "@importHashtagsResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "equipment": "Equipment",
   "diveTypes": "Dive types",
   "diveType": "Dive type",
@@ -278,22 +376,42 @@
   "noProfile": "No profile recorded",
   "axisDepth": "depth (m)",
   "axisTime": "time (min)",
-
   "selectedCount": "{count} selected",
-  "@selectedCount": { "placeholders": { "count": {} } },
+  "@selectedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "deleteConfirm": "Delete {count}? This can't be undone.",
-  "@deleteConfirm": { "placeholders": { "count": {} } },
+  "@deleteConfirm": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "exportName": "Logbook name",
   "exportSelection": "Export selection (.ddb)",
   "adjustTimeExplain": "You'll set the new date/time for the first dive; the same shift is applied to all {count} selected dives. Continue?",
-  "@adjustTimeExplain": { "placeholders": { "count": {} } },
+  "@adjustTimeExplain": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "adjustTime": "Adjust time",
   "originalTime": "Original time",
   "merge": "Merge",
   "mergeConfirm": "Merge {count} dives into one? The others will be deleted.",
-  "@mergeConfirm": { "placeholders": { "count": {} } },
+  "@mergeConfirm": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "mergeTooFar": "Too much surface time between dives ({gap} min, limit {limit} min).",
-  "@mergeTooFar": { "placeholders": { "gap": {}, "limit": {} } },
+  "@mergeTooFar": {
+    "placeholders": {
+      "gap": {},
+      "limit": {}
+    }
+  },
   "mergeGapSetting": "Max surface gap to merge (min)",
   "nightDiveHours": "Night dive hours",
   "nightFrom": "From",
@@ -323,5 +441,41 @@
   "cylEmpties": "Empties",
   "planReserveTarget": "Reserve target",
   "planPerReserveCyl": "(reserve cylinders)",
-  "planStagesEmpty": "Stage cylinders end empty (0 bar)."
+  "planStagesEmpty": "Stage cylinders end empty (0 bar).",
+  "documents": "Documentation",
+  "docAdd": "Add document",
+  "docEmpty": "No documents yet",
+  "docNew": "New document",
+  "docEdit": "Edit document",
+  "docTitle": "Title",
+  "docNotes": "Notes",
+  "docTitleRequired": "Title is required",
+  "docExpiresQuestion": "This document expires",
+  "docPickExpiry": "Pick expiry date",
+  "docDeleteConfirm": "Delete this document?",
+  "docValid": "Valid",
+  "docExpiresSoon": "Expires soon",
+  "docExpired": "Expired",
+  "docSourceCamera": "Take photo",
+  "docSourceGallery": "From gallery",
+  "docSourcePdf": "From PDF",
+  "docPickPage": "Choose page",
+  "docPageN": "Page {n}",
+  "@docPageN": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "docBannerExpired": "{count} expired",
+  "@docBannerExpired": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "docBannerSoon": "{count} expiring soon",
+  "@docBannerSoon": {
+    "placeholders": {
+      "count": {}
+    }
+  }
 }

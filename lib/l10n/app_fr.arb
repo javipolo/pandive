@@ -1,6 +1,5 @@
 {
   "@@locale": "fr",
-
   "navDives": "Plongées",
   "navSites": "Sites",
   "navStats": "Stats",
@@ -47,7 +46,6 @@
   "database": "Base de données",
   "changeDbWarning": "Vous cesserez d'utiliser le carnet de plongée actuel et reviendrez à l'écran de chargement pour en ouvrir ou en créer un autre. Le fichier n'est pas supprimé.",
   "settings": "Paramètres",
-
   "settingsTitle": "Paramètres",
   "language": "Langue",
   "languageSystem": "Par défaut du système",
@@ -64,7 +62,6 @@
   "textSize": "Taille du texte",
   "textSizeHint": "La plongée la plus profonde ne sert à rien si vous ne pouvez pas lire les chiffres.",
   "reset": "Réinitialiser",
-
   "loadHeadline": "Chargez votre carnet de plongée",
   "loadSubtitle": "Choisissez un fichier .ddb DiveMate pour commencer.",
   "pickFile": "Choisir un fichier .ddb",
@@ -73,7 +70,6 @@
   "dbOpenFailed": "Impossible d'ouvrir la base de données : {error}",
   "errorLoad": "Erreur de chargement : {error}",
   "errorCreate": "Erreur de création : {error}",
-
   "noResults": "Aucun résultat",
   "resultsFound": "{count} résultats trouvés",
   "newDive": "Nouvelle",
@@ -87,7 +83,6 @@
   "save": "Enregistrer",
   "saving": "Enregistrement…",
   "errorSave": "Erreur d'enregistrement : {error}",
-
   "profile": "Profil",
   "cylinders": "Bouteilles",
   "notes": "Notes",
@@ -98,7 +93,6 @@
   "statTempAvg": "Temp. moy.",
   "statWeight": "Lestage",
   "statComputer": "Ordinateur",
-
   "fieldNumber": "Plongée n°",
   "fieldDate": "Date",
   "ppo2Max": "PPO2 max",
@@ -122,10 +116,8 @@
   "ratingLabel": "Note",
   "liters": "Litres",
   "o2pct": "O₂ %",
-
   "searchSites": "Rechercher site, pays, région…",
   "site": "Site",
-
   "statsDives": "Plongées",
   "statsTotalTime": "Temps total",
   "statsAvgDive": "Plongée moy.",
@@ -146,7 +138,6 @@
   "byYear": "Année",
   "byMonth": "Mois",
   "byWeek": "Semaine",
-
   "searchComputer": "En rechercher un nouveau",
   "saveComputer": "Enregistrer cet ordinateur de plongée",
   "noComputers": "Aucun ordinateur de plongée enregistré",
@@ -163,7 +154,6 @@
   "retry": "Réessayer",
   "diveChip": "Plongée",
   "scanError": "Erreur de scan : {error}",
-
   "showAllDevices": "Afficher tous les appareils Bluetooth",
   "sync": "Télécharger un nombre précis de plongées",
   "syncSub": "Télécharge toujours les N dernières plongées",
@@ -183,7 +173,6 @@
   "savedNew": "{added} nouvelles enregistrées.",
   "baselineDone": "Marquées comme déjà importées.\nLes futurs téléchargements n'apporteront que les nouvelles plongées.",
   "done": "Terminé",
-
   "samplesCount": "{count} échantillons",
   "buddies": "Binômes",
   "addBuddy": "Ajouter un binôme",
@@ -250,7 +239,6 @@
   "noProfile": "Aucun profil enregistré",
   "axisDepth": "profondeur (m)",
   "axisTime": "temps (min)",
-
   "selectedCount": "{count} sélectionnées",
   "deleteConfirm": "Supprimer {count} ? Cette action est irréversible.",
   "exportName": "Nom du carnet",
@@ -290,5 +278,26 @@
   "cylEmpties": "Se vide",
   "planReserveTarget": "Réserve cible",
   "planPerReserveCyl": "(blocs de réserve)",
-  "planStagesEmpty": "Les relais sortent vides (0 bar)."
+  "planStagesEmpty": "Les relais sortent vides (0 bar).",
+  "documents": "Documentation",
+  "docAdd": "Ajouter un document",
+  "docEmpty": "Aucun document pour l'instant",
+  "docNew": "Nouveau document",
+  "docEdit": "Modifier le document",
+  "docTitle": "Titre",
+  "docNotes": "Notes",
+  "docTitleRequired": "Le titre est obligatoire",
+  "docExpiresQuestion": "Ce document expire",
+  "docPickExpiry": "Choisir la date d'expiration",
+  "docDeleteConfirm": "Supprimer ce document ?",
+  "docValid": "Valide",
+  "docExpiresSoon": "Expire bientôt",
+  "docExpired": "Expiré",
+  "docSourceCamera": "Prendre une photo",
+  "docSourceGallery": "Depuis la galerie",
+  "docSourcePdf": "Depuis un PDF",
+  "docPickPage": "Choisir la page",
+  "docPageN": "Page {n}",
+  "docBannerExpired": "{count} expirés",
+  "docBannerSoon": "{count} bientôt expirés"
 }

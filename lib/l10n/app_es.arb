@@ -1,6 +1,5 @@
 {
   "@@locale": "es",
-
   "navDives": "Inmersiones",
   "navSites": "Sitios",
   "navStats": "Estadísticas",
@@ -47,7 +46,6 @@
   "database": "Base de datos",
   "changeDbWarning": "Dejarás de usar el logbook actual y volverás a la pantalla de carga para abrir o crear otro. El fichero no se borra.",
   "settings": "Ajustes",
-
   "settingsTitle": "Ajustes",
   "language": "Idioma",
   "languageSystem": "Predeterminado del sistema",
@@ -64,7 +62,6 @@
   "textSize": "Tamaño de letra",
   "textSizeHint": "La inmersión más profunda no sirve de nada si no ves los números.",
   "reset": "Restablecer",
-
   "loadHeadline": "Carga tu logbook",
   "loadSubtitle": "Selecciona un fichero .ddb de DiveMate para empezar.",
   "pickFile": "Elegir fichero .ddb",
@@ -73,14 +70,12 @@
   "dbOpenFailed": "No se pudo abrir la base de datos: {error}",
   "errorLoad": "Error al cargar: {error}",
   "errorCreate": "Error al crear: {error}",
-
   "noResults": "Sin resultados",
   "resultsFound": "{count} resultados",
   "newDive": "Nueva",
   "newDiveManual": "Nueva inmersión (manual)",
   "diveTransfer": "Transferir del ordenador",
   "dive": "Inmersión",
-
   "edit": "Editar",
   "editDiveNumber": "Editar #{number}",
   "editDive": "Editar inmersión",
@@ -88,7 +83,6 @@
   "save": "Guardar",
   "saving": "Guardando…",
   "errorSave": "Error al guardar: {error}",
-
   "profile": "Perfil",
   "cylinders": "Botellas",
   "notes": "Notas",
@@ -99,7 +93,6 @@
   "statTempAvg": "Temp. media",
   "statWeight": "Lastre",
   "statComputer": "Ordenador",
-
   "fieldNumber": "Nº inmersión",
   "fieldDate": "Fecha",
   "ppo2Max": "PPO2 máx",
@@ -123,10 +116,8 @@
   "ratingLabel": "Valoración",
   "liters": "Litros",
   "o2pct": "O₂ %",
-
   "searchSites": "Buscar sitio, país, región…",
   "site": "Sitio",
-
   "statsDives": "Inmersiones",
   "statsTotalTime": "Tiempo total",
   "statsAvgDive": "Media inmersión",
@@ -147,7 +138,6 @@
   "byYear": "Año",
   "byMonth": "Mes",
   "byWeek": "Semana",
-
   "searchComputer": "Buscar uno nuevo",
   "saveComputer": "Guardar este ordenador",
   "noComputers": "Sin ordenadores guardados",
@@ -164,7 +154,6 @@
   "retry": "Reintentar",
   "diveChip": "Buceo",
   "scanError": "Error de escaneo: {error}",
-
   "showAllDevices": "Mostrar todos los dispositivos Bluetooth",
   "sync": "Descargar un número concreto de inmersiones",
   "syncSub": "Baja siempre las últimas N inmersiones",
@@ -184,7 +173,6 @@
   "savedNew": "Guardadas {added} nuevas.",
   "baselineDone": "Marcado como ya importado.\nLas próximas descargas solo traerán buceos nuevos.",
   "done": "Hecho",
-
   "samplesCount": "{count} muestras",
   "buddies": "Compañeros",
   "addBuddy": "Añadir compañero",
@@ -251,7 +239,6 @@
   "noProfile": "Sin perfil registrado",
   "axisDepth": "prof (m)",
   "axisTime": "tiempo (min)",
-
   "selectedCount": "{count} seleccionadas",
   "deleteConfirm": "¿Eliminar {count}? No se puede deshacer.",
   "exportName": "Nombre del cuaderno",
@@ -291,5 +278,26 @@
   "cylEmpties": "Se vacía",
   "planReserveTarget": "Reserva objetivo",
   "planPerReserveCyl": "(botellas de reserva)",
-  "planStagesEmpty": "Las etapas salen vacías (0 bar)."
+  "planStagesEmpty": "Las etapas salen vacías (0 bar).",
+  "documents": "Documentación",
+  "docAdd": "Añadir documento",
+  "docEmpty": "Aún no hay documentos",
+  "docNew": "Nuevo documento",
+  "docEdit": "Editar documento",
+  "docTitle": "Título",
+  "docNotes": "Notas",
+  "docTitleRequired": "El título es obligatorio",
+  "docExpiresQuestion": "Este documento caduca",
+  "docPickExpiry": "Elegir fecha de caducidad",
+  "docDeleteConfirm": "¿Borrar este documento?",
+  "docValid": "Vigente",
+  "docExpiresSoon": "Caduca pronto",
+  "docExpired": "Caducado",
+  "docSourceCamera": "Hacer foto",
+  "docSourceGallery": "Desde galería",
+  "docSourcePdf": "Desde PDF",
+  "docPickPage": "Elegir página",
+  "docPageN": "Página {n}",
+  "docBannerExpired": "{count} caducados",
+  "docBannerSoon": "{count} por caducar"
 }

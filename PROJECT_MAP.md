@@ -40,6 +40,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_pending.dart` -> caché de descargados no guardados (reaparecen una vez)
 - `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
 - `lib/core/db/db_computers.dart` -> ordenadores de buceo guardados (por MAC)
+- `lib/core/db/db_documents.dart` -> documentación (PandiveDocument): CRUD de metadatos (imagen en disco)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 - `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
@@ -56,6 +57,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/dive_site.dart` -> punto de buceo con nº de inmersiones
 - `lib/core/models/dive_computer_ref.dart` -> ordenador de buceo guardado (MAC+nombre+modelo)
 - `lib/core/models/dive_type.dart` -> tipo de buceo (nombre + plantilla de botellas)
+- `lib/core/models/document.dart` -> documento del buzo (imagen + caducidad); DiveDoc + DocStatus
 - `lib/core/models/downloaded_dive.dart` -> inmersión descargada del ordenador (+ muestras/gases, parse JSON)
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
 
@@ -145,6 +147,17 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/plan/widgets/plan_results.dart` -> resultados (gas, presión final por botella coloreada, margen, tiempo máx.)
 - `lib/features/plan/widgets/plan_reserve_field.dart` -> selector de reserva (35/50 bar, tercios 1/3, cuartos 1/2, personalizada)
 - `lib/features/plan/widgets/plan_cylinders_field.dart` -> lista editable de botellas (litros + marca reserva/se vacía); PlanCyl
+
+### documents (documentación)
+- `lib/features/documents/screens/documents_screen.dart` -> lista con estado de caducidad + alta + export múltiple a PDF
+- `lib/features/documents/screens/document_detail_screen.dart` -> ver imagen grande, editar, borrar, compartir (PDF)
+- `lib/features/documents/screens/document_edit_screen.dart` -> alta/edición de metadatos (título/notas/caducidad)
+- `lib/features/documents/logic/document_store.dart` -> carpeta documents/ en disco (guardar/borrar/ruta)
+- `lib/features/documents/logic/document_import.dart` -> elegir origen (cámara/galería/PDF), render PDF, recorte, guardar
+- `lib/features/documents/logic/document_export.dart` -> genera un PDF con los seleccionados y lo comparte
+- `lib/features/documents/widgets/document_tile.dart` -> fila (miniatura + título + estado)
+- `lib/features/documents/widgets/document_status.dart` -> color/etiqueta por estado de caducidad
+- `lib/features/documents/widgets/documents_banner.dart` -> aviso resumen (caducados/por caducar)
 
 ### sites (sitios)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info

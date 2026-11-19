@@ -1,6 +1,5 @@
 {
   "@@locale": "eu",
-
   "navDives": "Murgilketak",
   "navSites": "Guneak",
   "navStats": "Estatistikak",
@@ -47,7 +46,6 @@
   "database": "Datu-basea",
   "changeDbWarning": "Egungo murgilketa-koadernoa erabiltzeari utziko diozu eta kargatze-pantailara itzuliko zara beste bat ireki edo sortzeko. Fitxategia ez da ezabatzen.",
   "settings": "Ezarpenak",
-
   "settingsTitle": "Ezarpenak",
   "language": "Hizkuntza",
   "languageSystem": "Sistemaren lehenetsia",
@@ -64,7 +62,6 @@
   "textSize": "Testuaren tamaina",
   "textSizeHint": "Murgilketarik sakonena alferrikakoa da zenbakiak irakurri ezin badituzu.",
   "reset": "Berrezarri",
-
   "loadHeadline": "Kargatu zure murgilketa-koadernoa",
   "loadSubtitle": "Hautatu DiveMate .ddb fitxategi bat hasteko.",
   "pickFile": "Aukeratu .ddb fitxategia",
@@ -73,14 +70,12 @@
   "dbOpenFailed": "Ezin izan da datu-basea ireki: {error}",
   "errorLoad": "Kargatze-errorea: {error}",
   "errorCreate": "Sortze-errorea: {error}",
-
   "noResults": "Emaitzarik ez",
   "resultsFound": "{count} emaitza aurkitu dira",
   "newDive": "Berria",
   "newDiveManual": "Murgilketa berria (eskuz)",
   "diveTransfer": "Murgilketa-transferentzia (ordenagailua)",
   "dive": "Murgilketa",
-
   "edit": "Editatu",
   "editDiveNumber": "Editatu #{number}",
   "editDive": "Editatu murgilketa",
@@ -88,7 +83,6 @@
   "save": "Gorde",
   "saving": "Gordetzen…",
   "errorSave": "Gordetze-errorea: {error}",
-
   "profile": "Profila",
   "cylinders": "Botilak",
   "notes": "Oharrak",
@@ -99,7 +93,6 @@
   "statTempAvg": "Batez besteko tenp.",
   "statWeight": "Lastrea",
   "statComputer": "Ordenagailua",
-
   "fieldNumber": "Murgilketa #",
   "fieldDate": "Data",
   "ppo2Max": "PPO2 maximoa",
@@ -123,10 +116,8 @@
   "ratingLabel": "Balorazioa",
   "liters": "Litroak",
   "o2pct": "O₂ %",
-
   "searchSites": "Bilatu gunea, herrialdea, eskualdea…",
   "site": "Gunea",
-
   "statsDives": "Murgilketak",
   "statsTotalTime": "Denbora osoa",
   "statsAvgDive": "Batez besteko murgilketa",
@@ -147,7 +138,6 @@
   "byYear": "Urtea",
   "byMonth": "Hilabetea",
   "byWeek": "Astea",
-
   "searchComputer": "Bilatu berri bat",
   "saveComputer": "Gorde murgilketa-ordenagailu hau",
   "noComputers": "Gordetako murgilketa-ordenagailurik ez",
@@ -164,7 +154,6 @@
   "retry": "Saiatu berriro",
   "diveChip": "Murgilketa",
   "scanError": "Eskaneatze-errorea: {error}",
-
   "showAllDevices": "Erakutsi Bluetooth gailu guztiak",
   "sync": "Murgilketa kopuru jakin bat deskargatu",
   "syncSub": "Beti azken N murgilketak deskargatzen ditu",
@@ -184,7 +173,6 @@
   "savedNew": "{added} berri gordeta.",
   "baselineDone": "Jada inportatu bezala markatuta.\nEtorkizuneko deskargek murgilketa berriak bakarrik ekarriko dituzte.",
   "done": "Eginda",
-
   "samplesCount": "{count} lagin",
   "buddies": "Bikotekideak",
   "addBuddy": "Gehitu bikotekidea",
@@ -251,7 +239,6 @@
   "noProfile": "Ez da profilik grabatu",
   "axisDepth": "sakonera (m)",
   "axisTime": "denbora (min)",
-
   "selectedCount": "{count} hautatuta",
   "deleteConfirm": "{count} ezabatu? Ezin da desegin.",
   "exportName": "Koadernoaren izena",
@@ -291,5 +278,26 @@
   "cylEmpties": "Hustu",
   "planReserveTarget": "Erreserba helburua",
   "planPerReserveCyl": "(erreserbako botilak)",
-  "planStagesEmpty": "Etapak hutsik ateratzen dira (0 bar)."
+  "planStagesEmpty": "Etapak hutsik ateratzen dira (0 bar).",
+  "documents": "Dokumentazioa",
+  "docAdd": "Gehitu dokumentua",
+  "docEmpty": "Oraindik ez dago dokumenturik",
+  "docNew": "Dokumentu berria",
+  "docEdit": "Editatu dokumentua",
+  "docTitle": "Izenburua",
+  "docNotes": "Oharrak",
+  "docTitleRequired": "Izenburua beharrezkoa da",
+  "docExpiresQuestion": "Dokumentu honek iraungitze-data du",
+  "docPickExpiry": "Aukeratu iraungitze-data",
+  "docDeleteConfirm": "Dokumentu hau ezabatu?",
+  "docValid": "Indarrean",
+  "docExpiresSoon": "Laster iraungiko da",
+  "docExpired": "Iraungita",
+  "docSourceCamera": "Atera argazkia",
+  "docSourceGallery": "Galeriatik",
+  "docSourcePdf": "PDFtik",
+  "docPickPage": "Aukeratu orria",
+  "docPageN": "{n}. orria",
+  "docBannerExpired": "{count} iraungita",
+  "docBannerSoon": "{count} laster iraungiko dira"
 }

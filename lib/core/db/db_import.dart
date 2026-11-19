@@ -50,6 +50,11 @@ void _ensureSyncTable(Database db) {
   // Parámetros extra por muestra (ppo2/cns/presión/rbt) como JSON de arrays.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveSampleExtra '
       '(DiveId INTEGER PRIMARY KEY, Json TEXT)');
+  // Documentación (certificaciones, seguro, etc.): imagen en disco + metadatos.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveDocument '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT, Notes TEXT, '
+      'Expires INTEGER, ExpiryDate TEXT, FileName TEXT, Created TEXT, '
+      'Updated TEXT)');
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.

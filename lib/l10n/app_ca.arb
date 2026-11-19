@@ -1,6 +1,5 @@
 {
   "@@locale": "ca",
-
   "navDives": "Immersions",
   "navSites": "Punts",
   "navStats": "Estadístiques",
@@ -47,7 +46,6 @@
   "database": "Base de dades",
   "changeDbWarning": "Deixaràs d'utilitzar el quadern d'immersions actual i tornaràs a la pantalla de càrrega per obrir-ne o crear-ne un altre. El fitxer no s'esborra.",
   "settings": "Configuració",
-
   "settingsTitle": "Configuració",
   "language": "Idioma",
   "languageSystem": "Per defecte del sistema",
@@ -64,7 +62,6 @@
   "textSize": "Mida del text",
   "textSizeHint": "La immersió més profunda no serveix de res si no pots llegir els números.",
   "reset": "Restableix",
-
   "loadHeadline": "Carrega el teu quadern d'immersions",
   "loadSubtitle": "Tria un fitxer .ddb de DiveMate per començar.",
   "pickFile": "Tria un fitxer .ddb",
@@ -73,14 +70,12 @@
   "dbOpenFailed": "No s'ha pogut obrir la base de dades: {error}",
   "errorLoad": "Error en carregar: {error}",
   "errorCreate": "Error en crear: {error}",
-
   "noResults": "Sense resultats",
   "resultsFound": "S'han trobat {count} resultats",
   "newDive": "Nova",
   "newDiveManual": "Immersió nova (manual)",
   "diveTransfer": "Transferència d'immersions (ordinador)",
   "dive": "Immersió",
-
   "edit": "Edita",
   "editDiveNumber": "Edita la núm. {number}",
   "editDive": "Edita la immersió",
@@ -88,7 +83,6 @@
   "save": "Desa",
   "saving": "S'està desant…",
   "errorSave": "Error en desar: {error}",
-
   "profile": "Perfil",
   "cylinders": "Ampolles",
   "notes": "Notes",
@@ -99,7 +93,6 @@
   "statTempAvg": "Temp. mitjana",
   "statWeight": "Llast",
   "statComputer": "Ordinador",
-
   "fieldNumber": "Immersió núm.",
   "fieldDate": "Data",
   "ppo2Max": "PPO2 màx.",
@@ -123,10 +116,8 @@
   "ratingLabel": "Valoració",
   "liters": "Litres",
   "o2pct": "O₂ %",
-
   "searchSites": "Cerca punt, país, regió…",
   "site": "Punt d'immersió",
-
   "statsDives": "Immersions",
   "statsTotalTime": "Temps total",
   "statsAvgDive": "Immersió mitjana",
@@ -147,7 +138,6 @@
   "byYear": "Any",
   "byMonth": "Mes",
   "byWeek": "Setmana",
-
   "searchComputer": "Cerca'n un de nou",
   "saveComputer": "Desa aquest ordinador de busseig",
   "noComputers": "No hi ha cap ordinador de busseig desat",
@@ -164,7 +154,6 @@
   "retry": "Torna-ho a provar",
   "diveChip": "Immersió",
   "scanError": "Error d'escaneig: {error}",
-
   "showAllDevices": "Mostra tots els dispositius Bluetooth",
   "sync": "Baixa un nombre concret d'immersions",
   "syncSub": "Baixa sempre les últimes N immersions",
@@ -184,7 +173,6 @@
   "savedNew": "S'han desat {added} de noves.",
   "baselineDone": "Marcades com a ja importades.\nLes baixades futures només portaran immersions noves.",
   "done": "Fet",
-
   "samplesCount": "{count} mostres",
   "buddies": "Companys",
   "addBuddy": "Afegeix un company",
@@ -251,7 +239,6 @@
   "noProfile": "No s'ha registrat cap perfil",
   "axisDepth": "profunditat (m)",
   "axisTime": "temps (min)",
-
   "selectedCount": "{count} seleccionades",
   "deleteConfirm": "Vols esborrar {count}? Això no es pot desfer.",
   "exportName": "Nom del quadern",
@@ -291,5 +278,26 @@
   "cylEmpties": "Es buida",
   "planReserveTarget": "Reserva objectiu",
   "planPerReserveCyl": "(ampolles de reserva)",
-  "planStagesEmpty": "Les etapes surten buides (0 bar)."
+  "planStagesEmpty": "Les etapes surten buides (0 bar).",
+  "documents": "Documentació",
+  "docAdd": "Afegeix document",
+  "docEmpty": "Encara no hi ha documents",
+  "docNew": "Nou document",
+  "docEdit": "Edita document",
+  "docTitle": "Títol",
+  "docNotes": "Notes",
+  "docTitleRequired": "El títol és obligatori",
+  "docExpiresQuestion": "Aquest document caduca",
+  "docPickExpiry": "Tria la data de caducitat",
+  "docDeleteConfirm": "Esborrar aquest document?",
+  "docValid": "Vigent",
+  "docExpiresSoon": "Caduca aviat",
+  "docExpired": "Caducat",
+  "docSourceCamera": "Fer foto",
+  "docSourceGallery": "Des de la galeria",
+  "docSourcePdf": "Des de PDF",
+  "docPickPage": "Tria pàgina",
+  "docPageN": "Pàgina {n}",
+  "docBannerExpired": "{count} caducats",
+  "docBannerSoon": "{count} per caducar"
 }

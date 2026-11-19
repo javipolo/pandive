@@ -5,8 +5,10 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/screens/backup_screen.dart';
+import 'package:pandive/features/documents/screens/documents_screen.dart';
 import 'package:pandive/features/settings/screens/about_screen.dart';
 import 'package:pandive/features/settings/screens/tools_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -56,6 +58,9 @@ class HomeDrawer extends StatelessWidget {
             _item(context, 4, Icons.tune_outlined, t.equipment),
             _item(context, 5, Icons.bar_chart_outlined, t.navStats),
             const Divider(),
+            _push(context, Icons.folder_outlined, t.documents,
+                (_) => DocumentsScreen(db: db),
+                alert: _docsAlert()),
             _push(context, Icons.build_outlined, t.tools,
                 (_) => ToolsScreen(settings: settings, db: db)),
             _push(context, Icons.cloud_upload_outlined, t.backup,
@@ -67,11 +72,24 @@ class HomeDrawer extends StatelessWidget {
     );
   }
 
+  bool _docsAlert() {
+    final now = DateTime.now();
+    return db.listDocuments().any((d) {
+      final s = d.status(now);
+      return s == DocStatus.expired || s == DocStatus.soon;
+    });
+  }
+
   Widget _push(BuildContext context, IconData icon, String label,
-      WidgetBuilder builder) {
+      WidgetBuilder builder,
+      {bool alert = false}) {
     return ListTile(
       leading: Icon(icon),
       title: Text(label),
+      trailing: alert
+          ? Icon(Icons.circle,
+              size: 12, color: Theme.of(context).colorScheme.error)
+          : null,
       onTap: () {
         Navigator.pop(context);
         Navigator.of(context).push(MaterialPageRoute(builder: builder));

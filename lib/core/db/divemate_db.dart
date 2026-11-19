@@ -32,6 +32,7 @@ part 'db_computers.dart';
 part 'db_encode.dart';
 part 'db_sync.dart';
 part 'db_import_ext.dart';
+part 'db_documents.dart';
 
 class DivemateDb {
   final Database _db;
