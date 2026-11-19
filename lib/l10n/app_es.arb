@@ -141,6 +141,7 @@
   "statsDecoDives": "Buceos con deco",
   "statsMaxTts": "TTS máx.",
   "statsMaxCeiling": "Ceiling máx.",
+  "statsMaxCeilingTime": "Tiempo techo máx.",
   "statsFirst": "Primera",
   "statsLast": "Última",
   "byYear": "Año",

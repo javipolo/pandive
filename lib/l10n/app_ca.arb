@@ -141,6 +141,7 @@
   "statsDecoDives": "Immersions amb deco",
   "statsMaxTts": "TTS màx.",
   "statsMaxCeiling": "Sostre màx.",
+  "statsMaxCeilingTime": "Temps sostre màx.",
   "statsFirst": "Primera",
   "statsLast": "Darrera",
   "byYear": "Any",

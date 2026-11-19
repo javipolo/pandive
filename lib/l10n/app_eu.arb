@@ -141,6 +141,7 @@
   "statsDecoDives": "Deko murgilketak",
   "statsMaxTts": "TTS max.",
   "statsMaxCeiling": "Sabai max.",
+  "statsMaxCeilingTime": "Sabai denbora max.",
   "statsFirst": "Lehena",
   "statsLast": "Azkena",
   "byYear": "Urtea",

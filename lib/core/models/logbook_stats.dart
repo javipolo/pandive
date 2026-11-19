@@ -20,6 +20,7 @@ class LogbookStats {
   final int? decoDives; // nº buceos con deco
   final int? maxTts; // min
   final double? maxCeiling; // m (más profundo = mayor)
+  final double? maxCeilingMinutes; // tiempo con techo del buceo que más tuvo
   final DateTime? firstDive;
   final DateTime? lastDive;
   final Map<int, int> divesPerYear; // año -> nº inmersiones
@@ -41,6 +42,7 @@ class LogbookStats {
     this.decoDives,
     this.maxTts,
     this.maxCeiling,
+    this.maxCeilingMinutes,
     this.firstDive,
     this.lastDive,
     this.divesPerYear = const {},

@@ -140,6 +140,7 @@
   "statsDecoDives": "Plongées déco",
   "statsMaxTts": "TTS max",
   "statsMaxCeiling": "Plafond max",
+  "statsMaxCeilingTime": "Temps plafond max",
   "statsFirst": "Première",
   "statsLast": "Dernière",
   "byYear": "Année",

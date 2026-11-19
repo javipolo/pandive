@@ -155,6 +155,7 @@
   "statsDecoDives": "Deco dives",
   "statsMaxTts": "Max TTS",
   "statsMaxCeiling": "Max ceiling",
+  "statsMaxCeilingTime": "Max ceiling time",
   "statsFirst": "First",
   "statsLast": "Last",
   "byYear": "Year",

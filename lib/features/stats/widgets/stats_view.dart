@@ -85,10 +85,13 @@ class _StatsViewState extends State<StatsView> {
         ),
         if ((s.decoDives ?? 0) > 0) ...[
           sectionLine(),
-          threeCol(
+          twoCol(
             LabeledValue(t.statsDecoDives, '${s.decoDives}'),
             LabeledValue(t.statsMaxTts, _min(s.maxTts?.toDouble())),
+          ),
+          twoCol(
             LabeledValue(t.statsMaxCeiling, _u(s.maxCeiling, 'm')),
+            LabeledValue(t.statsMaxCeilingTime, _min(s.maxCeilingMinutes)),
           ),
         ],
         if (widget.dates.isNotEmpty) ...[

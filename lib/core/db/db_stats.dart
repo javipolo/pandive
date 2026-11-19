@@ -88,14 +88,20 @@ extension DivemateDbStats on DivemateDb {
     int decoDives = 0;
     int maxTts = 0;
     double maxCeiling = 0;
+    int maxCeilSecs = 0; // más tiempo con techo (segundos) de un solo buceo
     for (final r
         in _db.select('SELECT ID FROM Logbook WHERE $filter AND Deco = 1', params)) {
       decoDives++;
       final p = diveProfile(r['ID'] as int);
       if (p == null) continue;
+      int ceilSamples = 0;
       for (final c in p.ceiling) {
+        if (c <= 0) continue;
+        ceilSamples++;
         if (c > maxCeiling) maxCeiling = c;
       }
+      final secs = ceilSamples * p.intervalSeconds;
+      if (secs > maxCeilSecs) maxCeilSecs = secs;
       for (final x in p.tts) {
         if (x != null && x > maxTts) maxTts = x;
       }
@@ -119,6 +125,7 @@ extension DivemateDbStats on DivemateDb {
       decoDives: decoDives,
       maxTts: maxTts > 0 ? maxTts : null,
       maxCeiling: maxCeiling > 0 ? maxCeiling : null,
+      maxCeilingMinutes: maxCeilSecs > 0 ? maxCeilSecs / 60.0 : null,
       firstDive: _parseDate(_str(agg['first']), null),
       lastDive: _parseDate(_str(agg['last']), null),
       divesPerYear: perYear,
