@@ -21,8 +21,21 @@ class BuddyPickerScreen extends StatefulWidget {
 }
 
 class _BuddyPickerScreenState extends State<BuddyPickerScreen> {
+  // Recuerda la posición de scroll entre aperturas (añadir el mismo buddy a
+  // varios buceos sin volver a buscarlo). Solo dura la sesión de la app.
+  static double _lastOffset = 0;
+
   late List<Buddy> _buddies = widget.db.listBuddies();
   late final Set<int> _selected = {...widget.selectedIds};
+  late final ScrollController _scroll =
+      ScrollController(initialScrollOffset: _lastOffset)
+        ..addListener(() => _lastOffset = _scroll.offset);
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
 
   Future<void> _createNew() async {
     final c = TextEditingController();
@@ -80,6 +93,7 @@ class _BuddyPickerScreenState extends State<BuddyPickerScreen> {
       body: _buddies.isEmpty
           ? Center(child: Text(t.noBuddies))
           : ListView.builder(
+              controller: _scroll,
               itemCount: _buddies.length,
               itemBuilder: (context, i) {
                 final b = _buddies[i];
