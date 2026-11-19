@@ -10,11 +10,14 @@ import 'package:image/image.dart' as img;
 
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Rota 90° en horario (en isolate vía compute).
-Uint8List rotate90(Uint8List bytes) {
+/// Rota 90° en horario / antihorario (en isolate vía compute).
+Uint8List rotateCw(Uint8List bytes) => _rotate(bytes, 90);
+Uint8List rotateCcw(Uint8List bytes) => _rotate(bytes, -90);
+
+Uint8List _rotate(Uint8List bytes, int angle) {
   final decoded = img.decodeImage(bytes);
   if (decoded == null) return bytes;
-  return img.encodeJpg(img.copyRotate(decoded, angle: 90), quality: 92);
+  return img.encodeJpg(img.copyRotate(decoded, angle: angle), quality: 92);
 }
 
 /// Reduce a un máximo de 2200 px por lado (una vez al entrar), para que rotar
@@ -41,6 +44,7 @@ class CropScreen extends StatefulWidget {
 class _CropScreenState extends State<CropScreen> {
   final _controller = CropController();
   late Uint8List _bytes = widget.bytes;
+  Uint8List? _original; // imagen reducida sin rotar (para reset)
   int _rot = 0;
   bool _busy = true; // empieza ocupado: reduce la imagen al entrar
 
@@ -55,18 +59,28 @@ class _CropScreenState extends State<CropScreen> {
     if (!mounted) return;
     setState(() {
       _bytes = out;
+      _original = out;
       _busy = false;
     });
   }
 
-  Future<void> _rotate() async {
+  Future<void> _apply(Uint8List Function(Uint8List) op) async {
     setState(() => _busy = true);
-    final out = await compute(rotate90, _bytes);
+    final out = await compute(op, _bytes);
     if (!mounted) return;
     setState(() {
       _bytes = out;
       _rot++;
       _busy = false;
+    });
+  }
+
+  void _reset() {
+    final o = _original;
+    if (o == null) return;
+    setState(() {
+      _bytes = o;
+      _rot++;
     });
   }
 
@@ -78,9 +92,17 @@ class _CropScreenState extends State<CropScreen> {
         title: Text(t.cropTitle),
         actions: [
           IconButton(
+              tooltip: t.cropRotateLeft,
+              icon: const Icon(Icons.rotate_90_degrees_ccw_outlined),
+              onPressed: _busy ? null : () => _apply(rotateCcw)),
+          IconButton(
               tooltip: t.cropRotate,
               icon: const Icon(Icons.rotate_90_degrees_cw_outlined),
-              onPressed: _busy ? null : _rotate),
+              onPressed: _busy ? null : () => _apply(rotateCw)),
+          IconButton(
+              tooltip: t.cropReset,
+              icon: const Icon(Icons.restart_alt),
+              onPressed: _busy ? null : _reset),
           IconButton(
               tooltip: t.confirm,
               icon: const Icon(Icons.check),

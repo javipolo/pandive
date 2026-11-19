@@ -480,5 +480,7 @@
   },
   "cropTitle": "Adjust",
   "cropRotate": "Rotate",
-  "cropFailed": "Could not crop the image"
+  "cropFailed": "Could not crop the image",
+  "cropRotateLeft": "Rotate left",
+  "cropReset": "Reset"
 }

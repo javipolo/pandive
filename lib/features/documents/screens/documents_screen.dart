@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/documents/logic/document_export.dart';
 import 'package:pandive/features/documents/logic/document_import.dart';
 import 'package:pandive/features/documents/logic/document_store.dart';
@@ -75,6 +76,20 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     _exitSel();
   }
 
+  Future<void> _deleteSel() async {
+    final t = AppLocalizations.of(context);
+    if (!await confirmDialog(context, t.deleteConfirm(_sel.length),
+        confirmLabel: t.delete)) {
+      return;
+    }
+    for (final d in _docs.where((d) => _sel.contains(d.id))) {
+      widget.db.deleteDocument(d.id);
+      await deleteDocFile(d.fileName);
+    }
+    _exitSel();
+    _reload();
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -85,11 +100,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             ? IconButton(icon: const Icon(Icons.close), onPressed: _exitSel)
             : null,
         actions: [
-          if (_selecting)
+          if (_selecting) ...[
             IconButton(
                 tooltip: t.exportSelection,
                 icon: const Icon(Icons.share),
                 onPressed: _sel.isEmpty ? null : _export),
+            IconButton(
+                tooltip: t.delete,
+                icon: const Icon(Icons.delete_outline),
+                onPressed: _sel.isEmpty ? null : _deleteSel),
+          ],
         ],
       ),
       floatingActionButton: _selecting

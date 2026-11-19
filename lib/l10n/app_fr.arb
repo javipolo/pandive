@@ -302,5 +302,7 @@
   "docBannerSoon": "{count} bientôt expirés",
   "cropTitle": "Ajuster",
   "cropRotate": "Pivoter",
-  "cropFailed": "Impossible de recadrer l'image"
+  "cropFailed": "Impossible de recadrer l'image",
+  "cropRotateLeft": "Pivoter à gauche",
+  "cropReset": "Réinitialiser"
 }

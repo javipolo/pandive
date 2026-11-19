@@ -49,6 +49,21 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
     if (mounted) Navigator.of(context).pop(true);
   }
 
+  void _openZoom() => Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+              backgroundColor: Colors.black, foregroundColor: Colors.white),
+          body: Center(
+            child: InteractiveViewer(
+              minScale: 1,
+              maxScale: 6,
+              child: Image.file(File(widget.imagePath), fit: BoxFit.contain),
+            ),
+          ),
+        ),
+      ));
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -82,9 +97,10 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
                       color: docStatusColor(context, status),
                       fontWeight: FontWeight.bold)),
             ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 480),
-            child: InteractiveViewer(
+          GestureDetector(
+            onTap: _openZoom,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 480),
               child: Image.file(File(widget.imagePath),
                   fit: BoxFit.contain,
                   errorBuilder: (_, _, _) =>

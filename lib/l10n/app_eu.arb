@@ -302,5 +302,7 @@
   "docBannerSoon": "{count} laster iraungiko dira",
   "cropTitle": "Doitu",
   "cropRotate": "Biratu",
-  "cropFailed": "Ezin izan da irudia moztu"
+  "cropFailed": "Ezin izan da irudia moztu",
+  "cropRotateLeft": "Biratu ezkerrera",
+  "cropReset": "Berrezarri"
 }

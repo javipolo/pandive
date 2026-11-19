@@ -302,5 +302,7 @@
   "docBannerSoon": "{count} per caducar",
   "cropTitle": "Ajustar",
   "cropRotate": "Gira",
-  "cropFailed": "No s'ha pogut retallar la imatge"
+  "cropFailed": "No s'ha pogut retallar la imatge",
+  "cropRotateLeft": "Gira a l'esquerra",
+  "cropReset": "Restableix"
 }
