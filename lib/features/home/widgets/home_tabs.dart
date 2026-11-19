@@ -53,10 +53,19 @@ class HomeTabs extends StatelessWidget {
             SitesTab(
                 key: ValueKey('sites-$v'),
                 db: db,
+                settings: settings,
                 query: _q(1),
                 collapseAll: collapseAll),
-            BuddiesTab(key: ValueKey('buddies-$v'), db: db, query: _q(2)),
-            TagsTab(key: ValueKey('tags-$v'), db: db, query: _q(3)),
+            BuddiesTab(
+                key: ValueKey('buddies-$v'),
+                db: db,
+                settings: settings,
+                query: _q(2)),
+            TagsTab(
+                key: ValueKey('tags-$v'),
+                db: db,
+                settings: settings,
+                query: _q(3)),
             EquipmentTab(key: ValueKey('equip-$v'), db: db),
             StatsTab(key: ValueKey('stats-$v'), db: db),
           ],

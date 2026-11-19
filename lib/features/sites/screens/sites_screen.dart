@@ -5,17 +5,23 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/features/sites/screens/site_edit_screen.dart';
 import 'package:pandive/features/sites/screens/site_info_screen.dart';
-import 'package:pandive/features/sites/widgets/site_dives_screen.dart';
 import 'package:pandive/features/sites/widgets/sites_grouped_list.dart';
 
 class SitesTab extends StatefulWidget {
   final DivemateDb db;
+  final Settings settings;
   final String query;
   final bool collapseAll;
   const SitesTab(
-      {super.key, required this.db, this.query = '', this.collapseAll = false});
+      {super.key,
+      required this.db,
+      required this.settings,
+      this.query = '',
+      this.collapseAll = false});
 
   @override
   State<SitesTab> createState() => _SitesTabState();
@@ -33,9 +39,15 @@ class _SitesTabState extends State<SitesTab> {
     if (changed == true && mounted) _reload();
   }
 
-  void _dives(DiveSite site) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => SiteDivesScreen(db: widget.db, site: site)));
+  Future<void> _dives(DiveSite site) async {
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => FilteredDivesScreen(
+              db: widget.db,
+              settings: widget.settings,
+              title: site.name ?? '',
+              loader: () => widget.db.listDivesBySite(site.id),
+            )));
+    if (mounted) _reload();
   }
 
   Future<void> _info(DiveSite site) async {

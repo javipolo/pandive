@@ -6,16 +6,19 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
+import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
-import 'buddy_dives_screen.dart';
 
 class BuddiesTab extends StatefulWidget {
   final DivemateDb db;
+  final Settings settings;
   final String query;
-  const BuddiesTab({super.key, required this.db, this.query = ''});
+  const BuddiesTab(
+      {super.key, required this.db, required this.settings, this.query = ''});
 
   @override
   State<BuddiesTab> createState() => _BuddiesTabState();
@@ -122,7 +125,12 @@ class _BuddiesTabState extends State<BuddiesTab> {
       onTap: _select
           ? () => _toggle(b.id)
           : () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => BuddyDivesScreen(db: widget.db, buddy: b),
+                builder: (_) => FilteredDivesScreen(
+                  db: widget.db,
+                  settings: widget.settings,
+                  title: t.divesWith(b.name),
+                  loader: () => widget.db.listDivesByBuddy(b.id),
+                ),
               )),
       trailing: _select
           ? null

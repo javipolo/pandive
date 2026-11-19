@@ -84,7 +84,6 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### tags (etiquetas)
 - `lib/features/tags/screens/tags_tab.dart` -> lista de tags (crear/renombrar/borrar, ver buceos)
-- `lib/features/dives/screens/dives_list_screen.dart` -> lista simple de buceos (tag/buddy/sitio)
 
 ### backup (copia de seguridad en Drive)
 - `lib/features/backup/screens/backup_screen.dart` -> conectar cuenta, backup manual, auto diario, restaurar
@@ -107,12 +106,12 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### buddies (compañeros)
 - `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar)
-- `lib/features/buddies/screens/buddy_dives_screen.dart` -> buceos de un compañero
 - `lib/features/buddies/screens/buddy_picker_screen.dart` -> multi-selección de compañeros (para editar buceo)
 
 ### dives (inmersiones)
 - `lib/features/dives/screens/dives_screen.dart` -> lista + búsqueda + "Nueva" + selección en lote (borrar/fusionar)
 - `lib/features/dives/screens/dive_detail_screen.dart` -> detalle: datos, perfil, botellas, editar
+- `lib/features/dives/screens/filtered_dives_screen.dart` -> lista filtrada (sitio/buddy/tag) con acciones en lote + búsqueda interna
 - `lib/features/dives/screens/edit_dive_screen.dart` -> editar campos editables
 - `lib/features/dives/screens/new_dive_screen.dart` -> formulario de alta manual
 - `lib/features/dives/widgets/cylinder_tile.dart` -> tarjeta de botella en el detalle
@@ -129,6 +128,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/screens/tag_picker_screen.dart` -> multi-selección de etiquetas
 - `lib/core/widgets/save_action.dart` -> botón Guardar de AppBar
 - `lib/core/db/db_tags.dart` -> etiquetas (tags) y enlace por inmersión
+- `lib/features/dives/widgets/dives_action_list.dart` -> lista de buceos con selección en lote + acciones (stats/fusionar/exportar/borrar); usada por el tab y las listas filtradas
 - `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle por secciones (nº/fecha, sitio, perfil+métricas, gases, deco, botellas)
 - `lib/features/dives/widgets/profile_section.dart` -> sección perfil: gráfica compacta + botones compartir / pantalla completa
 - `lib/features/dives/logic/share_profile.dart` -> genera PNG del perfil (con sitio) y lo comparte (share_plus)
@@ -148,7 +148,6 @@ con `screens/` y, si hace falta, `widgets/`).
 ### sites (sitios)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, editar/borrar, swipe entre sitios)
-- `lib/features/sites/widgets/site_dives_screen.dart` -> buceos de un sitio concreto
 
 ### stats (estadísticas)
 - `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook

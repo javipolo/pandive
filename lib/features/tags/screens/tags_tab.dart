@@ -6,16 +6,19 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
-import 'package:pandive/features/dives/screens/dives_list_screen.dart';
+import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class TagsTab extends StatefulWidget {
   final DivemateDb db;
+  final Settings settings;
   final String query;
-  const TagsTab({super.key, required this.db, this.query = ''});
+  const TagsTab(
+      {super.key, required this.db, required this.settings, this.query = ''});
 
   @override
   State<TagsTab> createState() => _TagsTabState();
@@ -65,10 +68,13 @@ class _TagsTabState extends State<TagsTab> {
   }
 
   void _openDives(Tag tag) {
-    final dives = widget.db.listDivesByTag(tag.id);
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) =>
-          DivesListScreen(db: widget.db, title: tag.name, dives: dives),
+      builder: (_) => FilteredDivesScreen(
+        db: widget.db,
+        settings: widget.settings,
+        title: tag.name,
+        loader: () => widget.db.listDivesByTag(tag.id),
+      ),
     ));
   }
 
