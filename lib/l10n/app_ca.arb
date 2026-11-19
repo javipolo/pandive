@@ -277,5 +277,10 @@
   "planEndPressure": "Pressió final",
   "planMargin": "Marge sobre reserva",
   "planMaxTime": "Temps màx. a aquesta prof.",
-  "planIncomplete": "Omple consum, profunditat, temps, volum i pressió inicial."
+  "planIncomplete": "Omple consum, profunditat, temps, volum i pressió inicial.",
+  "planReserveRule": "Reserva",
+  "reserveThirds": "Terços (reserva 1/3)",
+  "reserveQuarters": "Quarts (reserva 1/2)",
+  "reserveCustom": "Personalitzada",
+  "planPerBottle": "(per ampolla)"
 }

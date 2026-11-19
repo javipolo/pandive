@@ -309,5 +309,10 @@
   "planEndPressure": "End pressure",
   "planMargin": "Margin vs reserve",
   "planMaxTime": "Max time at this depth",
-  "planIncomplete": "Fill in consumption, depth, time, volume and start pressure."
+  "planIncomplete": "Fill in consumption, depth, time, volume and start pressure.",
+  "planReserveRule": "Reserve",
+  "reserveThirds": "Thirds (keep 1/3)",
+  "reserveQuarters": "Quarters (keep 1/2)",
+  "reserveCustom": "Custom",
+  "planPerBottle": "(per cylinder)"
 }

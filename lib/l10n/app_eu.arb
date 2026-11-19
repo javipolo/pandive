@@ -277,5 +277,10 @@
   "planEndPressure": "Amaierako presioa",
   "planMargin": "Erreserbaren gaineko tartea",
   "planMaxTime": "Gehienezko denbora sakonera honetan",
-  "planIncomplete": "Bete kontsumoa, sakonera, denbora, bolumena eta hasierako presioa."
+  "planIncomplete": "Bete kontsumoa, sakonera, denbora, bolumena eta hasierako presioa.",
+  "planReserveRule": "Erreserba",
+  "reserveThirds": "Herenak (1/3 erreserba)",
+  "reserveQuarters": "Laurdenak (1/2 erreserba)",
+  "reserveCustom": "Pertsonalizatua",
+  "planPerBottle": "(botila bakoitzeko)"
 }

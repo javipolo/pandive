@@ -17,6 +17,7 @@ class PlanDiveScreen extends StatefulWidget {
   final double? rmv;
   final double? avgDepth;
   final double? avgTime;
+  final ReserveRule initialRule;
 
   const PlanDiveScreen({
     super.key,
@@ -24,6 +25,7 @@ class PlanDiveScreen extends StatefulWidget {
     this.rmv,
     this.avgDepth,
     this.avgTime,
+    this.initialRule = ReserveRule.bar35,
   });
 
   @override
@@ -36,20 +38,22 @@ class _PlanDiveScreenState extends State<PlanDiveScreen> {
   late final time = TextEditingController(text: _fmt(widget.avgTime, 0));
   final litres = TextEditingController();
   final start = TextEditingController(text: '200');
-  final reserve = TextEditingController(text: '35');
+  final custom = TextEditingController(text: '35');
+  late ReserveRule rule = widget.initialRule;
+
   String? typeName;
 
   @override
   void initState() {
     super.initState();
-    for (final c in [rmv, depth, time, litres, start, reserve]) {
+    for (final c in [rmv, depth, time, litres, start, custom]) {
       c.addListener(() => setState(() {}));
     }
   }
 
   @override
   void dispose() {
-    for (final c in [rmv, depth, time, litres, start, reserve]) {
+    for (final c in [rmv, depth, time, litres, start, custom]) {
       c.dispose();
     }
     super.dispose();
@@ -74,13 +78,15 @@ class _PlanDiveScreenState extends State<PlanDiveScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final reserveBar = reserveBarFor(rule,
+        startBar: _d(start), custom: _d(custom));
     final plan = computeGasPlan(
       rmv: _d(rmv),
       avgDepthM: _d(depth),
       timeMin: _d(time),
       totalLitres: _d(litres),
       startBar: _d(start),
-      reserveBar: _d(reserve),
+      reserveBar: reserveBar,
     );
     return Scaffold(
       appBar: AppBar(title: Text(t.planTitle)),
@@ -93,10 +99,12 @@ class _PlanDiveScreenState extends State<PlanDiveScreen> {
             time: time,
             litres: litres,
             start: start,
-            reserve: reserve,
+            custom: custom,
             typeName: typeName,
             onPickType: _pickType,
             onClearType: () => setState(() => typeName = null),
+            rule: rule,
+            onRuleChanged: (r) => setState(() => rule = r),
           ),
           const SizedBox(height: 8),
           PlanResults(plan: plan),

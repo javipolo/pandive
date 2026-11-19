@@ -5,6 +5,7 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/gas_plan.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
 import 'package:pandive/features/stats/widgets/stats_view.dart';
@@ -19,6 +20,11 @@ class SelectionStatsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final stats = db.computeStats(ids: [for (final d in dives) d.id]);
+    final isCave = dives.any((d) => db
+        .tagsForDive(d.id)
+        .any((tag) => tag.name.toLowerCase().contains('cave') ||
+            tag.name.toLowerCase().contains('cueva')));
+    final rule = isCave ? ReserveRule.thirds : ReserveRule.bar35;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.statsSelectedTitle),
@@ -32,6 +38,7 @@ class SelectionStatsScreen extends StatelessWidget {
                 rmv: stats.sacAvg,
                 avgDepth: stats.avgDepth,
                 avgTime: stats.avgDiveMinutes,
+                initialRule: rule,
               ),
             )),
           ),

@@ -51,6 +51,18 @@ void main() {
       expect(p.maxTimeMin, closeTo(49.5, 0.1));
     });
 
+    test('reserveBarFor: fixed, thirds (1/3), quarters (1/2), custom', () {
+      expect(reserveBarFor(ReserveRule.bar35, startBar: 200), 35);
+      expect(reserveBarFor(ReserveRule.bar50, startBar: 200), 50);
+      expect(reserveBarFor(ReserveRule.thirds, startBar: 210), closeTo(70, 0.01));
+      expect(
+          reserveBarFor(ReserveRule.quarters, startBar: 200), closeTo(100, 0.01));
+      expect(
+          reserveBarFor(ReserveRule.custom, startBar: 200, custom: 60), 60);
+      // fracciones necesitan presión inicial
+      expect(reserveBarFor(ReserveRule.thirds, startBar: null), isNull);
+    });
+
     test('returns null when inputs incomplete or non-positive', () {
       expect(
           computeGasPlan(

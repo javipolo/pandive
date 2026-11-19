@@ -4,15 +4,19 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:pandive/core/gas_plan.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/features/dives/widgets/dive_type_picker_field.dart';
+import 'package:pandive/features/plan/widgets/plan_reserve_field.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class PlanInputs extends StatelessWidget {
-  final TextEditingController rmv, depth, time, litres, start, reserve;
+  final TextEditingController rmv, depth, time, litres, start, custom;
   final String? typeName;
   final VoidCallback onPickType;
   final VoidCallback onClearType;
+  final ReserveRule rule;
+  final ValueChanged<ReserveRule> onRuleChanged;
 
   const PlanInputs({
     super.key,
@@ -21,10 +25,12 @@ class PlanInputs extends StatelessWidget {
     required this.time,
     required this.litres,
     required this.start,
-    required this.reserve,
+    required this.custom,
     required this.typeName,
     required this.onPickType,
     required this.onClearType,
+    required this.rule,
+    required this.onRuleChanged,
   });
 
   @override
@@ -43,7 +49,11 @@ class PlanInputs extends StatelessWidget {
         LabeledField(controller: time, label: t.planTime, number: true),
         LabeledField(controller: litres, label: t.planVolume, number: true),
         LabeledField(controller: start, label: t.planStartBar, integer: true),
-        LabeledField(controller: reserve, label: t.planReserveBar, integer: true),
+        PlanReserveField(
+          rule: rule,
+          onRuleChanged: onRuleChanged,
+          custom: custom,
+        ),
       ],
     );
   }

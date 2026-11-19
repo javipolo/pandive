@@ -276,5 +276,10 @@
   "planEndPressure": "Pression finale",
   "planMargin": "Marge sur la réserve",
   "planMaxTime": "Temps max à cette prof.",
-  "planIncomplete": "Renseignez consommation, profondeur, temps, volume et pression initiale."
+  "planIncomplete": "Renseignez consommation, profondeur, temps, volume et pression initiale.",
+  "planReserveRule": "Réserve",
+  "reserveThirds": "Tiers (réserve 1/3)",
+  "reserveQuarters": "Quarts (réserve 1/2)",
+  "reserveCustom": "Personnalisée",
+  "planPerBottle": "(par bloc)"
 }

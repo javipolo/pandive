@@ -8,6 +8,31 @@
 ///   presión_final       = presión_inicial − ΔP
 library;
 
+/// Modo de reserva (umbral "verde" de presión final, por botella).
+enum ReserveRule { bar35, bar50, thirds, quarters, custom }
+
+/// Reserva en bar para una regla dada. Tercios = 1/3 de la presión inicial;
+/// cuartos = 1/2 (regla conservadora de cueva). Fijas: 35/50 bar. Custom: valor
+/// introducido. Devuelve null si falta el dato necesario.
+double? reserveBarFor(
+  ReserveRule rule, {
+  required double? startBar,
+  double? custom,
+}) {
+  switch (rule) {
+    case ReserveRule.bar35:
+      return 35;
+    case ReserveRule.bar50:
+      return 50;
+    case ReserveRule.thirds:
+      return startBar == null ? null : startBar / 3.0;
+    case ReserveRule.quarters:
+      return startBar == null ? null : startBar / 2.0;
+    case ReserveRule.custom:
+      return custom;
+  }
+}
+
 class GasPlan {
   final double gasNeededL; // litros en superficie para el buceo planeado
   final double deltaBar; // caída de presión sobre la configuración

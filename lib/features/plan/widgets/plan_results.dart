@@ -33,11 +33,13 @@ class PlanResults extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _row(context, t.planGasNeeded, '${p.gasNeededL.round()} L'),
-            _row(context, t.planDrop, '${p.deltaBar.round()} bar'),
+            _row(context, '${t.planDrop} ${t.planPerBottle}',
+                '${p.deltaBar.round()} bar'),
+            _row(context, t.planReserveRule, '${p.reserveBar.round()} bar'),
             const Divider(),
             _row(
               context,
-              t.planEndPressure,
+              '${t.planEndPressure} ${t.planPerBottle}',
               '${p.endBar.round()} bar',
               color: endColor,
               bold: true,

@@ -277,5 +277,10 @@
   "planEndPressure": "Presión final",
   "planMargin": "Margen sobre reserva",
   "planMaxTime": "Tiempo máx. a esta prof.",
-  "planIncomplete": "Rellena consumo, profundidad, tiempo, volumen y presión inicial."
+  "planIncomplete": "Rellena consumo, profundidad, tiempo, volumen y presión inicial.",
+  "planReserveRule": "Reserva",
+  "reserveThirds": "Tercios (reserva 1/3)",
+  "reserveQuarters": "Cuartos (reserva 1/2)",
+  "reserveCustom": "Personalizada",
+  "planPerBottle": "(por botella)"
 }
