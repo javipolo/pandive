@@ -282,5 +282,13 @@
   "reserveThirds": "Tiers (réserve 1/3)",
   "reserveQuarters": "Quarts (réserve 1/2)",
   "reserveCustom": "Personnalisée",
-  "planPerBottle": "(par bloc)"
+  "planPerBottle": "(par bloc)",
+  "planCylinders": "Blocs",
+  "planAddCylinder": "Ajouter un bloc",
+  "planCylLitres": "Litres",
+  "cylReserve": "Réserve",
+  "cylEmpties": "Se vide",
+  "planReserveTarget": "Réserve cible",
+  "planPerReserveCyl": "(blocs de réserve)",
+  "planStagesEmpty": "Les relais sortent vides (0 bar)."
 }

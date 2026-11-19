@@ -1,5 +1,6 @@
-/// Resultados del planificador: gas necesario, caída de presión, presión final
-/// (coloreada según la reserva), margen y tiempo máximo a esa profundidad.
+/// Resultados del planificador: gas necesario, reserva objetivo y presión de
+/// salida en las botellas de reserva (coloreada), margen y tiempo máximo. Si hay
+/// etapas que se vacían, lo indica (salen a 0 bar).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -25,6 +26,7 @@ class PlanResults extends StatelessWidget {
     }
     final cs = Theme.of(context).colorScheme;
     final endColor = p.ok ? Colors.green.shade700 : cs.error;
+    final per = p.hasStages ? t.planPerReserveCyl : t.planPerBottle;
     final marginSign = p.marginBar >= 0 ? '+' : '';
     return Card(
       child: Padding(
@@ -33,25 +35,26 @@ class PlanResults extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _row(context, t.planGasNeeded, '${p.gasNeededL.round()} L'),
-            _row(context, '${t.planDrop} ${t.planPerBottle}',
-                '${p.deltaBar.round()} bar'),
-            _row(context, t.planReserveRule, '${p.reserveBar.round()} bar'),
+            _row(context, '${t.planReserveTarget} $per',
+                '${p.reserveThresholdBar.round()} bar'),
             const Divider(),
             _row(
               context,
-              '${t.planEndPressure} ${t.planPerBottle}',
-              '${p.endBar.round()} bar',
+              '${t.planEndPressure} $per',
+              '${p.endReserveBar.round()} bar',
               color: endColor,
               bold: true,
             ),
-            _row(
-              context,
-              t.planMargin,
-              '$marginSign${p.marginBar.round()} bar',
-              color: endColor,
-            ),
+            _row(context, t.planMargin, '$marginSign${p.marginBar.round()} bar',
+                color: endColor),
             const Divider(),
             _row(context, t.planMaxTime, '${p.maxTimeMin.round()} min'),
+            if (p.hasStages)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(t.planStagesEmpty,
+                    style: Theme.of(context).textTheme.bodySmall),
+              ),
           ],
         ),
       ),
@@ -69,7 +72,7 @@ class PlanResults extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: style),
+          Flexible(child: Text(label, style: style)),
           Text(value, style: style),
         ],
       ),

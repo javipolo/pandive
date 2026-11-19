@@ -315,5 +315,13 @@
   "reserveThirds": "Thirds (keep 1/3)",
   "reserveQuarters": "Quarters (keep 1/2)",
   "reserveCustom": "Custom",
-  "planPerBottle": "(per cylinder)"
+  "planPerBottle": "(per cylinder)",
+  "planCylinders": "Cylinders",
+  "planAddCylinder": "Add cylinder",
+  "planCylLitres": "Litres",
+  "cylReserve": "Reserve",
+  "cylEmpties": "Empties",
+  "planReserveTarget": "Reserve target",
+  "planPerReserveCyl": "(reserve cylinders)",
+  "planStagesEmpty": "Stage cylinders end empty (0 bar)."
 }

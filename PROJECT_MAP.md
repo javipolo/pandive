@@ -144,6 +144,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/plan/widgets/plan_inputs.dart` -> campos (tipo de buceo, RMV, prof, tiempo, volumen, presión inicial, reserva)
 - `lib/features/plan/widgets/plan_results.dart` -> resultados (gas, presión final por botella coloreada, margen, tiempo máx.)
 - `lib/features/plan/widgets/plan_reserve_field.dart` -> selector de reserva (35/50 bar, tercios 1/3, cuartos 1/2, personalizada)
+- `lib/features/plan/widgets/plan_cylinders_field.dart` -> lista editable de botellas (litros + marca reserva/se vacía); PlanCyl
 
 ### sites (sitios)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info

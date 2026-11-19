@@ -283,5 +283,13 @@
   "reserveThirds": "Terços (reserva 1/3)",
   "reserveQuarters": "Quarts (reserva 1/2)",
   "reserveCustom": "Personalitzada",
-  "planPerBottle": "(per ampolla)"
+  "planPerBottle": "(per ampolla)",
+  "planCylinders": "Ampolles",
+  "planAddCylinder": "Afegeix ampolla",
+  "planCylLitres": "Litres",
+  "cylReserve": "Reserva",
+  "cylEmpties": "Es buida",
+  "planReserveTarget": "Reserva objectiu",
+  "planPerReserveCyl": "(ampolles de reserva)",
+  "planStagesEmpty": "Les etapes surten buides (0 bar)."
 }

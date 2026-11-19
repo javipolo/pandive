@@ -283,5 +283,13 @@
   "reserveThirds": "Tercios (reserva 1/3)",
   "reserveQuarters": "Cuartos (reserva 1/2)",
   "reserveCustom": "Personalizada",
-  "planPerBottle": "(por botella)"
+  "planPerBottle": "(por botella)",
+  "planCylinders": "Botellas",
+  "planAddCylinder": "Añadir botella",
+  "planCylLitres": "Litros",
+  "cylReserve": "Reserva",
+  "cylEmpties": "Se vacía",
+  "planReserveTarget": "Reserva objetivo",
+  "planPerReserveCyl": "(botellas de reserva)",
+  "planStagesEmpty": "Las etapas salen vacías (0 bar)."
 }

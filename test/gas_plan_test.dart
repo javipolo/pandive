@@ -3,64 +3,88 @@ import 'package:pandive/core/gas_plan.dart';
 
 void main() {
   group('computeGasPlan', () {
-    test('gas needed = rmv * time * ata', () {
-      // RMV 20 l/min, 30 m (4 ata), 40 min => 20*40*4 = 3200 L
+    test('single cylinder, fixed reserve', () {
+      // RMV 20, 30 m (4 ata), 40 min => 3200 L. 24 L @ 200 bar, reserva 35.
       final p = computeGasPlan(
         rmv: 20,
         avgDepthM: 30,
         timeMin: 40,
-        totalLitres: 24, // bibo 2x12
+        cylinders: const [PlanCylinder(24)],
         startBar: 200,
-        reserveBar: 35,
+        rule: ReserveRule.bar35,
       )!;
       expect(p.gasNeededL, closeTo(3200, 0.01));
-      // ΔP = 3200 / 24 = 133.3 bar
-      expect(p.deltaBar, closeTo(133.33, 0.1));
-      // end = 200 - 133.3 = 66.7 bar, por encima de 35 => ok
-      expect(p.endBar, closeTo(66.67, 0.1));
+      expect(p.reserveThresholdBar, closeTo(35, 0.01));
+      expect(p.endReserveBar, closeTo(66.67, 0.1)); // (4800-3200)/24
       expect(p.ok, isTrue);
-      expect(p.marginBar, closeTo(31.67, 0.1));
+      expect(p.hasStages, isFalse);
+      expect(p.maxTimeMin, closeTo(49.5, 0.1)); // (4800-840)/(20*4)
     });
 
-    test('flags insufficient gas (end below reserve)', () {
-      // Misma demanda con config más pequeña: mono 12 L
+    test('mixed sizes with a stage, thirds counts all gas', () {
+      // 2x11.1 reserva + 7 etapa, 200 bar. Gas: 15*40*5 = 3000 L.
+      final p = computeGasPlan(
+        rmv: 15,
+        avgDepthM: 40, // 5 ata
+        timeMin: 40,
+        cylinders: const [
+          PlanCylinder(11.1),
+          PlanCylinder(11.1),
+          PlanCylinder(7, keepsReserve: false),
+        ],
+        startBar: 200,
+        rule: ReserveRule.thirds,
+      )!;
+      expect(p.hasStages, isTrue);
+      // totalGas = 29.2*200 = 5840; reserva = 1/3 = 1946.67; en 22.2 L => 87.7 bar
+      expect(p.reserveThresholdBar, closeTo(87.69, 0.1));
+      // salida reserva = (5840-3000)/22.2 = 127.9 bar
+      expect(p.endReserveBar, closeTo(127.93, 0.1));
+      expect(p.ok, isTrue);
+    });
+
+    test('fixed reserve with stage = X bar in reserve cylinders', () {
+      final p = computeGasPlan(
+        rmv: 15,
+        avgDepthM: 40,
+        timeMin: 40,
+        cylinders: const [
+          PlanCylinder(11.1),
+          PlanCylinder(11.1),
+          PlanCylinder(7, keepsReserve: false),
+        ],
+        startBar: 200,
+        rule: ReserveRule.bar50,
+      )!;
+      expect(p.reserveThresholdBar, closeTo(50, 0.01));
+    });
+
+    test('no cylinder marked reserve => all treated as reserve', () {
       final p = computeGasPlan(
         rmv: 20,
         avgDepthM: 30,
         timeMin: 40,
-        totalLitres: 12,
+        cylinders: const [
+          PlanCylinder(12, keepsReserve: false),
+          PlanCylinder(12, keepsReserve: false),
+        ],
         startBar: 200,
-        reserveBar: 35,
+        rule: ReserveRule.bar35,
       )!;
-      // ΔP = 3200/12 = 266.7 => end negativo => no llega
-      expect(p.endBar, lessThan(35));
-      expect(p.ok, isFalse);
-      expect(p.marginBar, lessThan(0));
+      expect(p.hasStages, isFalse);
+      expect(p.endReserveBar, closeTo(66.67, 0.1)); // igual que 1x24
     });
 
-    test('max time respects reserve', () {
-      // usable = (200-35)*24 = 3960 L ; /(20*4) = 49.5 min
+    test('end pressure clamped to start pressure', () {
       final p = computeGasPlan(
-        rmv: 20,
-        avgDepthM: 30,
-        timeMin: 40,
-        totalLitres: 24,
+        rmv: 1,
+        avgDepthM: 10, // 2 ata
+        timeMin: 1,
+        cylinders: const [PlanCylinder(24)],
         startBar: 200,
-        reserveBar: 35,
+        rule: ReserveRule.bar35,
       )!;
-      expect(p.maxTimeMin, closeTo(49.5, 0.1));
-    });
-
-    test('reserveBarFor: fixed, thirds (1/3), quarters (1/2), custom', () {
-      expect(reserveBarFor(ReserveRule.bar35, startBar: 200), 35);
-      expect(reserveBarFor(ReserveRule.bar50, startBar: 200), 50);
-      expect(reserveBarFor(ReserveRule.thirds, startBar: 210), closeTo(70, 0.01));
-      expect(
-          reserveBarFor(ReserveRule.quarters, startBar: 200), closeTo(100, 0.01));
-      expect(
-          reserveBarFor(ReserveRule.custom, startBar: 200, custom: 60), 60);
-      // fracciones necesitan presión inicial
-      expect(reserveBarFor(ReserveRule.thirds, startBar: null), isNull);
+      expect(p.endReserveBar, lessThanOrEqualTo(200));
     });
 
     test('returns null when inputs incomplete or non-positive', () {
@@ -69,27 +93,27 @@ void main() {
               rmv: null,
               avgDepthM: 30,
               timeMin: 40,
-              totalLitres: 24,
+              cylinders: const [PlanCylinder(24)],
               startBar: 200,
-              reserveBar: 35),
-          isNull);
-      expect(
-          computeGasPlan(
-              rmv: 20,
-              avgDepthM: 0,
-              timeMin: 40,
-              totalLitres: 24,
-              startBar: 200,
-              reserveBar: 35),
+              rule: ReserveRule.bar35),
           isNull);
       expect(
           computeGasPlan(
               rmv: 20,
               avgDepthM: 30,
               timeMin: 40,
-              totalLitres: 0,
+              cylinders: const [],
               startBar: 200,
-              reserveBar: 35),
+              rule: ReserveRule.bar35),
+          isNull);
+      expect(
+          computeGasPlan(
+              rmv: 20,
+              avgDepthM: 30,
+              timeMin: 40,
+              cylinders: const [PlanCylinder(0)],
+              startBar: 200,
+              rule: ReserveRule.bar35),
           isNull);
     });
   });

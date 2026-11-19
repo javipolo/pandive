@@ -1,89 +1,109 @@
-/// Planificación de gas: dado un consumo (RMV, l/min en superficie), una
-/// profundidad y tiempo medios, y una configuración de botellas (litros totales
-/// + presión inicial), calcula el gas necesario, la caída de presión, la presión
-/// final y el tiempo máximo respetando una reserva.
+/// Planificación de gas con lista de botellas (tamaños distintos) y marca por
+/// botella de si mantiene reserva o se vacía (etapa). Presión inicial y regla de
+/// reserva compartidas.
 ///
-///   gas_necesario(L sup) = RMV · tiempo · (prof/10 + 1)
-///   ΔP(bar)             = gas_necesario / litros_totales
-///   presión_final       = presión_inicial − ΔP
+///   gas_necesario(L) = RMV · tiempo · (prof/10 + 1)
+///   gas_total(L)     = Σ(litros · presión_inicial)              (todas)
+///   salida_reserva   = (gas_total − gas_necesario) / Σ litros de reserva
+///   umbral X         = reserva(L) / Σ litros de reserva
+///
+/// La reserva en litros: tercios = 1/3 del gas total; cuartos = 1/2; fija
+/// (35/50/custom) = esos bar en las botellas de reserva. Si ninguna botella está
+/// marcada como reserva, se tratan todas como reserva.
 library;
 
-/// Modo de reserva (umbral "verde" de presión final, por botella).
+/// Regla de reserva (umbral "verde" de presión de salida).
 enum ReserveRule { bar35, bar50, thirds, quarters, custom }
 
-/// Reserva en bar para una regla dada. Tercios = 1/3 de la presión inicial;
-/// cuartos = 1/2 (regla conservadora de cueva). Fijas: 35/50 bar. Custom: valor
-/// introducido. Devuelve null si falta el dato necesario.
-double? reserveBarFor(
-  ReserveRule rule, {
-  required double? startBar,
-  double? custom,
-}) {
+class PlanCylinder {
+  final double litres;
+  final bool keepsReserve; // true = mantiene reserva; false = se vacía (etapa)
+  const PlanCylinder(this.litres, {this.keepsReserve = true});
+}
+
+class GasPlan {
+  final double gasNeededL; // litros en superficie del buceo planeado
+  final double endReserveBar; // presión de salida en las botellas de reserva
+  final double reserveThresholdBar; // umbral X (bar en las de reserva)
+  final double maxTimeMin; // tiempo máx. respetando la reserva
+  final bool hasStages; // hay botellas que se vacían
+
+  const GasPlan({
+    required this.gasNeededL,
+    required this.endReserveBar,
+    required this.reserveThresholdBar,
+    required this.maxTimeMin,
+    required this.hasStages,
+  });
+
+  bool get ok => endReserveBar >= reserveThresholdBar;
+  double get marginBar => endReserveBar - reserveThresholdBar;
+}
+
+double _fixedBar(ReserveRule rule, double? custom) {
   switch (rule) {
     case ReserveRule.bar35:
       return 35;
     case ReserveRule.bar50:
       return 50;
-    case ReserveRule.thirds:
-      return startBar == null ? null : startBar / 3.0;
-    case ReserveRule.quarters:
-      return startBar == null ? null : startBar / 2.0;
     case ReserveRule.custom:
-      return custom;
+      return custom ?? 0;
+    default:
+      return 0;
   }
-}
-
-class GasPlan {
-  final double gasNeededL; // litros en superficie para el buceo planeado
-  final double deltaBar; // caída de presión sobre la configuración
-  final double endBar; // presión al terminar
-  final double reserveBar; // reserva mínima objetivo
-  final double maxTimeMin; // tiempo máx. hasta tocar la reserva
-
-  const GasPlan({
-    required this.gasNeededL,
-    required this.deltaBar,
-    required this.endBar,
-    required this.reserveBar,
-    required this.maxTimeMin,
-  });
-
-  /// true si al terminar aún queda al menos la reserva.
-  bool get ok => endBar >= reserveBar;
-
-  /// Bar por encima (si +) o por debajo (si −) de la reserva al terminar.
-  double get marginBar => endBar - reserveBar;
 }
 
 GasPlan? computeGasPlan({
   required double? rmv,
   required double? avgDepthM,
   required double? timeMin,
-  required double? totalLitres,
+  required List<PlanCylinder> cylinders,
   required double? startBar,
-  required double? reserveBar,
+  required ReserveRule rule,
+  double? customBar,
 }) {
   if (rmv == null || rmv <= 0) return null;
   if (avgDepthM == null || avgDepthM <= 0) return null;
   if (timeMin == null || timeMin <= 0) return null;
-  if (totalLitres == null || totalLitres <= 0) return null;
   if (startBar == null || startBar <= 0) return null;
-  final reserve = (reserveBar == null || reserveBar < 0) ? 0.0 : reserveBar;
+
+  final totalLitres =
+      cylinders.fold<double>(0, (s, c) => s + (c.litres > 0 ? c.litres : 0));
+  if (totalLitres <= 0) return null;
+
+  // Litros de las botellas de reserva; si no hay ninguna, todas son reserva.
+  var reserveLitres = cylinders.fold<double>(
+      0, (s, c) => s + (c.keepsReserve && c.litres > 0 ? c.litres : 0));
+  if (reserveLitres <= 0) reserveLitres = totalLitres;
+  final hasStages = reserveLitres < totalLitres;
 
   final ata = avgDepthM / 10.0 + 1.0;
   final gasNeeded = rmv * timeMin * ata;
-  final delta = gasNeeded / totalLitres;
-  final end = startBar - delta;
+  final totalGas = totalLitres * startBar;
 
-  final usableBar = startBar - reserve;
-  final usableL = usableBar > 0 ? usableBar * totalLitres : 0.0;
-  final maxTime = usableL > 0 ? usableL / (rmv * ata) : 0.0;
+  final double reserveGas;
+  switch (rule) {
+    case ReserveRule.thirds:
+      reserveGas = totalGas / 3.0;
+    case ReserveRule.quarters:
+      reserveGas = totalGas / 2.0;
+    default:
+      reserveGas = _fixedBar(rule, customBar) * reserveLitres;
+  }
+
+  final thresholdBar = reserveGas / reserveLitres;
+  // La etapa se vacía primero; el gas restante queda en las de reserva.
+  final endBar =
+      ((totalGas - gasNeeded) / reserveLitres).clamp(double.negativeInfinity,
+          startBar);
+  final usableGas = totalGas - reserveGas;
+  final maxTime = usableGas > 0 ? usableGas / (rmv * ata) : 0.0;
 
   return GasPlan(
     gasNeededL: gasNeeded,
-    deltaBar: delta,
-    endBar: end,
-    reserveBar: reserve,
+    endReserveBar: endBar.toDouble(),
+    reserveThresholdBar: thresholdBar,
     maxTimeMin: maxTime,
+    hasStages: hasStages,
   );
 }
