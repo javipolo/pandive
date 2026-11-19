@@ -70,6 +70,19 @@ class _DivesActionListState extends State<DivesActionList> {
 
   List<Dive> get _picked => [for (final i in _sel) widget.dives[i]];
 
+  bool get _allSelected =>
+      widget.dives.isNotEmpty && _sel.length == widget.dives.length;
+
+  void _toggleSelectAll() => setState(() {
+        if (_allSelected) {
+          _sel.clear();
+          _setSelect(false);
+        } else {
+          _setSelect(true);
+          _sel.addAll([for (var i = 0; i < widget.dives.length; i++) i]);
+        }
+      });
+
   void _showStats() => Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => SelectionStatsScreen(db: widget.db, dives: _picked)));
 
@@ -137,7 +150,9 @@ class _DivesActionListState extends State<DivesActionList> {
             onMerge: _sel.length >= 2 ? _mergeSel : null,
             onAdjustTime: _adjustTimeSel,
             onExport: _exportSel,
-            onDelete: _deleteSel),
+            onDelete: _deleteSel,
+            onSelectAll: _toggleSelectAll,
+            allSelected: _allSelected),
       Expanded(
         child: widget.dives.isEmpty
             ? Center(child: Text(t.noResults))

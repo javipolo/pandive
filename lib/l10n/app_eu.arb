@@ -246,6 +246,7 @@
   "tankTypes": "Botila-motak",
   "noTankTypes": "Botila-motarik ez oraindik",
   "selectAll": "Hautatu dena",
+  "deselectAll": "Desautatu dena",
   "pendingBadge": "Zain",
   "noProfile": "Ez da profilik grabatu",
   "axisDepth": "sakonera (m)",

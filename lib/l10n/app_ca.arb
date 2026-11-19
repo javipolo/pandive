@@ -246,6 +246,7 @@
   "tankTypes": "Tipus d'ampolla",
   "noTankTypes": "Encara no hi ha tipus d'ampolla",
   "selectAll": "Selecciona-ho tot",
+  "deselectAll": "Desselecciona-ho tot",
   "pendingBadge": "Pendent",
   "noProfile": "No s'ha registrat cap perfil",
   "axisDepth": "profunditat (m)",

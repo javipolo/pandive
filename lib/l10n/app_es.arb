@@ -246,6 +246,7 @@
   "tankTypes": "Tipos de botella",
   "noTankTypes": "Aún no hay tipos de botella",
   "selectAll": "Seleccionar todo",
+  "deselectAll": "Deseleccionar todo",
   "pendingBadge": "Pendiente",
   "noProfile": "Sin perfil registrado",
   "axisDepth": "prof (m)",

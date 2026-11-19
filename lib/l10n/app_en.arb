@@ -273,6 +273,7 @@
   "tankTypes": "Tank types",
   "noTankTypes": "No tank types yet",
   "selectAll": "Select all",
+  "deselectAll": "Deselect all",
   "pendingBadge": "Pending",
   "noProfile": "No profile recorded",
   "axisDepth": "depth (m)",

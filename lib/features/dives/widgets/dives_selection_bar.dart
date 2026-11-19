@@ -14,6 +14,8 @@ class DivesSelectionBar extends StatelessWidget {
   final VoidCallback onAdjustTime;
   final VoidCallback onExport;
   final VoidCallback onDelete;
+  final VoidCallback onSelectAll;
+  final bool allSelected;
 
   const DivesSelectionBar({
     super.key,
@@ -24,12 +26,18 @@ class DivesSelectionBar extends StatelessWidget {
     required this.onAdjustTime,
     required this.onExport,
     required this.onDelete,
+    required this.onSelectAll,
+    required this.allSelected,
   });
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return SelectionBar(count: count, onClose: onClose, actions: [
+      IconButton(
+          tooltip: allSelected ? t.deselectAll : t.selectAll,
+          icon: Icon(allSelected ? Icons.deselect : Icons.select_all),
+          onPressed: onSelectAll),
       IconButton(
           tooltip: t.navStats,
           icon: const Icon(Icons.bar_chart),

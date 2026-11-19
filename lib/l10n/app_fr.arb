@@ -245,6 +245,7 @@
   "tankTypes": "Types de bouteille",
   "noTankTypes": "Aucun type de bouteille pour l'instant",
   "selectAll": "Tout sélectionner",
+  "deselectAll": "Tout désélectionner",
   "pendingBadge": "En attente",
   "noProfile": "Aucun profil enregistré",
   "axisDepth": "profondeur (m)",
