@@ -35,7 +35,7 @@ con `screens/` y, si hace falta, `widgets/`).
   `sampleExtra`/`storeSampleExtra` (PandiveSampleExtra: ppo2/cns/presión/rbt por muestra)
 - `lib/core/db/db_create.dart` -> crear una .ddb vacía nueva (esquema DiveMate + buceador)
 - `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
-- `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy
+- `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy, backfillBuddyIds (enlaza texto Buddy antiguo)
 - `lib/core/db/db_sites.dart` -> sitios (Place): obtener/crear/actualizar, find-or-create
 - `lib/core/db/db_tanks.dart` -> botellas por buceo, presets "mis botellas", buceos por sitio/buddy
 - `lib/core/db/db_merge.dart` -> fusionar inmersiones (perfil concatenado, unión de datos)
@@ -99,6 +99,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
 - `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
+- `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores

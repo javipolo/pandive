@@ -30,6 +30,29 @@ extension DivemateDbBuddies on DivemateDb {
       ..sort((a, b) => compareFold(a.name, b.name));
   }
 
+  /// Rellena `BuddyIDs` de las inmersiones del owner que tienen texto `Buddy`
+  /// pero `BuddyIDs` vacío (dives antiguas de DiveMate, que solo guardaban el
+  /// nombre). El texto puede ser CSV de varios nombres; crea los que falten.
+  /// Devuelve cuántas inmersiones actualizó.
+  int backfillBuddyIds() {
+    final owner = ownerId;
+    final f = owner != null ? 'AND DiverID = $owner' : '';
+    final rows = _db.select(
+      "SELECT ID, Buddy FROM Logbook WHERE (Status IS NULL OR Status != 2) $f "
+      "AND TRIM(IFNULL(Buddy,'')) != '' AND TRIM(IFNULL(BuddyIDs,'')) = ''");
+    var n = 0;
+    for (final r in rows) {
+      final ids = <int>{
+        for (final name in (_str(r['Buddy']) ?? '').split(','))
+          if (name.trim().isNotEmpty) findOrCreateBuddy(name.trim())
+      };
+      if (ids.isEmpty) continue;
+      updateDive(r['ID'] as int, {'BuddyIDs': ids.join(',')});
+      n++;
+    }
+    return n;
+  }
+
   /// Borra los buddies sin ninguna inmersión. Devuelve cuántos eliminó.
   int purgeUnusedBuddies() {
     final unused = [for (final b in listBuddies()) if (b.diveCount == 0) b.id];

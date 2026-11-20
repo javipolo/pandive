@@ -10,6 +10,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
+import 'package:pandive/features/settings/logic/link_buddies_tool.dart';
 import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
 import 'package:pandive/features/settings/screens/trash_screen.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
@@ -118,6 +119,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.group_add_outlined),
             title: Text(t.fillFromDdb),
             onTap: () => openFillFromDdb(context, db),
+          ),
+          ListTile(
+            leading: const Icon(Icons.group_outlined),
+            title: Text(t.linkBuddies),
+            onTap: () => runLinkBuddies(context, db),
           ),
           ListTile(
             leading: const Icon(Icons.person_remove_outlined),
