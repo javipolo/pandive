@@ -22,6 +22,7 @@ part 'db_import.dart';
 part 'db_create.dart';
 part 'db_helpers.dart';
 part 'db_buddies.dart';
+part 'db_buddies_merge.dart';
 part 'db_sites.dart';
 part 'db_tanks.dart';
 part 'db_tags.dart';

@@ -36,6 +36,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_create.dart` -> crear una .ddb vacía nueva (esquema DiveMate + buceador)
 - `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
 - `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy, backfillBuddyIds (enlaza texto Buddy antiguo)
+- `lib/core/db/db_buddies_merge.dart` -> mergeBuddies: fusiona varios buddies en uno (reasigna BuddyIDs, borra el resto)
 - `lib/core/db/db_sites.dart` -> sitios (Place): obtener/crear/actualizar, find-or-create
 - `lib/core/db/db_tanks.dart` -> botellas por buceo, presets "mis botellas", buceos por sitio/buddy
 - `lib/core/db/db_merge.dart` -> fusionar inmersiones (perfil concatenado, unión de datos)
@@ -110,7 +111,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/widgets/night_hours_control.dart` -> franja horaria de inmersión nocturna (desde/hasta)
 
 ### buddies (compañeros)
-- `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar)
+- `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar/fusionar en lote)
+- `lib/features/buddies/widgets/buddy_tile.dart` -> fila de compañero (avatar, nº buceos, menú, abre sus buceos)
+- `lib/features/buddies/logic/merge_buddies_action.dart` -> diálogo elegir cuál conservar + fusión
 - `lib/features/buddies/screens/buddy_picker_screen.dart` -> multi-selección de compañeros (para editar buceo)
 
 ### dives (inmersiones)

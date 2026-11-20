@@ -48,4 +48,22 @@ void main() {
     // Segunda pasada: nada que hacer.
     expect(db.backfillBuddyIds(), 0);
   });
+
+  test('mergeBuddies reasigna dives y borra los fusionados', () {
+    db.backfillBuddyIds();
+    final withDives =
+        db.listBuddies().where((b) => b.diveCount > 0).toList();
+    expect(withDives.length, greaterThanOrEqualTo(2));
+    final keep = withDives[0];
+    final gone = withDives[1];
+    final maxExpected = keep.diveCount + gone.diveCount; // tope (sin solape)
+
+    db.mergeBuddies(keep.id, [gone.id]);
+
+    final after = db.listBuddies();
+    expect(after.any((b) => b.id == gone.id), isFalse); // fusionado borrado
+    final keepAfter = after.firstWhere((b) => b.id == keep.id);
+    expect(keepAfter.diveCount, greaterThan(keep.diveCount)); // ganó dives
+    expect(keepAfter.diveCount, lessThanOrEqualTo(maxExpected));
+  });
 }

@@ -48,6 +48,14 @@
       "count": {}
     }
   },
+  "mergeBuddies": "Merge",
+  "mergeKeepTitle": "Which buddy to keep?",
+  "mergeBuddiesDone": "Buddies merged into {name}",
+  "@mergeBuddiesDone": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "linkBuddies": "Link buddies of old dives",
   "linkBuddiesConfirm": "Link buddies from old dives (imported with only a name) so they count? New buddies may be created.",
   "linkBuddiesResult": "{count} dives updated",

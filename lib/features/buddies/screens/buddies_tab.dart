@@ -10,7 +10,8 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
-import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
+import 'package:pandive/features/buddies/logic/merge_buddies_action.dart';
+import 'package:pandive/features/buddies/widgets/buddy_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class BuddiesTab extends StatefulWidget {
@@ -54,6 +55,14 @@ class _BuddiesTabState extends State<BuddiesTab> {
     _reload();
   }
 
+  Future<void> _mergeSel() async {
+    final sel = _buddies.where((b) => _sel.contains(b.id)).toList();
+    if (await runMergeBuddies(context, widget.db, sel)) {
+      _exitSel();
+      _reload();
+    }
+  }
+
   Future<void> _add() async {
     final name = await nameDialog(context, AppLocalizations.of(context).newBuddy);
     if (name != null && name.isNotEmpty) {
@@ -89,6 +98,12 @@ class _BuddiesTabState extends State<BuddiesTab> {
       body: Column(children: [
         if (_select)
           SelectionBar(count: _sel.length, onClose: _exitSel, actions: [
+            if (_sel.length >= 2)
+              IconButton(
+                tooltip: t.mergeBuddies,
+                icon: const Icon(Icons.merge_type),
+                onPressed: _mergeSel,
+              ),
             IconButton(
               tooltip: t.delete,
               icon: const Icon(Icons.delete_outline),
@@ -101,52 +116,28 @@ class _BuddiesTabState extends State<BuddiesTab> {
               : ListView.separated(
                   itemCount: shown.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, i) => _tile(shown[i], t),
+                  itemBuilder: (context, i) => _tile(shown[i]),
                 ),
         ),
       ]),
     );
   }
 
-  Widget _tile(Buddy b, AppLocalizations t) {
-    final selected = _sel.contains(b.id);
-    return ListTile(
-      selected: selected,
-      leading: selected
-          ? const CircleAvatar(child: Icon(Icons.check))
-          : CircleAvatar(
-              child: Text(b.name.isNotEmpty ? b.name[0].toUpperCase() : '?')),
-      title: Text(b.name),
-      subtitle: Text(t.diveCountLabel(b.diveCount)),
-      onLongPress: () => setState(() {
-        _select = true;
-        _sel.add(b.id);
-      }),
-      onTap: _select
-          ? () => _toggle(b.id)
-          : () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => FilteredDivesScreen(
-                  db: widget.db,
-                  settings: widget.settings,
-                  title: t.divesWith(b.name),
-                  loader: () => widget.db.listDivesByBuddy(b.id),
-                ),
-              )),
-      trailing: _select
-          ? null
-          : PopupMenuButton<String>(
-              onSelected: (v) {
-                if (v == 'rename') _rename(b);
-                if (v == 'delete') {
-                  widget.db.deleteBuddy(b.id);
-                  _reload();
-                }
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(value: 'rename', child: Text(t.rename)),
-                PopupMenuItem(value: 'delete', child: Text(t.delete)),
-              ],
-            ),
-    );
-  }
+  Widget _tile(Buddy b) => BuddyTile(
+        buddy: b,
+        selected: _sel.contains(b.id),
+        selectMode: _select,
+        db: widget.db,
+        settings: widget.settings,
+        onToggle: () => _toggle(b.id),
+        onLongPress: () => setState(() {
+          _select = true;
+          _sel.add(b.id);
+        }),
+        onRename: () => _rename(b),
+        onDelete: () {
+          widget.db.deleteBuddy(b.id);
+          _reload();
+        },
+      );
 }
