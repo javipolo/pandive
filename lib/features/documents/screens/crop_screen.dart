@@ -116,6 +116,9 @@ class _CropScreenState extends State<CropScreen> {
               image: _bytes,
               controller: _controller,
               aspectRatio: null, // relación libre
+              // Rectángulo inicial = imagen completa (maximizado); se encoge.
+              initialRectBuilder:
+                  InitialRectBuilder.withBuilder((viewport, image) => image),
               baseColor: Colors.black,
               maskColor: Colors.black54,
               onCropped: (result) {

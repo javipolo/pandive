@@ -1,10 +1,12 @@
-/// Exportar documentos seleccionados a un único PDF (una página por documento,
-/// con su título) y compartirlo.
+/// Exportar documentos seleccionados a un PDF y compartirlo. Van varios por
+/// página (fluyen con MultiPage), sin ampliar la imagen: se limita su tamaño a
+/// una resolución máxima para que queden parecidos pero nítidos.
 library;
 
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 
@@ -13,37 +15,52 @@ import 'package:pandive/core/storage/documents_storage.dart';
 
 Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
   if (docs.isEmpty) return;
-  final pdf = pw.Document();
+  const margin = 24.0;
+  final contentW = PdfPageFormat.a4.width - margin * 2;
+  final maxH = PdfPageFormat.a4.height - margin * 2 - 40; // deja hueco al título
+
+  final items = <pw.Widget>[];
   for (final d in docs) {
     final file = await docFile(d.fileName);
     if (!await file.exists()) continue;
     final image = pw.MemoryImage(await file.readAsBytes());
-    pdf.addPage(
-      pw.Page(
-        margin: const pw.EdgeInsets.all(24),
-        build: (ctx) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(d.title,
-                style: pw.TextStyle(
-                    fontSize: 18, fontWeight: pw.FontWeight.bold)),
-            if (d.notes != null && d.notes!.isNotEmpty)
-              pw.Padding(
-                padding: const pw.EdgeInsets.only(top: 4),
-                child: pw.Text(d.notes!),
-              ),
-            pw.SizedBox(height: 12),
-            pw.Expanded(
-                child: pw.Center(child: pw.Image(image, fit: pw.BoxFit.contain))),
-          ],
-        ),
-      ),
-    );
+    final size = _fit((image.width ?? 1).toDouble(),
+        (image.height ?? 1).toDouble(), contentW, maxH);
+    items.add(pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(d.title,
+            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+        if (d.notes != null && d.notes!.isNotEmpty)
+          pw.Text(d.notes!, style: const pw.TextStyle(fontSize: 10)),
+        pw.SizedBox(height: 6),
+        pw.Image(image, width: size.x, height: size.y),
+        pw.SizedBox(height: 20),
+      ],
+    ));
   }
+  if (items.isEmpty) return;
+
+  final pdf = pw.Document();
+  pdf.addPage(pw.MultiPage(
+    pageFormat: PdfPageFormat.a4,
+    margin: const pw.EdgeInsets.all(margin),
+    build: (_) => items,
+  ));
+
   final bytes = await pdf.save();
   final dir = await getTemporaryDirectory();
   final out = File('${dir.path}/pandive_docs_'
       '${DateTime.now().millisecondsSinceEpoch}.pdf');
   await out.writeAsBytes(bytes, flush: true);
   await SharePlus.instance.share(ShareParams(files: [XFile(out.path)]));
+}
+
+/// Tamaño en puntos sin ampliar: ~150 dpi, limitado al ancho/alto disponible.
+PdfPoint _fit(double pxW, double pxH, double maxW, double maxH) {
+  const dpi = 150.0;
+  var w = pxW * 72 / dpi;
+  var h = pxH * 72 / dpi;
+  final k = [1.0, maxW / w, maxH / h].reduce((a, b) => a < b ? a : b);
+  return PdfPoint(w * k, h * k);
 }
