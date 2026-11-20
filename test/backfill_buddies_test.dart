@@ -116,6 +116,16 @@ void main() {
     expect(db.getSite(acc)!.lat, closeTo(1.5, 1e-4)); // acento-insensible
   });
 
+  test('findOrCreateSite rellena coords si faltan y no las pisa', () {
+    final id = db.createSite({'Place': 'ZZZ Enrich Site', 'Country': 'X'});
+    final again =
+        db.findOrCreateSite('ZZZ Enrich Site', country: 'X', lat: 10, lon: 20);
+    expect(again, id); // mismo sitio
+    expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // coords rellenadas
+    db.findOrCreateSite('ZZZ Enrich Site', country: 'X', lat: 99, lon: 99);
+    expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // no se pisan
+  });
+
   test('mergeBuddies reasigna dives y borra los fusionados', () {
     db.backfillBuddyIds();
     final withDives =

@@ -58,14 +58,29 @@ extension DivemateDbSites on DivemateDb {
     return _db.lastInsertRowId;
   }
 
-  /// Busca un sitio por nombre (+país opcional) o lo crea. Devuelve su ID.
+  /// Busca un sitio por nombre (+país opcional) o lo crea. Devuelve su ID. Si
+  /// existe pero no tiene coordenadas y se pasan [lat]/[lon], las rellena (no
+  /// sobrescribe las que ya tenga).
   int findOrCreateSite(String name, {String? country, double? lat, double? lon}) {
     final rows = _db.select(
-      'SELECT ID FROM Place WHERE Place = ? COLLATE NOCASE '
+      'SELECT ID, Lat, Lon FROM Place WHERE Place = ? COLLATE NOCASE '
       "AND IFNULL(Country,'') = IFNULL(?, '')",
       [name.trim(), country],
     );
-    if (rows.isNotEmpty) return rows.first['ID'] as int;
+    if (rows.isNotEmpty) {
+      final id = rows.first['ID'] as int;
+      final hasCoords =
+          _num(rows.first['Lat']) != null && _num(rows.first['Lon']) != null;
+      if (!hasCoords && lat != null && lon != null) {
+        _db.execute('UPDATE Place SET Lat=?, Lon=?, Updated=? WHERE ID=?', [
+          lat.toStringAsFixed(6),
+          lon.toStringAsFixed(6),
+          _nowStamp(),
+          id,
+        ]);
+      }
+      return id;
+    }
     return createSite(
         {'Place': name.trim(), 'Country': country, 'Lat': lat, 'Lon': lon});
   }
