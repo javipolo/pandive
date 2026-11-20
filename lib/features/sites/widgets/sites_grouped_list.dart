@@ -53,30 +53,50 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
             : const []);
     }
   }
-  Map<String, List<DiveSite>> _grouped() {
+  List<DiveSite> _filtered() {
     final q = (widget.externalQuery ?? _q).trim().toLowerCase();
+    if (q.isEmpty) return widget.sites;
+    return [
+      for (final s in widget.sites)
+        if (('${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}')
+            .toLowerCase()
+            .contains(q))
+          s
+    ];
+  }
+  Map<String, List<DiveSite>> _grouped() {
     final map = <String, List<DiveSite>>{};
-    for (final s in widget.sites) {
-      if (q.isNotEmpty &&
-          !('${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}')
-              .toLowerCase()
-              .contains(q)) {
-        continue;
-      }
+    for (final s in _filtered()) {
       (map[s.country ?? '—'] ??= []).add(s);
     }
     for (final list in map.values) {
-      list.sort((a, b) => widget.sortByDives && a.diveCount != b.diveCount
-          ? b.diveCount.compareTo(a.diveCount)
-          : compareFold(a.name ?? '', b.name ?? ''));
+      list.sort((a, b) => compareFold(a.name ?? '', b.name ?? ''));
     }
     return map;
+  }
+  // Orden por nº de buceos: lista plana (sin agrupar por país) global.
+  List<DiveSite> _byDives() => _filtered().toList()
+    ..sort((a, b) => a.diveCount != b.diveCount
+        ? b.diveCount.compareTo(a.diveCount)
+        : compareFold(a.name ?? '', b.name ?? ''));
+  // Filas agrupadas por país (cabeceras colapsables), orden alfabético.
+  List<Widget> _groupedRows(BuildContext context) {
+    final grouped = _grouped();
+    final countries = grouped.keys.toList()..sort(compareFold);
+    return [
+      for (final c in countries) ...[
+        _header(context, c, grouped[c]!.length),
+        if (!_collapsed.contains(c))
+          for (final s in grouped[c]!) _tile(s),
+      ],
+    ];
   }
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final grouped = _grouped();
-    final countries = grouped.keys.toList()..sort(compareFold);
+    final rows = widget.sortByDives
+        ? [for (final s in _byDives()) _tile(s)]
+        : _groupedRows(context);
     return Column(
       children: [
         if (widget.externalQuery == null)
@@ -90,17 +110,11 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
             ),
           ),
         Expanded(
-          child: countries.isEmpty
+          child: rows.isEmpty
               ? Center(child: Text(t.noSitesYet))
               : ListView(
                   padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
-                  children: [
-                    for (final c in countries) ...[
-                      _header(context, c, grouped[c]!.length),
-                      if (!_collapsed.contains(c))
-                        for (final s in grouped[c]!) _tile(s),
-                    ],
-                  ],
+                  children: rows,
                 ),
         ),
       ],

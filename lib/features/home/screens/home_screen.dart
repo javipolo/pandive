@@ -43,7 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final _searchCtrl = TextEditingController();
   StreamSubscription<String>? _openSub;
   bool get _canSearch => _index <= 3; // todas menos estadísticas
-  bool get _canCollapse => _index == 0 || _index == 1; // inmersiones / sitios
+  // sitios solo si NO se ordena por buceos (en ese modo no hay grupos de país)
+  bool get _canCollapse => _index == 0 || (_index == 1 && !_sortByDives);
   bool get _canSort => _index == 1 || _index == 2; // sitios / compañeros
   @override
   void initState() {
