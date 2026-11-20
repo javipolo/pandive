@@ -42,13 +42,27 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
 
   void _openMap() {
     final t = AppLocalizations.of(context);
-    final placeIds = {
-      for (final d in widget.db.listDivesByTrip(widget.trip.id)) d.placeId,
-    };
+    final dives = widget.db.listDivesByTrip(widget.trip.id);
+    // Fecha más temprana en que se visitó cada sitio durante el viaje (orden).
+    final firstAt = <int, DateTime>{};
+    for (final d in dives) {
+      final pid = d.placeId, date = d.date;
+      if (pid == null || date == null) continue;
+      final cur = firstAt[pid];
+      if (cur == null || date.isBefore(cur)) firstAt[pid] = date;
+    }
+    final placeIds = {for (final d in dives) d.placeId};
     final sites = widget.db
         .listSites()
         .where((s) => placeIds.contains(s.id) && s.hasCoords)
-        .toList();
+        .toList()
+      ..sort((a, b) {
+        final da = firstAt[a.id], db2 = firstAt[b.id];
+        if (da == null && db2 == null) return 0;
+        if (da == null) return 1;
+        if (db2 == null) return -1;
+        return da.compareTo(db2);
+      });
     if (sites.isEmpty) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(t.noLocatedSites)));
@@ -59,7 +73,8 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
           db: widget.db,
           settings: widget.settings,
           sites: sites,
-          title: widget.trip.name),
+          title: widget.trip.name,
+          connect: true),
     ));
   }
 

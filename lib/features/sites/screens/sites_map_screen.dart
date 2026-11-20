@@ -19,12 +19,16 @@ class SitesMapScreen extends StatelessWidget {
   /// Si se pasa, muestra solo estos sitios (p.ej. los de un viaje); si no, todos.
   final List<DiveSite>? sites;
   final String? title;
+  /// Une los sitios con una línea en el orden dado y numera los marcadores
+  /// (recorrido del viaje).
+  final bool connect;
   const SitesMapScreen(
       {super.key,
       required this.db,
       required this.settings,
       this.sites,
-      this.title});
+      this.title,
+      this.connect = false});
 
   void _open(BuildContext context, DiveSite s) {
     final t = AppLocalizations.of(context);
@@ -60,6 +64,20 @@ class SitesMapScreen extends StatelessWidget {
     );
   }
 
+  Widget _numbered(BuildContext context, int n) => Container(
+        decoration: BoxDecoration(
+          color: Colors.red,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2),
+        ),
+        alignment: Alignment.center,
+        child: Text('$n',
+            style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 13)),
+      );
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -74,17 +92,21 @@ class SitesMapScreen extends StatelessWidget {
               center: points.first,
               zoom: 8,
               fitBounds: points,
+              route: connect ? points : null,
               markers: [
-                for (final s in located)
+                for (var i = 0; i < located.length; i++)
                   Marker(
-                    point: LatLng(s.lat!, s.lon!),
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.topCenter,
+                    point: points[i],
+                    width: connect ? 30 : 40,
+                    height: connect ? 30 : 40,
+                    alignment:
+                        connect ? Alignment.center : Alignment.topCenter,
                     child: GestureDetector(
-                      onTap: () => _open(context, s),
-                      child: const Icon(Icons.location_on,
-                          color: Colors.red, size: 40),
+                      onTap: () => _open(context, located[i]),
+                      child: connect
+                          ? _numbered(context, i + 1)
+                          : const Icon(Icons.location_on,
+                              color: Colors.red, size: 40),
                     ),
                   ),
               ],

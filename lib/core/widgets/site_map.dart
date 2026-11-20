@@ -21,6 +21,8 @@ class SiteMap extends StatelessWidget {
   final MapController? controller;
   /// Si se pasan 2+ puntos, encuadra el mapa para mostrarlos todos.
   final List<LatLng>? fitBounds;
+  /// Línea que une puntos en orden (p.ej. el recorrido de un viaje).
+  final List<LatLng>? route;
   const SiteMap({
     super.key,
     required this.center,
@@ -29,6 +31,7 @@ class SiteMap extends StatelessWidget {
     this.onTap,
     this.controller,
     this.fitBounds,
+    this.route,
   });
 
   @override
@@ -59,6 +62,13 @@ class SiteMap extends StatelessWidget {
           maxNativeZoom: 19,
           tileDisplay: const TileDisplay.fadeIn(),
         ),
+        if (route != null && route!.length >= 2)
+          PolylineLayer(polylines: [
+            Polyline(
+                points: route!,
+                strokeWidth: 3,
+                color: Colors.amber),
+          ]),
         if (markers.isNotEmpty) MarkerLayer(markers: markers),
         const RichAttributionWidget(
           attributions: [
