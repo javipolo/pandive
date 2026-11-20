@@ -35,6 +35,7 @@
   "latitude": "Latitudea",
   "longitude": "Longitudea",
   "pickOnMap": "Aukeratu mapan",
+  "tripDistance": "{km} km guztira",
   "viewOnMap": "Ikusi mapan",
   "mapTitle": "Mapa",
   "pickLocation": "Aukeratu kokapena",

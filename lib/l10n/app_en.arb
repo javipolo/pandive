@@ -55,6 +55,12 @@
   "latitude": "Latitude",
   "longitude": "Longitude",
   "pickOnMap": "Pick on map",
+  "tripDistance": "{km} km total",
+  "@tripDistance": {
+    "placeholders": {
+      "km": {}
+    }
+  },
   "viewOnMap": "View on map",
   "mapTitle": "Map",
   "pickLocation": "Pick location",

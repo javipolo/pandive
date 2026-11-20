@@ -88,29 +88,61 @@ class SitesMapScreen extends StatelessWidget {
       appBar: AppBar(title: Text(title ?? t.mapTitle)),
       body: located.isEmpty
           ? Center(child: Text(t.noLocatedSites))
-          : SiteMap(
-              center: points.first,
-              zoom: 8,
-              fitBounds: points,
-              route: connect ? points : null,
-              markers: [
-                for (var i = 0; i < located.length; i++)
-                  Marker(
-                    point: points[i],
-                    width: connect ? 30 : 40,
-                    height: connect ? 30 : 40,
-                    alignment:
-                        connect ? Alignment.center : Alignment.topCenter,
-                    child: GestureDetector(
-                      onTap: () => _open(context, located[i]),
-                      child: connect
-                          ? _numbered(context, i + 1)
-                          : const Icon(Icons.location_on,
-                              color: Colors.red, size: 40),
+          : Stack(
+              children: [
+                SiteMap(
+                  center: points.first,
+                  zoom: 8,
+                  fitBounds: points,
+                  route: connect ? points : null,
+                  markers: [
+                    for (var i = 0; i < located.length; i++)
+                      Marker(
+                        point: points[i],
+                        width: connect ? 30 : 40,
+                        height: connect ? 30 : 40,
+                        alignment:
+                            connect ? Alignment.center : Alignment.topCenter,
+                        child: GestureDetector(
+                          onTap: () => _open(context, located[i]),
+                          child: connect
+                              ? _numbered(context, i + 1)
+                              : const Icon(Icons.location_on,
+                                  color: Colors.red, size: 40),
+                        ),
+                      ),
+                  ],
+                ),
+                if (connect && points.length >= 2)
+                  Positioned(
+                    top: 8,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          child: Text(t.tripDistance(_km(points)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ),
                     ),
                   ),
               ],
             ),
     );
+  }
+
+  // Km recorridos sumando las distancias entre puntos consecutivos.
+  String _km(List<LatLng> pts) {
+    const d = Distance();
+    var m = 0.0;
+    for (var i = 1; i < pts.length; i++) {
+      m += d.distance(pts[i - 1], pts[i]);
+    }
+    final km = m / 1000;
+    return km.toStringAsFixed(km >= 100 ? 0 : 1);
   }
 }
