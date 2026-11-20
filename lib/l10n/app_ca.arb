@@ -245,8 +245,6 @@
   "deselectAll": "Desselecciona-ho tot",
   "pendingBadge": "Pendent",
   "noProfile": "No s'ha registrat cap perfil",
-  "axisDepth": "profunditat (m)",
-  "axisTime": "temps (min)",
   "selectedCount": "{count} seleccionades",
   "deleteConfirm": "Vols esborrar {count}? Això no es pot desfer.",
   "exportName": "Nom del quadern",

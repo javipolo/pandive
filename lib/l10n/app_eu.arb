@@ -245,8 +245,6 @@
   "deselectAll": "Desautatu dena",
   "pendingBadge": "Zain",
   "noProfile": "Ez da profilik grabatu",
-  "axisDepth": "sakonera (m)",
-  "axisTime": "denbora (min)",
   "selectedCount": "{count} hautatuta",
   "deleteConfirm": "{count} ezabatu? Ezin da desegin.",
   "exportName": "Koadernoaren izena",

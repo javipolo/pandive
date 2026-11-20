@@ -245,8 +245,6 @@
   "deselectAll": "Deseleccionar todo",
   "pendingBadge": "Pendiente",
   "noProfile": "Sin perfil registrado",
-  "axisDepth": "prof (m)",
-  "axisTime": "tiempo (min)",
   "selectedCount": "{count} seleccionadas",
   "deleteConfirm": "¿Eliminar {count}? No se puede deshacer.",
   "exportName": "Nombre del cuaderno",

@@ -392,8 +392,6 @@
   "deselectAll": "Deselect all",
   "pendingBadge": "Pending",
   "noProfile": "No profile recorded",
-  "axisDepth": "depth (m)",
-  "axisTime": "time (min)",
   "selectedCount": "{count} selected",
   "@selectedCount": {
     "placeholders": {

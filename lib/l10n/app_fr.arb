@@ -245,8 +245,6 @@
   "deselectAll": "Tout désélectionner",
   "pendingBadge": "En attente",
   "noProfile": "Aucun profil enregistré",
-  "axisDepth": "profondeur (m)",
-  "axisTime": "temps (min)",
   "selectedCount": "{count} sélectionnées",
   "deleteConfirm": "Supprimer {count} ? Cette action est irréversible.",
   "exportName": "Nom du carnet",
