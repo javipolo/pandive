@@ -130,6 +130,8 @@
   "recordDeepest": "Més profund",
   "recordLongest": "Més llarg",
   "recordColdest": "Més fred",
+  "recordLongestDeco": "Deco més llarga (TTS)",
+  "recordLongestCeiling": "Més temps amb sostre",
   "recordsMilestone": "Propera fita: {target} immersions (en falten {n})",
   "statsDives": "Immersions",
   "statsTotalTime": "Temps total",

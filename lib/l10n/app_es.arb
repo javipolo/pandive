@@ -130,6 +130,8 @@
   "recordDeepest": "Más profundo",
   "recordLongest": "Más largo",
   "recordColdest": "Más frío",
+  "recordLongestDeco": "Deco más larga (TTS)",
+  "recordLongestCeiling": "Más tiempo con techo",
   "recordsMilestone": "Próximo hito: {target} buceos (faltan {n})",
   "statsDives": "Inmersiones",
   "statsTotalTime": "Tiempo total",

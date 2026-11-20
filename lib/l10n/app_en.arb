@@ -210,6 +210,8 @@
   "recordDeepest": "Deepest",
   "recordLongest": "Longest",
   "recordColdest": "Coldest",
+  "recordLongestDeco": "Longest deco (TTS)",
+  "recordLongestCeiling": "Most time with ceiling",
   "recordsMilestone": "Next milestone: {target} dives ({n} to go)",
   "@recordsMilestone": {
     "placeholders": {

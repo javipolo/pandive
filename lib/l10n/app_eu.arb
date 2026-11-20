@@ -130,6 +130,8 @@
   "recordDeepest": "Sakonena",
   "recordLongest": "Luzeena",
   "recordColdest": "Hotzena",
+  "recordLongestDeco": "Deko luzeena (TTS)",
+  "recordLongestCeiling": "Denbora gehien sabaiarekin",
   "recordsMilestone": "Hurrengo muga: {target} murgilketa ({n} falta)",
   "statsDives": "Murgilketak",
   "statsTotalTime": "Denbora osoa",

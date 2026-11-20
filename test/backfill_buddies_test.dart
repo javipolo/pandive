@@ -53,6 +53,20 @@ void main() {
     expect(db.backfillBuddyIds(), 0); // idempotente
   });
 
+  test('personalRecords: más profundo coherente con computeStats', () {
+    final r = db.personalRecords();
+    final s = db.computeStats();
+    if (s.maxDepth != null) {
+      expect(r.deepest, isNotNull);
+      expect(r.deepest!.value, closeTo(s.maxDepth!, 0.01));
+      expect(r.deepest!.diveId, greaterThan(0));
+    }
+    if ((s.decoDives ?? 0) > 0 && (s.maxTts ?? 0) > 0) {
+      expect(r.longestDeco, isNotNull);
+      expect(r.longestDeco!.value, closeTo(s.maxTts!.toDouble(), 0.01));
+    }
+  });
+
   test('mergeBuddies reasigna dives y borra los fusionados', () {
     db.backfillBuddyIds();
     final withDives =

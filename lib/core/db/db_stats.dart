@@ -163,10 +163,46 @@ extension DivemateDbStats on DivemateDb {
           _parseDate(_str(r['Divedate']), _str(r['Entrytime'])), _str(r['Place']));
     }
 
+    // Récords de deco: recorrer buceos con deco y decodificar el perfil.
+    int? ttsId, ceilId;
+    int bestTts = 0, bestCeilSecs = 0;
+    for (final r in _db.select(
+        "SELECT ID FROM Logbook WHERE (Status IS NULL OR Status != 2) $f AND Deco = 1")) {
+      final id = r['ID'] as int;
+      final p = diveProfile(id);
+      if (p == null) continue;
+      var ceilSamples = 0;
+      for (final c in p.ceiling) {
+        if (c > 0) ceilSamples++;
+      }
+      final secs = ceilSamples * p.intervalSeconds;
+      if (secs > bestCeilSecs) {
+        bestCeilSecs = secs;
+        ceilId = id;
+      }
+      for (final x in p.tts) {
+        if (x != null && x > bestTts) {
+          bestTts = x;
+          ttsId = id;
+        }
+      }
+    }
+    DiveRecord? decoRec(int? id, double value) {
+      if (id == null || value <= 0) return null;
+      final r = _db.select(
+          'SELECT Divedate, Entrytime, Place FROM Logbook WHERE ID = ?', [id]);
+      final row = r.isEmpty ? null : r.first;
+      return DiveRecord(id, value,
+          row == null ? null : _parseDate(_str(row['Divedate']), _str(row['Entrytime'])),
+          row == null ? null : _str(row['Place']));
+    }
+
     return PersonalRecords(
       deepest: top('Depth', 'Depth DESC', 'Depth > 0'),
       longest: top('Divetime', 'Divetime DESC', 'Divetime > 0'),
       coldest: top('Watertemp', 'Watertemp ASC', 'Watertemp > -50 AND Watertemp < 60'),
+      longestDeco: decoRec(ttsId, bestTts.toDouble()),
+      longestCeiling: decoRec(ceilId, bestCeilSecs / 60.0),
     );
   }
 }

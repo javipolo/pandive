@@ -35,6 +35,10 @@ class RecordsCard extends StatelessWidget {
             records.longest, (v) => '${v.round()} min'),
         _row(context, t, fmt, Icons.ac_unit, t.recordColdest, records.coldest,
             (v) => '${v.toStringAsFixed(1)} °C'),
+        _row(context, t, fmt, Icons.hourglass_bottom, t.recordLongestDeco,
+            records.longestDeco, (v) => '${v.round()} min'),
+        _row(context, t, fmt, Icons.vertical_align_top, t.recordLongestCeiling,
+            records.longestCeiling, (v) => '${v.round()} min'),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Text(t.recordsMilestone(next, next - totalDives),
