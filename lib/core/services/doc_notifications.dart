@@ -53,7 +53,7 @@ Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
   for (final d in docs) {
     final e = d.expiryDate!;
     for (var k = 0; k < _offsets.length; k++) {
-      final when = tz.TZDateTime(tz.local, e.year, e.month, e.day, 9)
+      final when = tz.TZDateTime(tz.local, e.year, e.month, e.day, 21)
           .subtract(Duration(days: _offsets[k]));
       if (!when.isAfter(now)) continue;
       await _plugin.zonedSchedule(
