@@ -11,9 +11,14 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 - **Arquitectura feature-first**: organiza `lib/` en `core/` (tema, rutas,
   servicios globales, widgets genéricos) y `features/<nombre>/` (subcarpetas
   `screens/`, `widgets/`, `logic/` o `providers/`).
-- **Anti-anidamiento (regla de oro Flutter)**: ningún `.dart` supera **150
-  líneas**. Si un `build()` crece, extrae sub-widgets privados o ficheros en
-  `features/<nombre>/widgets/`.
+- **Anti-anidamiento (regla de oro Flutter)**: objetivo **~200 líneas** por
+  `.dart` (guía blanda, no límite duro). Si un `build()` crece o un fichero
+  mezcla responsabilidades (UI + lógica, varias pantallas), extrae sub-widgets
+  privados o ficheros en `features/<nombre>/widgets/` o `logic/`. El número
+  orienta; manda la cohesión: un fichero de ~180 líneas coherente es mejor que
+  tres de 60 troceados a la fuerza. NO comprimas código legible (borrar líneas en
+  blanco, partir expresiones) solo para bajar del número. Pasado ~250 líneas casi
+  siempre toca trocear de verdad.
 - **Separación UI vs lógica**: la lógica de negocio y el estado van fuera de los
   widgets visuales (usa el gestor de estado que ya haya o el más simple, sin
   sobreingeniería).
