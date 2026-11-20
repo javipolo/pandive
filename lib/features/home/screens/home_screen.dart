@@ -13,6 +13,7 @@ import 'package:pandive/features/home/widgets/home_app_bar.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/home/widgets/home_tabs.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
+import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -110,11 +111,15 @@ class _HomeScreenState extends State<HomeScreen> {
         canSearch: _canSearch,
         canCollapse: _canCollapse,
         canSort: _canSort,
+        canMap: _index == 1,
         onQueryChanged: (q) => setState(() => _query = q),
         onStartSearch: () => setState(() => _searching = true),
         onExitSearch: _exitSearch,
         onToggleCollapse: () => setState(() => _collapseAll = !_collapseAll),
         onToggleSort: () => setState(() => _sortByDives = !_sortByDives),
+        onMap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) =>
+                SitesMapScreen(db: widget.db, settings: widget.settings))),
         onSettings: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => SettingsScreen(
                 settings: widget.settings, onChangeDb: widget.onChangeDb))),

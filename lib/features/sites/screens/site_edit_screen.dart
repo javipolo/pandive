@@ -3,9 +3,12 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:latlong2/latlong.dart';
+
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
+import 'package:pandive/features/sites/screens/map_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SiteEditScreen extends StatefulWidget {
@@ -22,6 +25,8 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
   late final _country = TextEditingController(text: widget.site?.country ?? '');
   late final _water = TextEditingController(text: widget.site?.waterName ?? '');
   late final _region = TextEditingController(text: widget.site?.region ?? '');
+  late double? _lat = widget.site?.lat;
+  late double? _lon = widget.site?.lon;
 
   @override
   void dispose() {
@@ -40,6 +45,8 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
       'Country': _s(_country),
       'WaterName': _s(_water),
       'Region': _s(_region),
+      'Lat': _lat?.toStringAsFixed(6),
+      'Lon': _lon?.toStringAsFixed(6),
     };
     if (widget.site == null) {
       widget.db.createSite(map);
@@ -71,8 +78,30 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
           LabeledField(controller: _country, label: t.fieldCountry),
           LabeledField(controller: _water, label: t.fieldStretchOfWater),
           LabeledField(controller: _region, label: t.fieldRegion),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.place_outlined),
+            title: Text(t.location),
+            subtitle: Text(_lat == null || _lon == null
+                ? t.noLocation
+                : '${_lat!.toStringAsFixed(5)}, ${_lon!.toStringAsFixed(5)}'),
+            trailing: const Icon(Icons.map_outlined),
+            onTap: _pickLocation,
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _pickLocation() async {
+    final initial =
+        (_lat != null && _lon != null) ? LatLng(_lat!, _lon!) : null;
+    final picked = await pickLocation(context, initial);
+    if (picked != null) {
+      setState(() {
+        _lat = picked.latitude;
+        _lon = picked.longitude;
+      });
+    }
   }
 }

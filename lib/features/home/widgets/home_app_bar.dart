@@ -20,11 +20,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool canSearch;
   final bool canCollapse;
   final bool canSort;
+  final bool canMap;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onStartSearch;
   final VoidCallback onExitSearch;
   final VoidCallback onToggleCollapse;
   final VoidCallback onToggleSort;
+  final VoidCallback onMap;
   final VoidCallback onSettings;
   const HomeAppBar({
     super.key,
@@ -39,11 +41,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.canSearch,
     required this.canCollapse,
     required this.canSort,
+    required this.canMap,
     required this.onQueryChanged,
     required this.onStartSearch,
     required this.onExitSearch,
     required this.onToggleCollapse,
     required this.onToggleSort,
+    required this.onMap,
     required this.onSettings,
   });
 
@@ -79,6 +83,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     tooltip: t.search,
                     icon: const Icon(Icons.search),
                     onPressed: onStartSearch),
+              if (canMap)
+                IconButton(
+                    tooltip: t.mapTitle,
+                    icon: const Icon(Icons.map_outlined),
+                    onPressed: onMap),
               if (canSort)
                 IconButton(
                     tooltip: t.sortByDives,

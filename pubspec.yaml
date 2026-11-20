@@ -73,6 +73,9 @@ dependencies:
   flutter_appauth: ^13.0.0
   flutter_secure_storage: ^10.3.4
   http: ^1.6.0
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+  geolocator: ^14.0.2
 
 # pdf limita archive <4.1 -> pub coge archive 4.0.9, e image 4.11.0 llama a un
 # método (decodeLazy) que esa archive no tiene. Fijamos image <4.11 (compatible).

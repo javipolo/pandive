@@ -50,6 +50,12 @@
     }
   },
   "sortByDives": "Sort by dives",
+  "mapTitle": "Map",
+  "pickLocation": "Pick location",
+  "location": "Location",
+  "noLocation": "No location",
+  "locationDenied": "Couldn't get location",
+  "noLocatedSites": "No sites with coordinates yet",
   "mergeBuddies": "Merge",
   "mergeKeepTitle": "Which buddy to keep?",
   "mergeBuddiesDone": "Buddies merged into {name}",

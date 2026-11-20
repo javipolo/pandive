@@ -170,8 +170,12 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/documents/widgets/documents_banner.dart` -> aviso resumen (caducados/por caducar)
 
 ### sites (sitios)
+- `lib/core/widgets/site_map.dart` -> mapa reutilizable (tiles satélite Esri + atribución)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, editar/borrar, swipe entre sitios)
+- `lib/features/sites/screens/site_edit_screen.dart` -> alta/edición de sitio (campos + ubicación GPS en mapa)
+- `lib/features/sites/screens/map_picker_screen.dart` -> elegir ubicación en mapa (tocar + mi GPS)
+- `lib/features/sites/screens/sites_map_screen.dart` -> visor de todos los sitios con coords (marcadores -> ver buceos)
 - `lib/features/sites/widgets/sites_grouped_list.dart` -> lista agrupada por país (colapsar/buscar/ordenar por buceos)
 - `lib/features/sites/widgets/site_tile.dart` -> fila de sitio (avatar, región · nº buceos, ojo info)
 

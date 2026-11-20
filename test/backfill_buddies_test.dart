@@ -67,6 +67,15 @@ void main() {
     }
   });
 
+  test('createSite guarda Lat/Lon y listSites los devuelve', () {
+    final id = db.createSite(
+        {'Place': 'ZZZ Map Test', 'Lat': '41.123456', 'Lon': '2.654321'});
+    final site = db.listSites().firstWhere((s) => s.id == id);
+    expect(site.hasCoords, isTrue);
+    expect(site.lat, closeTo(41.123456, 1e-5));
+    expect(site.lon, closeTo(2.654321, 1e-5));
+  });
+
   test('mergeBuddies reasigna dives y borra los fusionados', () {
     db.backfillBuddyIds();
     final withDives =
