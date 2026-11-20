@@ -35,6 +35,7 @@
   "latitude": "Latitudea",
   "longitude": "Longitudea",
   "pickOnMap": "Aukeratu mapan",
+  "viewOnMap": "Ikusi mapan",
   "mapTitle": "Mapa",
   "pickLocation": "Aukeratu kokapena",
   "location": "Kokapena",

@@ -16,7 +16,15 @@ import 'package:pandive/l10n/app_localizations.dart';
 class SitesMapScreen extends StatelessWidget {
   final DivemateDb db;
   final Settings settings;
-  const SitesMapScreen({super.key, required this.db, required this.settings});
+  /// Si se pasa, muestra solo estos sitios (p.ej. los de un viaje); si no, todos.
+  final List<DiveSite>? sites;
+  final String? title;
+  const SitesMapScreen(
+      {super.key,
+      required this.db,
+      required this.settings,
+      this.sites,
+      this.title});
 
   void _open(BuildContext context, DiveSite s) {
     final t = AppLocalizations.of(context);
@@ -55,18 +63,19 @@ class SitesMapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final sites = db.listSites().where((s) => s.hasCoords).toList();
-    final points = [for (final s in sites) LatLng(s.lat!, s.lon!)];
+    final located =
+        (sites ?? db.listSites()).where((s) => s.hasCoords).toList();
+    final points = [for (final s in located) LatLng(s.lat!, s.lon!)];
     return Scaffold(
-      appBar: AppBar(title: Text(t.mapTitle)),
-      body: sites.isEmpty
+      appBar: AppBar(title: Text(title ?? t.mapTitle)),
+      body: located.isEmpty
           ? Center(child: Text(t.noLocatedSites))
           : SiteMap(
               center: points.first,
               zoom: 8,
               fitBounds: points,
               markers: [
-                for (final s in sites)
+                for (final s in located)
                   Marker(
                     point: LatLng(s.lat!, s.lon!),
                     width: 40,

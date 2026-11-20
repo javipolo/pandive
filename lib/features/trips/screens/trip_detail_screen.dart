@@ -8,6 +8,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
+import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class TripDetailScreen extends StatefulWidget {
@@ -37,6 +38,29 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     if (picked == null) return;
     widget.db.setTripBuddies(widget.trip.id, [for (final b in picked) b.id]);
     setState(() => _buddies = widget.db.tripBuddies(widget.trip.id));
+  }
+
+  void _openMap() {
+    final t = AppLocalizations.of(context);
+    final placeIds = {
+      for (final d in widget.db.listDivesByTrip(widget.trip.id)) d.placeId,
+    };
+    final sites = widget.db
+        .listSites()
+        .where((s) => placeIds.contains(s.id) && s.hasCoords)
+        .toList();
+    if (sites.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(t.noLocatedSites)));
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => SitesMapScreen(
+          db: widget.db,
+          settings: widget.settings,
+          sites: sites,
+          title: widget.trip.name),
+    ));
   }
 
   void _fromDives() {
@@ -72,6 +96,13 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
                 loader: () => widget.db.listDivesByTrip(widget.trip.id),
               ),
             )),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.map_outlined),
+            title: Text(t.viewOnMap),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _openMap,
           ),
           const Divider(),
           Row(

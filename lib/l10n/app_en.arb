@@ -55,6 +55,7 @@
   "latitude": "Latitude",
   "longitude": "Longitude",
   "pickOnMap": "Pick on map",
+  "viewOnMap": "View on map",
   "mapTitle": "Map",
   "pickLocation": "Pick location",
   "location": "Location",
