@@ -22,6 +22,7 @@ class HomeTabs extends StatelessWidget {
   final bool searching;
   final String query;
   final bool collapseAll;
+  final bool sortByDives;
   const HomeTabs({
     super.key,
     required this.db,
@@ -31,6 +32,7 @@ class HomeTabs extends StatelessWidget {
     required this.searching,
     required this.query,
     required this.collapseAll,
+    required this.sortByDives,
   });
 
   String _q(int i) => (searching && index == i) ? query : '';
@@ -55,12 +57,14 @@ class HomeTabs extends StatelessWidget {
                 db: db,
                 settings: settings,
                 query: _q(1),
-                collapseAll: collapseAll),
+                collapseAll: collapseAll,
+                sortByDives: sortByDives),
             BuddiesTab(
                 key: ValueKey('buddies-$v'),
                 db: db,
                 settings: settings,
-                query: _q(2)),
+                query: _q(2),
+                sortByDives: sortByDives),
             TagsTab(
                 key: ValueKey('tags-$v'),
                 db: db,

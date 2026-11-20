@@ -48,6 +48,7 @@
       "count": {}
     }
   },
+  "sortByDives": "Sort by dives",
   "mergeBuddies": "Merge",
   "mergeKeepTitle": "Which buddy to keep?",
   "mergeBuddiesDone": "Buddies merged into {name}",

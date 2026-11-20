@@ -28,6 +28,7 @@
   "purgeOrphanTanks": "Elimina les ampolles òrfenes",
   "purgeOrphanTanksConfirm": "Eliminar totes les ampolles sense cap immersió?",
   "purgeOrphanTanksResult": "{count} ampolles òrfenes eliminades",
+  "sortByDives": "Ordena per immersions",
   "mergeBuddies": "Fusiona",
   "mergeKeepTitle": "Quin company vols conservar?",
   "mergeBuddiesDone": "Companys fusionats en {name}",

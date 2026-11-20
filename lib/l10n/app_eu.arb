@@ -28,6 +28,7 @@
   "purgeOrphanTanks": "Ezabatu botila zurtzak",
   "purgeOrphanTanksConfirm": "Murgilketarik gabeko botila guztiak ezabatu?",
   "purgeOrphanTanksResult": "{count} botila zurtz ezabatu dira",
+  "sortByDives": "Ordenatu murgilketen arabera",
   "mergeBuddies": "Bateratu",
   "mergeKeepTitle": "Zein kide mantendu?",
   "mergeBuddiesDone": "Kideak {name}-n bateratu dira",

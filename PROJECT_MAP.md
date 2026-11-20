@@ -80,6 +80,7 @@ con `screens/` y, si hace falta, `widgets/`).
 ### home
 - `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
 - `lib/features/home/widgets/home_nav_bar.dart` -> barra inferior (Inmersiones/Sitios/Compañeros)
+- `lib/features/home/widgets/home_app_bar.dart` -> AppBar: título/buscador + acciones (buscar, colapsar, ordenar por buceos, ajustes)
 - `lib/features/home/widgets/home_tabs.dart` -> pestañas (IndexedStack); escucha data_revision para refresco blando
 - `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats + Herramientas/Backup)
 
@@ -114,6 +115,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar/fusionar en lote)
 - `lib/features/buddies/widgets/buddy_tile.dart` -> fila de compañero (avatar, nº buceos, menú, abre sus buceos)
 - `lib/features/buddies/logic/merge_buddies_action.dart` -> diálogo elegir cuál conservar + fusión
+- `lib/features/buddies/logic/buddy_sort.dart` -> ordena compañeros por nº de buceos (desc) y nombre
 - `lib/features/buddies/screens/buddy_picker_screen.dart` -> multi-selección de compañeros (para editar buceo)
 
 ### dives (inmersiones)
@@ -168,6 +170,8 @@ con `screens/` y, si hace falta, `widgets/`).
 ### sites (sitios)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, editar/borrar, swipe entre sitios)
+- `lib/features/sites/widgets/sites_grouped_list.dart` -> lista agrupada por país (colapsar/buscar/ordenar por buceos)
+- `lib/features/sites/widgets/site_tile.dart` -> fila de sitio (avatar, región · nº buceos, ojo info)
 
 ### stats (estadísticas)
 - `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook

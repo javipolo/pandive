@@ -5,6 +5,7 @@ library;
 import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/text/collate.dart';
+import 'package:pandive/features/sites/widgets/site_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SitesGroupedList extends StatefulWidget {
@@ -16,6 +17,7 @@ class SitesGroupedList extends StatefulWidget {
   /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
   final String? externalQuery;
   final bool collapseAll;
+  final bool sortByDives;
   const SitesGroupedList({
     super.key,
     required this.sites,
@@ -23,6 +25,7 @@ class SitesGroupedList extends StatefulWidget {
     this.onInfo,
     this.externalQuery,
     this.collapseAll = false,
+    this.sortByDives = false,
   });
 
   @override
@@ -63,7 +66,9 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
       (map[s.country ?? '—'] ??= []).add(s);
     }
     for (final list in map.values) {
-      list.sort((a, b) => compareFold(a.name ?? '', b.name ?? ''));
+      list.sort((a, b) => widget.sortByDives && a.diveCount != b.diveCount
+          ? b.diveCount.compareTo(a.diveCount)
+          : compareFold(a.name ?? '', b.name ?? ''));
     }
     return map;
   }
@@ -93,7 +98,7 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
                     for (final c in countries) ...[
                       _header(context, c, grouped[c]!.length),
                       if (!_collapsed.contains(c))
-                        for (final s in grouped[c]!) _tile(context, t, s),
+                        for (final s in grouped[c]!) _tile(s),
                     ],
                   ],
                 ),
@@ -118,32 +123,9 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
           collapsed ? _collapsed.remove(country) : _collapsed.add(country)),
     );
   }
-  Widget _tile(BuildContext context, AppLocalizations t, DiveSite s) {
-    final sub = [if (s.region != null) s.region!, t.diveCountLabel(s.diveCount)]
-        .join(' · ');
-    final nm = (s.name ?? '').trim();
-    final cs = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      position: DecorationPosition.foreground,
-      decoration: BoxDecoration(
-        border: Border(
-            bottom: BorderSide(
-                color: cs.outlineVariant.withValues(alpha: 0.5), width: 1)),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-            child: Text(nm.isEmpty ? '?' : nm.substring(0, 1).toUpperCase())),
-        title: Text(s.name ?? t.site,
-            maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text(sub),
-        trailing: widget.onInfo == null
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.visibility_outlined),
-                tooltip: t.site,
-                onPressed: () => widget.onInfo!(s)),
+  Widget _tile(DiveSite s) => SiteTile(
+        site: s,
         onTap: () => widget.onTap(s),
-      ),
-    );
-  }
+        onInfo: widget.onInfo == null ? null : () => widget.onInfo!(s),
+      );
 }

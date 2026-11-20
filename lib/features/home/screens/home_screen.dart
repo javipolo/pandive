@@ -9,9 +9,9 @@ import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/settings/screens/preview_ddb_screen.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
+import 'package:pandive/features/home/widgets/home_app_bar.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/home/widgets/home_tabs.dart';
-import 'package:pandive/features/home/widgets/search_results_bar.dart';
 import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -39,10 +39,12 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _searching = false;
   String _query = '';
   bool _collapseAll = false;
+  bool _sortByDives = false;
   final _searchCtrl = TextEditingController();
   StreamSubscription<String>? _openSub;
   bool get _canSearch => _index <= 3; // todas menos estadísticas
   bool get _canCollapse => _index == 0 || _index == 1; // inmersiones / sitios
+  bool get _canSort => _index == 1 || _index == 2; // sitios / compañeros
   @override
   void initState() {
     super.initState();
@@ -95,50 +97,26 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: HomeDrawer(
           selectedIndex: _index, onSelected: _go, db: widget.db,
           settings: widget.settings, onReloadDb: widget.onReloadDb),
-      appBar: AppBar(
-        bottom: (_searching && _query.trim().isNotEmpty)
-            ? SearchResultsBar(db: widget.db, index: _index, query: _query)
-            : null,
-        leading: _searching
-            ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: _exitSearch)
-            : null,
-        title: _searching
-            ? TextField(
-                controller: _searchCtrl,
-                autofocus: true,
-                decoration: InputDecoration(
-                    hintText: t.search, border: InputBorder.none),
-                onChanged: (q) => setState(() => _query = q),
-              )
-            : Text(titles[_index]),
-        actions: [
-          if (_searching)
-            IconButton(icon: const Icon(Icons.clear), onPressed: _exitSearch)
-          else ...[
-            if (_canSearch)
-              IconButton(
-                tooltip: t.search,
-                icon: const Icon(Icons.search),
-                onPressed: () => setState(() => _searching = true),
-              ),
-            if (_canCollapse)
-              IconButton(
-                tooltip: '',
-                iconSize: 30,
-                icon: Icon(_collapseAll ? Icons.unfold_more : Icons.unfold_less),
-                onPressed: () => setState(() => _collapseAll = !_collapseAll),
-              ),
-            IconButton(
-              tooltip: t.settings,
-              icon: const Icon(Icons.settings),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
-                        settings: widget.settings,
-                        onChangeDb: widget.onChangeDb,
-                      ))),
-            ),
-          ],
-        ],
+      appBar: HomeAppBar(
+        db: widget.db,
+        index: _index,
+        title: titles[_index],
+        searching: _searching,
+        query: _query,
+        searchCtrl: _searchCtrl,
+        collapseAll: _collapseAll,
+        sortByDives: _sortByDives,
+        canSearch: _canSearch,
+        canCollapse: _canCollapse,
+        canSort: _canSort,
+        onQueryChanged: (q) => setState(() => _query = q),
+        onStartSearch: () => setState(() => _searching = true),
+        onExitSearch: _exitSearch,
+        onToggleCollapse: () => setState(() => _collapseAll = !_collapseAll),
+        onToggleSort: () => setState(() => _sortByDives = !_sortByDives),
+        onSettings: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => SettingsScreen(
+                settings: widget.settings, onChangeDb: widget.onChangeDb))),
       ),
       body: HomeTabs(
         db: widget.db,
@@ -148,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
         searching: _searching,
         query: _query,
         collapseAll: _collapseAll,
+        sortByDives: _sortByDives,
       ),
       bottomNavigationBar: HomeNavBar(selectedIndex: _index, onSelected: _go),
     );

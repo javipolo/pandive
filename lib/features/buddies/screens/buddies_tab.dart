@@ -10,6 +10,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
+import 'package:pandive/features/buddies/logic/buddy_sort.dart';
 import 'package:pandive/features/buddies/logic/merge_buddies_action.dart';
 import 'package:pandive/features/buddies/widgets/buddy_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -18,8 +19,13 @@ class BuddiesTab extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   final String query;
+  final bool sortByDives;
   const BuddiesTab(
-      {super.key, required this.db, required this.settings, this.query = ''});
+      {super.key,
+      required this.db,
+      required this.settings,
+      this.query = '',
+      this.sortByDives = false});
 
   @override
   State<BuddiesTab> createState() => _BuddiesTabState();
@@ -31,7 +37,6 @@ class _BuddiesTabState extends State<BuddiesTab> {
   final Set<int> _sel = {};
 
   void _reload() => setState(() => _buddies = widget.db.listBuddies());
-
   void _exitSel() => setState(() {
         _select = false;
         _sel.clear();
@@ -85,8 +90,9 @@ class _BuddiesTabState extends State<BuddiesTab> {
     final t = AppLocalizations.of(context);
     final q = widget.query.trim().toLowerCase();
     final shown = q.isEmpty
-        ? _buddies
+        ? [..._buddies]
         : _buddies.where((b) => b.name.toLowerCase().contains(q)).toList();
+    sortBuddies(shown, widget.sortByDives);
     return Scaffold(
       floatingActionButton: _select
           ? null

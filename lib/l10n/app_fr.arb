@@ -28,6 +28,7 @@
   "purgeOrphanTanks": "Supprimer les blocs orphelins",
   "purgeOrphanTanksConfirm": "Supprimer tous les blocs non liés à une plongée ?",
   "purgeOrphanTanksResult": "{count} blocs orphelins supprimés",
+  "sortByDives": "Trier par plongées",
   "mergeBuddies": "Fusionner",
   "mergeKeepTitle": "Quel binôme conserver ?",
   "mergeBuddiesDone": "Binômes fusionnés dans {name}",

@@ -28,6 +28,7 @@
   "purgeOrphanTanks": "Eliminar botellas huérfanas",
   "purgeOrphanTanksConfirm": "¿Eliminar todas las botellas no asociadas a ningún buceo?",
   "purgeOrphanTanksResult": "{count} botellas huérfanas eliminadas",
+  "sortByDives": "Ordenar por buceos",
   "mergeBuddies": "Fusionar",
   "mergeKeepTitle": "¿Qué compañero conservar?",
   "mergeBuddiesDone": "Compañeros fusionados en {name}",

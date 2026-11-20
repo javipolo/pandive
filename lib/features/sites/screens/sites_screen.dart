@@ -16,12 +16,14 @@ class SitesTab extends StatefulWidget {
   final Settings settings;
   final String query;
   final bool collapseAll;
+  final bool sortByDives;
   const SitesTab(
       {super.key,
       required this.db,
       required this.settings,
       this.query = '',
-      this.collapseAll = false});
+      this.collapseAll = false,
+      this.sortByDives = false});
 
   @override
   State<SitesTab> createState() => _SitesTabState();
@@ -71,7 +73,8 @@ class _SitesTabState extends State<SitesTab> {
           onTap: _dives,
           onInfo: _info,
           externalQuery: widget.query,
-          collapseAll: widget.collapseAll),
+          collapseAll: widget.collapseAll,
+          sortByDives: widget.sortByDives),
     );
   }
 }
