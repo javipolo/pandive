@@ -24,7 +24,7 @@ Future<void> _init() async {
     tz.setLocalLocation(tz.getLocation(info.identifier));
   } catch (_) {/* deja UTC por defecto */}
   await _plugin.initialize(const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher')));
+      android: AndroidInitializationSettings('ic_stat_panda')));
   _inited = true;
 }
 
@@ -47,7 +47,10 @@ Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
 
   final details = NotificationDetails(
     android: AndroidNotificationDetails('doc_expiry', t.docNotifTitle,
-        importance: Importance.high, priority: Priority.high),
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: 'ic_stat_panda',
+        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher')),
   );
   final now = tz.TZDateTime.now(tz.local);
 
