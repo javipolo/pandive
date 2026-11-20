@@ -11,6 +11,7 @@ import 'package:pandive/features/backup/screens/backup_screen.dart';
 import 'package:pandive/features/documents/screens/documents_screen.dart';
 import 'package:pandive/features/settings/screens/about_screen.dart';
 import 'package:pandive/features/settings/screens/tools_screen.dart';
+import 'package:pandive/features/trips/screens/trips_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -58,6 +59,8 @@ class HomeDrawer extends StatelessWidget {
             _item(context, 4, Icons.tune_outlined, t.equipment),
             _item(context, 5, Icons.bar_chart_outlined, t.navStats),
             const Divider(),
+            _push(context, Icons.luggage_outlined, t.trips,
+                (_) => TripsScreen(db: db, settings: settings)),
             _push(context, Icons.folder_outlined, t.documents,
                 (_) => DocumentsScreen(db: db),
                 alert: _docsAlert()),

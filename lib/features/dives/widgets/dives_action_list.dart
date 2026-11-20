@@ -16,6 +16,7 @@ import 'package:pandive/features/dives/screens/dive_detail_screen.dart';
 import 'package:pandive/features/dives/widgets/dives_selection_bar.dart';
 import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
 import 'package:pandive/features/stats/screens/selection_stats_screen.dart';
+import 'package:pandive/features/trips/logic/assign_trip_action.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DivesActionList extends StatefulWidget {
@@ -138,6 +139,14 @@ class _DivesActionListState extends State<DivesActionList> {
     _exitSel();
   }
 
+  Future<void> _assignTripSel() async {
+    if (await runAssignToTrip(
+        context, widget.db, [for (final d in _picked) d.id])) {
+      _exitSel();
+      widget.onChanged();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -150,6 +159,7 @@ class _DivesActionListState extends State<DivesActionList> {
             onMerge: _sel.length >= 2 ? _mergeSel : null,
             onAdjustTime: _adjustTimeSel,
             onExport: _exportSel,
+            onAssignTrip: _assignTripSel,
             onDelete: _deleteSel,
             onSelectAll: _toggleSelectAll,
             allSelected: _allSelected),

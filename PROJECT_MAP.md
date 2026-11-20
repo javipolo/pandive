@@ -38,6 +38,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_helpers.dart` -> helpers de la librería (parse, uuid, timestamp, mapeo de fila)
 - `lib/core/db/db_buddies.dart` -> compañeros (Buddy): listar, crear/renombrar/borrar, buceos por buddy, backfillBuddyIds (enlaza texto Buddy antiguo)
 - `lib/core/db/db_buddies_merge.dart` -> mergeBuddies: fusiona varios buddies en uno (reasigna BuddyIDs, borra el resto)
+- `lib/core/db/db_trips.dart` -> viajes: crear/renombrar/borrar, asignar buceos (PandiveTripId), compañeros del viaje
 - `lib/core/db/db_sites.dart` -> sitios (Place): obtener/crear/actualizar, find-or-create
 - `lib/core/db/db_tanks.dart` -> botellas por buceo, presets "mis botellas", buceos por sitio/buddy
 - `lib/core/db/db_merge.dart` -> fusionar inmersiones (perfil concatenado, unión de datos)
@@ -65,6 +66,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/downloaded_dive.dart` -> inmersión descargada del ordenador (+ muestras/gases, parse JSON)
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
 - `lib/core/models/personal_records.dart` -> récords personales (buceo más profundo/largo/frío)
+- `lib/core/models/trip.dart` -> viaje (nombre, nº buceos/compañeros, rango de fechas)
 
 ### Core · widgets compartidos
 - `lib/core/widgets/profile_chart.dart` -> gráfico de perfil (prof + temp eje dcho, línea táctil)
@@ -168,6 +170,11 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/documents/widgets/document_tile.dart` -> fila (miniatura + título + estado)
 - `lib/features/documents/widgets/document_status.dart` -> color/etiqueta por estado de caducidad
 - `lib/features/documents/widgets/documents_banner.dart` -> aviso resumen (caducados/por caducar)
+
+### trips (viajes)
+- `lib/features/trips/screens/trips_screen.dart` -> lista de viajes (crear/renombrar/borrar)
+- `lib/features/trips/screens/trip_detail_screen.dart` -> detalle: compañeros (editar/desde buceos) + ver buceos
+- `lib/features/trips/logic/assign_trip_action.dart` -> diálogo asignar selección a viaje (elegir/crear)
 
 ### sites (sitios)
 - `lib/core/widgets/site_map.dart` -> mapa reutilizable (tiles satélite Esri + atribución)

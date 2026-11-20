@@ -13,6 +13,7 @@ class DivesSelectionBar extends StatelessWidget {
   final VoidCallback? onMerge;
   final VoidCallback onAdjustTime;
   final VoidCallback onExport;
+  final VoidCallback onAssignTrip;
   final VoidCallback onDelete;
   final VoidCallback onSelectAll;
   final bool allSelected;
@@ -25,6 +26,7 @@ class DivesSelectionBar extends StatelessWidget {
     required this.onMerge,
     required this.onAdjustTime,
     required this.onExport,
+    required this.onAssignTrip,
     required this.onDelete,
     required this.onSelectAll,
     required this.allSelected,
@@ -52,6 +54,10 @@ class DivesSelectionBar extends StatelessWidget {
           tooltip: t.exportSelection,
           icon: const Icon(Icons.share),
           onPressed: onExport),
+      IconButton(
+          tooltip: t.assignToTrip,
+          icon: const Icon(Icons.luggage),
+          onPressed: onAssignTrip),
       IconButton(
           tooltip: t.delete,
           icon: const Icon(Icons.delete_outline),

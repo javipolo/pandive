@@ -14,3 +14,4 @@ export 'logbook_stats.dart';
 export 'personal_records.dart';
 export 'tag.dart';
 export 'tank_preset.dart';
+export 'trip.dart';

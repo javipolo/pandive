@@ -340,6 +340,24 @@
       "name": {}
     }
   },
+  "trips": "Trips",
+  "newTrip": "New trip",
+  "noTrips": "No trips yet",
+  "assignToTrip": "Assign to trip",
+  "tripAssigned": "Added to trip",
+  "deleteTripConfirm": "Delete trip {name}? (dives are kept)",
+  "buddyCountLabel": "{count} buddies",
+  "tripBuddiesFromDives": "From dives",
+  "@deleteTripConfirm": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@buddyCountLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "diveCountLabel": "{count} dives",
   "@diveCountLabel": {
     "placeholders": {

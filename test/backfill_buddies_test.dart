@@ -76,6 +76,26 @@ void main() {
     expect(site.lon, closeTo(2.654321, 1e-5));
   });
 
+  test('viajes: crear, asignar buceos/compañeros, listar y borrar', () {
+    final dives = db.listDives().take(2).map((d) => d.id).toList();
+    expect(dives.length, 2);
+    final tripId = db.createTrip('ZZZ Trip Test');
+    db.assignDivesToTrip(tripId, dives);
+
+    final trip = db.listTrips().firstWhere((t) => t.id == tripId);
+    expect(trip.diveCount, 2);
+    expect(db.listDivesByTrip(tripId).length, 2);
+
+    final buddyId = db.listBuddies().first.id;
+    db.setTripBuddies(tripId, [buddyId]);
+    expect(db.tripBuddies(tripId).map((b) => b.id), contains(buddyId));
+
+    db.deleteTrip(tripId);
+    expect(db.listTrips().any((t) => t.id == tripId), isFalse);
+    // Los buceos siguen existiendo (solo se desasignan).
+    expect(db.listDives().where((d) => dives.contains(d.id)).length, 2);
+  });
+
   test('mergeBuddies reasigna dives y borra los fusionados', () {
     db.backfillBuddyIds();
     final withDives =

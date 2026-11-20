@@ -59,6 +59,14 @@ void _ensureSyncTable(Database db) {
   try {
     db.execute('ALTER TABLE PandiveDocument ADD COLUMN SortOrd INTEGER');
   } catch (_) {/* ya existe */}
+  // Viajes: agrupan inmersiones (columna propia en Logbook) + compañeros del viaje.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveTrip '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Notes TEXT, Updated TEXT)');
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveTripBuddy '
+      '(TripId INTEGER, BuddyId INTEGER, PRIMARY KEY (TripId, BuddyId))');
+  try {
+    db.execute('ALTER TABLE Logbook ADD COLUMN PandiveTripId INTEGER');
+  } catch (_) {/* ya existe */}
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.
