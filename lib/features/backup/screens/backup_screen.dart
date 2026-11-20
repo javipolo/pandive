@@ -4,6 +4,7 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:pandive/core/services/backup_worker.dart';
 import 'package:pandive/core/services/drive_backup.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/widgets/restore_list.dart';
@@ -49,15 +50,25 @@ class _BackupScreenState extends State<BackupScreen> {
     try {
       if (_svc.connected) {
         await _svc.signOut();
+        await cancelAutoBackup();
       } else {
         await _svc.signIn();
-        // Al conectar, activar el backup diario por defecto.
-        if (_svc.connected) await widget.settings.setAutoBackup(true);
+        // Al conectar, activar el backup automático por defecto.
+        if (_svc.connected) {
+          await widget.settings.setAutoBackup(true);
+          await registerAutoBackup();
+        }
       }
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('$e')));
     }
     if (mounted) setState(() => _busy = false);
+  }
+
+  Future<void> _toggleAutoBackup(bool v) async {
+    await widget.settings.setAutoBackup(v);
+    await (v ? registerAutoBackup() : cancelAutoBackup());
+    if (mounted) setState(() {});
   }
 
   @override
@@ -85,10 +96,9 @@ class _BackupScreenState extends State<BackupScreen> {
           const Divider(),
           SwitchListTile(
             title: Text(t.autoBackupDaily),
+            subtitle: Text(t.autoBackupHint),
             value: widget.settings.autoBackup,
-            onChanged: connected
-                ? (v) => setState(() => widget.settings.setAutoBackup(v))
-                : null,
+            onChanged: connected ? _toggleAutoBackup : null,
           ),
           ListTile(
             leading: const Icon(Icons.backup_outlined),

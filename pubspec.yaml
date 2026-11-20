@@ -71,6 +71,7 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   timezone: ^0.10.0
   flutter_timezone: ^5.1.1
+  workmanager: ^0.10.10
 
 # pdf limita archive <4.1 -> pub coge archive 4.0.9, e image 4.11.0 llama a un
 # método (decodeLazy) que esa archive no tiene. Fijamos image <4.11 (compatible).

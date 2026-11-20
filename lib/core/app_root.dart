@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import 'db/divemate_db.dart';
+import 'services/backup_worker.dart';
 import 'services/drive_backup.dart';
 import 'settings/settings.dart';
 import '../features/home/screens/home_screen.dart';
@@ -81,9 +82,11 @@ class _AppRootState extends State<AppRoot> {
     }
   }
 
-  // Backup diario automático a Drive (silencioso; no hace nada si no procede).
+  // Backup a Drive: copia inmediata al arrancar (silenciosa) y, si el backup
+  // automático está activo, (re)programa la tarea periódica en segundo plano.
   void _maybeBackup() {
     DriveBackupService().backupIfNeeded(widget.settings);
+    if (widget.settings.autoBackup) registerAutoBackup();
   }
 
   @override

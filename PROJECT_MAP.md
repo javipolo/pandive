@@ -18,7 +18,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/l10n/app_en.arb` / `app_es.arb` -> traducciones (plantilla EN + ES); `AppLocalizations` se genera con `flutter gen-l10n`
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
 - `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth, carpeta, hash (parts)
-- `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/list/restore/poda
+- `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/restore/poda
+- `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió
 - `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)
 - `lib/core/storage/documents_storage.dart` -> carpeta documents/ en disco (guardar/borrar/ruta); usado por UI y backup
 - `lib/core/services/doc_notifications.dart` -> notis locales de caducidad (30/7/1/0 días); permiso solo si hay docs con caducidad

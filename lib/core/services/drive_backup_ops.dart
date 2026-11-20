@@ -98,6 +98,21 @@ extension DriveBackupOps on DriveBackupService {
     }
   }
 
+  /// Como [backupNow] pero solo si la DB cambió desde el último backup. Sin gate
+  /// de tiempo (la cadencia la controla WorkManager). Auth silenciosa. Devuelve
+  /// true si subió algo.
+  Future<bool> backupIfChanged(Settings s) async {
+    if (!await signInSilently()) return false;
+    final hash = await dbHash(s.dbPath);
+    if (hash == null) return false;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (hash == s.backupLastHash) {
+      await s.setBackupState(hash, now); // sin cambios: solo refresca la fecha
+      return false;
+    }
+    return backupNow(s, interactive: false);
+  }
+
   /// Backup automático diario: solo si hay cuenta, pasaron >24 h y la DB cambió.
   Future<void> backupIfNeeded(Settings s) async {
     if (!s.autoBackup) return;
