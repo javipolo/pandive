@@ -30,6 +30,8 @@
   "purgeOrphanTanksConfirm": "¿Eliminar todas las botellas no asociadas a ningún buceo?",
   "purgeOrphanTanksResult": "{count} botellas huérfanas eliminadas",
   "sortByDives": "Ordenar por buceos",
+  "searchPlace": "Buscar lugar",
+  "searchNoResults": "Sin resultados",
   "mapTitle": "Mapa",
   "pickLocation": "Elegir ubicación",
   "location": "Ubicación",

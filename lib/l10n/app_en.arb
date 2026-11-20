@@ -50,6 +50,8 @@
     }
   },
   "sortByDives": "Sort by dives",
+  "searchPlace": "Search place",
+  "searchNoResults": "No results",
   "mapTitle": "Map",
   "pickLocation": "Pick location",
   "location": "Location",

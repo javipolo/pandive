@@ -30,6 +30,8 @@
   "purgeOrphanTanksConfirm": "Eliminar totes les ampolles sense cap immersió?",
   "purgeOrphanTanksResult": "{count} ampolles òrfenes eliminades",
   "sortByDives": "Ordena per immersions",
+  "searchPlace": "Cerca lloc",
+  "searchNoResults": "Sense resultats",
   "mapTitle": "Mapa",
   "pickLocation": "Tria ubicació",
   "location": "Ubicació",

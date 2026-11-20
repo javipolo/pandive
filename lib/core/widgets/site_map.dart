@@ -9,6 +9,9 @@ import 'package:latlong2/latlong.dart';
 
 const _esriUrl =
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+// Capa de referencia (transparente): nombres de países, regiones y poblaciones.
+const _esriLabels =
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
 
 class SiteMap extends StatelessWidget {
   final LatLng center;
@@ -49,6 +52,12 @@ class SiteMap extends StatelessWidget {
           urlTemplate: _esriUrl,
           userAgentPackageName: 'org.drslump.pandive',
           maxNativeZoom: 19,
+        ),
+        TileLayer(
+          urlTemplate: _esriLabels,
+          userAgentPackageName: 'org.drslump.pandive',
+          maxNativeZoom: 19,
+          tileDisplay: const TileDisplay.fadeIn(),
         ),
         if (markers.isNotEmpty) MarkerLayer(markers: markers),
         const RichAttributionWidget(

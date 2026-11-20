@@ -1,10 +1,13 @@
-/// Selector de ubicación en un mapa de satélite: tocar para colocar el marcador,
-/// botón "mi ubicación" (GPS). Devuelve el LatLng elegido al confirmar.
+/// Selector de ubicación: mueve el mapa (mira fija en el centro) y guarda el
+/// centro. Botón "mi ubicación" (GPS) y buscador por nombre (geocoding Nominatim).
 library;
+
+import 'dart:convert';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import 'package:pandive/core/widgets/site_map.dart';
@@ -25,7 +28,13 @@ class MapPickerScreen extends StatefulWidget {
 
 class _MapPickerScreenState extends State<MapPickerScreen> {
   final _ctrl = MapController();
-  late LatLng? _picked = widget.initial;
+  final _search = TextEditingController();
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   Future<void> _myLocation() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -41,26 +50,45 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
         throw 'denied';
       }
       final pos = await Geolocator.getCurrentPosition();
-      final here = LatLng(pos.latitude, pos.longitude);
-      setState(() => _picked = here);
-      _ctrl.move(here, 15);
+      _ctrl.move(LatLng(pos.latitude, pos.longitude), 15);
     } catch (_) {
       messenger.showSnackBar(SnackBar(content: Text(t.locationDenied)));
+    }
+  }
+
+  Future<void> _doSearch() async {
+    final q = _search.text.trim();
+    if (q.isEmpty) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final t = AppLocalizations.of(context);
+    final focus = FocusScope.of(context);
+    try {
+      final uri = Uri.parse('https://nominatim.openstreetmap.org/search'
+          '?format=json&limit=1&q=${Uri.encodeQueryComponent(q)}');
+      final res = await http
+          .get(uri, headers: {'User-Agent': 'Pandive/1.0 (dive logbook)'});
+      final list = res.statusCode == 200
+          ? jsonDecode(res.body) as List
+          : const [];
+      if (list.isEmpty) throw 'none';
+      final m = list.first as Map<String, dynamic>;
+      _ctrl.move(
+          LatLng(double.parse(m['lat']), double.parse(m['lon'])), 13);
+      focus.unfocus();
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(t.searchNoResults)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final center = _picked ?? const LatLng(20, 0);
     return Scaffold(
       appBar: AppBar(
         title: Text(t.pickLocation),
         actions: [
           TextButton.icon(
-            onPressed: _picked == null
-                ? null
-                : () => Navigator.of(context).pop(_picked),
+            onPressed: () => Navigator.of(context).pop(_ctrl.camera.center),
             icon: const Icon(Icons.check),
             label: Text(t.save),
           ),
@@ -70,20 +98,33 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
         onPressed: _myLocation,
         child: const Icon(Icons.my_location),
       ),
-      body: SiteMap(
-        controller: _ctrl,
-        center: center,
-        zoom: _picked == null ? 2 : 13,
-        onTap: (p) => setState(() => _picked = p),
-        markers: [
-          if (_picked != null)
-            Marker(
-              point: _picked!,
-              width: 40,
-              height: 40,
-              alignment: Alignment.topCenter,
-              child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+      body: Stack(
+        children: [
+          SiteMap(
+            controller: _ctrl,
+            center: widget.initial ?? const LatLng(20, 0),
+            zoom: widget.initial == null ? 2 : 13,
+          ),
+          // Mira fija: el pin apunta siempre al centro del mapa.
+          const IgnorePointer(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 40),
+                child: Icon(Icons.location_on, color: Colors.red, size: 44),
+              ),
             ),
+          ),
+          Positioned(
+            top: 8,
+            left: 8,
+            right: 8,
+            child: SearchBar(
+              controller: _search,
+              hintText: t.searchPlace,
+              leading: const Icon(Icons.search),
+              onSubmitted: (_) => _doSearch(),
+            ),
+          ),
         ],
       ),
     );

@@ -30,6 +30,8 @@
   "purgeOrphanTanksConfirm": "Murgilketarik gabeko botila guztiak ezabatu?",
   "purgeOrphanTanksResult": "{count} botila zurtz ezabatu dira",
   "sortByDives": "Ordenatu murgilketen arabera",
+  "searchPlace": "Bilatu lekua",
+  "searchNoResults": "Emaitzarik ez",
   "mapTitle": "Mapa",
   "pickLocation": "Aukeratu kokapena",
   "location": "Kokapena",
