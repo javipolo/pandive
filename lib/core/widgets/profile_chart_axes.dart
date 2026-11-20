@@ -5,7 +5,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/models/models.dart';
-import 'package:pandive/l10n/app_localizations.dart';
 
 double niceStep(double range, int target) {
   if (range <= 0) return 1;
@@ -16,15 +15,14 @@ double niceStep(double range, int target) {
   return 100;
 }
 
-AxisTitles depthAxis(BuildContext c, AppLocalizations t, double step) => AxisTitles(
-      axisNameSize: 22,
-      axisNameWidget: Text(t.axisDepth),
+// Etiquetas con sufijo de unidad (sin título de eje): "-5m", "15°C", "15min".
+AxisTitles depthAxis(BuildContext c, double step) => AxisTitles(
       sideTitles: SideTitles(
         showTitles: true,
         interval: step,
-        reservedSize: 40,
+        reservedSize: 44,
         getTitlesWidget: (v, m) =>
-            Text((-v).round().toString(), style: Theme.of(c).textTheme.bodySmall),
+            Text('${v.round()}m', style: Theme.of(c).textTheme.bodySmall),
       ),
     );
 
@@ -32,29 +30,25 @@ AxisTitles tempAxis(double minY, double tLo, double tHi) {
   final span = tHi - tLo;
   final tempStep = (span / 5).ceil().clamp(1, 1000);
   return AxisTitles(
-    axisNameSize: 22,
-    axisNameWidget: const Text('°C'),
     sideTitles: SideTitles(
       showTitles: true,
       interval: (-minY) * tempStep / span,
-      reservedSize: 40,
+      reservedSize: 44,
       getTitlesWidget: (v, m) => Text(
-        (tLo + (v - minY) / (-minY) * span).round().toString(),
+        '${(tLo + (v - minY) / (-minY) * span).round()}°C',
         style: const TextStyle(color: Colors.red, fontSize: 11),
       ),
     ),
   );
 }
 
-AxisTitles timeAxis(BuildContext c, AppLocalizations t, double maxTime) => AxisTitles(
-      axisNameSize: 24,
-      axisNameWidget: Text(t.axisTime),
+AxisTitles timeAxis(BuildContext c, double maxTime) => AxisTitles(
       sideTitles: SideTitles(
         showTitles: true,
         interval: niceStep(maxTime, 6),
         reservedSize: 28,
         getTitlesWidget: (v, m) =>
-            Text(v.round().toString(), style: Theme.of(c).textTheme.bodySmall),
+            Text('${v.round()}min', style: Theme.of(c).textTheme.bodySmall),
       ),
     );
 

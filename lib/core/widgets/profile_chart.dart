@@ -104,11 +104,11 @@ class _ProfileChartState extends State<ProfileChart> {
       ),
       titlesData: FlTitlesData(
         topTitles: _hidden,
-        leftTitles: widget.compact ? _hidden : depthAxis(context, t, depthStep),
+        leftTitles: widget.compact ? _hidden : depthAxis(context, depthStep),
         rightTitles: (hasTemp && !widget.compact)
             ? tempAxis(minY, tLo, tHi)
             : _hidden,
-        bottomTitles: widget.compact ? _hidden : timeAxis(context, t, maxTime),
+        bottomTitles: widget.compact ? _hidden : timeAxis(context, maxTime),
       ),
       borderData:
           FlBorderData(show: true, border: Border.all(color: cs.outlineVariant)),
