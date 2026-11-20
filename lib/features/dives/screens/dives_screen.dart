@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/dives/logic/dive_search.dart';
 import 'package:pandive/features/dives/widgets/add_dive_sheet.dart';
 import 'package:pandive/features/dives/widgets/dives_action_list.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -28,7 +29,7 @@ class DivesTab extends StatefulWidget {
 }
 
 class _DivesTabState extends State<DivesTab> {
-  late List<Dive> _dives = widget.db.listDives(search: widget.query);
+  late List<Dive> _dives = filterDives(widget.db.listDives(), widget.query);
   late Set<int> _cave = widget.db.diveIdsWithTag('cave');
   bool _selecting = false;
 
@@ -39,7 +40,7 @@ class _DivesTabState extends State<DivesTab> {
   }
 
   void _reload() => setState(() {
-        _dives = widget.db.listDives(search: widget.query);
+        _dives = filterDives(widget.db.listDives(), widget.query);
         _cave = widget.db.diveIdsWithTag('cave');
       });
 

@@ -171,6 +171,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/documents/widgets/document_status.dart` -> color/etiqueta por estado de caducidad
 - `lib/features/documents/widgets/documents_banner.dart` -> aviso resumen (caducados/por caducar)
 
+- `lib/features/dives/logic/dive_search.dart` -> filtro de búsqueda de buceos sin acentos (foldContains)
+
 ### trips (viajes)
 - `lib/features/trips/screens/trips_screen.dart` -> lista de viajes (crear/renombrar/borrar)
 - `lib/features/trips/screens/trip_detail_screen.dart` -> detalle: compañeros (editar/desde buceos) + ver buceos

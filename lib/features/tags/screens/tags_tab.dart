@@ -5,6 +5,7 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/text/collate.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
@@ -81,10 +82,10 @@ class _TagsTabState extends State<TagsTab> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final q = widget.query.trim().toLowerCase();
+    final q = widget.query.trim();
     final shown = q.isEmpty
         ? _tags
-        : _tags.where((e) => e.name.toLowerCase().contains(q)).toList();
+        : _tags.where((e) => foldContains(e.name, q)).toList();
     return Scaffold(
       floatingActionButton: _select
           ? null

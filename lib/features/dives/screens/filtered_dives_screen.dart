@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/features/dives/logic/dive_search.dart';
 import 'package:pandive/features/dives/widgets/dives_action_list.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -48,17 +49,7 @@ class _FilteredDivesScreenState extends State<FilteredDivesScreen> {
         _cave = widget.db.diveIdsWithTag('cave');
       });
 
-  bool _match(Dive d, String q) {
-    for (final s in [d.place, d.country, d.comments, d.buddy, d.diveType]) {
-      if (s != null && s.toLowerCase().contains(q)) return true;
-    }
-    return d.number?.toString() == q;
-  }
-
-  List<Dive> get _shown {
-    final q = _query.trim().toLowerCase();
-    return q.isEmpty ? _base : _base.where((d) => _match(d, q)).toList();
-  }
+  List<Dive> get _shown => filterDives(_base, _query);
 
   void _exitSearch() {
     _ctrl.clear();

@@ -54,13 +54,12 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     }
   }
   List<DiveSite> _filtered() {
-    final q = (widget.externalQuery ?? _q).trim().toLowerCase();
+    final q = (widget.externalQuery ?? _q).trim();
     if (q.isEmpty) return widget.sites;
     return [
       for (final s in widget.sites)
-        if (('${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}')
-            .toLowerCase()
-            .contains(q))
+        if (foldContains(
+            '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}', q))
           s
     ];
   }

@@ -17,3 +17,8 @@ String foldAccents(String s) {
 
 int compareFold(String a, String b) =>
     foldAccents(a).toLowerCase().compareTo(foldAccents(b).toLowerCase());
+
+/// ¿[haystack] contiene [needle] ignorando acentos y mayúsculas?
+/// ("tomas" encuentra "Tomás"). [needle] se asume ya recortado por el llamador.
+bool foldContains(String haystack, String needle) =>
+    foldAccents(haystack).toLowerCase().contains(foldAccents(needle).toLowerCase());

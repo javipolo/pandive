@@ -4,6 +4,8 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/text/collate.dart';
+import 'package:pandive/features/dives/logic/dive_search.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SearchResultsBar extends StatelessWidget implements PreferredSizeWidget {
@@ -19,21 +21,19 @@ class SearchResultsBar extends StatelessWidget implements PreferredSizeWidget {
   int _count() {
     final q = query.trim();
     if (q.isEmpty) return 0;
-    final ql = q.toLowerCase();
     switch (index) {
       case 0:
-        return db.listDives(search: q).length;
+        return filterDives(db.listDives(), q).length;
       case 1:
         return db
             .listSites()
-            .where((s) => '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}'
-                .toLowerCase()
-                .contains(ql))
+            .where((s) => foldContains(
+                '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}', q))
             .length;
       case 2:
-        return db.listBuddies().where((b) => b.name.toLowerCase().contains(ql)).length;
+        return db.listBuddies().where((b) => foldContains(b.name, q)).length;
       case 3:
-        return db.listTags().where((e) => e.name.toLowerCase().contains(ql)).length;
+        return db.listTags().where((e) => foldContains(e.name, q)).length;
       default:
         return 0;
     }

@@ -5,6 +5,7 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/text/collate.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
@@ -88,10 +89,10 @@ class _BuddiesTabState extends State<BuddiesTab> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final q = widget.query.trim().toLowerCase();
+    final q = widget.query.trim();
     final shown = q.isEmpty
         ? [..._buddies]
-        : _buddies.where((b) => b.name.toLowerCase().contains(q)).toList();
+        : _buddies.where((b) => foldContains(b.name, q)).toList();
     sortBuddies(shown, widget.sortByDives);
     return Scaffold(
       floatingActionButton: _select
