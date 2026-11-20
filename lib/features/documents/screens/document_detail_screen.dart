@@ -50,17 +50,26 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
   }
 
   void _openZoom() => Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => Scaffold(
+        builder: (ctx) => Scaffold(
           backgroundColor: Colors.black,
-          appBar: AppBar(
-              backgroundColor: Colors.black, foregroundColor: Colors.white),
-          body: Center(
-            child: InteractiveViewer(
-              minScale: 1,
-              maxScale: 6,
-              child: Image.file(File(widget.imagePath), fit: BoxFit.contain),
+          body: Stack(children: [
+            Positioned.fill(
+              child: InteractiveViewer(
+                minScale: 1,
+                maxScale: 8,
+                child: Image.file(File(widget.imagePath), fit: BoxFit.contain),
+              ),
             ),
-          ),
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+              ),
+            ),
+          ]),
         ),
       ));
 
