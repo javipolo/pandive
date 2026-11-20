@@ -25,12 +25,14 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
   late final _country = TextEditingController(text: widget.site?.country ?? '');
   late final _water = TextEditingController(text: widget.site?.waterName ?? '');
   late final _region = TextEditingController(text: widget.site?.region ?? '');
-  late double? _lat = widget.site?.lat;
-  late double? _lon = widget.site?.lon;
+  late final _lat =
+      TextEditingController(text: widget.site?.lat?.toString() ?? '');
+  late final _lon =
+      TextEditingController(text: widget.site?.lon?.toString() ?? '');
 
   @override
   void dispose() {
-    for (final c in [_name, _country, _water, _region]) {
+    for (final c in [_name, _country, _water, _region, _lat, _lon]) {
       c.dispose();
     }
     super.dispose();
@@ -45,8 +47,8 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
       'Country': _s(_country),
       'WaterName': _s(_water),
       'Region': _s(_region),
-      'Lat': _lat?.toStringAsFixed(6),
-      'Lon': _lon?.toStringAsFixed(6),
+      'Lat': double.tryParse(_lat.text.trim())?.toStringAsFixed(6),
+      'Lon': double.tryParse(_lon.text.trim())?.toStringAsFixed(6),
     };
     if (widget.site == null) {
       widget.db.createSite(map);
@@ -78,15 +80,27 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
           LabeledField(controller: _country, label: t.fieldCountry),
           LabeledField(controller: _water, label: t.fieldStretchOfWater),
           LabeledField(controller: _region, label: t.fieldRegion),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.place_outlined),
-            title: Text(t.location),
-            subtitle: Text(_lat == null || _lon == null
-                ? t.noLocation
-                : '${_lat!.toStringAsFixed(5)}, ${_lon!.toStringAsFixed(5)}'),
-            trailing: const Icon(Icons.map_outlined),
-            onTap: _pickLocation,
+          Row(
+            children: [
+              Expanded(
+                  child: LabeledField(
+                      controller: _lat,
+                      label: t.latitude,
+                      number: true,
+                      signed: true)),
+              const SizedBox(width: 12),
+              Expanded(
+                  child: LabeledField(
+                      controller: _lon,
+                      label: t.longitude,
+                      number: true,
+                      signed: true)),
+            ],
+          ),
+          OutlinedButton.icon(
+            onPressed: _pickLocation,
+            icon: const Icon(Icons.map_outlined),
+            label: Text(t.pickOnMap),
           ),
         ],
       ),
@@ -94,14 +108,13 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
   }
 
   Future<void> _pickLocation() async {
-    final initial =
-        (_lat != null && _lon != null) ? LatLng(_lat!, _lon!) : null;
+    final lat = double.tryParse(_lat.text.trim());
+    final lon = double.tryParse(_lon.text.trim());
+    final initial = (lat != null && lon != null) ? LatLng(lat, lon) : null;
     final picked = await pickLocation(context, initial);
     if (picked != null) {
-      setState(() {
-        _lat = picked.latitude;
-        _lon = picked.longitude;
-      });
+      _lat.text = picked.latitude.toStringAsFixed(6);
+      _lon.text = picked.longitude.toStringAsFixed(6);
     }
   }
 }

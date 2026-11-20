@@ -3,10 +3,13 @@
 library;
 
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
+import 'package:pandive/core/widgets/site_map.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
 import 'package:pandive/features/sites/screens/site_edit_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -98,6 +101,37 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
         sectionLine(),
         twoCol(LabeledValue(t.fieldStretchOfWater, s.waterName),
             LabeledValue(t.fieldRegion, s.region)),
+        sectionLine(),
+        twoCol(
+            LabeledValue(
+                t.location,
+                s.hasCoords
+                    ? '${s.lat!.toStringAsFixed(5)}, ${s.lon!.toStringAsFixed(5)}'
+                    : t.noLocation),
+            null),
+        if (s.hasCoords) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 200,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SiteMap(
+                center: LatLng(s.lat!, s.lon!),
+                zoom: 12,
+                markers: [
+                  Marker(
+                    point: LatLng(s.lat!, s.lon!),
+                    width: 40,
+                    height: 40,
+                    alignment: Alignment.topCenter,
+                    child: const Icon(Icons.location_on,
+                        color: Colors.red, size: 40),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

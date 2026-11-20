@@ -10,6 +10,7 @@ class LabeledField extends StatelessWidget {
   final int maxLines;
   final bool number;
   final bool integer; // solo dígitos (sin decimales)
+  final bool signed; // permite negativos (p.ej. coordenadas)
 
   const LabeledField({
     super.key,
@@ -18,6 +19,7 @@ class LabeledField extends StatelessWidget {
     this.maxLines = 1,
     this.number = false,
     this.integer = false,
+    this.signed = false,
   });
 
   @override
@@ -30,7 +32,7 @@ class LabeledField extends StatelessWidget {
         keyboardType: integer
             ? TextInputType.number
             : number
-                ? const TextInputType.numberWithOptions(decimal: true)
+                ? TextInputType.numberWithOptions(decimal: true, signed: signed)
                 : TextInputType.text,
         inputFormatters:
             integer ? [FilteringTextInputFormatter.digitsOnly] : null,
