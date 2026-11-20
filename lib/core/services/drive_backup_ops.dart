@@ -47,6 +47,7 @@ extension DriveBackupOps on DriveBackupService {
   }
 
   /// Sube la DB como latest + copia con timestamp y poda a 10. Guarda estado.
+  /// También sube las imágenes de documentos como un zip (solo "latest").
   Future<bool> backupNow(Settings s, {bool interactive = true}) async {
     final path = s.dbPath;
     if (path == null) return false;
@@ -57,9 +58,44 @@ extension DriveBackupOps on DriveBackupService {
     await _upload(api, folder, latestBackupName, bytes, replace: true);
     await _upload(api, folder, backupFileName(DateTime.now()), bytes);
     await _prune(api, folder);
+    await _backupDocuments(api, folder);
     await s.setBackupState(
         sha256.convert(bytes).toString(), DateTime.now().millisecondsSinceEpoch);
     return true;
+  }
+
+  /// Comprime las imágenes de `documents/` y las sube como [documentsBackupName]
+  /// (reemplazando). Si no hay imágenes, no hace nada.
+  Future<void> _backupDocuments(drive.DriveApi api, String folder) async {
+    final dir = await documentsDir();
+    final archive = Archive();
+    await for (final e in dir.list()) {
+      if (e is! File) continue;
+      final data = await e.readAsBytes();
+      archive.addFile(
+          ArchiveFile(e.uri.pathSegments.last, data.length, data));
+    }
+    if (archive.isEmpty) return;
+    final zip = ZipEncoder().encode(archive);
+    await _upload(api, folder, documentsBackupName, zip, replace: true);
+  }
+
+  /// Descarga y descomprime [documentsBackupName] en `documents/` (si existe).
+  Future<void> _restoreDocuments(drive.DriveApi api, String folder) async {
+    final existing = await _findInFolder(api, folder, documentsBackupName);
+    if (existing == null) return;
+    final media = await api.files.get(existing.id!,
+        downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
+    final bytes = <int>[];
+    await for (final chunk in media.stream) {
+      bytes.addAll(chunk);
+    }
+    final dir = await documentsDir();
+    for (final file in ZipDecoder().decodeBytes(bytes)) {
+      if (!file.isFile) continue;
+      await File('${dir.path}/${file.name}')
+          .writeAsBytes(file.content as List<int>, flush: true);
+    }
   }
 
   /// Backup automático diario: solo si hay cuenta, pasaron >24 h y la DB cambió.
@@ -117,6 +153,7 @@ extension DriveBackupOps on DriveBackupService {
       bytes.addAll(chunk);
     }
     await File(path).writeAsBytes(bytes, flush: true);
+    await _restoreDocuments(api, await _ensureFolder(api));
     return true;
   }
 }

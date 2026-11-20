@@ -19,7 +19,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
 - `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth, carpeta, hash (parts)
 - `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/list/restore/poda
-- `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10
+- `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)
+- `lib/core/storage/documents_storage.dart` -> carpeta documents/ en disco (guardar/borrar/ruta); usado por UI y backup
 
 ### Core · base de datos (una librería con `part`s)
 - `lib/core/db/divemate_db.dart` -> abre .ddb, owner, helpers; declara los parts
@@ -153,7 +154,6 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/documents/screens/document_detail_screen.dart` -> ver imagen grande, editar, borrar, compartir (PDF)
 - `lib/features/documents/screens/document_edit_screen.dart` -> alta/edición de metadatos (título/notas/caducidad)
 - `lib/features/documents/screens/crop_screen.dart` -> recorte propio (crop_your_image): rotar 90°, rectángulo libre, confirmar
-- `lib/features/documents/logic/document_store.dart` -> carpeta documents/ en disco (guardar/borrar/ruta)
 - `lib/features/documents/logic/document_import.dart` -> elegir origen (cámara/galería/PDF), render PDF, recorte, guardar
 - `lib/features/documents/logic/document_export.dart` -> genera un PDF con los seleccionados y lo comparte
 - `lib/features/documents/widgets/document_tile.dart` -> fila (miniatura + título + estado)

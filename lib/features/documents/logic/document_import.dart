@@ -11,7 +11,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pdfx/pdfx.dart';
 
-import 'package:pandive/features/documents/logic/document_store.dart';
+import 'package:pandive/core/storage/documents_storage.dart';
 import 'package:pandive/features/documents/screens/crop_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 

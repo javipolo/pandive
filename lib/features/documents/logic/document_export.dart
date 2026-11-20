@@ -9,7 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/models/models.dart';
-import 'package:pandive/features/documents/logic/document_store.dart';
+import 'package:pandive/core/storage/documents_storage.dart';
 
 Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
   if (docs.isEmpty) return;

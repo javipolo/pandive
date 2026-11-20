@@ -1,5 +1,6 @@
 /// Almacenamiento en disco de las imágenes de documentos (carpeta `documents/`
 /// dentro del directorio de la app). La DB solo guarda el nombre de fichero.
+/// Vive en `core/` porque lo usan tanto la UI como el backup de Drive.
 library;
 
 import 'dart:io';

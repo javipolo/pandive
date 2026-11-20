@@ -2,6 +2,7 @@
 library;
 
 const latestBackupName = 'latest.ddb';
+const documentsBackupName = 'documents-latest.zip';
 
 String _p2(int v) => v.toString().padLeft(2, '0');
 

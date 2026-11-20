@@ -9,7 +9,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/documents/logic/document_export.dart';
 import 'package:pandive/features/documents/logic/document_import.dart';
-import 'package:pandive/features/documents/logic/document_store.dart';
+import 'package:pandive/core/storage/documents_storage.dart';
 import 'package:pandive/features/documents/screens/document_detail_screen.dart';
 import 'package:pandive/features/documents/screens/document_edit_screen.dart';
 import 'package:pandive/features/documents/widgets/document_tile.dart';
