@@ -14,6 +14,10 @@
     <!-- Notificaciones de caducidad de documentos -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Entrega puntual de avisos de caducidad (alarma exacta). USE_EXACT_ALARM
+         se auto-concede; SCHEDULE_EXACT_ALARM cubre versiones previas. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:label="PanDive"

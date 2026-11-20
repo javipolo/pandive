@@ -43,6 +43,7 @@ Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
       AndroidFlutterLocalNotificationsPlugin>();
   final granted = await android?.requestNotificationsPermission() ?? false;
   if (!granted) return;
+  await android?.requestExactAlarmsPermission();
 
   final details = NotificationDetails(
     android: AndroidNotificationDetails('doc_expiry', t.docNotifTitle,
@@ -62,7 +63,7 @@ Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
         t.docNotifBody(_offsets[k], d.title),
         when,
         details,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
