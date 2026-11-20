@@ -304,5 +304,7 @@
   "cropRotate": "Rotar",
   "cropFailed": "No se pudo recortar la imagen",
   "cropRotateLeft": "Rotar a la izquierda",
-  "cropReset": "Restablecer"
+  "cropReset": "Restablecer",
+  "docNotifTitle": "Caducidad de documento",
+  "docNotifBody": "{days, plural, =0{{title} caduca hoy} =1{{title} caduca mañana} other{{title} caduca en {days} días}}"
 }

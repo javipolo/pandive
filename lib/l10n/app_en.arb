@@ -482,5 +482,17 @@
   "cropRotate": "Rotate",
   "cropFailed": "Could not crop the image",
   "cropRotateLeft": "Rotate left",
-  "cropReset": "Reset"
+  "cropReset": "Reset",
+  "docNotifTitle": "Document expiry",
+  "docNotifBody": "{days, plural, =0{{title} expires today} =1{{title} expires tomorrow} other{{title} expires in {days} days}}",
+  "@docNotifBody": {
+    "placeholders": {
+      "days": {
+        "type": "num"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  }
 }

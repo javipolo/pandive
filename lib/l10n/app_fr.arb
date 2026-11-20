@@ -304,5 +304,7 @@
   "cropRotate": "Pivoter",
   "cropFailed": "Impossible de recadrer l'image",
   "cropRotateLeft": "Pivoter à gauche",
-  "cropReset": "Réinitialiser"
+  "cropReset": "Réinitialiser",
+  "docNotifTitle": "Expiration de document",
+  "docNotifBody": "{days, plural, =0{{title} expire aujourd'hui} =1{{title} expire demain} other{{title} expire dans {days} jours}}"
 }

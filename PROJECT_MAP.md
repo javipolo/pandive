@@ -21,6 +21,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/list/restore/poda
 - `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)
 - `lib/core/storage/documents_storage.dart` -> carpeta documents/ en disco (guardar/borrar/ruta); usado por UI y backup
+- `lib/core/services/doc_notifications.dart` -> notis locales de caducidad (30/7/1/0 días); permiso solo si hay docs con caducidad
 
 ### Core · base de datos (una librería con `part`s)
 - `lib/core/db/divemate_db.dart` -> abre .ddb, owner, helpers; declara los parts

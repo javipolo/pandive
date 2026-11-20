@@ -304,5 +304,7 @@
   "cropRotate": "Gira",
   "cropFailed": "No s'ha pogut retallar la imatge",
   "cropRotateLeft": "Gira a l'esquerra",
-  "cropReset": "Restableix"
+  "cropReset": "Restableix",
+  "docNotifTitle": "Caducitat de document",
+  "docNotifBody": "{days, plural, =0{{title} caduca avui} =1{{title} caduca demà} other{{title} caduca d'aquí a {days} dies}}"
 }

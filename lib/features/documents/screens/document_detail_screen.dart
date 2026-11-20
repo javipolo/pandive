@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/services/doc_notifications.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/documents/logic/document_export.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
@@ -46,6 +47,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
     }
     widget.db.deleteDocument(_doc.id);
     await deleteDocFile(_doc.fileName);
+    syncDocNotifications(widget.db, t); // reprograma avisos
     if (mounted) Navigator.of(context).pop(true);
   }
 

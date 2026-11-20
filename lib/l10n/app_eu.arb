@@ -304,5 +304,7 @@
   "cropRotate": "Biratu",
   "cropFailed": "Ezin izan da irudia moztu",
   "cropRotateLeft": "Biratu ezkerrera",
-  "cropReset": "Berrezarri"
+  "cropReset": "Berrezarri",
+  "docNotifTitle": "Dokumentuaren iraungitzea",
+  "docNotifBody": "{days, plural, =0{{title} gaur iraungitzen da} =1{{title} bihar iraungitzen da} other{{title} {days} egun barru iraungitzen da}}"
 }

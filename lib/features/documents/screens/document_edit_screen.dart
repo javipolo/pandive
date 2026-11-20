@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/services/doc_notifications.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/save_action.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -68,6 +69,7 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
           expires: _expires,
           expiryDate: expiry);
     }
+    syncDocNotifications(widget.db, t); // reprograma avisos de caducidad
     Navigator.of(context).pop(true);
   }
 

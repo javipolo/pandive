@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/services/doc_notifications.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/documents/logic/document_export.dart';
 import 'package:pandive/features/documents/logic/document_import.dart';
@@ -97,6 +98,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     }
     _exitSel();
     _reload();
+    if (mounted) syncDocNotifications(widget.db, AppLocalizations.of(context));
   }
 
   Widget _tile(DiveDoc d, {int? index}) {

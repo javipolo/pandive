@@ -4,6 +4,7 @@ library;
 import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/services/doc_notifications.dart';
 import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/settings/screens/preview_ddb_screen.dart';
@@ -50,6 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     _openSub = OpenedFile.events().listen((p) {
       if (mounted) _onOpened(p);
+    });
+    // Reprograma las notificaciones de caducidad (solo pide permiso si procede).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) syncDocNotifications(widget.db, AppLocalizations.of(context));
     });
   }
   void _onOpened(String path) => Navigator.of(context).push(MaterialPageRoute(
