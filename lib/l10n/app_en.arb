@@ -206,6 +206,17 @@
   "o2pct": "O₂ %",
   "searchSites": "Search site, country, region…",
   "site": "Site",
+  "recordsTitle": "Personal records",
+  "recordDeepest": "Deepest",
+  "recordLongest": "Longest",
+  "recordColdest": "Coldest",
+  "recordsMilestone": "Next milestone: {target} dives ({n} to go)",
+  "@recordsMilestone": {
+    "placeholders": {
+      "target": {},
+      "n": {}
+    }
+  },
   "statsDives": "Dives",
   "statsTotalTime": "Total time",
   "statsAvgDive": "Avg dive",

@@ -11,5 +11,6 @@ export 'dive_type.dart';
 export 'document.dart';
 export 'downloaded_dive.dart';
 export 'logbook_stats.dart';
+export 'personal_records.dart';
 export 'tag.dart';
 export 'tank_preset.dart';

@@ -145,4 +145,28 @@ extension DivemateDbStats on DivemateDb {
       divesPerYear: perYear,
     );
   }
+
+  /// Récords personales del owner: el buceo más profundo, más largo y más frío.
+  PersonalRecords personalRecords() {
+    final owner = ownerId;
+    final f = owner != null ? 'AND DiverID = $owner' : '';
+    DiveRecord? top(String col, String order, String extra) {
+      final rows = _db.select(
+        "SELECT ID, $col v, Divedate, Entrytime, Place FROM Logbook "
+        "WHERE (Status IS NULL OR Status != 2) $f AND $extra "
+        "ORDER BY $order LIMIT 1");
+      if (rows.isEmpty) return null;
+      final r = rows.first;
+      final v = _num(r['v']);
+      if (v == null) return null;
+      return DiveRecord(r['ID'] as int, v,
+          _parseDate(_str(r['Divedate']), _str(r['Entrytime'])), _str(r['Place']));
+    }
+
+    return PersonalRecords(
+      deepest: top('Depth', 'Depth DESC', 'Depth > 0'),
+      longest: top('Divetime', 'Divetime DESC', 'Divetime > 0'),
+      coldest: top('Watertemp', 'Watertemp ASC', 'Watertemp > -50 AND Watertemp < 60'),
+    );
+  }
 }

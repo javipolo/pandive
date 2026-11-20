@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
+import 'package:pandive/features/stats/widgets/records_card.dart';
 import 'package:pandive/features/stats/widgets/stats_buckets.dart';
 import 'package:pandive/features/stats/widgets/year_bars.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -14,7 +15,14 @@ import 'package:pandive/l10n/app_localizations.dart';
 class StatsView extends StatefulWidget {
   final LogbookStats stats;
   final List<DateTime> dates;
-  const StatsView({super.key, required this.stats, required this.dates});
+  final PersonalRecords? records; // solo global: tarjeta de récords (tocable)
+  final void Function(int diveId)? onOpenRecord;
+  const StatsView(
+      {super.key,
+      required this.stats,
+      required this.dates,
+      this.records,
+      this.onOpenRecord});
 
   @override
   State<StatsView> createState() => _StatsViewState();
@@ -55,9 +63,24 @@ class _StatsViewState extends State<StatsView> {
     final s = widget.stats;
     LabeledValue date(String label, DateTime? d) =>
         LabeledValue(label, d == null ? null : fullFmt.format(d));
+    final records = widget.records;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        if (records != null &&
+            !records.isEmpty &&
+            widget.onOpenRecord != null) ...[
+          Text(t.recordsTitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold)),
+          RecordsCard(
+              records: records,
+              totalDives: s.totalDives,
+              onOpen: widget.onOpenRecord!),
+          sectionLine(),
+        ],
         twoCol(
           LabeledValue(t.statsDives, '${s.totalDives}'),
           s.buddiesCount == null

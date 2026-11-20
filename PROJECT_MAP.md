@@ -28,7 +28,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/divemate_db.dart` -> abre .ddb, owner, helpers; declara los parts
 - `lib/core/db/db_queries.dart` -> lecturas: listar/obtener inmersiones, botellas, nº siguiente
 - `lib/core/db/db_profile.dart` -> decode del perfil (profundidad/temperatura)
-- `lib/core/db/db_stats.dart` -> sitios de buceo y estadísticas agregadas
+- `lib/core/db/db_stats.dart` -> sitios de buceo y estadísticas agregadas + personalRecords (récords)
 - `lib/core/db/db_writes.dart` -> escritura: editar y crear inmersiones
 - `lib/core/db/db_import.dart` -> importar inmersiones descargadas (dedupe, Profile4 deco, gas)
 - `lib/core/db/db_encode.dart` -> encode de perfiles al formato DiveMate (Profile/Profile2/Profile4)
@@ -64,6 +64,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/models/document.dart` -> documento del buzo (imagen + caducidad); DiveDoc + DocStatus
 - `lib/core/models/downloaded_dive.dart` -> inmersión descargada del ordenador (+ muestras/gases, parse JSON)
 - `lib/core/models/logbook_stats.dart` -> estadísticas agregadas
+- `lib/core/models/personal_records.dart` -> récords personales (buceo más profundo/largo/frío)
 
 ### Core · widgets compartidos
 - `lib/core/widgets/profile_chart.dart` -> gráfico de perfil (prof + temp eje dcho, línea táctil)
@@ -177,7 +178,8 @@ con `screens/` y, si hace falta, `widgets/`).
 ### stats (estadísticas)
 - `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook
 - `lib/features/stats/screens/selection_stats_screen.dart` -> stats solo de una selección de buceos
-- `lib/features/stats/widgets/stats_view.dart` -> vista reutilizable (tarjetas + barras, selector año/mes/semana)
+- `lib/features/stats/widgets/stats_view.dart` -> vista reutilizable (tarjetas + barras, selector año/mes/semana; récords en global)
+- `lib/features/stats/widgets/records_card.dart` -> tarjeta de récords personales (tocable -> abre el buceo) + próximo hito
 - `lib/features/stats/widgets/year_bars.dart` -> PeriodBars: barras etiqueta/valor
 - `lib/features/stats/widgets/stats_buckets.dart` -> agrupar fechas por año/mes/semana (ISO)
 
