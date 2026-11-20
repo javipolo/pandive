@@ -67,20 +67,6 @@ class _StatsViewState extends State<StatsView> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        if (records != null &&
-            !records.isEmpty &&
-            widget.onOpenRecord != null) ...[
-          Text(t.recordsTitle,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          RecordsCard(
-              records: records,
-              totalDives: s.totalDives,
-              onOpen: widget.onOpenRecord!),
-          sectionLine(),
-        ],
         twoCol(
           LabeledValue(t.statsDives, '${s.totalDives}'),
           s.buddiesCount == null
@@ -126,6 +112,20 @@ class _StatsViewState extends State<StatsView> {
             LabeledValue(t.statsMaxCeiling, _u(s.maxCeiling, 'm')),
             LabeledValue(t.statsMaxCeilingTime, _min(s.maxCeilingMinutes)),
           ),
+        ],
+        if (records != null &&
+            !records.isEmpty &&
+            widget.onOpenRecord != null) ...[
+          sectionLine(),
+          Text(t.recordsTitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold)),
+          RecordsCard(
+              records: records,
+              totalDives: s.totalDives,
+              onOpen: widget.onOpenRecord!),
         ],
         if (widget.dates.isNotEmpty) ...[
           sectionLine(),
