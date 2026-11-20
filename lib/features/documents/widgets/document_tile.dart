@@ -17,6 +17,7 @@ class DocumentTile extends StatelessWidget {
   final bool selectionMode;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final Widget? dragHandle;
 
   const DocumentTile({
     super.key,
@@ -26,6 +27,7 @@ class DocumentTile extends StatelessWidget {
     required this.onLongPress,
     this.selected = false,
     this.selectionMode = false,
+    this.dragHandle,
   });
 
   @override
@@ -56,11 +58,20 @@ class DocumentTile extends StatelessWidget {
       subtitle: sub.isEmpty
           ? null
           : Text(sub, style: TextStyle(color: color, fontSize: 12)),
-      trailing: !selectionMode && status != DocStatus.none
-          ? Icon(Icons.circle, size: 12, color: color)
-          : null,
+      trailing: _trailing(status, color),
       onTap: onTap,
       onLongPress: onLongPress,
     );
+  }
+
+  Widget? _trailing(DocStatus status, Color color) {
+    final dot = !selectionMode && status != DocStatus.none
+        ? Icon(Icons.circle, size: 12, color: color)
+        : null;
+    if (dragHandle == null) return dot;
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      if (dot != null) ...[dot, const SizedBox(width: 8)],
+      dragHandle!,
+    ]);
   }
 }

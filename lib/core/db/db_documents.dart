@@ -14,13 +14,21 @@ extension DivemateDbDocuments on DivemateDb {
         updated: _parseDate(_str(r['Updated']), null),
       );
 
-  /// Documentos ordenados: caducados y próximos primero, luego por fecha.
+  /// Documentos en el orden manual del usuario (SortOrd); los sin orden al final.
   List<DiveDoc> listDocuments() {
     final rows = _db.select(
         'SELECT Id, Title, Notes, Expires, ExpiryDate, FileName, Created, '
-        'Updated FROM PandiveDocument ORDER BY '
-        'CASE WHEN Expires = 1 THEN 0 ELSE 1 END, ExpiryDate ASC, Title ASC');
+        'Updated FROM PandiveDocument '
+        'ORDER BY SortOrd IS NULL, SortOrd ASC, Created ASC, Title ASC');
     return rows.map(_docFromRow).toList();
+  }
+
+  /// Persiste el orden manual: [ids] en el orden deseado.
+  void setDocumentOrder(List<int> ids) {
+    for (var i = 0; i < ids.length; i++) {
+      _db.execute('UPDATE PandiveDocument SET SortOrd = ? WHERE Id = ?',
+          [i, ids[i]]);
+    }
   }
 
   DiveDoc? getDocument(int id) {

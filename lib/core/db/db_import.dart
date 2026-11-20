@@ -54,7 +54,11 @@ void _ensureSyncTable(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDocument '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT, Notes TEXT, '
       'Expires INTEGER, ExpiryDate TEXT, FileName TEXT, Created TEXT, '
-      'Updated TEXT)');
+      'Updated TEXT, SortOrd INTEGER)');
+  // Migración: añadir SortOrd si la tabla se creó antes (orden manual).
+  try {
+    db.execute('ALTER TABLE PandiveDocument ADD COLUMN SortOrd INTEGER');
+  } catch (_) {/* ya existe */}
 }
 
 /// Importación de inmersiones descargadas del ordenador al formato DiveMate.

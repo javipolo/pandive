@@ -76,6 +76,15 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     _exitSel();
   }
 
+  void _reorder(int oldI, int newI) {
+    // onReorderItem ya ajusta newI para el item retirado en oldI.
+    setState(() {
+      final d = _docs.removeAt(oldI);
+      _docs.insert(newI, d);
+    });
+    widget.db.setDocumentOrder([for (final d in _docs) d.id]);
+  }
+
   Future<void> _deleteSel() async {
     final t = AppLocalizations.of(context);
     if (!await confirmDialog(context, t.deleteConfirm(_sel.length),
@@ -88,6 +97,26 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     }
     _exitSel();
     _reload();
+  }
+
+  Widget _tile(DiveDoc d, {int? index}) {
+    return DocumentTile(
+      key: ValueKey(d.id),
+      doc: d,
+      imagePath: '$_dir/${d.fileName}',
+      selected: _sel.contains(d.id),
+      selectionMode: _selecting,
+      onTap: () => _selecting ? _toggle(d.id) : _open(d),
+      onLongPress: () => setState(() {
+        _selecting = true;
+        _sel.add(d.id);
+      }),
+      dragHandle: index == null
+          ? null
+          : ReorderableDragStartListener(
+              index: index,
+              child: const Icon(Icons.drag_handle)),
+    );
   }
 
   @override
@@ -125,25 +154,19 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               Expanded(
                 child: _docs.isEmpty
                     ? Center(child: Text(t.docEmpty))
-                    : ListView.separated(
-                        itemCount: _docs.length,
-                        separatorBuilder: (_, _) => const Divider(height: 1),
-                        itemBuilder: (context, i) {
-                          final d = _docs[i];
-                          return DocumentTile(
-                            doc: d,
-                            imagePath: '$_dir/${d.fileName}',
-                            selected: _sel.contains(d.id),
-                            selectionMode: _selecting,
-                            onTap: () =>
-                                _selecting ? _toggle(d.id) : _open(d),
-                            onLongPress: () => setState(() {
-                              _selecting = true;
-                              _sel.add(d.id);
-                            }),
-                          );
-                        },
-                      ),
+                    : _selecting
+                        ? ListView.separated(
+                            itemCount: _docs.length,
+                            separatorBuilder: (_, _) =>
+                                const Divider(height: 1),
+                            itemBuilder: (context, i) => _tile(_docs[i]),
+                          )
+                        : ReorderableListView.builder(
+                            itemCount: _docs.length,
+                            onReorderItem: _reorder,
+                            buildDefaultDragHandles: false,
+                            itemBuilder: (context, i) => _tile(_docs[i], index: i),
+                          ),
               ),
             ]),
     );
