@@ -16,8 +16,8 @@ import 'package:pandive/core/storage/documents_storage.dart';
 Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
   if (docs.isEmpty) return;
   const margin = 24.0;
-  final contentW = PdfPageFormat.a4.width - margin * 2;
-  final maxH = PdfPageFormat.a4.height - margin * 2 - 40; // deja hueco al título
+  // Tope físico ~ tamaño carnet (8,5 cm ≈ 240 pt) por lado; nunca se amplía.
+  const cardMax = 240.0;
 
   final items = <pw.Widget>[];
   for (final d in docs) {
@@ -25,7 +25,7 @@ Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
     if (!await file.exists()) continue;
     final image = pw.MemoryImage(await file.readAsBytes());
     final size = _fit((image.width ?? 1).toDouble(),
-        (image.height ?? 1).toDouble(), contentW, maxH);
+        (image.height ?? 1).toDouble(), cardMax, cardMax);
     items.add(pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
