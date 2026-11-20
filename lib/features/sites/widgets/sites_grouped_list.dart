@@ -88,6 +88,7 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
           child: countries.isEmpty
               ? Center(child: Text(t.noSitesYet))
               : ListView(
+                  padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
                   children: [
                     for (final c in countries) ...[
                       _header(context, c, grouped[c]!.length),
@@ -118,10 +119,8 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     );
   }
   Widget _tile(BuildContext context, AppLocalizations t, DiveSite s) {
-    final sub = [
-      if (s.region != null) s.region!,
-      t.diveCountLabel(s.diveCount),
-    ].join(' · ');
+    final sub = [if (s.region != null) s.region!, t.diveCountLabel(s.diveCount)]
+        .join(' · ');
     final nm = (s.name ?? '').trim();
     final cs = Theme.of(context).colorScheme;
     return DecoratedBox(

@@ -105,6 +105,7 @@ class _TagsTabState extends State<TagsTab> {
           child: shown.isEmpty
               ? Center(child: Text(t.noTags))
               : ListView.separated(
+                  padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
                   itemCount: shown.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, i) => _tile(shown[i], t),
