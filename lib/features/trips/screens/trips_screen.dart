@@ -66,13 +66,34 @@ class _TripsScreenState extends State<TripsScreen> {
       ),
       body: _trips.isEmpty
           ? Center(child: Text(t.noTrips))
-          : ListView.separated(
+          : ListView(
               padding: const EdgeInsets.only(bottom: 88),
-              itemCount: _trips.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, i) => _tile(_trips[i], t, fmt),
+              children: _rows(context, t, fmt),
             ),
     );
+  }
+
+  // Filas con cabecera por año (año del viaje = fecha del último buceo).
+  List<Widget> _rows(BuildContext context, AppLocalizations t, DateFormat fmt) {
+    final cs = Theme.of(context).colorScheme;
+    final out = <Widget>[];
+    int? lastYear;
+    for (final tr in _trips) {
+      final year = (tr.lastDate ?? tr.firstDate)?.year;
+      if (year != lastYear) {
+        lastYear = year;
+        out.add(Container(
+          width: double.infinity,
+          color: cs.primaryContainer,
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: Text(year?.toString() ?? '—',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: cs.onPrimaryContainer)),
+        ));
+      }
+      out.add(_tile(tr, t, fmt));
+    }
+    return out;
   }
 
   Widget _tile(Trip tr, AppLocalizations t, DateFormat fmt) {
