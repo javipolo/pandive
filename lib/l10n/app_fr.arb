@@ -212,6 +212,7 @@
   "noBuddies": "Aucun binôme pour l'instant",
   "selectBuddies": "Sélectionner des binômes",
   "divesWith": "Plongées avec {name}",
+  "sortOrder": "Ordre",
   "trips": "Voyages",
   "newTrip": "Nouveau voyage",
   "noTrips": "Aucun voyage",

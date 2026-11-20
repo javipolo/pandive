@@ -212,6 +212,7 @@
   "noBuddies": "Encara no hi ha companys",
   "selectBuddies": "Selecciona els companys",
   "divesWith": "Immersions amb {name}",
+  "sortOrder": "Ordre",
   "trips": "Viatges",
   "newTrip": "Nou viatge",
   "noTrips": "Encara no hi ha viatges",

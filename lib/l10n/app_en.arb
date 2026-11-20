@@ -340,6 +340,7 @@
       "name": {}
     }
   },
+  "sortOrder": "Sort order",
   "trips": "Trips",
   "newTrip": "New trip",
   "noTrips": "No trips yet",

@@ -23,8 +23,12 @@ class TripsScreen extends StatefulWidget {
 
 class _TripsScreenState extends State<TripsScreen> {
   late List<Trip> _trips = widget.db.listTrips();
+  bool _desc = true; // listTrips ya viene por fecha descendente
 
   void _reload() => setState(() => _trips = widget.db.listTrips());
+
+  // Orden actual (listTrips es descendente; para ascendente se invierte).
+  List<Trip> get _ordered => _desc ? _trips : _trips.reversed.toList();
 
   Future<void> _add() async {
     final name = await nameDialog(context, AppLocalizations.of(context).newTrip);
@@ -58,7 +62,14 @@ class _TripsScreenState extends State<TripsScreen> {
     final t = AppLocalizations.of(context);
     final fmt = DateFormat('dd/MM/yyyy');
     return Scaffold(
-      appBar: AppBar(title: Text(t.trips)),
+      appBar: AppBar(title: Text(t.trips), actions: [
+        if (_trips.isNotEmpty)
+          IconButton(
+            tooltip: t.sortOrder,
+            icon: Icon(_desc ? Icons.arrow_downward : Icons.arrow_upward),
+            onPressed: () => setState(() => _desc = !_desc),
+          ),
+      ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _add,
         icon: const Icon(Icons.add),
@@ -78,7 +89,7 @@ class _TripsScreenState extends State<TripsScreen> {
     final cs = Theme.of(context).colorScheme;
     final out = <Widget>[];
     int? lastYear;
-    for (final tr in _trips) {
+    for (final tr in _ordered) {
       final year = (tr.lastDate ?? tr.firstDate)?.year;
       if (year != lastYear) {
         lastYear = year;
