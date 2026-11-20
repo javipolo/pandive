@@ -13,7 +13,10 @@ export PATH := $(dir $(FLUTTER)):$(ANDROID_HOME)/platform-tools:$(PATH)
 # OAuth Web client ID para Google Drive (serverClientId). Se lee de
 # android/gdrive_client_id.txt (no versionado) o de la variable de entorno.
 GDRIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_client_id.txt 2>/dev/null))
+# OAuth iOS client ID (flutter_appauth, refresh token para backup de fondo).
+GDRIVE_NATIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_native_client_id.txt 2>/dev/null))
 DART_DEFINES := $(if $(GDRIVE_CLIENT_ID),--dart-define=GDRIVE_SERVER_CLIENT_ID=$(GDRIVE_CLIENT_ID),)
+DART_DEFINES += $(if $(GDRIVE_NATIVE_CLIENT_ID),--dart-define=GDRIVE_NATIVE_CLIENT_ID=$(GDRIVE_NATIVE_CLIENT_ID),)
 
 .DEFAULT_GOAL := help
 

@@ -206,43 +206,40 @@ Por fases (ver plan de desarrollo):
 
 ## Backup en Google Drive (configuración OAuth, una vez)
 
-El backup/restore usa `google_sign_in` con el scope **`drive.file`** (no sensible,
-sin verificación de Google): la app solo ve los ficheros que ella crea, en una
-carpeta visible "Pandive Backups". Para que funcione en el móvil hay que crear un
-cliente OAuth de Android en Google Cloud (no se embebe ninguna clave en el APK;
-Android lo resuelve por paquete + SHA-1):
+El backup/restore usa OAuth nativo (`flutter_appauth`) con el scope **`drive.file`**
+(no sensible, sin verificación de Google): la app solo ve los ficheros que ella
+crea, en una carpeta visible "Pandive Backups". La auth persiste un **refresh
+token** (en `flutter_secure_storage`), de modo que el **backup en segundo plano**
+puede refrescar el access token sin abrir la app (headless). Configuración única:
 
 1. [Google Cloud Console](https://console.cloud.google.com/) → crea un proyecto.
 2. **APIs y servicios → Biblioteca** → habilita **Google Drive API**.
 3. **Pantalla de consentimiento OAuth** → tipo *External* → añade tu cuenta de
    Google como **usuario de prueba** (así no hace falta verificación).
-4. **Credenciales → Crear → ID de cliente OAuth → Android**:
-   - Paquete: `org.drslump.pandive`
-   - SHA-1 de la **clave de firma release** (la que usa el APK release, ver
-     `android/key.properties`). Recupéralo con:
+4. **Credenciales → Crear → ID de cliente OAuth → iOS**:
+   - Bundle ID: `org.drslump.pandive`
+   - (El tipo *iOS* es solo para obtener un esquema de redirect invertido sin
+     secreto, `com.googleusercontent.apps.<id>`; **no** implica una app iOS.)
+   - Copia su **Client ID** (`…apps.googleusercontent.com`) y guárdalo en:
      ```
-     keytool -list -v -keystore android/app/pandive-release.jks -alias pandive
+     echo 'TU_IOS_CLIENT_ID.apps.googleusercontent.com' > android/gdrive_native_client_id.txt
      ```
-     (El build release se firma con esta clave; es el SHA-1 que hay que
-     registrar. Puedes añadir varios SHA-1 al mismo cliente: p.ej. el debug
-     `~/.android/debug.keystore` alias `androiddebugkey`, pass `android`, si
-     alguna vez quieres probar un build debug.)
-5. **Credenciales → Crear → ID de cliente OAuth → Aplicación web**: crea uno
-   (nombre libre, sin orígenes). Copia su **Client ID** (`…apps.googleusercontent.com`).
-   `google_sign_in` lo exige en Android como `serverClientId`. Guárdalo en:
-   ```
-   echo 'TU_WEB_CLIENT_ID.apps.googleusercontent.com' > android/gdrive_client_id.txt
-   ```
-   (fichero no versionado; `make apk`/`apk-release` lo inyecta como
-   `--dart-define=GDRIVE_SERVER_CLIENT_ID`). Sin él, Conectar falla con
-   "ServerClientID must be provided".
-6. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
+     (fichero no versionado; `make apk`/`apk-release` lo inyecta como
+     `--dart-define=GDRIVE_NATIVE_CLIENT_ID` y `build.gradle.kts` deriva de él el
+     `appAuthRedirectScheme`). Sin él, Conectar no funciona.
+5. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
 
-> La firma release vive en `android/app/pandive-release.jks` + `android/key.properties`
-> (ambos **gitignored**, no se versionan). Si cambias de clave, añade el nuevo
-> SHA-1 al cliente OAuth y reinstala la app (firma distinta → hay que desinstalar
-> la anterior).
+> **Navegador para Conectar:** el consentimiento se abre en el navegador por
+> defecto. **Brave** falla (su Custom Tab pierde el estado del redirect →
+> "No stored state" / "User cancelled"); usa **Chrome** (ponlo como navegador por
+> defecto solo para ese paso). Una vez conectado, el refresh es por HTTP puro
+> (`oauth2.googleapis.com`), sin navegador: puedes volver a poner Brave. Solo
+> necesitarás Chrome de nuevo si desconectas y reconectas.
 
-El backup automático diario se dispara al abrir la app si han pasado >24 h y la
-DB cambió. Se guarda `latest.ddb` + copias con timestamp (se conservan las 10
-más recientes). Al restaurar, por defecto se ofrece `latest`.
+Backups: se guarda `latest.ddb` + copias con timestamp (se conservan las 10 más
+recientes) y un zip con las imágenes de documentos. Al restaurar, por defecto se
+ofrece `latest`. Disparadores:
+- Al abrir la app (si pasaron >24 h y la DB cambió).
+- **En segundo plano** (WorkManager, ~cada 12 h, **solo WiFi**), aunque la app
+  esté cerrada, si la DB cambió desde el último backup. Se activa con el toggle
+  "Copia automática" (se enciende al conectar la cuenta).

@@ -45,6 +45,18 @@ android {
             // ABIs para los que tenemos libdivecomputer precompilado.
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
+
+        // Esquema de redirect de AppAuth (flutter_appauth): esquema invertido del
+        // OAuth client iOS, derivado del id en android/gdrive_native_client_id.txt
+        // (no versionado). Debe ir en minúsculas.
+        val nativeClientIdFile = rootProject.file("gdrive_native_client_id.txt")
+        val nativeClientId =
+            if (nativeClientIdFile.exists()) nativeClientIdFile.readText().trim() else ""
+        manifestPlaceholders["appAuthRedirectScheme"] =
+            if (nativeClientId.isNotEmpty())
+                "com.googleusercontent.apps." +
+                    nativeClientId.removeSuffix(".apps.googleusercontent.com")
+            else "com.googleusercontent.apps.pandive-placeholder"
     }
 
     // Wrapper JNI sobre libdivecomputer (src/main/cpp).

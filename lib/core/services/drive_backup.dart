@@ -1,15 +1,20 @@
 /// Backup/restauración de la DB en Google Drive (carpeta visible "Pandive
-/// Backups", scope drive.file). Requiere un OAuth client Android en Google Cloud
-/// (paquete + SHA-1); ver README. La lógica de operaciones está en el `part`.
+/// Backups", scope drive.file). Auth OAuth nativo con `flutter_appauth` que
+/// persiste un refresh token (en `flutter_secure_storage`), de modo que el
+/// backup en segundo plano puede refrescar el access token sin Activity (headless).
+/// Requiere un OAuth client **de tipo iOS** (da el esquema invertido sin secreto);
+/// ver README. La lógica de operaciones está en el `part`.
 library;
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:http/http.dart' as http;
 
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
@@ -17,14 +22,23 @@ import 'backup_util.dart';
 
 part 'drive_backup_ops.dart';
 
-/// OAuth client ID **de tipo Web** del proyecto Google Cloud. google_sign_in v7
-/// lo exige en Android como `serverClientId`. Pégalo aquí (termina en
-/// `.apps.googleusercontent.com`) o pásalo con
-/// `--dart-define=GDRIVE_SERVER_CLIENT_ID=...`. No es secreto.
-const _serverClientId = String.fromEnvironment(
-  'GDRIVE_SERVER_CLIENT_ID',
+/// OAuth client ID **de tipo iOS** del proyecto Google Cloud (sin secreto; da el
+/// esquema invertido `com.googleusercontent.apps.<id>`). Pásalo con
+/// `--dart-define=GDRIVE_NATIVE_CLIENT_ID=...`. No es secreto.
+const _clientId = String.fromEnvironment(
+  'GDRIVE_NATIVE_CLIENT_ID',
   defaultValue: '',
 );
+
+// Endpoints explícitos de Google (sin discovery: evita el fetch a
+// accounts.google.com/.well-known, frágil en el isolate de background).
+const _serviceConfig = AuthorizationServiceConfiguration(
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+);
+const _scopes = [drive.DriveApi.driveFileScope, 'email', 'openid'];
+const _kRefresh = 'drive_refresh_token';
+const _kEmail = 'drive_email';
 
 /// Un backup listado en Drive (para restaurar).
 class BackupEntry {
@@ -37,68 +51,97 @@ class BackupEntry {
 
 class DriveBackupService {
   static const _folderName = 'Pandive Backups';
-  static const _scope = drive.DriveApi.driveFileScope;
 
-  final GoogleSignIn _gsi = GoogleSignIn.instance;
-  bool _inited = false;
-  GoogleSignInAccount? _account;
+  final FlutterAppAuth _appAuth = const FlutterAppAuth();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  String? _refreshToken;
+  String? _email;
+  String? _accessToken;
+  DateTime? _accessExp;
   String? _folderId;
 
-  String? get email => _account?.email;
-  bool get connected => _account != null;
+  String? get email => _email;
+  bool get connected => _refreshToken != null;
 
-  Future<void> _ensureInit() async {
-    if (_inited) return;
-    if (_serverClientId.isEmpty) {
-      throw Exception('Falta el OAuth Web client ID (serverClientId). '
-          'Ver README › Backup en Google Drive.');
-    }
-    await _gsi.initialize(serverClientId: _serverClientId);
-    _inited = true;
-  }
+  // scheme invertido a partir del client id -> redirect de AppAuth.
+  String get _scheme =>
+      'com.googleusercontent.apps.${_clientId.replaceAll('.apps.googleusercontent.com', '')}';
+  String get _redirectUrl => '$_scheme:/oauth2redirect';
 
-  /// Reconexión silenciosa (sin UI). Devuelve true si hay cuenta.
-  Future<bool> signInSilently() async {
-    try {
-      await _ensureInit();
-      _account = await _gsi.attemptLightweightAuthentication();
-    } catch (_) {
-      return false;
-    }
-    return _account != null;
-  }
-
-  /// Conexión interactiva: selector de cuenta del teléfono + consentimiento de
-  /// Drive en un solo paso (como DiveMate). Lanza si falla (para mostrar el error).
+  /// Conexión interactiva: consentimiento en el navegador y guarda el refresh
+  /// token. Lanza si falla (para mostrar el error).
   Future<void> signIn() async {
-    await _ensureInit();
-    final acc = await _gsi.authenticate(scopeHint: const [_scope]);
-    await acc.authorizationClient.authorizeScopes(const [_scope]);
-    _account = acc;
+    final res = await _appAuth.authorizeAndExchangeCode(
+      AuthorizationTokenRequest(
+        _clientId,
+        _redirectUrl,
+        serviceConfiguration: _serviceConfig,
+        scopes: _scopes,
+        promptValues: const ['consent'],
+        additionalParameters: const {'access_type': 'offline'},
+      ),
+    );
+    _accessToken = res.accessToken;
+    _accessExp = res.accessTokenExpirationDateTime;
+    _email = _emailFromIdToken(res.idToken);
+    if (res.refreshToken != null) {
+      _refreshToken = res.refreshToken;
+      await _storage.write(key: _kRefresh, value: _refreshToken);
+    }
+    if (_email != null) await _storage.write(key: _kEmail, value: _email);
   }
 
   Future<void> signOut() async {
-    await _gsi.signOut();
-    _account = null;
-    _folderId = null;
+    _refreshToken = _accessToken = _email = _folderId = null;
+    _accessExp = null;
+    await _storage.delete(key: _kRefresh);
+    await _storage.delete(key: _kEmail);
   }
 
-  /// Cliente Drive autenticado, o null si no hay autorización. Si [interactive]
-  /// se pedirá el consentimiento de scopes cuando falte.
-  Future<drive.DriveApi?> _api({bool interactive = false}) async {
-    final acc = _account;
-    if (acc == null) return null;
-    GoogleSignInClientAuthorization? authz =
-        await acc.authorizationClient.authorizationForScopes(const [_scope]);
-    if (authz == null && interactive) {
-      try {
-        authz = await acc.authorizationClient.authorizeScopes(const [_scope]);
-      } on GoogleSignInException {
-        return null;
-      }
+  /// Reconexión silenciosa (sin UI): true si hay refresh token guardado.
+  /// Funciona en el isolate de background (solo lee el storage).
+  Future<bool> signInSilently() async {
+    _refreshToken ??= await _storage.read(key: _kRefresh);
+    _email ??= await _storage.read(key: _kEmail);
+    return _refreshToken != null;
+  }
+
+  /// Access token válido (refresca con el refresh token si hace falta). Headless.
+  Future<String?> _freshAccessToken() async {
+    final exp = _accessExp;
+    if (_accessToken != null &&
+        exp != null &&
+        exp.isAfter(DateTime.now().add(const Duration(minutes: 2)))) {
+      return _accessToken;
     }
-    if (authz == null) return null;
-    return drive.DriveApi(authz.authClient(scopes: const [_scope]));
+    final refresh = _refreshToken ??= await _storage.read(key: _kRefresh);
+    if (refresh == null) return null;
+    final res = await _appAuth.token(TokenRequest(
+      _clientId,
+      _redirectUrl,
+      serviceConfiguration: _serviceConfig,
+      scopes: _scopes,
+      refreshToken: refresh,
+    ));
+    _accessToken = res.accessToken;
+    _accessExp = res.accessTokenExpirationDateTime;
+    if (res.refreshToken != null && res.refreshToken != refresh) {
+      _refreshToken = res.refreshToken;
+      await _storage.write(key: _kRefresh, value: _refreshToken);
+    }
+    return _accessToken;
+  }
+
+  /// Cliente Drive autenticado, o null si no hay sesión. Si [interactive] y no
+  /// hay refresh token, lanza el consentimiento.
+  Future<drive.DriveApi?> _api({bool interactive = false}) async {
+    var token = await _freshAccessToken();
+    if (token == null && interactive) {
+      await signIn();
+      token = await _freshAccessToken();
+    }
+    if (token == null) return null;
+    return drive.DriveApi(_BearerClient(token));
   }
 
   Future<String> _ensureFolder(drive.DriveApi api) async {
@@ -121,5 +164,30 @@ class DriveBackupService {
     final f = File(path);
     if (!f.existsSync()) return null;
     return sha256.convert(await f.readAsBytes()).toString();
+  }
+
+  String? _emailFromIdToken(String? idToken) {
+    if (idToken == null) return null;
+    final parts = idToken.split('.');
+    if (parts.length < 2) return null;
+    try {
+      final payload =
+          utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+      return (jsonDecode(payload) as Map<String, dynamic>)['email'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+/// http.Client que añade el bearer token a cada petición (para googleapis).
+class _BearerClient extends http.BaseClient {
+  final http.Client _inner = http.Client();
+  final String _token;
+  _BearerClient(this._token);
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    request.headers['Authorization'] = 'Bearer $_token';
+    return _inner.send(request);
   }
 }

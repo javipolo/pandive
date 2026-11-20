@@ -53,9 +53,7 @@ dependencies:
   permission_handler: ^11.3.1
   # Mantener la pantalla encendida durante la descarga
   wakelock_plus: ^1.2.8
-  google_sign_in: ^7.2.0
   googleapis: ^19.0.0
-  extension_google_sign_in_as_googleapis_auth: ^3.0.0
   crypto: ^3.0.8
   share_plus: ^12.0.2
   # Parseo del XML de Subsurface (.ssrf) al importar
@@ -72,6 +70,9 @@ dependencies:
   timezone: ^0.10.0
   flutter_timezone: ^5.1.1
   workmanager: ^0.10.10
+  flutter_appauth: ^13.0.0
+  flutter_secure_storage: ^10.3.4
+  http: ^1.6.0
 
 # pdf limita archive <4.1 -> pub coge archive 4.0.9, e image 4.11.0 llama a un
 # método (decodeLazy) que esa archive no tiene. Fijamos image <4.11 (compatible).
