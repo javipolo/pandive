@@ -2,6 +2,7 @@ package org.drslump.pandive
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import io.flutter.embedding.android.FlutterActivity
@@ -97,6 +98,21 @@ class MainActivity : FlutterActivity() {
     private fun isBluetoothOn(): Boolean {
         val mgr = getSystemService(BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager
         return mgr?.adapter?.isEnabled == true
+    }
+
+    // share_plus lanza el selector con startActivityForResult (para el callback de
+    // resultado), lo que impide FLAG_ACTIVITY_NEW_TASK y hace que la app destino
+    // se apile en NUESTRA task (había que salir de ella para volver a Pandive).
+    // Añadimos NEW_TASK al ACTION_CHOOSER y a su intent interno (EXTRA_INTENT) para
+    // que el destino abra en su propia task. No usamos el resultado del share.
+    @Suppress("DEPRECATION")
+    override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
+        if (intent.action == Intent.ACTION_CHOOSER) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+                ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        super.startActivityForResult(intent, requestCode, options)
     }
 
     // App ya abierta: llega un nuevo .ddb -> avisar a Flutter (o dejar pendiente).
