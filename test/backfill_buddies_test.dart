@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/features/settings/logic/import_site_coords.dart';
 import 'package:sqlite3/open.dart';
 
 void main() {
@@ -94,6 +95,25 @@ void main() {
     expect(db.listTrips().any((t) => t.id == tripId), isFalse);
     // Los buceos siguen existiendo (solo se desasignan).
     expect(db.listDives().where((d) => dives.contains(d.id)).length, 2);
+  });
+
+  test('importSiteCoordsFromJson rellena por nombre/region/country', () {
+    final a = db.createSite({'Place': 'ZZZ Abu Test', 'Country': 'Egypt'});
+    final b = db.createSite(
+        {'Place': 'ZZZ Brother Test', 'Country': 'Egypt', 'Region': 'Brothers'});
+    final acc = db.createSite({'Place': 'ZZZ Niño Test'});
+    const json = '''[
+      {"name":"ZZZ Abu Test","region":null,"country":"Egypt","coordinates":{"latitude":25.3,"longitude":34.7}},
+      {"name":"ZZZ Brother Test","region":"Brothers","country":"Egypt","coordinates":{"latitude":26.3,"longitude":34.8}},
+      {"name":"ZZZ Brother Test","region":"WrongRegion","country":"Egypt","coordinates":{"latitude":9,"longitude":9}},
+      {"name":"ZZZ Nino Test","coordinates":{"latitude":1.5,"longitude":2.5}},
+      {"name":"ZZZ Abu Test","country":"Egypt","coordinates":null}
+    ]''';
+    final n = importSiteCoordsFromJson(db, json);
+    expect(n, 3); // Abu, Brother (region correcta), Niño (sin acento) ; null ignorado
+    expect(db.getSite(a)!.lat, closeTo(25.3, 1e-4));
+    expect(db.getSite(b)!.lon, closeTo(34.8, 1e-4)); // no la de WrongRegion
+    expect(db.getSite(acc)!.lat, closeTo(1.5, 1e-4)); // acento-insensible
   });
 
   test('mergeBuddies reasigna dives y borra los fusionados', () {

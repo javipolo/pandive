@@ -255,6 +255,8 @@
   "importing": "Important…",
   "importSubsurface": "Importa de Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} immersions importades",
+  "importCoords": "Importa coordenades de llocs (JSON)",
+  "importCoordsResult": "{count} llocs actualitzats",
   "importHashtags": "Importa els #hashtags dels comentaris com a etiquetes",
   "removeHashtags": "Treu els hashtags dels comentaris",
   "tagsToHashtags": "Tags a #hashtags als comentaris",

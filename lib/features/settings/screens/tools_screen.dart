@@ -13,6 +13,7 @@ import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
 import 'package:pandive/features/settings/logic/link_buddies_tool.dart';
 import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
 import 'package:pandive/features/settings/screens/trash_screen.dart';
+import 'package:pandive/features/settings/logic/import_site_coords.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -73,6 +74,14 @@ class ToolsScreen extends StatelessWidget {
     messenger.showSnackBar(
         SnackBar(content: Text(t.importSubsurfaceResult(n))));
   }
+  Future<void> _importSiteCoords(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final t = AppLocalizations.of(context);
+    final n = await pickAndImportSiteCoords(db);
+    if (n == null) return;
+    bumpDataRevision();
+    messenger.showSnackBar(SnackBar(content: Text(t.importCoordsResult(n))));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +105,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.file_download_outlined),
             title: Text(t.importSubsurface),
             onTap: () => _importSubsurface(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.place_outlined),
+            title: Text(t.importCoords),
+            onTap: () => _importSiteCoords(context),
           ),
           _header(context, t.tags),
           ListTile(

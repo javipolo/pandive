@@ -255,6 +255,8 @@
   "importing": "Inportatzen…",
   "importSubsurface": "Subsurface-tik inportatu (.ssrf)",
   "importSubsurfaceResult": "{count} murgilketa inportatu dira",
+  "importCoords": "Inportatu lekuen koordenatuak (JSON)",
+  "importCoordsResult": "{count} leku eguneratuta",
   "importHashtags": "Inportatu #traolak iruzkinetatik etiketa gisa",
   "removeHashtags": "Kendu traolak iruzkinetatik",
   "tagsToHashtags": "Etiketak iruzkinetako #traola bihurtu",

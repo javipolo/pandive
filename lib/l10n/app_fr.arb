@@ -255,6 +255,8 @@
   "importing": "Importation…",
   "importSubsurface": "Importer depuis Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} plongées importées",
+  "importCoords": "Importer les coordonnées (JSON)",
+  "importCoordsResult": "{count} sites mis à jour",
   "importHashtags": "Importer les #hashtags des commentaires comme tags",
   "removeHashtags": "Retirer les hashtags des commentaires",
   "tagsToHashtags": "Tags vers #hashtags dans les commentaires",

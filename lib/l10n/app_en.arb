@@ -408,6 +408,13 @@
       "count": {}
     }
   },
+  "importCoords": "Import site coordinates (JSON)",
+  "importCoordsResult": "{count} sites updated",
+  "@importCoordsResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "importHashtags": "Import #hashtags from comments as tags",
   "removeHashtags": "Remove hashtags from comments",
   "tagsToHashtags": "Tags to #hashtags in comments",

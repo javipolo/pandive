@@ -104,6 +104,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/tools_screen.dart` -> herramientas: importar hashtags, export DDB/Subsurface, papelera, debug sync (desde drawer)
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
+- `lib/features/settings/logic/import_site_coords.dart` -> importa lat/lon a sitios desde JSON (match por nombre/region/country, sin acentos)
 - `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
 - `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura
