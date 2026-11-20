@@ -91,7 +91,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     iconSize: 30,
                     icon: Icon(
                         collapseAll ? Icons.unfold_more : Icons.unfold_less),
-                    onPressed: onToggleCollapse),
+                    onPressed: onToggleCollapse)
+              // En sitios, al ordenar por buceos desaparece colapsar: deja el
+              // hueco para que el resto de iconos no se muevan.
+              else if (canSort && index == 1)
+                const SizedBox(width: 48),
               IconButton(
                   tooltip: t.settings,
                   icon: const Icon(Icons.settings),
