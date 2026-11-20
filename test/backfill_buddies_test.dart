@@ -32,21 +32,25 @@ void main() {
     tmp.deleteSync(recursive: true);
   });
 
-  int guillemDives() => db
-      .listBuddies()
-      .firstWhere((b) => b.name == 'Guillem de Castro')
-      .diveCount;
+  // Nombre único: no debe existir ya como buddy en la DB real.
+  const name = 'ZZZ Test Backfill Buddy';
+  int divesOf(String n) {
+    final m = db.listBuddies().where((b) => b.name == n);
+    return m.isEmpty ? 0 : m.first.diveCount;
+  }
 
-  test('Guillem de Castro empieza con 0 buceos (solo texto)', () {
-    expect(guillemDives(), 0);
-  });
+  test('backfill enlaza un buddy solo-texto y es idempotente', () {
+    // Monta el estado: una inmersión con texto Buddy pero sin BuddyIDs
+    // (como las importadas de DiveMate), autocontenido (no depende del estado
+    // actual de la DB, que puede estar ya enlazada).
+    final diveId = db.listDives().first.id;
+    db.updateDive(diveId, {'Buddy': name, 'BuddyIDs': ''});
+    expect(divesOf(name), 0); // aún sin fila Buddy enlazada
 
-  test('backfill enlaza las dives antiguas y es idempotente', () {
     final updated = db.backfillBuddyIds();
     expect(updated, greaterThan(0));
-    expect(guillemDives(), greaterThan(0));
-    // Segunda pasada: nada que hacer.
-    expect(db.backfillBuddyIds(), 0);
+    expect(divesOf(name), greaterThan(0)); // ya enlazado y cuenta
+    expect(db.backfillBuddyIds(), 0); // idempotente
   });
 
   test('mergeBuddies reasigna dives y borra los fusionados', () {
