@@ -4,6 +4,8 @@
 library;
 
 import 'package:material_ui/material_ui.dart';
+
+import 'package:pandive/core/widgets/scroll_helpers.dart';
 import 'package:intl/intl.dart';
 
 import 'package:pandive/core/models/models.dart';
@@ -21,6 +23,7 @@ class MonthGroupedDives extends StatefulWidget {
   final Set<int> selected;
   final bool selectionMode;
   final bool collapseAll;
+  final int? highlightDiveId; // buceo recién añadido (destacar + desplazar)
   const MonthGroupedDives({
     super.key,
     required this.dives,
@@ -32,6 +35,7 @@ class MonthGroupedDives extends StatefulWidget {
     this.selected = const {},
     this.selectionMode = false,
     this.collapseAll = false,
+    this.highlightDiveId,
   });
 
   @override
@@ -40,15 +44,24 @@ class MonthGroupedDives extends StatefulWidget {
 
 class _MonthGroupedDivesState extends State<MonthGroupedDives> {
   final Set<String> _collapsed = {};
+  final _hlKey = GlobalKey();
+
+  @override
+  void didUpdateWidget(MonthGroupedDives old) {
+    super.didUpdateWidget(old);
+    _onCollapseChange(old);
+    if (widget.highlightDiveId != null &&
+        widget.highlightDiveId != old.highlightDiveId) {
+      scrollToHighlight(_hlKey);
+    }
+  }
 
   String _yKey(Dive d) => d.date == null ? 'Y:—' : 'Y:${d.date!.year}';
   String _mKey(Dive d) => d.date == null
       ? 'M:—'
       : 'M:${d.date!.year}-${d.date!.month.toString().padLeft(2, '0')}';
 
-  @override
-  void didUpdateWidget(MonthGroupedDives old) {
-    super.didUpdateWidget(old);
+  void _onCollapseChange(MonthGroupedDives old) {
     if (old.collapseAll != widget.collapseAll) {
       _collapsed.clear();
       if (widget.collapseAll) {
@@ -115,7 +128,7 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
         rows.add(_header(label, mIdxs, mCollapsed, false, () => _toggle(mk)));
         if (mCollapsed) continue;
         for (final i in mIdxs) {
-          rows.add(DiveRow(
+          final row = DiveRow(
             dive: widget.dives[i],
             settings: widget.settings,
             isCave: widget.caveIds.contains(widget.dives[i].id),
@@ -123,7 +136,16 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
             onTap: () => widget.onOpen(i),
             onLongPress:
                 widget.onLongPress == null ? null : () => widget.onLongPress!(i),
-          ));
+          );
+          rows.add(widget.dives[i].id == widget.highlightDiveId
+              ? Container(
+                  key: _hlKey,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withValues(alpha: 0.6),
+                  child: row)
+              : row);
         }
       }
     }

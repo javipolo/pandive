@@ -2,6 +2,8 @@
 /// lote), ver sus buceos.
 library;
 
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -10,6 +12,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
+import 'package:pandive/core/widgets/scroll_helpers.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
 import 'package:pandive/features/buddies/logic/buddy_sort.dart';
 import 'package:pandive/features/buddies/logic/merge_buddies_action.dart';
@@ -36,8 +39,25 @@ class _BuddiesTabState extends State<BuddiesTab> {
   late List<Buddy> _buddies = widget.db.listBuddies();
   bool _select = false;
   final Set<int> _sel = {};
+  int? _highlightId; // buddy recién añadido, para destacar/desplazar
+  final _hlKey = GlobalKey();
+  Timer? _hlTimer;
+
+  @override
+  void dispose() {
+    _hlTimer?.cancel();
+    super.dispose();
+  }
 
   void _reload() => setState(() => _buddies = widget.db.listBuddies());
+
+  void _flash(int id) {
+    setState(() => _highlightId = id);
+    scrollToHighlight(_hlKey);
+    _hlTimer?.cancel();
+    _hlTimer = Timer(const Duration(seconds: 3),
+        () => mounted ? setState(() => _highlightId = null) : null);
+  }
   void _exitSel() => setState(() {
         _select = false;
         _sel.clear();
@@ -72,8 +92,9 @@ class _BuddiesTabState extends State<BuddiesTab> {
   Future<void> _add() async {
     final name = await nameDialog(context, AppLocalizations.of(context).newBuddy);
     if (name != null && name.isNotEmpty) {
-      widget.db.findOrCreateBuddy(name);
+      final id = widget.db.findOrCreateBuddy(name);
       _reload();
+      _flash(id);
     }
   }
 
@@ -131,21 +152,29 @@ class _BuddiesTabState extends State<BuddiesTab> {
     );
   }
 
-  Widget _tile(Buddy b) => BuddyTile(
-        buddy: b,
-        selected: _sel.contains(b.id),
-        selectMode: _select,
-        db: widget.db,
-        settings: widget.settings,
-        onToggle: () => _toggle(b.id),
-        onLongPress: () => setState(() {
-          _select = true;
-          _sel.add(b.id);
-        }),
-        onRename: () => _rename(b),
-        onDelete: () {
-          widget.db.deleteBuddy(b.id);
-          _reload();
-        },
-      );
+  Widget _tile(Buddy b) {
+    final tile = BuddyTile(
+      buddy: b,
+      selected: _sel.contains(b.id),
+      selectMode: _select,
+      db: widget.db,
+      settings: widget.settings,
+      onToggle: () => _toggle(b.id),
+      onLongPress: () => setState(() {
+        _select = true;
+        _sel.add(b.id);
+      }),
+      onRename: () => _rename(b),
+      onDelete: () {
+        widget.db.deleteBuddy(b.id);
+        _reload();
+      },
+    );
+    if (b.id != _highlightId) return tile;
+    return Container(
+      key: _hlKey,
+      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+      child: tile,
+    );
+  }
 }

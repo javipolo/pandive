@@ -25,6 +25,7 @@ class DivesActionList extends StatefulWidget {
   final List<Dive> dives;
   final Set<int> caveIds;
   final bool collapseAll;
+  final int? highlightDiveId; // buceo recién añadido (destacar/desplazar)
   final VoidCallback onChanged; // el padre recarga su lista
   final ValueChanged<bool>? onSelectionMode;
 
@@ -36,6 +37,7 @@ class DivesActionList extends StatefulWidget {
     required this.caveIds,
     required this.onChanged,
     this.collapseAll = false,
+    this.highlightDiveId,
     this.onSelectionMode,
   });
 
@@ -170,6 +172,7 @@ class _DivesActionListState extends State<DivesActionList> {
                 dives: widget.dives,
                 settings: widget.settings,
                 caveIds: widget.caveIds,
+                highlightDiveId: widget.highlightDiveId,
                 onOpen: _onOpen,
                 onLongPress: (i) => setState(() {
                   _setSelect(true);

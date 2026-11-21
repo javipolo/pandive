@@ -3,6 +3,8 @@
 /// `DivesActionList`.
 library;
 
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
@@ -32,6 +34,14 @@ class _DivesTabState extends State<DivesTab> {
   late List<Dive> _dives = filterDives(widget.db.listDives(), widget.query);
   late Set<int> _cave = widget.db.diveIdsWithTag('cave');
   bool _selecting = false;
+  int? _highlightId; // buceo recién añadido, para destacar/desplazar
+  Timer? _hlTimer;
+
+  @override
+  void dispose() {
+    _hlTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(DivesTab old) {
@@ -45,8 +55,17 @@ class _DivesTabState extends State<DivesTab> {
       });
 
   Future<void> _add() async {
-    await showAddDiveSheet(context, widget.db, widget.settings);
-    if (mounted) _reload();
+    final id = await showAddDiveSheet(context, widget.db, widget.settings);
+    if (!mounted) return;
+    _reload();
+    if (id != null) _flash(id);
+  }
+
+  void _flash(int id) {
+    setState(() => _highlightId = id);
+    _hlTimer?.cancel();
+    _hlTimer = Timer(const Duration(seconds: 3),
+        () => mounted ? setState(() => _highlightId = null) : null);
   }
 
   @override
@@ -65,6 +84,7 @@ class _DivesTabState extends State<DivesTab> {
         dives: _dives,
         caveIds: _cave,
         collapseAll: widget.collapseAll,
+        highlightDiveId: _highlightId,
         onChanged: _reload,
         onSelectionMode: (v) => setState(() => _selecting = v),
       ),

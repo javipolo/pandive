@@ -99,7 +99,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
       if (_typeName != null) widget.db.updateDive(id, {'Divetype': _typeName});
       widget.db.setDiveTanks(id, _tanks);
       widget.db.setDiveTags(id, _tags);
-      if (mounted) Navigator.of(context).pop(true);
+      if (mounted) Navigator.of(context).pop(id);
     } catch (e) {
       setState(() => _saving = false);
       if (mounted) {

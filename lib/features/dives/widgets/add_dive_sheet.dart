@@ -10,7 +10,9 @@ import 'package:pandive/features/dives/screens/new_dive_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 /// Muestra la hoja y navega a la pantalla elegida (alta manual o transferencia).
-Future<void> showAddDiveSheet(
+/// Devuelve el id del buceo recién creado (alta manual) para poder destacarlo;
+/// null si se canceló o fue transferencia.
+Future<int?> showAddDiveSheet(
     BuildContext context, DivemateDb db, Settings settings) async {
   final t = AppLocalizations.of(context);
   final choice = await showModalBottomSheet<String>(
@@ -31,10 +33,12 @@ Future<void> showAddDiveSheet(
       ]),
     ),
   );
-  if (!context.mounted || choice == null) return;
-  final route = choice == 'new'
-      ? MaterialPageRoute(builder: (_) => NewDiveScreen(db: db))
-      : MaterialPageRoute(
-          builder: (_) => ComputerPickScreen(db: db, settings: settings));
-  await Navigator.of(context).push(route);
+  if (!context.mounted || choice == null) return null;
+  if (choice == 'new') {
+    return Navigator.of(context)
+        .push<int>(MaterialPageRoute(builder: (_) => NewDiveScreen(db: db)));
+  }
+  await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ComputerPickScreen(db: db, settings: settings)));
+  return null;
 }
