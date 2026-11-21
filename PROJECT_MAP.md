@@ -178,6 +178,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/trips/screens/trips_screen.dart` -> lista de viajes (crear/renombrar/borrar)
 - `lib/features/trips/screens/trip_detail_screen.dart` -> detalle: compañeros (editar/desde buceos) + ver buceos
 - `lib/features/trips/logic/assign_trip_action.dart` -> diálogo asignar selección a viaje (elegir/crear)
+- `lib/features/trips/logic/export_trip.dart` -> exporta/comparte un viaje como .ddb (viaje+buceos+compañeros; nombre Año-Nombre-PanDive)
 
 ### sites (sitios)
 - `lib/core/widgets/site_map.dart` -> mapa reutilizable (tiles satélite Esri + atribución)

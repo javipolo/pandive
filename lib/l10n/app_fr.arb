@@ -215,6 +215,7 @@
   "selectBuddies": "Sélectionner des binômes",
   "divesWith": "Plongées avec {name}",
   "sortOrder": "Ordre",
+  "exportTrip": "Exporter le voyage",
   "trips": "Voyages",
   "newTrip": "Nouveau voyage",
   "noTrips": "Aucun voyage",

@@ -9,6 +9,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/features/sites/screens/sites_map_screen.dart';
+import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class TripDetailScreen extends StatefulWidget {
@@ -93,7 +94,13 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.trip.name)),
+      appBar: AppBar(title: Text(widget.trip.name), actions: [
+        IconButton(
+          tooltip: t.exportTrip,
+          icon: const Icon(Icons.ios_share),
+          onPressed: () => exportTripDdb(widget.db, widget.trip),
+        ),
+      ]),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

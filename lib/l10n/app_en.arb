@@ -348,6 +348,7 @@
     }
   },
   "sortOrder": "Sort order",
+  "exportTrip": "Export trip",
   "trips": "Trips",
   "newTrip": "New trip",
   "noTrips": "No trips yet",

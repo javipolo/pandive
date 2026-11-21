@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/features/settings/logic/import_site_coords.dart';
+import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:sqlite3/open.dart';
 
 void main() {
@@ -124,6 +125,32 @@ void main() {
     expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // coords rellenadas
     db.findOrCreateSite('ZZZ Enrich Site', country: 'X', lat: 99, lon: 99);
     expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // no se pisan
+  });
+
+  test('export de viaje: nombre de fichero + .ddb con viaje/buceos/compañeros',
+      () {
+    final dives = db.listDives().take(2).map((d) => d.id).toList();
+    final tripId = db.createTrip('Egipto 2024');
+    db.assignDivesToTrip(tripId, dives);
+    db.setTripBuddies(tripId, [db.listBuddies().first.id]);
+    final trip = db.listTrips().firstWhere((t) => t.id == tripId);
+
+    final base = tripFileBase(trip, db.listDivesByTrip(tripId));
+    expect(base, contains('Egipto 2024'));
+    expect(base, endsWith('PanDive'));
+
+    final outPath = '${tmp.path}/out_trip.ddb';
+    final out = DivemateDb.createEmpty(outPath);
+    writeTripDdb(db, trip, out, db.listDivesByTrip(tripId));
+    out.close();
+
+    final r = DivemateDb.open(outPath);
+    final trips = r.listTrips();
+    expect(trips.length, 1);
+    expect(trips.first.name, 'Egipto 2024');
+    expect(r.listDivesByTrip(trips.first.id).length, 2);
+    expect(r.tripBuddies(trips.first.id).length, 1);
+    r.close();
   });
 
   test('mergeBuddies reasigna dives y borra los fusionados', () {
