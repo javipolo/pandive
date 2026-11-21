@@ -18,6 +18,11 @@ class SitesGroupedList extends StatefulWidget {
   final String? externalQuery;
   final bool collapseAll;
   final bool sortByDives;
+  /// Selección múltiple (opcional): ids marcados, modo, y callbacks por sitio.
+  final Set<int> selectedIds;
+  final bool selectMode;
+  final void Function(DiveSite)? onToggle;
+  final void Function(DiveSite)? onLongPress;
   const SitesGroupedList({
     super.key,
     required this.sites,
@@ -26,6 +31,10 @@ class SitesGroupedList extends StatefulWidget {
     this.externalQuery,
     this.collapseAll = false,
     this.sortByDives = false,
+    this.selectedIds = const {},
+    this.selectMode = false,
+    this.onToggle,
+    this.onLongPress,
   });
 
   @override
@@ -140,5 +149,10 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
         site: s,
         onTap: () => widget.onTap(s),
         onInfo: widget.onInfo == null ? null : () => widget.onInfo!(s),
+        selected: widget.selectedIds.contains(s.id),
+        selectMode: widget.selectMode,
+        onToggle: widget.onToggle == null ? null : () => widget.onToggle!(s),
+        onLongPress:
+            widget.onLongPress == null ? null : () => widget.onLongPress!(s),
       );
 }

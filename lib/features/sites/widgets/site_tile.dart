@@ -1,5 +1,6 @@
 /// Fila de un sitio de buceo: avatar, nombre, región · nº buceos, y opcional
-/// icono "ojo" para ver su info. Toca para ver sus buceos.
+/// icono "ojo" para ver su info. Toca para ver sus buceos; en modo selección
+/// hace toggle y muestra check.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -11,8 +12,20 @@ class SiteTile extends StatelessWidget {
   final DiveSite site;
   final VoidCallback onTap;
   final VoidCallback? onInfo;
-  const SiteTile(
-      {super.key, required this.site, required this.onTap, this.onInfo});
+  final bool selected;
+  final bool selectMode;
+  final VoidCallback? onToggle;
+  final VoidCallback? onLongPress;
+  const SiteTile({
+    super.key,
+    required this.site,
+    required this.onTap,
+    this.onInfo,
+    this.selected = false,
+    this.selectMode = false,
+    this.onToggle,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +42,22 @@ class SiteTile extends StatelessWidget {
                 color: cs.outlineVariant.withValues(alpha: 0.5), width: 1)),
       ),
       child: ListTile(
-        leading: CircleAvatar(
-            child: Text(nm.isEmpty ? '?' : nm.substring(0, 1).toUpperCase())),
+        selected: selected,
+        leading: selected
+            ? const CircleAvatar(child: Icon(Icons.check))
+            : CircleAvatar(
+                child: Text(nm.isEmpty ? '?' : nm.substring(0, 1).toUpperCase())),
         title: Text(site.name ?? t.site,
             maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(sub),
-        trailing: onInfo == null
+        trailing: selectMode || onInfo == null
             ? null
             : IconButton(
                 icon: const Icon(Icons.visibility_outlined),
                 tooltip: t.site,
                 onPressed: onInfo),
-        onTap: onTap,
+        onTap: selectMode ? onToggle : onTap,
+        onLongPress: onLongPress,
       ),
     );
   }

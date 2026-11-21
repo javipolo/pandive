@@ -184,7 +184,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/widgets/scroll_helpers.dart` -> scrollToHighlight: desplaza la lista al elemento recién añadido
 - `lib/core/widgets/progress_dialog.dart` -> diálogo modal de progreso (withProgress) para export/import largos
 - `lib/core/widgets/site_map.dart` -> mapa reutilizable (tiles satélite Esri + atribución)
-- `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
+- `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info; multi-select (exportar JSON / borrar)
 - `lib/features/sites/screens/import_sites_screen.dart` -> preview del import JSON (checkbox por fila, color add/modify, confirma recuento)
 - `lib/features/sites/logic/site_import.dart` -> plan de import JSON (add/modify, null no pisa) + applySiteImport
 - `lib/features/sites/logic/export_sites.dart` -> exporta sitios a JSON y comparte (sitesToJson/exportSitesJson)
