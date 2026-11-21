@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_body.dart';
+import 'package:pandive/features/sites/screens/site_info_screen.dart';
 import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 import 'edit_dive_screen.dart';
@@ -75,6 +76,18 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
     }
   }
 
+  Future<void> _openSite(Dive dive) async {
+    if (dive.placeId == null) return;
+    final site = db.getSite(dive.placeId!);
+    if (site == null) return;
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) =>
+          SiteInfoScreen(db: db, sites: [site], initialIndex: 0),
+    ));
+    final reloaded = db.getDive(dive.id);
+    if (reloaded != null && mounted) setState(() => _dives[_index] = reloaded);
+  }
+
   void _openSiteMap(Dive dive) {
     final t = AppLocalizations.of(context);
     final site = dive.placeId != null ? db.getSite(dive.placeId!) : null;
@@ -96,6 +109,11 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
       appBar: AppBar(
         title: Text(dive.place ?? t.dive),
         actions: [
+          if (dive.placeId != null)
+            IconButton(
+                tooltip: t.site,
+                icon: const Icon(Icons.place_outlined),
+                onPressed: () => _openSite(dive)),
           IconButton(
               tooltip: t.viewOnMap,
               icon: const Icon(Icons.map_outlined),
