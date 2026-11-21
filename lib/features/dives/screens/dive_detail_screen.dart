@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_body.dart';
+import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 import 'edit_dive_screen.dart';
 
@@ -74,6 +75,19 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
     }
   }
 
+  void _openSiteMap(Dive dive) {
+    final t = AppLocalizations.of(context);
+    final site = dive.placeId != null ? db.getSite(dive.placeId!) : null;
+    if (site == null || !site.hasCoords) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(t.noLocation)));
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => SitesMapScreen(db: db, sites: [site], title: site.name),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -82,6 +96,10 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
       appBar: AppBar(
         title: Text(dive.place ?? t.dive),
         actions: [
+          IconButton(
+              tooltip: t.viewOnMap,
+              icon: const Icon(Icons.map_outlined),
+              onPressed: () => _openSiteMap(dive)),
           IconButton(
               tooltip: t.edit, icon: const Icon(Icons.edit), onPressed: _edit),
         ],

@@ -15,7 +15,9 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class SitesMapScreen extends StatelessWidget {
   final DivemateDb db;
-  final Settings settings;
+  /// Solo para abrir los buceos de un sitio desde su marcador; si es null, el
+  /// marcador solo muestra el nombre.
+  final Settings? settings;
   /// Si se pasa, muestra solo estos sitios (p.ej. los de un viaje); si no, todos.
   final List<DiveSite>? sites;
   final String? title;
@@ -25,7 +27,7 @@ class SitesMapScreen extends StatelessWidget {
   const SitesMapScreen(
       {super.key,
       required this.db,
-      required this.settings,
+      this.settings,
       this.sites,
       this.title,
       this.connect = false});
@@ -43,21 +45,22 @@ class SitesMapScreen extends StatelessWidget {
               title: Text(s.name ?? t.site),
               subtitle: Text(t.diveCountLabel(s.diveCount)),
             ),
-            ListTile(
-              leading: const Icon(Icons.scuba_diving),
-              title: Text(t.divesWith(s.name ?? t.site)),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => FilteredDivesScreen(
-                    db: db,
-                    settings: settings,
-                    title: s.name ?? t.site,
-                    loader: () => db.listDivesBySite(s.id),
-                  ),
-                ));
-              },
-            ),
+            if (settings != null)
+              ListTile(
+                leading: const Icon(Icons.scuba_diving),
+                title: Text(t.divesWith(s.name ?? t.site)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => FilteredDivesScreen(
+                      db: db,
+                      settings: settings!,
+                      title: s.name ?? t.site,
+                      loader: () => db.listDivesBySite(s.id),
+                    ),
+                  ));
+                },
+              ),
           ],
         ),
       ),

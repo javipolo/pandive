@@ -11,6 +11,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/site_map.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
+import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/features/sites/screens/site_edit_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -111,23 +112,44 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
             null),
         if (s.hasCoords) ...[
           const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) =>
+                  SitesMapScreen(db: widget.db, sites: [s], title: s.name),
+            )),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: SiteMap(
-                center: LatLng(s.lat!, s.lon!),
-                zoom: 12,
-                markers: [
-                  Marker(
-                    point: LatLng(s.lat!, s.lon!),
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.topCenter,
-                    child: const Icon(Icons.location_on,
-                        color: Colors.red, size: 40),
-                  ),
-                ],
+              child: SizedBox(
+                height: 200,
+                child: Stack(
+                  children: [
+                    // Mapa no interactivo: el toque abre el mapa a pantalla completa.
+                    IgnorePointer(
+                      child: SiteMap(
+                        center: LatLng(s.lat!, s.lon!),
+                        zoom: 12,
+                        markers: [
+                          Marker(
+                            point: LatLng(s.lat!, s.lon!),
+                            width: 40,
+                            height: 40,
+                            alignment: Alignment.topCenter,
+                            child: const Icon(Icons.location_on,
+                                color: Colors.red, size: 40),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Positioned(
+                      right: 8,
+                      top: 8,
+                      child: CircleAvatar(
+                        radius: 16,
+                        child: Icon(Icons.fullscreen, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
