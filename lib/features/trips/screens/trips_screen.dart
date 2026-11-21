@@ -9,6 +9,8 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
+import 'package:pandive/core/widgets/selection_bar.dart';
+import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:pandive/features/trips/screens/trip_detail_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -24,8 +26,27 @@ class TripsScreen extends StatefulWidget {
 class _TripsScreenState extends State<TripsScreen> {
   late List<Trip> _trips = widget.db.listTrips();
   bool _desc = true; // listTrips ya viene por fecha descendente
+  bool _select = false;
+  final Set<int> _sel = {};
 
   void _reload() => setState(() => _trips = widget.db.listTrips());
+
+  void _exitSel() => setState(() {
+        _select = false;
+        _sel.clear();
+      });
+
+  void _toggle(int id) => setState(() {
+        if (!_sel.remove(id)) _sel.add(id);
+        if (_sel.isEmpty) _select = false;
+      });
+
+  Future<void> _exportSel() async {
+    final trips = [for (final tr in _trips) if (_sel.contains(tr.id)) tr];
+    if (trips.isEmpty) return;
+    await exportTripsDdb(widget.db, trips);
+    _exitSel();
+  }
 
   // Orden actual (listTrips es descendente; para ascendente se invierte).
   List<Trip> get _ordered => _desc ? _trips : _trips.reversed.toList();
@@ -70,17 +91,30 @@ class _TripsScreenState extends State<TripsScreen> {
             onPressed: () => setState(() => _desc = !_desc),
           ),
       ]),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _add,
-        icon: const Icon(Icons.add),
-        label: Text(t.newTrip),
-      ),
+      floatingActionButton: _select
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _add,
+              icon: const Icon(Icons.add),
+              label: Text(t.newTrip),
+            ),
       body: _trips.isEmpty
           ? Center(child: Text(t.noTrips))
-          : ListView(
-              padding: const EdgeInsets.only(bottom: 88),
-              children: _rows(context, t, fmt),
-            ),
+          : Column(children: [
+              if (_select)
+                SelectionBar(count: _sel.length, onClose: _exitSel, actions: [
+                  IconButton(
+                      tooltip: t.exportTrip,
+                      icon: const Icon(Icons.ios_share),
+                      onPressed: _exportSel),
+                ]),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.only(bottom: 88),
+                  children: _rows(context, t, fmt),
+                ),
+              ),
+            ]),
     );
   }
 
@@ -118,24 +152,35 @@ class _TripsScreenState extends State<TripsScreen> {
       t.diveCountLabel(tr.diveCount),
       if (tr.buddyCount > 0) t.buddyCountLabel(tr.buddyCount),
     ].join(' · ');
+    final selected = _sel.contains(tr.id);
     return ListTile(
-      leading: const CircleAvatar(child: Icon(Icons.luggage)),
+      selected: selected,
+      leading: CircleAvatar(
+          child: Icon(selected ? Icons.check : Icons.luggage)),
       title: Text(tr.name),
       subtitle: Text(sub),
-      onTap: () async {
-        await Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => TripDetailScreen(
-              db: widget.db, settings: widget.settings, trip: tr),
-        ));
-        _reload();
-      },
-      trailing: PopupMenuButton<String>(
-        onSelected: (v) => v == 'rename' ? _rename(tr) : _delete(tr),
-        itemBuilder: (_) => [
-          PopupMenuItem(value: 'rename', child: Text(t.rename)),
-          PopupMenuItem(value: 'delete', child: Text(t.delete)),
-        ],
-      ),
+      onLongPress: () => setState(() {
+        _select = true;
+        _sel.add(tr.id);
+      }),
+      onTap: _select
+          ? () => _toggle(tr.id)
+          : () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => TripDetailScreen(
+                    db: widget.db, settings: widget.settings, trip: tr),
+              ));
+              _reload();
+            },
+      trailing: _select
+          ? null
+          : PopupMenuButton<String>(
+              onSelected: (v) => v == 'rename' ? _rename(tr) : _delete(tr),
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'rename', child: Text(t.rename)),
+                PopupMenuItem(value: 'delete', child: Text(t.delete)),
+              ],
+            ),
     );
   }
 }

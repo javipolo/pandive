@@ -170,6 +170,31 @@ void main() {
     expect(db.listDives().where((d) => d.date?.year == 2099).length, 2);
   });
 
+  test('export de varios viajes: nombre + ddb con todos los viajes', () {
+    final dives = db.listDives().map((d) => d.id).toList();
+    final t1 = db.createTrip('Viaje Uno');
+    final t2 = db.createTrip('Viaje Dos');
+    db.assignDivesToTrip(t1, [dives[0]]);
+    db.assignDivesToTrip(t2, [dives[1]]);
+    final trips = [
+      db.listTrips().firstWhere((t) => t.id == t1),
+      db.listTrips().firstWhere((t) => t.id == t2),
+    ];
+
+    final base = tripsFileBase(trips);
+    expect(base, endsWith('PanDive'));
+    expect(base, contains('Viaje Uno'));
+
+    final out = DivemateDb.createEmpty('${tmp.path}/multi.ddb');
+    for (final tr in trips) {
+      writeTripDdb(db, tr, out, db.listDivesByTrip(tr.id));
+    }
+    out.close();
+    final r = DivemateDb.open('${tmp.path}/multi.ddb');
+    expect(r.listTrips().length, 2);
+    r.close();
+  });
+
   test('mergeBuddies reasigna dives y borra los fusionados', () {
     db.backfillBuddyIds();
     final withDives =
