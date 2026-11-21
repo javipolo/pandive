@@ -23,22 +23,26 @@ class BuddiesTab extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   final String query;
-  final bool sortByDives;
   const BuddiesTab(
       {super.key,
       required this.db,
       required this.settings,
-      this.query = '',
-      this.sortByDives = false});
+      this.query = ''});
 
   @override
   State<BuddiesTab> createState() => _BuddiesTabState();
 }
 
 class _BuddiesTabState extends State<BuddiesTab> {
+  // Orden y preferencia de sección "antiguos", recordados durante la sesión.
+  static BuddySort _lastSort = BuddySort.name;
+  static bool _lastShowStale = true;
+
   late List<Buddy> _buddies = widget.db.listBuddies();
   bool _select = false;
   final Set<int> _sel = {};
+  BuddySort _sort = _lastSort;
+  bool _showStale = _lastShowStale; // agrupar los de >2 años en una sección
   bool _staleOpen = false; // sección "hace >2 años" (colapsada por defecto)
   int? _highlightId; // buddy recién añadido, para destacar/desplazar
   final _hlKey = GlobalKey();
@@ -115,14 +119,17 @@ class _BuddiesTabState extends State<BuddiesTab> {
     final shown = q.isEmpty
         ? [..._buddies]
         : _buddies.where((b) => foldContains(b.name, q)).toList();
-    sortBuddiesBy(shown, widget.sortByDives ? BuddySort.dives : BuddySort.name);
+    sortBuddiesBy(shown, _sort);
 
-    // Al buscar: lista plana. Si no: los que no bucean contigo hace >2 años van
-    // a una sección colapsada al final.
+    // Al buscar (o con la sección desactivada): lista plana. Si no: los que no
+    // bucean contigo hace >2 años van a una sección colapsada al final.
     final now = DateTime.now();
     final cutoff = DateTime(now.year - 2, now.month, now.day);
     bool isStale(Buddy b) =>
-        q.isEmpty && b.lastDive != null && b.lastDive!.isBefore(cutoff);
+        _showStale &&
+        q.isEmpty &&
+        b.lastDive != null &&
+        b.lastDive!.isBefore(cutoff);
     final main = [for (final b in shown) if (!isStale(b)) b];
     final stale = [for (final b in shown) if (isStale(b)) b];
 
@@ -156,6 +163,7 @@ class _BuddiesTabState extends State<BuddiesTab> {
               onPressed: _deleteSel,
             ),
           ]),
+        if (!_select) _controls(t),
         Expanded(
           child: shown.isEmpty
               ? Center(child: Text(t.noBuddies))
@@ -167,6 +175,42 @@ class _BuddiesTabState extends State<BuddiesTab> {
       ]),
     );
   }
+
+  String _sortLabel(AppLocalizations t) => switch (_sort) {
+        BuddySort.name => t.sortByName,
+        BuddySort.dives => t.sortByDives,
+        BuddySort.recent => t.sortRecent,
+      };
+
+  Widget _controls(AppLocalizations t) => Padding(
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+        child: Row(children: [
+          PopupMenuButton<BuddySort>(
+            initialValue: _sort,
+            onSelected: (v) => setState(() => _sort = _lastSort = v),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: BuddySort.name, child: Text(t.sortByName)),
+              PopupMenuItem(value: BuddySort.dives, child: Text(t.sortByDives)),
+              PopupMenuItem(value: BuddySort.recent, child: Text(t.sortRecent)),
+            ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.sort, size: 20),
+                const SizedBox(width: 6),
+                Text(_sortLabel(t)),
+                const Icon(Icons.arrow_drop_down),
+              ]),
+            ),
+          ),
+          const Spacer(),
+          FilterChip(
+            label: Text(t.olderBuddies),
+            selected: _showStale,
+            onSelected: (v) => setState(() => _showStale = _lastShowStale = v),
+          ),
+        ]),
+      );
 
   Widget _staleHeader(AppLocalizations t, int n) {
     final cs = Theme.of(context).colorScheme;

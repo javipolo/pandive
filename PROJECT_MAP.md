@@ -117,7 +117,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/widgets/night_hours_control.dart` -> franja horaria de inmersión nocturna (desde/hasta)
 
 ### buddies (compañeros)
-- `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar/fusionar en lote); sección ">2 años" colapsada al final
+- `lib/features/buddies/screens/buddies_tab.dart` -> lista de compañeros (añadir/renombrar/borrar/fusionar en lote); orden en-tab (nombre/buceos/reciente) + toggle sección ">2 años" colapsada al final
 - `lib/features/buddies/widgets/buddy_tile.dart` -> fila de compañero (avatar, nº buceos, menú, abre sus buceos)
 - `lib/features/buddies/logic/merge_buddies_action.dart` -> diálogo elegir cuál conservar + fusión
 - `lib/features/buddies/logic/buddy_sort.dart` -> enum BuddySort {name,dives,recent} + sortBuddiesBy

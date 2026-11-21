@@ -63,8 +63,7 @@ class HomeTabs extends StatelessWidget {
                 key: ValueKey('buddies-$v'),
                 db: db,
                 settings: settings,
-                query: _q(2),
-                sortByDives: sortByDives),
+                query: _q(2)),
             TagsTab(
                 key: ValueKey('tags-$v'),
                 db: db,

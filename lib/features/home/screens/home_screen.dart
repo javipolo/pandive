@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool get _canSearch => _index <= 3; // todas menos estadísticas
   // sitios solo si NO se ordena por buceos (en ese modo no hay grupos de país)
   bool get _canCollapse => _index == 0 || (_index == 1 && !_sortByDives);
-  bool get _canSort => _index == 1 || _index == 2; // sitios / compañeros
+  bool get _canSort => _index == 1; // sitios (buddies ordena desde su tab)
   @override
   void initState() {
     super.initState();
