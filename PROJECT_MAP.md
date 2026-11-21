@@ -182,6 +182,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/trips/logic/export_trip.dart` -> exporta/comparte un viaje como .ddb (viaje+buceos+compañeros; nombre Año-Nombre-PanDive)
 
 ### sites (sitios)
+- `lib/core/widgets/progress_dialog.dart` -> diálogo modal de progreso (withProgress) para export/import largos
 - `lib/core/widgets/site_map.dart` -> mapa reutilizable (tiles satélite Esri + atribución)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, editar/borrar, swipe entre sitios)

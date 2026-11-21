@@ -129,7 +129,7 @@ void main() {
   });
 
   test('export de viaje: nombre de fichero + .ddb con viaje/buceos/compañeros',
-      () {
+      () async {
     final dives = db.listDives().take(2).map((d) => d.id).toList();
     final tripId = db.createTrip('Egipto 2024');
     db.assignDivesToTrip(tripId, dives);
@@ -142,7 +142,7 @@ void main() {
 
     final outPath = '${tmp.path}/out_trip.ddb';
     final out = DivemateDb.createEmpty(outPath);
-    writeTripDdb(db, trip, out, db.listDivesByTrip(tripId));
+    await writeTripDdb(db, trip, out, db.listDivesByTrip(tripId));
     out.close();
 
     final r = DivemateDb.open(outPath);
@@ -154,7 +154,7 @@ void main() {
     r.close();
   });
 
-  test('importDivesFromDb copia buceos de otro ddb y dedupe por fecha/hora', () {
+  test('importDivesFromDb copia buceos de otro ddb y dedupe por fecha/hora', () async {
     final src = DivemateDb.createEmpty('${tmp.path}/src.ddb');
     src.importExternalDive(
         dateTime: DateTime(2099, 1, 1, 10),
@@ -163,14 +163,14 @@ void main() {
     src.importExternalDive(
         dateTime: DateTime(2099, 1, 2, 10), placeName: 'ZZZ Src B');
 
-    expect(importDivesFromDb(db, src), 2);
-    expect(importDivesFromDb(db, src), 0); // dedupe por fecha/hora
+    expect(await importDivesFromDb(db, src), 2);
+    expect(await importDivesFromDb(db, src), 0); // dedupe por fecha/hora
     src.close();
 
     expect(db.listDives().where((d) => d.date?.year == 2099).length, 2);
   });
 
-  test('export de varios viajes: nombre + ddb con todos los viajes', () {
+  test('export de varios viajes: nombre + ddb con todos los viajes', () async {
     final dives = db.listDives().map((d) => d.id).toList();
     final t1 = db.createTrip('Viaje Uno');
     final t2 = db.createTrip('Viaje Dos');
@@ -187,7 +187,7 @@ void main() {
 
     final out = DivemateDb.createEmpty('${tmp.path}/multi.ddb');
     for (final tr in trips) {
-      writeTripDdb(db, tr, out, db.listDivesByTrip(tr.id));
+      await writeTripDdb(db, tr, out, db.listDivesByTrip(tr.id));
     }
     out.close();
     final r = DivemateDb.open('${tmp.path}/multi.ddb');

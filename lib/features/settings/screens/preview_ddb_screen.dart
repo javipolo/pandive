@@ -9,6 +9,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
 import 'package:pandive/features/settings/logic/import_dives.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
@@ -76,7 +77,9 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
         confirmLabel: t.importDivesAction)) {
       return;
     }
-    final n = importDivesFromDb(widget.db, src);
+    if (!mounted) return;
+    final n = await withProgress(
+        context, t.working, () => importDivesFromDb(widget.db, src));
     bumpDataRevision();
     messenger.showSnackBar(SnackBar(content: Text(t.importDivesResult(n))));
   }

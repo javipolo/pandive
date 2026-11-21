@@ -349,6 +349,7 @@
   },
   "sortOrder": "Sort order",
   "exportTrip": "Export trip",
+  "working": "Working…",
   "trips": "Trips",
   "newTrip": "New trip",
   "noTrips": "No trips yet",

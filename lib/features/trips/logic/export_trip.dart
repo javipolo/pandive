@@ -26,7 +26,7 @@ Future<void> exportTripsDdb(DivemateDb source, List<Trip> trips) async {
   final out = DivemateDb.createEmpty(f.path);
   try {
     for (final trip in trips) {
-      writeTripDdb(source, trip, out, source.listDivesByTrip(trip.id));
+      await writeTripDdb(source, trip, out, source.listDivesByTrip(trip.id));
     }
   } finally {
     out.close();
@@ -65,26 +65,29 @@ Future<File> buildTripDdb(DivemateDb source, Trip trip) async {
   if (f.existsSync()) f.deleteSync();
   final out = DivemateDb.createEmpty(f.path);
   try {
-    writeTripDdb(source, trip, out, dives);
+    await writeTripDdb(source, trip, out, dives);
   } finally {
     out.close();
   }
   return f;
 }
 
-/// Pobla [out] con el viaje, sus inmersiones y compañeros. Testeable (sin IO).
-void writeTripDdb(
+/// Pobla [out] con el viaje, sus inmersiones y compañeros. Cede frames cada
+/// pocas inmersiones para no congelar la UI. Testeable (sin IO).
+Future<void> writeTripDdb(
   DivemateDb source,
   Trip trip,
   DivemateDb out,
   List<Dive> dives,
-) {
+) async {
   final outTrip = out.createTrip(trip.name);
   out.setTripBuddies(outTrip, [
     for (final b in source.tripBuddies(trip.id)) out.findOrCreateBuddy(b.name),
   ]);
 
+  var i = 0;
   for (final d in dives) {
+    if (i++ % 10 == 9) await Future<void>.delayed(Duration.zero);
     final dt = d.date;
     if (dt == null) continue;
     final site = d.placeId != null ? source.getSite(d.placeId!) : null;

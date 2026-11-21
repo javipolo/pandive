@@ -7,10 +7,13 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
 /// Importa en [target] las inmersiones de [source]. Devuelve cuántas añadió
-/// (las ya presentes por fecha/hora se omiten).
-int importDivesFromDb(DivemateDb target, DivemateDb source) {
+/// (las ya presentes por fecha/hora se omiten). Cede frames cada pocas para no
+/// congelar la UI.
+Future<int> importDivesFromDb(DivemateDb target, DivemateDb source) async {
   var n = 0;
+  var i = 0;
   for (final d in source.listDives()) {
+    if (i++ % 10 == 9) await Future<void>.delayed(Duration.zero);
     final dt = d.date;
     if (dt == null) continue;
     final site = d.placeId != null ? source.getSite(d.placeId!) : null;

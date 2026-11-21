@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/features/sites/screens/sites_map_screen.dart';
@@ -98,7 +99,8 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
         IconButton(
           tooltip: t.exportTrip,
           icon: const Icon(Icons.share),
-          onPressed: () => exportTripDdb(widget.db, widget.trip),
+          onPressed: () => withProgress(
+              context, t.working, () => exportTripDdb(widget.db, widget.trip)),
         ),
       ]),
       body: ListView(

@@ -9,6 +9,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/name_dialog.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
 import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:pandive/features/trips/screens/trip_detail_screen.dart';
@@ -44,7 +45,8 @@ class _TripsScreenState extends State<TripsScreen> {
   Future<void> _exportSel() async {
     final trips = [for (final tr in _trips) if (_sel.contains(tr.id)) tr];
     if (trips.isEmpty) return;
-    await exportTripsDdb(widget.db, trips);
+    await withProgress(context, AppLocalizations.of(context).working,
+        () => exportTripsDdb(widget.db, trips));
     _exitSel();
   }
 

@@ -216,6 +216,7 @@
   "divesWith": "Plongées avec {name}",
   "sortOrder": "Ordre",
   "exportTrip": "Exporter le voyage",
+  "working": "Traitement…",
   "trips": "Voyages",
   "newTrip": "Nouveau voyage",
   "noTrips": "Aucun voyage",
