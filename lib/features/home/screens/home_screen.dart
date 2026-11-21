@@ -7,6 +7,9 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/doc_notifications.dart';
 import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/storage/documents_storage.dart';
+import 'package:pandive/features/documents/screens/documents_screen.dart';
+import 'package:pandive/features/documents/screens/document_detail_screen.dart';
 import 'package:pandive/features/settings/screens/preview_ddb_screen.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_app_bar.dart';
@@ -56,10 +59,34 @@ class _HomeScreenState extends State<HomeScreen> {
     _openSub = OpenedFile.events().listen((p) {
       if (mounted) _onOpened(p);
     });
-    // Reprograma las notificaciones de caducidad (solo pide permiso si procede).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) syncDocNotifications(widget.db, AppLocalizations.of(context));
+    // Reprograma avisos de caducidad y abre el documento si la app se lanzó al
+    // pulsar una notificación (arranque en frío).
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      syncDocNotifications(widget.db, AppLocalizations.of(context));
+      final coldId = await consumeNotificationLaunch();
+      if (coldId != null && mounted) _openDocById(coldId);
     });
+    // Notificación pulsada con la app abierta/en segundo plano.
+    tappedDocId.addListener(_onTappedDoc);
+  }
+  void _onTappedDoc() {
+    final id = tappedDocId.value;
+    if (id == null || !mounted) return;
+    tappedDocId.value = null;
+    _openDocById(id);
+  }
+  // Abre la sección Documentación y, si el documento existe, su detalle encima.
+  Future<void> _openDocById(int id) async {
+    final nav = Navigator.of(context);
+    nav.push(MaterialPageRoute(builder: (_) => DocumentsScreen(db: widget.db)));
+    final doc = widget.db.getDocument(id);
+    if (doc == null) return;
+    final dir = await documentsDir();
+    if (!mounted) return;
+    nav.push(MaterialPageRoute(
+        builder: (_) => DocumentDetailScreen(
+            db: widget.db, doc: doc, imagePath: '${dir.path}/${doc.fileName}')));
   }
   void _onOpened(String path) => Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => PreviewDdbScreen(
@@ -69,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onReplace: widget.onReplaceDb)));
   @override
   void dispose() {
+    tappedDocId.removeListener(_onTappedDoc);
     _openSub?.cancel();
     _searchCtrl.dispose();
     super.dispose();

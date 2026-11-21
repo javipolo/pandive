@@ -1,8 +1,11 @@
 /// Notificaciones locales de caducidad de documentos: 30/7/1 días antes y el
 /// mismo día. Reprograma todas desde cero en cada cambio. Solo pide permiso si
 /// hay algún documento con fecha de caducidad (si no, no molesta al usuario).
+/// El payload de cada notificación es el id del documento, para que al pulsarla
+/// la app abra ese documento ([tappedDocId] / [consumeNotificationLaunch]).
 library;
 
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
@@ -16,6 +19,24 @@ const _offsets = [30, 7, 1, 0]; // días antes de caducar (0 = el mismo día)
 final _plugin = FlutterLocalNotificationsPlugin();
 bool _inited = false;
 
+/// Id del documento de la última notificación pulsada con la app abierta (o en
+/// segundo plano). Lo escucha HomeScreen para abrir ese documento.
+final ValueNotifier<int?> tappedDocId = ValueNotifier<int?>(null);
+
+void _onTap(NotificationResponse r) {
+  final id = int.tryParse(r.payload ?? '');
+  if (id != null) tappedDocId.value = id;
+}
+
+/// Si la app se abrió (en frío) al pulsar una notificación, devuelve el id del
+/// documento una sola vez; si no, null.
+Future<int?> consumeNotificationLaunch() async {
+  await _init();
+  final d = await _plugin.getNotificationAppLaunchDetails();
+  if (d?.didNotificationLaunchApp != true) return null;
+  return int.tryParse(d!.notificationResponse?.payload ?? '');
+}
+
 Future<void> _init() async {
   if (_inited) return;
   tzdata.initializeTimeZones();
@@ -23,8 +44,11 @@ Future<void> _init() async {
     final info = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(info.identifier));
   } catch (_) {/* deja UTC por defecto */}
-  await _plugin.initialize(const InitializationSettings(
-      android: AndroidInitializationSettings('ic_stat_panda')));
+  await _plugin.initialize(
+    const InitializationSettings(
+        android: AndroidInitializationSettings('ic_stat_panda')),
+    onDidReceiveNotificationResponse: _onTap,
+  );
   _inited = true;
 }
 
@@ -66,6 +90,7 @@ Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
         t.docNotifBody(_offsets[k], d.title),
         when,
         details,
+        payload: '${d.id}',
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
