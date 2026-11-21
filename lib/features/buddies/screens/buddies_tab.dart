@@ -39,6 +39,7 @@ class _BuddiesTabState extends State<BuddiesTab> {
   late List<Buddy> _buddies = widget.db.listBuddies();
   bool _select = false;
   final Set<int> _sel = {};
+  bool _staleOpen = false; // sección "hace >2 años" (colapsada por defecto)
   int? _highlightId; // buddy recién añadido, para destacar/desplazar
   final _hlKey = GlobalKey();
   Timer? _hlTimer;
@@ -114,7 +115,24 @@ class _BuddiesTabState extends State<BuddiesTab> {
     final shown = q.isEmpty
         ? [..._buddies]
         : _buddies.where((b) => foldContains(b.name, q)).toList();
-    sortBuddies(shown, widget.sortByDives);
+    sortBuddiesBy(shown, widget.sortByDives ? BuddySort.dives : BuddySort.name);
+
+    // Al buscar: lista plana. Si no: los que no bucean contigo hace >2 años van
+    // a una sección colapsada al final.
+    final now = DateTime.now();
+    final cutoff = DateTime(now.year - 2, now.month, now.day);
+    bool isStale(Buddy b) =>
+        q.isEmpty && b.lastDive != null && b.lastDive!.isBefore(cutoff);
+    final main = [for (final b in shown) if (!isStale(b)) b];
+    final stale = [for (final b in shown) if (isStale(b)) b];
+
+    final rows = <Widget>[
+      for (final b in main) ...[_tile(b), const Divider(height: 1)],
+      if (stale.isNotEmpty) _staleHeader(t, stale.length),
+      if (stale.isNotEmpty && _staleOpen)
+        for (final b in stale) ...[_tile(b), const Divider(height: 1)],
+    ];
+
     return Scaffold(
       floatingActionButton: _select
           ? null
@@ -141,14 +159,26 @@ class _BuddiesTabState extends State<BuddiesTab> {
         Expanded(
           child: shown.isEmpty
               ? Center(child: Text(t.noBuddies))
-              : ListView.separated(
+              : ListView(
                   padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
-                  itemCount: shown.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, i) => _tile(shown[i]),
+                  children: rows,
                 ),
         ),
       ]),
+    );
+  }
+
+  Widget _staleHeader(AppLocalizations t, int n) {
+    final cs = Theme.of(context).colorScheme;
+    return ListTile(
+      dense: true,
+      tileColor: cs.primaryContainer,
+      title: Text(t.staleBuddies(n),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: cs.onPrimaryContainer)),
+      trailing: Icon(_staleOpen ? Icons.expand_less : Icons.expand_more,
+          color: cs.onPrimaryContainer),
+      onTap: () => setState(() => _staleOpen = !_staleOpen),
     );
   }
 

@@ -1,10 +1,14 @@
 /// Selección múltiple de compañeros (con crear nuevo). Devuelve `List<Buddy>`.
+/// Búsqueda por nombre, nº de buceos por fila y orden configurable
+/// (alfabético por defecto, por nº de buceos o por buceo más reciente).
 library;
 
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/text/collate.dart';
+import 'package:pandive/features/buddies/logic/buddy_sort.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class BuddyPickerScreen extends StatefulWidget {
@@ -21,20 +25,28 @@ class BuddyPickerScreen extends StatefulWidget {
 }
 
 class _BuddyPickerScreenState extends State<BuddyPickerScreen> {
-  // Recuerda la posición de scroll entre aperturas (añadir el mismo buddy a
-  // varios buceos sin volver a buscarlo). Solo dura la sesión de la app.
-  static double _lastOffset = 0;
+  // Recuerda el orden elegido entre aperturas (solo durante la sesión).
+  static BuddySort _lastSort = BuddySort.name;
 
   late List<Buddy> _buddies = widget.db.listBuddies();
   late final Set<int> _selected = {...widget.selectedIds};
-  late final ScrollController _scroll =
-      ScrollController(initialScrollOffset: _lastOffset)
-        ..addListener(() => _lastOffset = _scroll.offset);
+  final _searchCtrl = TextEditingController();
+  String _query = '';
+  BuddySort _sort = _lastSort;
 
   @override
   void dispose() {
-    _scroll.dispose();
+    _searchCtrl.dispose();
     super.dispose();
+  }
+
+  List<Buddy> _shown() {
+    final q = _query.trim();
+    final list = q.isEmpty
+        ? [..._buddies]
+        : _buddies.where((b) => foldContains(b.name, q)).toList();
+    sortBuddiesBy(list, _sort);
+    return list;
   }
 
   Future<void> _createNew() async {
@@ -74,10 +86,21 @@ class _BuddyPickerScreenState extends State<BuddyPickerScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final shown = _shown();
     return Scaffold(
       appBar: AppBar(
         title: Text(t.selectBuddies),
         actions: [
+          PopupMenuButton<BuddySort>(
+            icon: const Icon(Icons.sort),
+            initialValue: _sort,
+            onSelected: (v) => setState(() => _sort = _lastSort = v),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: BuddySort.name, child: Text(t.sortByName)),
+              PopupMenuItem(value: BuddySort.dives, child: Text(t.sortByDives)),
+              PopupMenuItem(value: BuddySort.recent, child: Text(t.sortRecent)),
+            ],
+          ),
           TextButton.icon(
             onPressed: _confirm,
             icon: const Icon(Icons.check),
@@ -90,26 +113,39 @@ class _BuddyPickerScreenState extends State<BuddyPickerScreen> {
         icon: const Icon(Icons.person_add),
         label: Text(t.create),
       ),
-      body: _buddies.isEmpty
-          ? Center(child: Text(t.noBuddies))
-          : ListView.builder(
-              controller: _scroll,
-              itemCount: _buddies.length,
-              itemBuilder: (context, i) {
-                final b = _buddies[i];
-                return CheckboxListTile(
-                  value: _selected.contains(b.id),
-                  title: Text(b.name),
-                  onChanged: (v) => setState(() {
-                    if (v == true) {
-                      _selected.add(b.id);
-                    } else {
-                      _selected.remove(b.id);
-                    }
-                  }),
-                );
-              },
-            ),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+          child: SearchBar(
+            controller: _searchCtrl,
+            hintText: t.search,
+            leading: const Icon(Icons.search),
+            onChanged: (v) => setState(() => _query = v),
+          ),
+        ),
+        Expanded(
+          child: shown.isEmpty
+              ? Center(child: Text(t.noBuddies))
+              : ListView.builder(
+                  itemCount: shown.length,
+                  itemBuilder: (context, i) {
+                    final b = shown[i];
+                    return CheckboxListTile(
+                      value: _selected.contains(b.id),
+                      title: Text(b.name),
+                      subtitle: Text(t.diveCountLabel(b.diveCount)),
+                      onChanged: (v) => setState(() {
+                        if (v == true) {
+                          _selected.add(b.id);
+                        } else {
+                          _selected.remove(b.id);
+                        }
+                      }),
+                    );
+                  },
+                ),
+        ),
+      ]),
     );
   }
 }

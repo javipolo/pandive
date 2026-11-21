@@ -2,19 +2,21 @@ part of 'divemate_db.dart';
 
 /// Compañeros de buceo (tabla Buddy). Guardamos el nombre en FirstName.
 extension DivemateDbBuddies on DivemateDb {
-  /// Nº de inmersiones del owner que referencian a un buddy (por BuddyIDs).
-  String _buddyCountSubquery() {
+  /// Filtro de inmersiones del owner que referencian a un buddy (por BuddyIDs).
+  String _buddyDivesWhere() {
     final owner = ownerId;
     final diverFilter = owner != null ? 'AND L.DiverID = $owner' : '';
-    return "(SELECT COUNT(*) FROM Logbook L WHERE "
-        "(L.Status IS NULL OR L.Status != 2) $diverFilter AND "
-        "(',' || IFNULL(L.BuddyIDs,'') || ',') LIKE ('%,' || B.ID || ',%'))";
+    return "(L.Status IS NULL OR L.Status != 2) $diverFilter AND "
+        "(',' || IFNULL(L.BuddyIDs,'') || ',') LIKE ('%,' || B.ID || ',%')";
   }
 
-  /// Lista de buddies, alfabética, con nº de inmersiones.
+  /// Lista de buddies, alfabética, con nº de inmersiones y fecha del último.
   List<Buddy> listBuddies() {
+    final where = _buddyDivesWhere();
     final rows = _db.select(
-      'SELECT B.ID, B.FirstName, B.LastName, ${_buddyCountSubquery()} AS dives '
+      'SELECT B.ID, B.FirstName, B.LastName, '
+      '(SELECT COUNT(*) FROM Logbook L WHERE $where) AS dives, '
+      '(SELECT MAX(L.Divedate) FROM Logbook L WHERE $where) AS lastdive '
       'FROM Buddy B ORDER BY B.FirstName COLLATE NOCASE, B.LastName COLLATE NOCASE',
     );
     return rows.map((r) {
@@ -25,6 +27,7 @@ extension DivemateDbBuddies on DivemateDb {
         id: r['ID'] as int,
         name: name.isEmpty ? '—' : name,
         diveCount: (r['dives'] as int?) ?? 0,
+        lastDive: DateTime.tryParse(_str(r['lastdive']) ?? ''),
       );
     }).toList()
       ..sort((a, b) => compareFold(a.name, b.name));

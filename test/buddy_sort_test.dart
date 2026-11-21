@@ -4,21 +4,28 @@ import 'package:pandive/features/buddies/logic/buddy_sort.dart';
 
 void main() {
   List<Buddy> sample() => [
-        const Buddy(id: 1, name: 'Ana', diveCount: 2),
-        const Buddy(id: 2, name: 'Zoe', diveCount: 10),
-        const Buddy(id: 3, name: 'bru', diveCount: 2),
+        Buddy(id: 1, name: 'Ana', diveCount: 2, lastDive: DateTime(2020, 1, 1)),
+        Buddy(id: 2, name: 'Zoe', diveCount: 10, lastDive: DateTime(2024, 6, 1)),
+        Buddy(id: 3, name: 'bru', diveCount: 2, lastDive: DateTime(2023, 3, 1)),
+        const Buddy(id: 4, name: 'Cal', diveCount: 0), // sin buceos
       ];
 
-  test('sin byDives no reordena', () {
+  test('name: alfabético (fold)', () {
     final l = sample();
-    sortBuddies(l, false);
-    expect(l.map((b) => b.id), [1, 2, 3]);
+    sortBuddiesBy(l, BuddySort.name);
+    expect(l.map((b) => b.name), ['Ana', 'bru', 'Cal', 'Zoe']);
   });
 
-  test('byDives: desc por buceos, luego nombre (fold)', () {
+  test('dives: desc por buceos, luego nombre (fold)', () {
     final l = sample();
-    sortBuddies(l, true);
-    // Zoe(10), luego empate 2 -> Ana, bru (orden alfabético insensible)
-    expect(l.map((b) => b.name), ['Zoe', 'Ana', 'bru']);
+    sortBuddiesBy(l, BuddySort.dives);
+    // Zoe(10), empate 2 -> Ana, bru, luego Cal(0)
+    expect(l.map((b) => b.name), ['Zoe', 'Ana', 'bru', 'Cal']);
+  });
+
+  test('recent: más reciente primero, sin buceos al final', () {
+    final l = sample();
+    sortBuddiesBy(l, BuddySort.recent);
+    expect(l.map((b) => b.name), ['Zoe', 'bru', 'Ana', 'Cal']);
   });
 }

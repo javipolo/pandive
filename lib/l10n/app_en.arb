@@ -50,6 +50,14 @@
     }
   },
   "sortByDives": "Sort by dives",
+  "sortByName": "Sort by name",
+  "sortRecent": "Sort by most recent",
+  "staleBuddies": "Older than 2 years ({count})",
+  "@staleBuddies": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "searchPlace": "Search place",
   "searchNoResults": "No results",
   "latitude": "Latitude",
