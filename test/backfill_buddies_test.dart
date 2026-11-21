@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/features/settings/logic/import_dives.dart';
 import 'package:pandive/features/settings/logic/import_site_coords.dart';
 import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:sqlite3/open.dart';
@@ -151,6 +152,22 @@ void main() {
     expect(r.listDivesByTrip(trips.first.id).length, 2);
     expect(r.tripBuddies(trips.first.id).length, 1);
     r.close();
+  });
+
+  test('importDivesFromDb copia buceos de otro ddb y dedupe por fecha/hora', () {
+    final src = DivemateDb.createEmpty('${tmp.path}/src.ddb');
+    src.importExternalDive(
+        dateTime: DateTime(2099, 1, 1, 10),
+        placeName: 'ZZZ Src A',
+        buddies: ['ZZZ SrcBuddy']);
+    src.importExternalDive(
+        dateTime: DateTime(2099, 1, 2, 10), placeName: 'ZZZ Src B');
+
+    expect(importDivesFromDb(db, src), 2);
+    expect(importDivesFromDb(db, src), 0); // dedupe por fecha/hora
+    src.close();
+
+    expect(db.listDives().where((d) => d.date?.year == 2099).length, 2);
   });
 
   test('mergeBuddies reasigna dives y borra los fusionados', () {

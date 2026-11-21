@@ -7,8 +7,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
+import 'package:pandive/features/settings/logic/import_dives.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -65,6 +67,20 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _importDives() async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final src = _preview;
+    if (src == null) return;
+    if (!await confirmDialog(context, t.importDivesConfirm(_dives.length),
+        confirmLabel: t.importDivesAction)) {
+      return;
+    }
+    final n = importDivesFromDb(widget.db, src);
+    bumpDataRevision();
+    messenger.showSnackBar(SnackBar(content: Text(t.importDivesResult(n))));
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -75,6 +91,13 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
         title: Text(t.previewDdb),
         backgroundColor: cs.error,
         foregroundColor: cs.onError,
+        actions: [
+          if (ok && _dives.isNotEmpty)
+            IconButton(
+                tooltip: t.importDivesAction,
+                icon: const Icon(Icons.download_outlined),
+                onPressed: _importDives),
+        ],
       ),
       body: !ok
           ? Center(child: Text(t.invalidDb))
