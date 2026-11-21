@@ -185,6 +185,12 @@ class _BuddiesTabState extends State<BuddiesTab> {
   Widget _controls(AppLocalizations t) => Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
         child: Row(children: [
+          FilterChip(
+            label: Text(t.olderBuddies),
+            selected: _showStale,
+            onSelected: (v) => setState(() => _showStale = _lastShowStale = v),
+          ),
+          const Spacer(),
           PopupMenuButton<BuddySort>(
             initialValue: _sort,
             onSelected: (v) => setState(() => _sort = _lastSort = v),
@@ -202,12 +208,6 @@ class _BuddiesTabState extends State<BuddiesTab> {
                 const Icon(Icons.arrow_drop_down),
               ]),
             ),
-          ),
-          const Spacer(),
-          FilterChip(
-            label: Text(t.olderBuddies),
-            selected: _showStale,
-            onSelected: (v) => setState(() => _showStale = _lastShowStale = v),
           ),
         ]),
       );

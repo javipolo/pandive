@@ -52,8 +52,8 @@
   "sortByDives": "Sort by dives",
   "sortByName": "Sort by name",
   "sortRecent": "Sort by most recent",
-  "olderBuddies": "Older than 2 years",
-  "staleBuddies": "Older than 2 years ({count})",
+  "olderBuddies": "Dormant",
+  "staleBuddies": "Dormant ({count})",
   "@staleBuddies": {
     "placeholders": {
       "count": {}
