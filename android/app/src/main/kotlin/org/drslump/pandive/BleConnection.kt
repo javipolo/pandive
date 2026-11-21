@@ -5,9 +5,14 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
 import java.util.UUID
@@ -250,11 +255,46 @@ class BleConnection(private val context: Context, private val address: String) {
     @SuppressLint("MissingPermission")
     fun connect(timeoutMs: Long): Boolean {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val device = manager.adapter.getRemoteDevice(address)
+        val adapter = manager.adapter
+        // Descubrir por escaneo ANTES de conectar: conectar por MAC cruda a un
+        // dispositivo no cacheado da device_type=Unknown y el connect falla
+        // (timeout). El escaneo lo cachea con su tipo de dirección correcto
+        // (igual que la pantalla de escaneo, que sí funciona) y usamos su
+        // BluetoothDevice para conectar.
+        val scanned = scanFor(adapter, 15000)
+        val device = scanned ?: adapter.getRemoteDevice(address)
         gatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE)
         val ok = connectLatch.await(timeoutMs, TimeUnit.MILLISECONDS)
-        if (!ok) { connectError = "Timeout de conexión"; return false }
+        if (!ok) {
+            connectError =
+                if (scanned == null) "No se encontró el dispositivo" else "Timeout de conexión"
+            return false
+        }
         return ready
+    }
+
+    /** Escanea hasta encontrar [address] (o agotar [timeoutMs]); devuelve el
+     *  dispositivo descubierto (con su tipo correcto) o null. */
+    @SuppressLint("MissingPermission")
+    private fun scanFor(adapter: BluetoothAdapter, timeoutMs: Long): BluetoothDevice? {
+        val scanner = adapter.bluetoothLeScanner ?: return null
+        var found: BluetoothDevice? = null
+        val latch = CountDownLatch(1)
+        val cb = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                if (result.device.address.equals(address, ignoreCase = true)) {
+                    found = result.device
+                    latch.countDown()
+                }
+            }
+        }
+        val filters = listOf(ScanFilter.Builder().setDeviceAddress(address).build())
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+        scanner.startScan(filters, settings, cb)
+        latch.await(timeoutMs, TimeUnit.MILLISECONDS)
+        scanner.stopScan(cb)
+        return found
     }
 
     fun error(): String? = connectError
