@@ -105,7 +105,7 @@ class _TripsScreenState extends State<TripsScreen> {
                 SelectionBar(count: _sel.length, onClose: _exitSel, actions: [
                   IconButton(
                       tooltip: t.exportTrip,
-                      icon: const Icon(Icons.ios_share),
+                      icon: const Icon(Icons.share),
                       onPressed: _exportSel),
                 ]),
               Expanded(

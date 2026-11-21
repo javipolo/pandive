@@ -97,7 +97,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
       appBar: AppBar(title: Text(widget.trip.name), actions: [
         IconButton(
           tooltip: t.exportTrip,
-          icon: const Icon(Icons.ios_share),
+          icon: const Icon(Icons.share),
           onPressed: () => exportTripDdb(widget.db, widget.trip),
         ),
       ]),
