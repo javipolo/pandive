@@ -45,6 +45,15 @@ extension DivemateDbSites on DivemateDb {
 
   void deleteSite(int id) => _db.execute('DELETE FROM Place WHERE ID=?', [id]);
 
+  /// Borra los sitios sin ninguna inmersión (del owner). Devuelve cuántos.
+  int purgeUnusedSites() {
+    final unused = [for (final s in listSites()) if (s.diveCount == 0) s.id];
+    for (final id in unused) {
+      deleteSite(id);
+    }
+    return unused.length;
+  }
+
   int createSite(Map<String, Object?> fields) {
     _db.execute(
       'INSERT INTO Place (Place, Country, WaterName, Region, Lat, Lon, '

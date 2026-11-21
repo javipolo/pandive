@@ -48,6 +48,17 @@ class ToolsScreen extends StatelessWidget {
     bumpDataRevision();
     messenger.showSnackBar(SnackBar(content: Text(t.purgeBuddiesResult(n))));
   }
+  Future<void> _purgeSites(BuildContext context) async {
+    final t = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (!await confirmDialog(context, t.purgeSitesConfirm,
+        confirmLabel: t.delete)) {
+      return;
+    }
+    final n = db.purgeUnusedSites();
+    bumpDataRevision();
+    messenger.showSnackBar(SnackBar(content: Text(t.purgeSitesResult(n))));
+  }
   Future<void> _purgeOrphanTanks(BuildContext context) async {
     final t = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -160,6 +171,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.person_remove_outlined),
             title: Text(t.purgeBuddies),
             onTap: () => _purgeBuddies(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.wrong_location_outlined),
+            title: Text(t.purgeSites),
+            onTap: () => _purgeSites(context),
           ),
           ListTile(
             leading: const Icon(Icons.cleaning_services_outlined),

@@ -92,6 +92,14 @@
       "count": {}
     }
   },
+  "purgeSites": "Delete sites with no dives",
+  "purgeSitesConfirm": "Delete all dive sites that have no dives?",
+  "purgeSitesResult": "{count} sites deleted",
+  "@purgeSitesResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "previewDdb": "Preview (read-only)",
   "replaceDb": "Use this as my database",
   "replaceDbConfirm": "Replace your current logbook with this file? Your current data will no longer be used.",

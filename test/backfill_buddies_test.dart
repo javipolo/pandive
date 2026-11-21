@@ -179,6 +179,16 @@ void main() {
     expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // no se pisan
   });
 
+  test('purgeUnusedSites borra solo los sitios sin buceos', () {
+    final empty = db.createSite({'Place': 'ZZZ Purge Empty'});
+    final before = db.listSites().length;
+    final n = db.purgeUnusedSites();
+    expect(n, greaterThan(0));
+    expect(db.getSite(empty), isNull);
+    expect(db.listSites().length, before - n);
+    expect(db.listSites().every((s) => s.diveCount > 0), isTrue);
+  });
+
   test('export de viaje: nombre de fichero + .ddb con viaje/buceos/compañeros',
       () async {
     final dives = db.listDives().take(2).map((d) => d.id).toList();
