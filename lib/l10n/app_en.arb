@@ -417,11 +417,22 @@
       "count": {}
     }
   },
-  "importCoords": "Import site coordinates (JSON)",
-  "importCoordsResult": "{count} sites updated",
-  "@importCoordsResult": {
+  "importSites": "Import sites (JSON)",
+  "importAdd": "Add",
+  "importModify": "Modify",
+  "nothingToImport": "Nothing to import",
+  "exportSites": "Export sites (JSON)",
+  "importResult": "{count} sites imported",
+  "@importResult": {
     "placeholders": {
       "count": {}
+    }
+  },
+  "importSitesConfirm": "Will add {add} and modify {mod} sites. Continue?",
+  "@importSitesConfirm": {
+    "placeholders": {
+      "add": {},
+      "mod": {}
     }
   },
   "importDivesAction": "Import dives to my logbook",

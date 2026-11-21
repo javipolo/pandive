@@ -105,7 +105,6 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
 - `lib/features/settings/logic/import_dives.dart` -> copia inmersiones de otro .ddb al logbook (dedupe fecha/hora; perfil/sitio/buddies/tags/botellas)
-- `lib/features/settings/logic/import_site_coords.dart` -> importa lat/lon a sitios desde JSON (match por nombre/region/country, sin acentos)
 - `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
 - `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura
@@ -186,6 +185,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/widgets/progress_dialog.dart` -> diálogo modal de progreso (withProgress) para export/import largos
 - `lib/core/widgets/site_map.dart` -> mapa reutilizable (tiles satélite Esri + atribución)
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info
+- `lib/features/sites/screens/import_sites_screen.dart` -> preview del import JSON (checkbox por fila, color add/modify, confirma recuento)
+- `lib/features/sites/logic/site_import.dart` -> plan de import JSON (add/modify, null no pisa) + applySiteImport
+- `lib/features/sites/logic/export_sites.dart` -> exporta sitios a JSON y comparte (sitesToJson/exportSitesJson)
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, editar/borrar, swipe entre sitios)
 - `lib/features/sites/screens/site_edit_screen.dart` -> alta/edición de sitio (campos + ubicación GPS en mapa)
 - `lib/features/sites/screens/map_picker_screen.dart` -> elegir ubicación en mapa (tocar + mi GPS)

@@ -6,7 +6,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/features/settings/logic/import_dives.dart';
-import 'package:pandive/features/settings/logic/import_site_coords.dart';
+import 'package:pandive/features/sites/logic/site_import.dart';
+import 'package:pandive/features/sites/logic/export_sites.dart';
 import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:sqlite3/open.dart';
 
@@ -99,23 +100,73 @@ void main() {
     expect(db.listDives().where((d) => dives.contains(d.id)).length, 2);
   });
 
-  test('importSiteCoordsFromJson rellena por nombre/region/country', () {
-    final a = db.createSite({'Place': 'ZZZ Abu Test', 'Country': 'Egypt'});
-    final b = db.createSite(
-        {'Place': 'ZZZ Brother Test', 'Country': 'Egypt', 'Region': 'Brothers'});
-    final acc = db.createSite({'Place': 'ZZZ Niño Test'});
+  test('planSiteImport: add nuevos, modify difiere, null/igual no listan', () {
+    final ex = db.createSite({
+      'Place': 'ZZZ Plan Exist',
+      'Country': 'Egypt',
+      'Region': 'Old',
+      'Lat': '1.000000',
+      'Lon': '2.000000',
+    });
     const json = '''[
-      {"name":"ZZZ Abu Test","region":null,"country":"Egypt","coordinates":{"latitude":25.3,"longitude":34.7}},
-      {"name":"ZZZ Brother Test","region":"Brothers","country":"Egypt","coordinates":{"latitude":26.3,"longitude":34.8}},
-      {"name":"ZZZ Brother Test","region":"WrongRegion","country":"Egypt","coordinates":{"latitude":9,"longitude":9}},
-      {"name":"ZZZ Nino Test","coordinates":{"latitude":1.5,"longitude":2.5}},
-      {"name":"ZZZ Abu Test","country":"Egypt","coordinates":null}
+      {"name":"ZZZ Plan New","region":"R","country":"Spain","coordinates":{"latitude":5.5,"longitude":6.6}},
+      {"name":"ZZZ Plan Exist","region":null,"country":"Egypt","coordinates":{"latitude":9.9,"longitude":2.0}}
     ]''';
-    final n = importSiteCoordsFromJson(db, json);
-    expect(n, 3); // Abu, Brother (region correcta), Niño (sin acento) ; null ignorado
-    expect(db.getSite(a)!.lat, closeTo(25.3, 1e-4));
-    expect(db.getSite(b)!.lon, closeTo(34.8, 1e-4)); // no la de WrongRegion
-    expect(db.getSite(acc)!.lat, closeTo(1.5, 1e-4)); // acento-insensible
+    final plan = planSiteImport(db, json);
+    final add = plan.firstWhere((p) => p.name == 'ZZZ Plan New');
+    expect(add.action, SiteImportAction.add);
+    final mod = plan.firstWhere((p) => p.name == 'ZZZ Plan Exist');
+    expect(mod.action, SiteImportAction.modify);
+    expect(mod.existingId, ex);
+    // region null no toca; Lon igual no cambia; solo Lat difiere.
+    expect(mod.fields.keys.toSet(), {'Lat'});
+  });
+
+  test('planSiteImport: sin cambios no se lista', () {
+    db.createSite({
+      'Place': 'ZZZ Plan Same',
+      'Country': 'Egypt',
+      'Lat': '3.000000',
+      'Lon': '4.000000',
+    });
+    const json =
+        '[{"name":"ZZZ Plan Same","region":null,"country":"Egypt","coordinates":{"latitude":3.0,"longitude":4.0}}]';
+    final plan = planSiteImport(db, json);
+    expect(plan.any((p) => p.name == 'ZZZ Plan Same'), isFalse);
+  });
+
+  test('applySiteImport: add crea, modify pisa solo no-null', () {
+    final ex = db.createSite({
+      'Place': 'ZZZ Apply Exist',
+      'Country': 'Egypt',
+      'Region': 'KeepMe',
+      'Lat': '1.000000',
+    });
+    const json = '''[
+      {"name":"ZZZ Apply New","region":null,"country":"Spain","coordinates":{"latitude":7.7,"longitude":8.8}},
+      {"name":"ZZZ Apply Exist","region":null,"country":"Egypt","coordinates":{"latitude":5.5,"longitude":6.6}}
+    ]''';
+    final n = applySiteImport(db, planSiteImport(db, json));
+    expect(n, 2);
+    final created = db.listSites().firstWhere((s) => s.name == 'ZZZ Apply New');
+    expect(created.lat, closeTo(7.7, 1e-4));
+    expect(created.country, 'Spain');
+    final after = db.getSite(ex)!;
+    expect(after.lat, closeTo(5.5, 1e-4)); // pisado
+    expect(after.region, 'KeepMe'); // null no pisó
+  });
+
+  test('sitesToJson: roundtrip no genera cambios', () {
+    final id = db.createSite({
+      'Place': 'ZZZ Round Trip',
+      'Country': 'Malta',
+      'Region': 'Gozo',
+      'Lat': '36.000000',
+      'Lon': '14.000000',
+    });
+    final site = db.listSites().firstWhere((s) => s.id == id);
+    final plan = planSiteImport(db, sitesToJson([site]));
+    expect(plan.any((p) => p.name == 'ZZZ Round Trip'), isFalse);
   });
 
   test('findOrCreateSite rellena coords si faltan y no las pisa', () {
