@@ -19,16 +19,22 @@ extension DivemateDbTags on DivemateDb {
     return _db.lastInsertRowId;
   }
 
-  /// IDs de inmersiones que tienen un tag por nombre (case-insensitive).
+  /// IDs de inmersiones que tienen un tag por nombre (case-insensitive), ya sea
+  /// propio del buceo o heredado del tag de su sitio (Place).
   Set<int> diveIdsWithTag(String name) {
     final rows = _db.select(
-      'SELECT D.DiveId FROM PandiveDiveTag D JOIN PandiveTag T ON T.Id = D.TagId '
-      'WHERE T.Name = ? COLLATE NOCASE',
-      [name],
+      'SELECT L.ID FROM Logbook L WHERE '
+      'L.ID IN (SELECT D.DiveId FROM PandiveDiveTag D '
+      '         JOIN PandiveTag T ON T.Id = D.TagId WHERE T.Name = ? COLLATE NOCASE) '
+      'OR L.PlaceID IN (SELECT S.PlaceId FROM PandiveSiteTag S '
+      '         JOIN PandiveTag T ON T.Id = S.TagId WHERE T.Name = ? COLLATE NOCASE)',
+      [name, name],
     );
-    return {for (final r in rows) r['DiveId'] as int};
+    return {for (final r in rows) r['ID'] as int};
   }
 
+  /// Tags propios del buceo (solo el enlace PandiveDiveTag). Es lo que edita y
+  /// guarda el editor; no incluye los heredados del sitio.
   List<Tag> tagsForDive(int diveId) {
     final rows = _db.select(
       'SELECT T.Id, T.Name FROM PandiveTag T '
@@ -39,6 +45,46 @@ extension DivemateDbTags on DivemateDb {
     return rows
         .map((r) => Tag(id: r['Id'] as int, name: _str(r['Name']) ?? ''))
         .toList();
+  }
+
+  /// Tags efectivos del buceo: propios + los del sitio (Place) al que pertenece.
+  /// Derivados en lectura (dinámicos): mostrar/contar, no persistir.
+  List<Tag> effectiveTagsForDive(int diveId) {
+    final rows = _db.select(
+      'SELECT T.Id, T.Name FROM PandiveTag T WHERE T.Id IN ('
+      '  SELECT TagId FROM PandiveDiveTag WHERE DiveId = ?1 '
+      '  UNION '
+      '  SELECT TagId FROM PandiveSiteTag WHERE PlaceId = '
+      '    (SELECT PlaceID FROM Logbook WHERE ID = ?1)'
+      ') ORDER BY T.Name COLLATE NOCASE',
+      [diveId],
+    );
+    return rows
+        .map((r) => Tag(id: r['Id'] as int, name: _str(r['Name']) ?? ''))
+        .toList();
+  }
+
+  /// Tags asignados a un sitio (Place).
+  List<Tag> tagsForSite(int placeId) {
+    final rows = _db.select(
+      'SELECT T.Id, T.Name FROM PandiveTag T '
+      'JOIN PandiveSiteTag S ON S.TagId = T.Id WHERE S.PlaceId = ? '
+      'ORDER BY T.Name COLLATE NOCASE',
+      [placeId],
+    );
+    return rows
+        .map((r) => Tag(id: r['Id'] as int, name: _str(r['Name']) ?? ''))
+        .toList();
+  }
+
+  void setSiteTags(int placeId, List<Tag> tags) {
+    _db.execute('DELETE FROM PandiveSiteTag WHERE PlaceId = ?', [placeId]);
+    for (final t in tags) {
+      _db.execute(
+        'INSERT OR IGNORE INTO PandiveSiteTag (PlaceId, TagId) VALUES (?,?)',
+        [placeId, t.id],
+      );
+    }
   }
 
   /// Recorre los comentarios de todas las inmersiones, extrae #hashtags y los
@@ -109,16 +155,19 @@ extension DivemateDbTags on DivemateDb {
 
   void deleteTag(int id) {
     _db.execute('DELETE FROM PandiveDiveTag WHERE TagId=?', [id]);
+    _db.execute('DELETE FROM PandiveSiteTag WHERE TagId=?', [id]);
     _db.execute('DELETE FROM PandiveTag WHERE Id=?', [id]);
   }
 
+  /// Buceos con un tag (propio del buceo o heredado del tag de su sitio).
   List<Dive> listDivesByTag(int tagId) {
     final owner = ownerId;
     final diver = owner != null ? 'AND L.DiverID = $owner' : '';
     final rows = _db.select(
       'SELECT ${DivemateDbQueries._diveColumns} FROM Logbook L '
-      'JOIN PandiveDiveTag D ON D.DiveId = L.ID '
-      'WHERE D.TagId = ? AND (L.Status IS NULL OR L.Status != 2) $diver '
+      'WHERE (L.ID IN (SELECT DiveId FROM PandiveDiveTag WHERE TagId = ?1) '
+      '   OR L.PlaceID IN (SELECT PlaceId FROM PandiveSiteTag WHERE TagId = ?1)) '
+      'AND (L.Status IS NULL OR L.Status != 2) $diver '
       'ORDER BY L.Divedate DESC, L.Entrytime DESC',
       [tagId],
     );

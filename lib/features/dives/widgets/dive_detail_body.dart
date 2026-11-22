@@ -31,7 +31,7 @@ class DiveDetailBody extends StatelessWidget {
     final profile = db.diveProfile(dive.id);
     final cyls = db.cylinders(dive.id);
     final buddies = db.diveBuddies(dive.id).map((b) => b.name).join(', ');
-    final tags = db.tagsForDive(dive.id);
+    final tags = db.effectiveTagsForDive(dive.id);
 
     final avg = dive.avgDepth ?? _avg(profile?.depths.where((d) => d > 0));
     final temps = profile?.temps.whereType<double>().toList() ?? const <double>[];

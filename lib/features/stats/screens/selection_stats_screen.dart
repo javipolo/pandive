@@ -21,7 +21,7 @@ class SelectionStatsScreen extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final stats = db.computeStats(ids: [for (final d in dives) d.id]);
     final isCave = dives.any((d) => db
-        .tagsForDive(d.id)
+        .effectiveTagsForDive(d.id)
         .any((tag) => tag.name.toLowerCase().contains('cave') ||
             tag.name.toLowerCase().contains('cueva')));
     final rule = isCave ? ReserveRule.thirds : ReserveRule.bar35;

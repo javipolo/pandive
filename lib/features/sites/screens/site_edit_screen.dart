@@ -8,6 +8,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
+import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
+import 'package:pandive/features/dives/widgets/tags_picker_field.dart';
 import 'package:pandive/features/sites/screens/map_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -29,6 +31,8 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
       TextEditingController(text: widget.site?.lat?.toString() ?? '');
   late final _lon =
       TextEditingController(text: widget.site?.lon?.toString() ?? '');
+  late List<Tag> _tags =
+      widget.site == null ? [] : widget.db.tagsForSite(widget.site!.id);
 
   @override
   void dispose() {
@@ -41,6 +45,13 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
   String? _s(TextEditingController c) =>
       c.text.trim().isEmpty ? null : c.text.trim();
 
+  Future<void> _pickTags() async {
+    final r = await Navigator.of(context).push<List<Tag>>(MaterialPageRoute(
+        builder: (_) => TagPickerScreen(
+            db: widget.db, selectedIds: [for (final t in _tags) t.id])));
+    if (r != null) setState(() => _tags = r);
+  }
+
   void _save() {
     final map = <String, Object?>{
       'Place': _s(_name),
@@ -50,11 +61,14 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
       'Lat': double.tryParse(_lat.text.trim())?.toStringAsFixed(6),
       'Lon': double.tryParse(_lon.text.trim())?.toStringAsFixed(6),
     };
+    final int id;
     if (widget.site == null) {
-      widget.db.createSite(map);
+      id = widget.db.createSite(map);
     } else {
       widget.db.updateSite(widget.site!.id, map);
+      id = widget.site!.id;
     }
+    widget.db.setSiteTags(id, _tags);
     Navigator.of(context).pop(true);
   }
 
@@ -102,6 +116,8 @@ class _SiteEditScreenState extends State<SiteEditScreen> {
             icon: const Icon(Icons.map_outlined),
             label: Text(t.pickOnMap),
           ),
+          const SizedBox(height: 8),
+          TagsPickerField(tags: _tags, onTap: _pickTags),
         ],
       ),
     );

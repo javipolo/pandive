@@ -94,6 +94,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
   }
 
   Widget _info(DiveSite s, AppLocalizations t) {
+    final tags = widget.db.tagsForSite(s.id);
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
@@ -103,6 +104,23 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
         twoCol(LabeledValue(t.fieldStretchOfWater, s.waterName),
             LabeledValue(t.fieldRegion, s.region)),
         sectionLine(),
+        if (tags.isNotEmpty) ...[
+          LabeledValue(t.tags, null),
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                for (final tag in tags)
+                  Chip(
+                      label: Text(tag.name),
+                      visualDensity: VisualDensity.compact),
+              ],
+            ),
+          ),
+          sectionLine(),
+        ],
         twoCol(
             LabeledValue(
                 t.location,

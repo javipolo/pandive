@@ -14,6 +14,10 @@ void _ensureSyncTable(Database db) {
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTag '
       '(DiveId INTEGER, TagId INTEGER, PRIMARY KEY (DiveId, TagId))');
+  // Tags por sitio (Place): derivados a los buceos de ese sitio en tiempo de
+  // lectura (ver effectiveTagsForDive / diveIdsWithTag / listDivesByTag).
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveSiteTag '
+      '(PlaceId INTEGER, TagId INTEGER, PRIMARY KEY (PlaceId, TagId))');
   // Caché de buceos descargados no guardados (reaparecen "una vez más").
   db.execute('CREATE TABLE IF NOT EXISTS PandivePending '
       '(DeviceId TEXT, Fingerprint TEXT, Json TEXT, Updated TEXT, '

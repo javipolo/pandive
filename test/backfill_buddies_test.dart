@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/settings/logic/import_dives.dart';
 import 'package:pandive/features/sites/logic/site_import.dart';
 import 'package:pandive/features/sites/logic/export_sites.dart';
@@ -187,6 +188,41 @@ void main() {
     expect(db.getSite(empty), isNull);
     expect(db.listSites().length, before - n);
     expect(db.listSites().every((s) => s.diveCount > 0), isTrue);
+  });
+
+  test('tags de sitio: derivados y dinámicos sobre sus buceos', () {
+    final site = db.createSite({'Place': 'ZZZ Tag Site'});
+    final tagId = db.findOrCreateTag('ZZZ sitetag');
+    final diveId = db.listDives().first.id;
+    db.updateDive(diveId, {'PlaceID': site});
+
+    // Sin tag en el sitio: no aparece.
+    expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isFalse);
+
+    // Asignar tag al sitio -> aparece en el buceo (efectivo), no en los propios.
+    db.setSiteTags(site, [Tag(id: tagId, name: 'ZZZ sitetag')]);
+    expect(db.tagsForSite(site).map((t) => t.id), [tagId]);
+    expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isTrue);
+    expect(db.tagsForDive(diveId).any((t) => t.id == tagId), isFalse);
+    expect(db.listDivesByTag(tagId).any((d) => d.id == diveId), isTrue);
+
+    // Quitar del sitio -> desaparece al instante (dinámico).
+    db.setSiteTags(site, []);
+    expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isFalse);
+    expect(db.listDivesByTag(tagId).any((d) => d.id == diveId), isFalse);
+  });
+
+  test('diveIdsWithTag incluye buceos por tag de sitio; deleteTag limpia', () {
+    final site = db.createSite({'Place': 'ZZZ Cave Site'});
+    final tagId = db.findOrCreateTag('ZZZ cavez');
+    final diveId = db.listDives().first.id;
+    db.updateDive(diveId, {'PlaceID': site});
+    db.setSiteTags(site, [Tag(id: tagId, name: 'ZZZ cavez')]);
+    expect(db.diveIdsWithTag('ZZZ cavez').contains(diveId), isTrue);
+
+    db.deleteTag(tagId);
+    expect(db.tagsForSite(site), isEmpty);
+    expect(db.diveIdsWithTag('ZZZ cavez'), isEmpty);
   });
 
   test('export de viaje: nombre de fichero + .ddb con viaje/buceos/compañeros',

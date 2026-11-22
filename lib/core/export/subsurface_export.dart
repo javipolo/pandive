@@ -54,7 +54,7 @@ void _writeDive(StringBuffer b, DivemateDb db, Dive d) {
   final sac = db.diveSac(d.id);
   if (sac != null) attrs.write(" sac='${sac.toStringAsFixed(3)} l/min'");
   if (d.placeId != null) attrs.write(" divesiteid='${_siteId(d.placeId!)}'");
-  final tags = db.tagsForDive(d.id).map((t) => t.name).join(', ');
+  final tags = db.effectiveTagsForDive(d.id).map((t) => t.name).join(', ');
   if (tags.isNotEmpty) attrs.write(" tags='${_esc(tags)}'");
   if (dt != null) {
     attrs.write(" date='${dt.year}-${_p2(dt.month)}-${_p2(dt.day)}'");
