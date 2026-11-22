@@ -435,6 +435,8 @@
     }
   },
   "importSites": "Import sites (JSON)",
+  "updateOnly": "Update existing",
+  "updateAndNew": "Update + add new",
   "importAdd": "Add",
   "importModify": "Modify",
   "nothingToImport": "Nothing to import",

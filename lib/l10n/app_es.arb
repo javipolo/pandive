@@ -267,6 +267,8 @@
   "importSubsurface": "Importar de Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} inmersiones importadas",
   "importSites": "Importar sitios (JSON)",
+  "updateOnly": "Solo actualizar",
+  "updateAndNew": "Actualizar + nuevos",
   "importAdd": "Añadir",
   "importModify": "Modificar",
   "nothingToImport": "Nada que importar",

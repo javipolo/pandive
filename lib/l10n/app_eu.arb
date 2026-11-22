@@ -267,6 +267,8 @@
   "importSubsurface": "Subsurface-tik inportatu (.ssrf)",
   "importSubsurfaceResult": "{count} murgilketa inportatu dira",
   "importSites": "Inportatu lekuak (JSON)",
+  "updateOnly": "Eguneratu soilik",
+  "updateAndNew": "Eguneratu + berriak",
   "importAdd": "Gehitu",
   "importModify": "Aldatu",
   "nothingToImport": "Ez dago ezer inportatzeko",
