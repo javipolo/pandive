@@ -25,7 +25,15 @@ class PandiveApp extends StatelessWidget {
           darkTheme: appTheme(Brightness.dark),
           themeMode: settings.themeMode,
           locale: settings.locale, // null = idioma del sistema
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          // Los globales deben ser los de material_ui (el Material de este SDK
+          // es un fork con su propio MaterialLocalizations). Los de
+          // flutter_localizations que genera gen-l10n son de otro tipo: dejan
+          // MaterialLocalizations.of == null en todo idioma != inglés y la
+          // cromática (NavigationBar/FAB/drawer) peta (cuadros grises).
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
           supportedLocales: AppLocalizations.supportedLocales,
           builder: (context, child) {
             // Escala de texto global (accesibilidad / presbicia).

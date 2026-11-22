@@ -58,6 +58,7 @@ dependencies:
   share_plus: ^12.0.2
   # Parseo del XML de Subsurface (.ssrf) al importar
   xml: ^6.5.0
+  # Material de este SDK de Flutter (fork: flutter/material está deprecado aquí).
   material_ui: ^1.11.1
   cupertino_ui: ^1.1.7
   image_picker: ^1.2.4
