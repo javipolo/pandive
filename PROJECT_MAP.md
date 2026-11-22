@@ -193,8 +193,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/sites/screens/site_edit_screen.dart` -> alta/edición de sitio (campos + ubicación GPS + tags)
 - `lib/features/sites/screens/map_picker_screen.dart` -> elegir ubicación en mapa (tocar + mi GPS)
 - `lib/features/sites/screens/sites_map_screen.dart` -> visor de todos los sitios con coords (marcadores -> ver buceos)
-- `lib/features/sites/widgets/sites_grouped_list.dart` -> lista agrupada por país (colapsar/buscar/ordenar por buceos)
-- `lib/features/sites/widgets/site_tile.dart` -> fila de sitio (avatar, región · nº buceos, ojo info)
+- `lib/features/sites/widgets/sites_grouped_list.dart` -> lista agrupada por país (colapsar/buscar por nombre/país/región/tags/ordenar por buceos)
+- `lib/features/sites/widgets/site_tile.dart` -> fila de sitio (avatar, región · nº buceos, chips de tags, ojo info)
 
 ### stats (estadísticas)
 - `lib/features/stats/screens/stats_screen.dart` -> pestaña de stats globales del logbook

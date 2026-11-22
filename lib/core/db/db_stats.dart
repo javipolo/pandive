@@ -11,11 +11,17 @@ extension DivemateDbStats on DivemateDb {
       diveFilter.write(' AND L.DiverID = ?');
       params.add(owner);
     }
+    // PandiveSiteTag solo existe en bases propias (no en .ddb read-only externas).
+    final tagsCol = _hasTable('PandiveSiteTag')
+        ? "(SELECT GROUP_CONCAT(T.Name, char(10)) FROM PandiveSiteTag S "
+            'JOIN PandiveTag T ON T.Id = S.TagId WHERE S.PlaceId = P.ID)'
+        : 'NULL';
     final rows = _db.select(
       'SELECT P.ID, P.Place, P.Country, P.Region, P.Lat, P.Lon, '
       '       P.MaxDepth, P.Rating, '
       '       (SELECT COUNT(*) FROM Logbook L '
-      '        WHERE L.PlaceID = P.ID AND $diveFilter) AS dives '
+      '        WHERE L.PlaceID = P.ID AND $diveFilter) AS dives, '
+      '       $tagsCol AS tags '
       'FROM Place P '
       'ORDER BY dives DESC, P.Place COLLATE NOCASE',
       params,
@@ -31,6 +37,9 @@ extension DivemateDbStats on DivemateDb {
               maxDepth: _num(r['MaxDepth']),
               rating: r['Rating'] as int?,
               diveCount: (r['dives'] as int?) ?? 0,
+              tags: (_str(r['tags']) ?? '').isEmpty
+                  ? const []
+                  : _str(r['tags'])!.split('\n'),
             ))
         .toList();
   }

@@ -13,6 +13,7 @@ class DiveSite {
   final String? difficulty;
   final int? rating;
   final int diveCount;
+  final List<String> tags; // tags asignados al sitio
 
   const DiveSite({
     required this.id,
@@ -26,6 +27,7 @@ class DiveSite {
     this.difficulty,
     this.rating,
     this.diveCount = 0,
+    this.tags = const [],
   });
 
   bool get hasCoords => lat != null && lon != null;

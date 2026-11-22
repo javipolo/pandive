@@ -69,6 +69,11 @@ class DivemateDb {
 
   void close() => _db.dispose();
 
+  /// Si existe una tabla (las tablas Pandive no están en .ddb read-only externas).
+  bool _hasTable(String name) => _db
+      .select("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", [name])
+      .isNotEmpty;
+
   /// DiverID "dueño" = el perfil con más inmersiones (ver owner_id en la CLI).
   /// Una .ddb puede contener varios diver profiles (demo/imports).
   int? get ownerId {

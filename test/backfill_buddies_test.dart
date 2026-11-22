@@ -202,6 +202,9 @@ void main() {
     // Asignar tag al sitio -> aparece en el buceo (efectivo), no en los propios.
     db.setSiteTags(site, [Tag(id: tagId, name: 'ZZZ sitetag')]);
     expect(db.tagsForSite(site).map((t) => t.id), [tagId]);
+    // listSites expone los tags (para buscar en la lista de sitios).
+    expect(db.listSites().firstWhere((s) => s.id == site).tags,
+        contains('ZZZ sitetag'));
     expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isTrue);
     expect(db.tagsForDive(diveId).any((t) => t.id == tagId), isFalse);
     expect(db.listDivesByTag(tagId).any((d) => d.id == diveId), isTrue);

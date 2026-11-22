@@ -22,13 +22,17 @@ extension DivemateDbTags on DivemateDb {
   /// IDs de inmersiones que tienen un tag por nombre (case-insensitive), ya sea
   /// propio del buceo o heredado del tag de su sitio (Place).
   Set<int> diveIdsWithTag(String name) {
+    final bySite = _hasTable('PandiveSiteTag')
+        ? 'OR L.PlaceID IN (SELECT S.PlaceId FROM PandiveSiteTag S '
+            'JOIN PandiveTag T ON T.Id = S.TagId WHERE T.Name = ? COLLATE NOCASE)'
+        : '';
+    final params = bySite.isEmpty ? [name] : [name, name];
     final rows = _db.select(
       'SELECT L.ID FROM Logbook L WHERE '
       'L.ID IN (SELECT D.DiveId FROM PandiveDiveTag D '
       '         JOIN PandiveTag T ON T.Id = D.TagId WHERE T.Name = ? COLLATE NOCASE) '
-      'OR L.PlaceID IN (SELECT S.PlaceId FROM PandiveSiteTag S '
-      '         JOIN PandiveTag T ON T.Id = S.TagId WHERE T.Name = ? COLLATE NOCASE)',
-      [name, name],
+      '$bySite',
+      params,
     );
     return {for (final r in rows) r['ID'] as int};
   }
@@ -50,6 +54,7 @@ extension DivemateDbTags on DivemateDb {
   /// Tags efectivos del buceo: propios + los del sitio (Place) al que pertenece.
   /// Derivados en lectura (dinámicos): mostrar/contar, no persistir.
   List<Tag> effectiveTagsForDive(int diveId) {
+    if (!_hasTable('PandiveSiteTag')) return tagsForDive(diveId);
     final rows = _db.select(
       'SELECT T.Id, T.Name FROM PandiveTag T WHERE T.Id IN ('
       '  SELECT TagId FROM PandiveDiveTag WHERE DiveId = ?1 '
@@ -163,10 +168,12 @@ extension DivemateDbTags on DivemateDb {
   List<Dive> listDivesByTag(int tagId) {
     final owner = ownerId;
     final diver = owner != null ? 'AND L.DiverID = $owner' : '';
+    final bySite = _hasTable('PandiveSiteTag')
+        ? 'OR L.PlaceID IN (SELECT PlaceId FROM PandiveSiteTag WHERE TagId = ?1)'
+        : '';
     final rows = _db.select(
       'SELECT ${DivemateDbQueries._diveColumns} FROM Logbook L '
-      'WHERE (L.ID IN (SELECT DiveId FROM PandiveDiveTag WHERE TagId = ?1) '
-      '   OR L.PlaceID IN (SELECT PlaceId FROM PandiveSiteTag WHERE TagId = ?1)) '
+      'WHERE (L.ID IN (SELECT DiveId FROM PandiveDiveTag WHERE TagId = ?1) $bySite) '
       'AND (L.Status IS NULL OR L.Status != 2) $diver '
       'ORDER BY L.Divedate DESC, L.Entrytime DESC',
       [tagId],

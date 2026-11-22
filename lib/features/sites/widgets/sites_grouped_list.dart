@@ -68,7 +68,9 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     return [
       for (final s in widget.sites)
         if (foldContains(
-            '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''}', q))
+            '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''} '
+            '${s.tags.join(' ')}',
+            q))
           s
     ];
   }

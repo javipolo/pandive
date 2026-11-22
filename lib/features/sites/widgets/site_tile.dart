@@ -49,7 +49,32 @@ class SiteTile extends StatelessWidget {
                 child: Text(nm.isEmpty ? '?' : nm.substring(0, 1).toUpperCase())),
         title: Text(site.name ?? t.site,
             maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text(sub),
+        subtitle: site.tags.isEmpty
+            ? Text(sub)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(sub),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Wrap(
+                      spacing: 4,
+                      runSpacing: 2,
+                      children: [
+                        for (final tg in site.tags)
+                          Chip(
+                            label: Text(tg),
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            padding: EdgeInsets.zero,
+                            labelStyle: Theme.of(context).textTheme.labelSmall,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
         trailing: selectMode || onInfo == null
             ? null
             : IconButton(
