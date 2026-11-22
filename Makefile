@@ -39,7 +39,11 @@ apk: ## Genera APK de depuración (sideload)
 
 .PHONY: apk-release
 apk-release: ## Genera APK de release arm64 (sideload)
-	$(FLUTTER) build apk --release --target-platform android-arm64 $(DART_DEFINES)
+	# --no-tree-shake-icons: incluye la fuente de iconos completa. El recorte
+	# producía una OTF que en algunos Android no se parsea y deja todos los
+	# iconos como cuadrados grises (tofu): hamburguesa, barra inferior, FAB...
+	$(FLUTTER) build apk --release --target-platform android-arm64 \
+		--no-tree-shake-icons $(DART_DEFINES)
 
 APK := build/app/outputs/flutter-apk/app-debug.apk
 
