@@ -8,6 +8,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/sac.dart';
 import 'package:pandive/core/widgets/save_action.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
+import 'package:pandive/features/dives/logic/apply_dive_type.dart';
 import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
 import 'package:pandive/features/dives/widgets/dive_editor_form.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
@@ -72,7 +73,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
     if (chosen == null) return;
     setState(() {
       _typeName = chosen.name;
-      _tanks = [..._tanks, ...chosen.tanks]; // añade a las existentes
+      _tanks = applyDiveTypeTanks(_tanks, chosen.tanks);
     });
   }
 
