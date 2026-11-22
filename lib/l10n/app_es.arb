@@ -32,7 +32,7 @@
   "sortByDives": "Ordenar por buceos",
   "sortByName": "Ordenar por nombre",
   "sortRecent": "Ordenar por más reciente",
-  "olderBuddies": "Inactivos",
+  "olderBuddies": "Ocultar inactivos",
   "staleBuddies": "Inactivos ({count})",
   "searchPlace": "Buscar lugar",
   "searchNoResults": "Sin resultados",

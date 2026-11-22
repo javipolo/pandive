@@ -52,7 +52,7 @@
   "sortByDives": "Sort by dives",
   "sortByName": "Sort by name",
   "sortRecent": "Sort by most recent",
-  "olderBuddies": "Dormant",
+  "olderBuddies": "Hide dormant",
   "staleBuddies": "Dormant ({count})",
   "@staleBuddies": {
     "placeholders": {

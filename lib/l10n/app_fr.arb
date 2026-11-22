@@ -32,7 +32,7 @@
   "sortByDives": "Trier par plongées",
   "sortByName": "Trier par nom",
   "sortRecent": "Trier par plus récent",
-  "olderBuddies": "Inactifs",
+  "olderBuddies": "Masquer inactifs",
   "staleBuddies": "Inactifs ({count})",
   "searchPlace": "Chercher un lieu",
   "searchNoResults": "Aucun résultat",
