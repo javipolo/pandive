@@ -370,9 +370,9 @@
   "importSummaryNotSelected": "No seleccionades: {count}",
   "importSummaryNewSites": "Llocs nous: {count}",
   "importSummaryNewBuddies": "Companys nous: {count}",
-  "useDdb": "Usa DDB",
+  "useDdb": "Opcions d'importació",
   "useDdbFor": "Usa DDB per a:",
   "useDdbFill": "Omplir llocs d'immersió",
-  "useDdbImport": "Importar immersions completes",
-  "useDdbReplace": "Substituir tota la base de dades local"
+  "useDdbImport": "Seleccionar immersions per importar",
+  "useDdbReplace": "Substituir la meva base de dades per aquesta"
 }

@@ -646,9 +646,9 @@
       "count": {}
     }
   },
-  "useDdb": "Use DDB",
+  "useDdb": "Import options",
   "useDdbFor": "Use DDB to:",
   "useDdbFill": "Fill in dive sites",
-  "useDdbImport": "Import complete dives",
-  "useDdbReplace": "Replace the whole local database"
+  "useDdbImport": "Select dives to import",
+  "useDdbReplace": "Replace my database with this one"
 }

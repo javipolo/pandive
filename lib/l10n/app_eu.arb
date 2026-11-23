@@ -370,9 +370,9 @@
   "importSummaryNotSelected": "Hautatu gabeak: {count}",
   "importSummaryNewSites": "Leku berriak: {count}",
   "importSummaryNewBuddies": "Lagun berriak: {count}",
-  "useDdb": "Erabili DDB",
+  "useDdb": "Inportazio-aukerak",
   "useDdbFor": "Erabili DDB honetarako:",
   "useDdbFill": "Murgiltze-lekuak bete",
-  "useDdbImport": "Murgilketa osoak inportatu",
-  "useDdbReplace": "Tokiko datu-base osoa ordeztu"
+  "useDdbImport": "Hautatu inportatzeko murgilketak",
+  "useDdbReplace": "Ordeztu nire datu-basea honekin"
 }

@@ -370,9 +370,9 @@
   "importSummaryNotSelected": "Non sélectionnées : {count}",
   "importSummaryNewSites": "Nouveaux sites : {count}",
   "importSummaryNewBuddies": "Nouveaux binômes : {count}",
-  "useDdb": "Utiliser DDB",
+  "useDdb": "Options d'importation",
   "useDdbFor": "Utiliser DDB pour :",
   "useDdbFill": "Compléter les sites de plongée",
-  "useDdbImport": "Importer des plongées complètes",
-  "useDdbReplace": "Remplacer toute la base de données locale"
+  "useDdbImport": "Sélectionner les plongées à importer",
+  "useDdbReplace": "Remplacer ma base de données par celle-ci"
 }

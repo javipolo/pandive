@@ -370,9 +370,9 @@
   "importSummaryNotSelected": "No seleccionados: {count}",
   "importSummaryNewSites": "Sitios nuevos: {count}",
   "importSummaryNewBuddies": "Compañeros nuevos: {count}",
-  "useDdb": "Usar DDB",
+  "useDdb": "Opciones de importación",
   "useDdbFor": "Usar DDB para:",
   "useDdbFill": "Rellenar sitios de buceo",
-  "useDdbImport": "Importar buceos completos",
-  "useDdbReplace": "Sustituir toda la base de datos local"
+  "useDdbImport": "Seleccionar buceos para importar",
+  "useDdbReplace": "Sustituir mi base de datos por esta"
 }
