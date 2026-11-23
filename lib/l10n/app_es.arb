@@ -277,7 +277,6 @@
   "importSitesConfirm": "Se añadirán {add} y se modificarán {mod} sitios. ¿Continuar?",
   "importDivesAction": "Importar buceos a mi logbook",
   "importDivesConfirm": "¿Importar {count} buceos a tu logbook? (se omiten duplicados por fecha/hora)",
-  "importDivesResult": "{count} buceos importados",
   "importHashtags": "Importar #hashtags de los comentarios como etiquetas",
   "removeHashtags": "Quitar los hashtags de los comentarios",
   "tagsToHashtags": "Tags a #hashtags en comentarios",
@@ -362,5 +361,13 @@
   "cropRotateLeft": "Rotar a la izquierda",
   "cropReset": "Restablecer",
   "docNotifTitle": "Caducidad de documento",
-  "docNotifBody": "{days, plural, =0{{title} caduca hoy} =1{{title} caduca mañana} other{{title} caduca en {days} días}}"
+  "docNotifBody": "{days, plural, =0{{title} caduca hoy} =1{{title} caduca mañana} other{{title} caduca en {days} días}}",
+  "importDivesHeader": "{newCount} nuevos · {dupCount} coinciden en hora con uno de tu logbook (se ignoran)",
+  "importDiveDuplicate": "Ya está en tu logbook · se ignora",
+  "importSummaryTitle": "Resumen de la importación",
+  "importSummaryImported": "Importados: {count}",
+  "importSummaryDuplicates": "Ignorados (misma hora que uno existente): {count}",
+  "importSummaryNotSelected": "No seleccionados: {count}",
+  "importSummaryNewSites": "Sitios nuevos: {count}",
+  "importSummaryNewBuddies": "Compañeros nuevos: {count}"
 }

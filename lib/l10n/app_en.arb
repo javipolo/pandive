@@ -456,13 +456,7 @@
   },
   "importDivesAction": "Import dives to my logbook",
   "importDivesConfirm": "Import {count} dives into your logbook? (duplicates by date/time are skipped)",
-  "importDivesResult": "{count} dives imported",
   "@importDivesConfirm": {
-    "placeholders": {
-      "count": {}
-    }
-  },
-  "@importDivesResult": {
     "placeholders": {
       "count": {}
     }
@@ -611,6 +605,45 @@
       "title": {
         "type": "String"
       }
+    }
+  },
+  "importDivesHeader": "{newCount} new · {dupCount} at the same time as a dive already in your logbook (ignored)",
+  "@importDivesHeader": {
+    "placeholders": {
+      "newCount": {},
+      "dupCount": {}
+    }
+  },
+  "importDiveDuplicate": "Already in your logbook · ignored",
+  "importSummaryTitle": "Import summary",
+  "importSummaryImported": "Imported: {count}",
+  "@importSummaryImported": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "importSummaryDuplicates": "Ignored (same time as an existing dive): {count}",
+  "@importSummaryDuplicates": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "importSummaryNotSelected": "Not selected: {count}",
+  "@importSummaryNotSelected": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "importSummaryNewSites": "New dive sites: {count}",
+  "@importSummaryNewSites": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "importSummaryNewBuddies": "New buddies: {count}",
+  "@importSummaryNewBuddies": {
+    "placeholders": {
+      "count": {}
     }
   }
 }

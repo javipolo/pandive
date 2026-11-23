@@ -6,39 +6,88 @@ library;
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-/// Importa en [target] las inmersiones de [source]. Devuelve cuántas añadió
-/// (las ya presentes por fecha/hora se omiten). Cede frames cada pocas para no
-/// congelar la UI.
-Future<int> importDivesFromDb(DivemateDb target, DivemateDb source) async {
-  var n = 0;
-  var i = 0;
-  for (final d in source.listDives()) {
+/// Un buceo del .ddb origen y si ya existe en el logbook (misma fecha/hora).
+class DdbImportEntry {
+  final Dive dive;
+  final bool duplicate;
+  const DdbImportEntry(this.dive, {required this.duplicate});
+}
+
+/// Resumen de un import: añadidos, ignorados por coincidir en hora con uno
+/// existente, no seleccionados y sitios/compañeros nuevos creados.
+class DdbImportResult {
+  final int imported;
+  final int duplicates;
+  final int notSelected;
+  final int newSites;
+  final int newBuddies;
+  const DdbImportResult({
+    required this.imported,
+    required this.duplicates,
+    required this.notSelected,
+    required this.newSites,
+    required this.newBuddies,
+  });
+}
+
+/// Buceos de [source] con fecha, marcando los que ya están en [target].
+List<DdbImportEntry> planDdbImport(DivemateDb target, DivemateDb source) => [
+      for (final d in source.listDives())
+        if (d.date != null)
+          DdbImportEntry(d, duplicate: target.hasDiveAt(d.date!)),
+    ];
+
+/// Importa en [target] los buceos de [source] (solo los de [only] si se da).
+/// Los que coinciden en fecha/hora con uno existente se ignoran. Cede frames
+/// cada pocos para no congelar la UI.
+Future<DdbImportResult> importDivesFromDb(DivemateDb target, DivemateDb source,
+    {Set<int>? only}) async {
+  final all = planDdbImport(target, source);
+  final sitesBefore = target.listSites().length;
+  final buddiesBefore = target.listBuddies().length;
+  var imported = 0, dups = 0, notSel = 0, i = 0;
+  for (final e in all) {
+    if (only != null && !only.contains(e.dive.id)) {
+      notSel++;
+      continue;
+    }
     if (i++ % 10 == 9) await Future<void>.delayed(Duration.zero);
-    final dt = d.date;
-    if (dt == null) continue;
-    final site = d.placeId != null ? source.getSite(d.placeId!) : null;
-    final ok = target.importExternalDive(
-      dateTime: dt,
-      placeName: site?.name ?? d.place,
-      country: site?.country ?? d.country,
-      lat: site?.lat,
-      lon: site?.lon,
-      comments: d.comments,
-      buddies: [for (final b in source.diveBuddies(d.id)) b.name],
-      tagNames: [for (final tg in source.tagsForDive(d.id)) tg.name],
-      maxDepth: d.maxDepth,
-      avgDepth: d.avgDepth,
-      durationMin: d.durationMin,
-      waterTemp: d.waterTemp,
-      airTemp: d.airTemp,
-      computer: d.computer,
-      o2: d.o2,
-      samples: _samples(source, d.id),
-      cylinders: source.cylinders(d.id),
-    );
-    if (ok) n++;
+    if (e.duplicate || !_importOne(target, source, e.dive)) {
+      dups++;
+    } else {
+      imported++;
+    }
   }
-  return n;
+  return DdbImportResult(
+    imported: imported,
+    duplicates: dups,
+    notSelected: notSel,
+    newSites: target.listSites().length - sitesBefore,
+    newBuddies: target.listBuddies().length - buddiesBefore,
+  );
+}
+
+bool _importOne(DivemateDb target, DivemateDb source, Dive d) {
+  final site = d.placeId != null ? source.getSite(d.placeId!) : null;
+  return target.importExternalDive(
+    dateTime: d.date!,
+    placeName: site?.name ?? d.place,
+    country: site?.country ?? d.country,
+    lat: site?.lat,
+    lon: site?.lon,
+    comments: d.comments,
+    buddies: [for (final b in source.diveBuddies(d.id)) b.name],
+    tagNames: [for (final tg in source.tagsForDive(d.id)) tg.name],
+    maxDepth: d.maxDepth,
+    avgDepth: d.avgDepth,
+    durationMin: d.durationMin,
+    waterTemp: d.waterTemp,
+    airTemp: d.airTemp,
+    computer: d.computer,
+    o2: d.o2,
+    samples: _samples(source, d.id),
+    cylinders: source.cylinders(d.id),
+  );
 }
 
 List<DiveSample> _samples(DivemateDb source, int diveId) {

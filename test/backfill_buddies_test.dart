@@ -263,11 +263,29 @@ void main() {
     src.importExternalDive(
         dateTime: DateTime(2099, 1, 2, 10), placeName: 'ZZZ Src B');
 
-    expect(await importDivesFromDb(db, src), 2);
-    expect(await importDivesFromDb(db, src), 0); // dedupe por fecha/hora
+    src.importExternalDive(
+        dateTime: DateTime(2099, 1, 3, 10), placeName: 'ZZZ Src C');
+    final c = src.listDives().firstWhere((d) => d.date!.day == 3).id;
+    final plan = planDdbImport(db, src);
+    expect(plan.where((e) => e.duplicate), isEmpty);
+
+    // Solo los seleccionados (todos menos C).
+    final only = {for (final e in plan) if (e.dive.id != c) e.dive.id};
+    final r1 = await importDivesFromDb(db, src, only: only);
+    expect(r1.imported, 2);
+    expect(r1.notSelected, 1);
+    expect(r1.duplicates, 0);
+    expect(r1.newBuddies, 1);
+    expect(r1.newSites, 2);
+
+    // Los ya importados aparecen como duplicados y se ignoran.
+    expect(planDdbImport(db, src).where((e) => e.duplicate).length, 2);
+    final r2 = await importDivesFromDb(db, src);
+    expect(r2.imported, 1); // solo C
+    expect(r2.duplicates, 2);
     src.close();
 
-    expect(db.listDives().where((d) => d.date?.year == 2099).length, 2);
+    expect(db.listDives().where((d) => d.date?.year == 2099).length, 3);
   });
 
   test('export de varios viajes: nombre + ddb con todos los viajes', () async {

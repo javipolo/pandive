@@ -7,11 +7,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
-import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
-import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
-import 'package:pandive/features/settings/logic/import_dives.dart';
+import 'package:pandive/features/settings/screens/import_ddb_dives_screen.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -69,19 +67,10 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
   }
 
   Future<void> _importDives() async {
-    final t = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
     final src = _preview;
     if (src == null) return;
-    if (!await confirmDialog(context, t.importDivesConfirm(_dives.length),
-        confirmLabel: t.importDivesAction)) {
-      return;
-    }
-    if (!mounted) return;
-    final n = await withProgress(
-        context, t.working, () => importDivesFromDb(widget.db, src));
-    bumpDataRevision();
-    messenger.showSnackBar(SnackBar(content: Text(t.importDivesResult(n))));
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => ImportDdbDivesScreen(target: widget.db, source: src)));
   }
 
   @override

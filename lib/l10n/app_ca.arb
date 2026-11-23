@@ -277,7 +277,6 @@
   "importSitesConfirm": "S'afegiran {add} i es modificaran {mod} llocs. Vols continuar?",
   "importDivesAction": "Importa immersions al meu quadern",
   "importDivesConfirm": "Importar {count} immersions al teu quadern? (s'ometen duplicats per data/hora)",
-  "importDivesResult": "{count} immersions importades",
   "importHashtags": "Importa els #hashtags dels comentaris com a etiquetes",
   "removeHashtags": "Treu els hashtags dels comentaris",
   "tagsToHashtags": "Tags a #hashtags als comentaris",
@@ -362,5 +361,13 @@
   "cropRotateLeft": "Gira a l'esquerra",
   "cropReset": "Restableix",
   "docNotifTitle": "Caducitat de document",
-  "docNotifBody": "{days, plural, =0{{title} caduca avui} =1{{title} caduca demà} other{{title} caduca d'aquí a {days} dies}}"
+  "docNotifBody": "{days, plural, =0{{title} caduca avui} =1{{title} caduca demà} other{{title} caduca d'aquí a {days} dies}}",
+  "importDivesHeader": "{newCount} nous · {dupCount} coincideixen en hora amb una del teu logbook (s'ignoren)",
+  "importDiveDuplicate": "Ja és al teu logbook · s'ignora",
+  "importSummaryTitle": "Resum de la importació",
+  "importSummaryImported": "Importades: {count}",
+  "importSummaryDuplicates": "Ignorades (mateixa hora que una existent): {count}",
+  "importSummaryNotSelected": "No seleccionades: {count}",
+  "importSummaryNewSites": "Llocs nous: {count}",
+  "importSummaryNewBuddies": "Companys nous: {count}"
 }

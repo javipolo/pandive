@@ -277,7 +277,6 @@
   "importSitesConfirm": "{add} sites seront ajoutés et {mod} modifiés. Continuer ?",
   "importDivesAction": "Importer les plongées dans mon carnet",
   "importDivesConfirm": "Importer {count} plongées dans votre carnet ? (les doublons par date/heure sont ignorés)",
-  "importDivesResult": "{count} plongées importées",
   "importHashtags": "Importer les #hashtags des commentaires comme tags",
   "removeHashtags": "Retirer les hashtags des commentaires",
   "tagsToHashtags": "Tags vers #hashtags dans les commentaires",
@@ -362,5 +361,13 @@
   "cropRotateLeft": "Pivoter à gauche",
   "cropReset": "Réinitialiser",
   "docNotifTitle": "Expiration de document",
-  "docNotifBody": "{days, plural, =0{{title} expire aujourd'hui} =1{{title} expire demain} other{{title} expire dans {days} jours}}"
+  "docNotifBody": "{days, plural, =0{{title} expire aujourd'hui} =1{{title} expire demain} other{{title} expire dans {days} jours}}",
+  "importDivesHeader": "{newCount} nouvelles · {dupCount} à la même heure qu'une plongée de ton carnet (ignorées)",
+  "importDiveDuplicate": "Déjà dans ton carnet · ignorée",
+  "importSummaryTitle": "Résumé de l'importation",
+  "importSummaryImported": "Importées : {count}",
+  "importSummaryDuplicates": "Ignorées (même heure qu'une plongée existante) : {count}",
+  "importSummaryNotSelected": "Non sélectionnées : {count}",
+  "importSummaryNewSites": "Nouveaux sites : {count}",
+  "importSummaryNewBuddies": "Nouveaux binômes : {count}"
 }

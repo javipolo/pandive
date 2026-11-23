@@ -104,10 +104,11 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/tools_screen.dart` -> herramientas: importar hashtags, export DDB/Subsurface, papelera, debug sync (desde drawer)
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
-- `lib/features/settings/logic/import_dives.dart` -> copia inmersiones de otro .ddb al logbook (dedupe fecha/hora; perfil/sitio/buddies/tags/botellas)
+- `lib/features/settings/logic/import_dives.dart` -> plan (nuevo/duplicado por fecha/hora) + copia de inmersiones seleccionadas de otro .ddb (perfil/sitio/buddies/tags/botellas) con resumen (DdbImportResult)
 - `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
 - `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
-- `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura
+- `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura (botón importar -> selección)
+- `lib/features/settings/screens/import_ddb_dives_screen.dart` -> elegir buceos del .ddb a importar (verde nuevo / ámbar ya existe, ignorado) + diálogo resumen
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
