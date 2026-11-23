@@ -1,6 +1,7 @@
-/// Exporta un viaje como .ddb: sus inmersiones (datos básicos + sitio con
-/// coordenadas + compañeros), el viaje en sí y los compañeros del viaje. Lo
-/// comparte con nombre "Año-Nombre del viaje-PanDive.ddb".
+/// Exporta un viaje como .ddb: sus inmersiones (datos, sitio con coordenadas,
+/// compañeros, botellas, tags, ordenador y, opcionalmente, el perfil), el viaje
+/// en sí y los compañeros del viaje. Lo comparte con nombre
+/// "Año-Nombre del viaje-PanDive.ddb".
 library;
 
 import 'dart:io';
@@ -11,22 +12,27 @@ import 'package:share_plus/share_plus.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-Future<void> exportTripDdb(DivemateDb source, Trip trip) async {
-  final f = await buildTripDdb(source, trip);
+Future<void> exportTripDdb(DivemateDb source, Trip trip,
+    {bool withProfiles = false}) async {
+  final f = await buildTripDdb(source, trip, withProfiles: withProfiles);
   await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
 }
 
 /// Exporta/comparte varios viajes en un solo .ddb.
-Future<void> exportTripsDdb(DivemateDb source, List<Trip> trips) async {
+Future<void> exportTripsDdb(DivemateDb source, List<Trip> trips,
+    {bool withProfiles = false}) async {
   if (trips.isEmpty) return;
-  if (trips.length == 1) return exportTripDdb(source, trips.first);
+  if (trips.length == 1) {
+    return exportTripDdb(source, trips.first, withProfiles: withProfiles);
+  }
   final dir = await getTemporaryDirectory();
   final f = File('${dir.path}/${tripsFileBase(trips)}.ddb');
   if (f.existsSync()) f.deleteSync();
   final out = DivemateDb.createEmpty(f.path);
   try {
     for (final trip in trips) {
-      await writeTripDdb(source, trip, out, source.listDivesByTrip(trip.id));
+      await writeTripDdb(source, trip, out, source.listDivesByTrip(trip.id),
+          withProfiles: withProfiles);
     }
   } finally {
     out.close();
@@ -58,28 +64,31 @@ String tripFileBase(Trip trip, List<Dive> dives) {
 
 /// Construye el .ddb del viaje en un fichero temporal y lo devuelve (sin
 /// compartir).
-Future<File> buildTripDdb(DivemateDb source, Trip trip) async {
+Future<File> buildTripDdb(DivemateDb source, Trip trip,
+    {bool withProfiles = false}) async {
   final dives = source.listDivesByTrip(trip.id);
   final dir = await getTemporaryDirectory();
   final f = File('${dir.path}/${tripFileBase(trip, dives)}.ddb');
   if (f.existsSync()) f.deleteSync();
   final out = DivemateDb.createEmpty(f.path);
   try {
-    await writeTripDdb(source, trip, out, dives);
+    await writeTripDdb(source, trip, out, dives, withProfiles: withProfiles);
   } finally {
     out.close();
   }
   return f;
 }
 
-/// Pobla [out] con el viaje, sus inmersiones y compañeros. Cede frames cada
-/// pocas inmersiones para no congelar la UI. Testeable (sin IO).
+/// Pobla [out] con el viaje, sus inmersiones y compañeros (con
+/// [withProfiles], también el perfil de cada buceo). Cede frames cada pocas
+/// inmersiones para no congelar la UI. Testeable (sin IO).
 Future<void> writeTripDdb(
   DivemateDb source,
   Trip trip,
   DivemateDb out,
-  List<Dive> dives,
-) async {
+  List<Dive> dives, {
+  bool withProfiles = false,
+}) async {
   final outTrip = out.createTrip(trip.name);
   out.setTripBuddies(outTrip, [
     for (final b in source.tripBuddies(trip.id)) out.findOrCreateBuddy(b.name),
@@ -120,6 +129,7 @@ Future<void> writeTripDdb(
       buddy: names.isEmpty ? null : names.join(', '),
       buddyIds: ids.isEmpty ? null : ids.join(','),
     );
+    out.copyDiveDetailsFrom(newId, source, d.id, withProfile: withProfiles);
     out.assignDivesToTrip(outTrip, [newId]);
   }
 }

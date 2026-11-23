@@ -649,5 +649,8 @@
   "useDdb": "Import options",
   "useDdbFill": "Fill in dive sites",
   "useDdbImport": "Select dives to import",
-  "useDdbReplace": "Replace my database with this one"
+  "useDdbReplace": "Replace my database with this one",
+  "exportTripsIntro": "You are going to export the following trips:",
+  "exportWithProfiles": "Also export dive profiles",
+  "exportAction": "Export"
 }

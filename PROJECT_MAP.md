@@ -51,7 +51,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
 - `lib/core/widgets/import_progress.dart` -> diálogo de progreso reutilizable para importar .ssrf
-- `lib/core/db/db_import_ext.dart` -> inserta inmersión externa (perfil, botellas, sitio, buddies, tags)
+- `lib/core/db/db_import_ext.dart` -> inserta inmersión externa (perfil, botellas, sitio, buddies, tags) + copyDiveDetailsFrom (copia ordenador/botellas/tags/perfil entre .ddb)
 - `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos
 
 ### Core · modelos (`models.dart` es el barrel)
@@ -180,7 +180,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/trips/screens/trips_screen.dart` -> lista de viajes (crear/renombrar/borrar)
 - `lib/features/trips/screens/trip_detail_screen.dart` -> detalle: compañeros (editar/desde buceos) + ver buceos
 - `lib/features/trips/logic/assign_trip_action.dart` -> diálogo asignar selección a viaje (elegir/crear)
-- `lib/features/trips/logic/export_trip.dart` -> exporta/comparte un viaje como .ddb (viaje+buceos+compañeros; nombre Año-Nombre-PanDive)
+- `lib/features/trips/logic/export_trip.dart` -> exporta/comparte viajes como .ddb (viaje+buceos+compañeros+botellas+tags, perfiles opcionales; nombre Año-Nombre-PanDive)
+- `lib/features/trips/widgets/export_trips_dialog.dart` -> confirmación: lista de viajes + checkbox "exportar también perfiles" (off)
 
 ### sites (sitios)
 - `lib/core/widgets/scroll_helpers.dart` -> scrollToHighlight: desplaza la lista al elemento recién añadido

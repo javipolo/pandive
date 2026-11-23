@@ -373,5 +373,8 @@
   "useDdb": "Opcions d'importació",
   "useDdbFill": "Omplir llocs d'immersió",
   "useDdbImport": "Seleccionar immersions per importar",
-  "useDdbReplace": "Substituir la meva base de dades per aquesta"
+  "useDdbReplace": "Substituir la meva base de dades per aquesta",
+  "exportTripsIntro": "Exportaràs els viatges següents:",
+  "exportWithProfiles": "Exportar també els perfils d'immersió",
+  "exportAction": "Exporta"
 }

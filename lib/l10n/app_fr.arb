@@ -373,5 +373,8 @@
   "useDdb": "Options d'importation",
   "useDdbFill": "Compléter les sites de plongée",
   "useDdbImport": "Sélectionner les plongées à importer",
-  "useDdbReplace": "Remplacer ma base de données par celle-ci"
+  "useDdbReplace": "Remplacer ma base de données par celle-ci",
+  "exportTripsIntro": "Tu vas exporter les voyages suivants :",
+  "exportWithProfiles": "Exporter aussi les profils de plongée",
+  "exportAction": "Exporter"
 }

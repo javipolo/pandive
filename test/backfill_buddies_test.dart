@@ -288,6 +288,33 @@ void main() {
     expect(db.listDives().where((d) => d.date?.year == 2099).length, 3);
   });
 
+  test('export de viaje: perfiles solo con withProfiles', () async {
+    final d = db.listDives().firstWhere(
+        (d) => db.diveProfile(d.id) != null && db.cylinders(d.id).isNotEmpty);
+    final tid = db.createTrip('ZZZ Perfiles');
+    db.assignDivesToTrip(tid, [d.id]);
+    final trip = db.listTrips().firstWhere((t) => t.id == tid);
+
+    Future<DivemateDb> export(bool profiles, String name) async {
+      final out = DivemateDb.createEmpty('${tmp.path}/$name.ddb');
+      await writeTripDdb(db, trip, out, [d], withProfiles: profiles);
+      out.close();
+      return DivemateDb.open('${tmp.path}/$name.ddb');
+    }
+
+    final plain = await export(false, 'plain');
+    final pd = plain.listDives().single;
+    expect(plain.diveProfile(pd.id), isNull);
+    expect(plain.cylinders(pd.id).length, db.cylinders(d.id).length);
+    plain.close();
+
+    final full = await export(true, 'full');
+    final fd = full.listDives().single;
+    expect(full.diveProfile(fd.id)!.depths.length,
+        db.diveProfile(d.id)!.depths.length);
+    full.close();
+  });
+
   test('export de varios viajes: nombre + ddb con todos los viajes', () async {
     final dives = db.listDives().map((d) => d.id).toList();
     final t1 = db.createTrip('Viaje Uno');

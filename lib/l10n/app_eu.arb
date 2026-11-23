@@ -373,5 +373,8 @@
   "useDdb": "Inportazio-aukerak",
   "useDdbFill": "Murgiltze-lekuak bete",
   "useDdbImport": "Hautatu inportatzeko murgilketak",
-  "useDdbReplace": "Ordeztu nire datu-basea honekin"
+  "useDdbReplace": "Ordeztu nire datu-basea honekin",
+  "exportTripsIntro": "Bidaia hauek esportatuko dituzu:",
+  "exportWithProfiles": "Esportatu murgilketa-profilak ere",
+  "exportAction": "Esportatu"
 }

@@ -373,5 +373,8 @@
   "useDdb": "Opciones de importación",
   "useDdbFill": "Rellenar sitios de buceo",
   "useDdbImport": "Seleccionar buceos para importar",
-  "useDdbReplace": "Sustituir mi base de datos por esta"
+  "useDdbReplace": "Sustituir mi base de datos por esta",
+  "exportTripsIntro": "Vas a exportar los siguientes viajes:",
+  "exportWithProfiles": "Exportar también los perfiles de buceo",
+  "exportAction": "Exportar"
 }

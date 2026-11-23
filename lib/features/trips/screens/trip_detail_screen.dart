@@ -11,6 +11,7 @@ import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/features/trips/logic/export_trip.dart';
+import 'package:pandive/features/trips/widgets/export_trips_dialog.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class TripDetailScreen extends StatefulWidget {
@@ -91,6 +92,14 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     setState(() => _buddies = widget.db.tripBuddies(widget.trip.id));
   }
 
+  Future<void> _export() async {
+    final t = AppLocalizations.of(context);
+    final profiles = await showExportTripsDialog(context, [widget.trip]);
+    if (profiles == null || !mounted) return;
+    await withProgress(context, t.working,
+        () => exportTripDdb(widget.db, widget.trip, withProfiles: profiles));
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -99,8 +108,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
         IconButton(
           tooltip: t.exportTrip,
           icon: const Icon(Icons.share),
-          onPressed: () => withProgress(
-              context, t.working, () => exportTripDdb(widget.db, widget.trip)),
+          onPressed: _export,
         ),
       ]),
       body: ListView(
