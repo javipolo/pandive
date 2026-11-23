@@ -645,5 +645,10 @@
     "placeholders": {
       "count": {}
     }
-  }
+  },
+  "useDdb": "Use DDB",
+  "useDdbFor": "Use DDB to:",
+  "useDdbFill": "Fill in dive sites",
+  "useDdbImport": "Import complete dives",
+  "useDdbReplace": "Replace the whole local database"
 }

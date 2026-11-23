@@ -1,5 +1,6 @@
 /// Previsualiza un .ddb en solo lectura (lista de inmersiones) sin tocar la DB
-/// activa. Desde aquí se puede rellenar buceos o usarlo como base de datos.
+/// activa. El botón flotante "Usar DDB" ofrece: rellenar, importar buceos o
+/// sustituir la base de datos.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -83,13 +84,6 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
         title: Text(t.previewDdb),
         backgroundColor: cs.error,
         foregroundColor: cs.onError,
-        actions: [
-          if (ok && _dives.isNotEmpty)
-            IconButton(
-                tooltip: t.importDivesAction,
-                icon: const Icon(Icons.download_outlined),
-                onPressed: _importDives),
-        ],
       ),
       body: !ok
           ? Center(child: Text(t.invalidDb))
@@ -100,29 +94,42 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
                   settings: widget.settings,
                   caveIds: _cave,
                   onOpen: (_) {}),
-      bottomNavigationBar: !ok
-          ? null
-          : Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-              child: Row(children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.swap_horiz),
-                    label: Text(t.replaceDb),
-                    onPressed: _useThis,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    icon: const Icon(Icons.group_add_outlined),
-                    label: Text(t.fillAction),
-                    onPressed: () => openFillFromDdb(context, widget.db,
-                        sourcePath: widget.path),
-                  ),
-                ),
-              ]),
-            ),
+      floatingActionButton: !ok ? null : _useDdbMenu(t),
+    );
+  }
+
+  /// Botón flotante "Usar DDB" que despliega las tres acciones.
+  Widget _useDdbMenu(AppLocalizations t) {
+    return MenuAnchor(
+      alignmentOffset: const Offset(0, 8),
+      menuChildren: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          child: Text(t.useDdbFor,
+              style: Theme.of(context).textTheme.labelLarge),
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.group_add_outlined),
+          onPressed: () =>
+              openFillFromDdb(context, widget.db, sourcePath: widget.path),
+          child: Text(t.useDdbFill),
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.playlist_add),
+          onPressed: _dives.isEmpty ? null : _importDives,
+          child: Text(t.useDdbImport),
+        ),
+        MenuItemButton(
+          leadingIcon: const Icon(Icons.swap_horiz),
+          onPressed: _useThis,
+          child: Text(t.useDdbReplace),
+        ),
+      ],
+      builder: (context, ctrl, _) => FloatingActionButton.extended(
+        onPressed: () => ctrl.isOpen ? ctrl.close() : ctrl.open(),
+        icon: const Icon(Icons.more_vert),
+        label: Text(t.useDdb),
+      ),
     );
   }
 }

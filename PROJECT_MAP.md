@@ -107,7 +107,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/logic/import_dives.dart` -> plan (nuevo/duplicado por fecha/hora) + copia de inmersiones seleccionadas de otro .ddb (perfil/sitio/buddies/tags/botellas) con resumen (DdbImportResult)
 - `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
 - `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
-- `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura (botón importar -> selección)
+- `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura; FAB "Usar DDB" con menú (rellenar / importar buceos / sustituir DB)
 - `lib/features/settings/screens/import_ddb_dives_screen.dart` -> elegir buceos del .ddb a importar (verde nuevo / ámbar ya existe, ignorado) + diálogo resumen
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores

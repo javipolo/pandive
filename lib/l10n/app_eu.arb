@@ -369,5 +369,10 @@
   "importSummaryDuplicates": "Baztertuak (lehendik dagoen baten ordu berean): {count}",
   "importSummaryNotSelected": "Hautatu gabeak: {count}",
   "importSummaryNewSites": "Leku berriak: {count}",
-  "importSummaryNewBuddies": "Lagun berriak: {count}"
+  "importSummaryNewBuddies": "Lagun berriak: {count}",
+  "useDdb": "Erabili DDB",
+  "useDdbFor": "Erabili DDB honetarako:",
+  "useDdbFill": "Murgiltze-lekuak bete",
+  "useDdbImport": "Murgilketa osoak inportatu",
+  "useDdbReplace": "Tokiko datu-base osoa ordeztu"
 }

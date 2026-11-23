@@ -369,5 +369,10 @@
   "importSummaryDuplicates": "Ignorados (misma hora que uno existente): {count}",
   "importSummaryNotSelected": "No seleccionados: {count}",
   "importSummaryNewSites": "Sitios nuevos: {count}",
-  "importSummaryNewBuddies": "Compañeros nuevos: {count}"
+  "importSummaryNewBuddies": "Compañeros nuevos: {count}",
+  "useDdb": "Usar DDB",
+  "useDdbFor": "Usar DDB para:",
+  "useDdbFill": "Rellenar sitios de buceo",
+  "useDdbImport": "Importar buceos completos",
+  "useDdbReplace": "Sustituir toda la base de datos local"
 }

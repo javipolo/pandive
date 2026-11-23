@@ -369,5 +369,10 @@
   "importSummaryDuplicates": "Ignorées (même heure qu'une plongée existante) : {count}",
   "importSummaryNotSelected": "Non sélectionnées : {count}",
   "importSummaryNewSites": "Nouveaux sites : {count}",
-  "importSummaryNewBuddies": "Nouveaux binômes : {count}"
+  "importSummaryNewBuddies": "Nouveaux binômes : {count}",
+  "useDdb": "Utiliser DDB",
+  "useDdbFor": "Utiliser DDB pour :",
+  "useDdbFill": "Compléter les sites de plongée",
+  "useDdbImport": "Importer des plongées complètes",
+  "useDdbReplace": "Remplacer toute la base de données locale"
 }
