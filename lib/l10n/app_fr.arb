@@ -371,7 +371,6 @@
   "importSummaryNewSites": "Nouveaux sites : {count}",
   "importSummaryNewBuddies": "Nouveaux binômes : {count}",
   "useDdb": "Options d'importation",
-  "useDdbFor": "Utiliser DDB pour :",
   "useDdbFill": "Compléter les sites de plongée",
   "useDdbImport": "Sélectionner les plongées à importer",
   "useDdbReplace": "Remplacer ma base de données par celle-ci"

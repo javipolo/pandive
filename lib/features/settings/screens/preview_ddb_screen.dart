@@ -105,7 +105,7 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
       menuChildren: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-          child: Text(t.useDdbFor,
+          child: Text(t.useDdb,
               style: Theme.of(context).textTheme.labelLarge),
         ),
         MenuItemButton(

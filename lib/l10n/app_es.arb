@@ -371,7 +371,6 @@
   "importSummaryNewSites": "Sitios nuevos: {count}",
   "importSummaryNewBuddies": "Compañeros nuevos: {count}",
   "useDdb": "Opciones de importación",
-  "useDdbFor": "Usar DDB para:",
   "useDdbFill": "Rellenar sitios de buceo",
   "useDdbImport": "Seleccionar buceos para importar",
   "useDdbReplace": "Sustituir mi base de datos por esta"

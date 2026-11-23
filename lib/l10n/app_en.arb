@@ -647,7 +647,6 @@
     }
   },
   "useDdb": "Import options",
-  "useDdbFor": "Use DDB to:",
   "useDdbFill": "Fill in dive sites",
   "useDdbImport": "Select dives to import",
   "useDdbReplace": "Replace my database with this one"
