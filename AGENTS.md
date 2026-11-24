@@ -28,6 +28,21 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
   automáticamente, EXCEPTO el build obligatorio tras cada commit (`make
   apk-release`, ver Workflow). Fuera de ese caso, solo `flutter analyze` (o
   `make analyze`) tras un cambio grande para verificar.
+- **Operaciones largas: feedback siempre y sin bloquear**. Toda acción que
+  pueda tardar (importar, exportar, leer/escribir ficheros, red, procesar
+  muchos registros) muestra **en el acto** un diálogo que diga qué está
+  pasando: spinner con texto (`withProgress`, `core/widgets/progress_dialog.dart`)
+  o barra de progreso (`withProgressBar`, `core/widgets/import_progress.dart`).
+  Nunca dejar la app "pensando" sin aviso. Y no bloquear el hilo: en Android
+  el código Dart corre en el hilo principal, y >5 s de trabajo síncrono es un
+  ANR ("la app no responde"). Trocear con `await` entre bloques y agrupar
+  escrituras en `db.inTransaction` (sin transacción cada sentencia hace su
+  propio commit a disco).
+- **Importaciones**: antes de importar, mostrar la lista de lo que se va a
+  importar para revisarla y desmarcar (verde nuevo / ámbar ya existe), y al
+  terminar llevar al usuario a la lista de buceos refrescada
+  (`requestDivesList()` + volver a la raíz), no dejarlo en la pantalla de
+  herramientas.
 - **i18n obligatorio**: TODO texto visible al usuario va traducido. Nunca
   hardcodees cadenas en la UI; usa claves de `AppLocalizations`
   (`final t = AppLocalizations.of(context); ... t.miClave`). Al añadir cualquier
