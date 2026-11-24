@@ -114,7 +114,7 @@ class Settings extends ChangeNotifier {
   }
 
   /// Backups automáticos solo con WiFi (los manuales siempre).
-  bool get backupWifiOnly => _prefs.getBool(_kBackupWifi) ?? false;
+  bool get backupWifiOnly => _prefs.getBool(_kBackupWifi) ?? true;
   Future<void> setBackupWifiOnly(bool v) async {
     await _prefs.setBool(_kBackupWifi, v);
     notifyListeners();

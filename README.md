@@ -312,10 +312,10 @@ Drive, sin perder nunca datos en silencio:
 - Aviso si Pandive está abierto en el otro dispositivo (presencia en Drive).
 - Las imágenes de documentos viajan en el zip de documentos.
 
-**Solo con WiFi** (dos interruptores en Backup, desactivados por defecto):
-- *Backups solo con WiFi*: los automáticos (al abrir y en segundo plano)
+**Solo con WiFi** (dos interruptores en Backup):
+- *Backups solo con WiFi* (activado por defecto): los automáticos (al abrir y en segundo plano)
   esperan a tener WiFi; el botón manual funciona siempre.
-- *Sincronizar solo con WiFi*: con datos móviles la sync no hace nada sola (ni
+- *Sincronizar solo con WiFi* (desactivado por defecto): con datos móviles la sync no hace nada sola (ni
   comprobaciones ni subidas/bajadas; icono de antena): solo el botón
   "Sincronizar ahora". La subida de respaldo al salir espera a la WiFi.
 
