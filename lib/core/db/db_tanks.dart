@@ -48,7 +48,12 @@ extension DivemateDbTanks on DivemateDb {
     if (d == null) return;
     final sac = computeSac(cylinders(logId),
         divetimeMin: d.durationMin, avgDepthM: d.avgDepth);
-    _db.execute('UPDATE Logbook SET PandiveSac = ? WHERE ID = ?', [sac, logId]);
+    // Solo si cambia: un UPDATE que deja el mismo valor (p.ej. NULL -> NULL
+    // cuando faltan datos) también dispara el trigger del sello de escritura,
+    // y al hacerse en cada apertura la sync veía "modificado en ambos lados".
+    _db.execute(
+        'UPDATE Logbook SET PandiveSac = ? WHERE ID = ? AND PandiveSac IS NOT ?',
+        [sac, logId, sac]);
   }
 
   /// Rellena `PandiveSac` donde falte y haya botellas con presiones (al abrir).
