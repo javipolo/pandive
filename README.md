@@ -21,7 +21,7 @@ App móvil de registro de inmersiones (un solo buceador, una base de datos por b
 ### Arquitectura (resumen)
 
 - **UI + lógica**: Flutter (Dart). Desarrollo rápido, SQLite (`drift`) y Google Drive (`googleapis`) bien soportados.
-- **Descarga de inmersiones**: `libdivecomputer` (C), compilada con el NDK de Android, envuelta en un **plugin nativo Android** (Kotlin + JNI). El plugin maneja el BLE por la API de Android y le pasa a libdivecomputer su I/O; Flutter solo recibe las inmersiones ya parseadas.
+- **Descarga de inmersiones**: `libdivecomputer` (C) con un núcleo común (`native/pandive_dc_core.c`) y un plugin por plataforma que pone el transporte BLE: en **Android** Kotlin + JNI sobre la API de Bluetooth; en **Linux** C sobre **BlueZ** por D-Bus (`linux/runner/dc/`). Flutter solo recibe las inmersiones ya parseadas.
 - **Por qué Flutter y no nativo puro**: la parte dura (C + BLE + threading) cuesta lo mismo en cualquier framework —hay que compilar C con el NDK y puentear BLE igualmente— pero Flutter ahorra mucho en UI, base de datos y Drive.
 
 ---
@@ -165,7 +165,40 @@ export ANDROID_NDK=$HOME/Android/ndk/27.2.12479018
 # salida: build/android/<abi>/install/lib/libdivecomputer.so
 ```
 
-Se compila **sin** libusb/hidapi: en Android el transporte es BLE, implementado desde Kotlin y conectado al I/O personalizado de libdivecomputer.
+**Para la app Linux** (estática, se enlaza dentro del ejecutable):
+
+```bash
+make ldc-linux                  # -> linux/ldc/libdivecomputer.a
+```
+
+Se compila **sin** libusb/hidapi/bluez: el transporte BLE lo pone la app (Kotlin en Android, BlueZ en Linux) y se conecta al I/O personalizado de libdivecomputer.
+
+---
+
+## App de escritorio (Linux)
+
+```bash
+make linux                      # build release -> build/linux/x64/release/bundle/pandive
+flutter run -d linux            # o compilar + ejecutar en modo debug
+```
+
+### Bluetooth en Linux
+
+La descarga del ordenador de buceo usa **BlueZ** (el servicio `bluetooth` del sistema). No hace falta ser root ni pedir permisos: basta con que el adaptador esté encendido (`bluetoothctl show` → `Powered: yes`; la app ofrece encenderlo si está apagado).
+
+Normalmente **no hace falta emparejar**: se escanea desde la app, se elige el ordenador y descarga (probado con Shearwater). Si un modelo exige emparejamiento, la app lo intenta sola y el PIN lo pide el Bluetooth del escritorio (GNOME/KDE). Si aun así falla la conexión ("No se pudieron activar notificaciones", errores de autenticación), empareja a mano una vez:
+
+```bash
+bluetoothctl
+[bluetooth]# scan le             # pon el ordenador en modo Bluetooth/descarga
+[bluetooth]# devices             # localiza su MAC (p.ej. por el nombre "Perdix")
+[bluetooth]# scan off
+[bluetooth]# pair AA:BB:CC:DD:EE:FF    # introduce el PIN que muestre el ordenador
+[bluetooth]# trust AA:BB:CC:DD:EE:FF
+[bluetooth]# quit
+```
+
+Después vuelve a descargar desde la app. Para deshacerlo: `bluetoothctl remove AA:BB:CC:DD:EE:FF`. Los mensajes de diagnóstico (`PandiveBLE:` / `PandiveDC:`) salen por la consola si lanzas la app desde un terminal.
 
 ## Estado del proyecto
 
@@ -177,7 +210,7 @@ Por fases (ver plan de desarrollo):
   - [x] Script de cross-compile Android listo: `scripts/build-libdivecomputer-android.sh`.
   - [x] Cross-compile con NDK OK: `.so` para arm64-v8a, armeabi-v7a, x86_64 (Android 24).
   - [x] API de I/O personalizado (`dc_custom_open` + `DC_TRANSPORT_BLE`) confirmada: el puente BLE Kotlin↔libdivecomputer es viable (patrón de Subsurface).
-  - [ ] Prototipo de descarga BLE en device real (= inicio del plugin nativo, Fase 2).
+  - [x] Prototipo de descarga BLE en device real (= inicio del plugin nativo, Fase 2).
 - [x] **Fase 1** — App base (sin migración: abre el `.ddb` directamente):
   - [x] Capa DB (`lib/db/divemate_db.dart`): abre `.ddb`, owner, lista dives, botellas, decode de perfil (validado contra `divemate-cli`).
   - [x] Pantalla de carga de `.ddb` (file picker), lista de inmersiones, detalle con perfil (`fl_chart`) y botellas.
@@ -188,7 +221,7 @@ Por fases (ver plan de desarrollo):
   - [x] Estadísticas agregadas (validadas contra `divemate-cli`).
   - [x] Edición de campos de una inmersión (escritura en el `.ddb`, respeta UUID/Status y marca `Updated`).
   - [x] Alta manual de inmersiones nuevas (genera Number/UUID, botella opcional).
-- [ ] **Fase 2** — Importar del ordenador de buceo (plugin nativo + UI de escaneo/descarga).
+- [x] **Fase 2** — Importar del ordenador de buceo (plugin nativo + UI de escaneo/descarga), en Android y Linux.
 - [ ] **Fase 3** — Export Subsurface + backup/restore Google Drive.
 - [ ] **Fase 4** — Pulido: estadísticas, sitios, buddies, equipo, certificaciones.
 
