@@ -12,6 +12,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/app.dart` -> MaterialApp, escala de texto global
 - `lib/core/app_root.dart` -> AppRoot: elige pantalla; crea DB vacía en el primer arranque, o pantalla de carga (Cambiar DB / error)
 - `lib/core/text/relative_date.dart` -> fecha "humana": "Hoy 17:12" / "Ayer 21:23" / fecha completa (lista de backups)
+- `lib/core/services/home_navigation.dart` -> peticiones de sección a HomeScreen (requestDivesList: volver a la lista de buceos tras importar)
 - `lib/core/services/opened_file.dart` -> fichero .ddb entrante (abrir con / compartir): consume + stream
 - `lib/core/services/data_revision.dart` -> señal global para refresco blando de pestañas (sin reabrir DB)
 - `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)
@@ -61,7 +62,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
 - `lib/core/import/ssi_csv_import.dart` -> importa el CSV del logbook de SSI (columnas por posición; etiquetas; dedupe por día+prof.+duración+hora con la candidata más parecida)
 - `lib/core/import/ssi_csv_fields.dart` -> lectura de celdas del CSV de SSI: CSV, fechas multi-idioma, duración, profundidad, compañeros pegados + centro + ordenador
-- `lib/core/widgets/import_progress.dart` -> diálogo de progreso reutilizable para importar .ssrf
+- `lib/core/widgets/import_progress.dart` -> diálogo con barra de progreso para importaciones largas (withProgressBar; importSsrfWithProgress)
 - `lib/core/db/db_import_ext.dart` -> inserta inmersión externa (perfil, botellas, sitio, buddies, tags) + copyDiveDetailsFrom (copia ordenador/botellas/tags/perfil entre .ddb)
 - `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos
 
@@ -125,6 +126,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura; FAB "Opciones de importación" con menú (rellenar / importar buceos / sustituir DB)
 - `lib/features/settings/screens/import_ddb_dives_screen.dart` -> elegir buceos del .ddb a importar (verde nuevo / ámbar ya existe, ignorado) + diálogo resumen
+- `lib/features/settings/screens/import_ssi_screen.dart` -> revisar el CSV de SSI antes de importar (verde nueva / ámbar parece existir, marcable), importa con barra y vuelve a la lista de buceos
+- `lib/features/settings/widgets/import_dive_tile.dart` -> fila con checkbox de las listas de importación (ddb y SSI)
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)

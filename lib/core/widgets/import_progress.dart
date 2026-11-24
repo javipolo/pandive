@@ -1,4 +1,6 @@
-/// Diálogo de progreso reutilizable para importar un .ssrf en una base de datos.
+/// Diálogo modal con barra de progreso para importaciones largas (Subsurface,
+/// SSI…). La tarea debe ceder el hilo de vez en cuando (await) para que la
+/// barra avance y Android no muestre "la app no responde".
 library;
 
 import 'package:flutter/foundation.dart';
@@ -8,26 +10,35 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Muestra un diálogo de progreso mientras importa [xml] en [db]. Devuelve el
-/// número de inmersiones añadidas.
-Future<int> importSsrfWithProgress(
-    BuildContext context, DivemateDb db, String xml) async {
+/// Ejecuta [task] con el diálogo abierto; [task] informa con (hechas, total).
+Future<T> withProgressBar<T>(BuildContext context,
+    Future<T> Function(void Function(int done, int total) onProgress) task) async {
+  final nav = Navigator.of(context, rootNavigator: true);
   final progress = ValueNotifier<(int, int)>((0, 0));
   showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => _ImportProgressDialog(progress),
+    builder: (_) => PopScope(canPop: false, child: _ProgressDialog(progress)),
   );
-  final n = await importSubsurfaceXml(db, xml,
-      onProgress: (d, t) => progress.value = (d, t));
-  if (context.mounted) Navigator.of(context).pop();
-  progress.dispose();
-  return n;
+  try {
+    await WidgetsBinding.instance.endOfFrame; // que se vea antes de empezar
+    return await task((d, t) => progress.value = (d, t));
+  } finally {
+    if (nav.canPop()) nav.pop();
+    progress.dispose();
+  }
 }
 
-class _ImportProgressDialog extends StatelessWidget {
+/// Importa [xml] (Subsurface) en [db] con barra de progreso. Devuelve cuántas
+/// inmersiones añadió.
+Future<int> importSsrfWithProgress(
+        BuildContext context, DivemateDb db, String xml) =>
+    withProgressBar(
+        context, (p) => importSubsurfaceXml(db, xml, onProgress: p));
+
+class _ProgressDialog extends StatelessWidget {
   final ValueListenable<(int, int)> progress;
-  const _ImportProgressDialog(this.progress);
+  const _ProgressDialog(this.progress);
 
   @override
   Widget build(BuildContext context) {

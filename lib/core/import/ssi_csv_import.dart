@@ -140,55 +140,82 @@ double? _distance(SsiDive d, _Existing e) {
 /// Importa el CSV de SSI en [db]. Ignora las inmersiones que ya estén: mismo
 /// día, profundidad ±3 m, duración ±6 min y, si hay hora, ±90 min; entre
 /// varias candidatas se empareja con la más parecida.
-SsiImportResult importSsiCsv(DivemateDb db, String text) {
+/// Una fila del CSV en el plan de importación: [duplicate] si ya hay un
+/// buceo que encaja (no se importa salvo que el usuario la marque).
+class SsiPlanEntry {
+  final SsiDive dive;
+  final bool duplicate;
+  const SsiPlanEntry(this.dive, {required this.duplicate});
+}
+
+/// Plan sin escribir nada: cada fila del CSV (en orden cronológico) marcada
+/// como nueva o ya existente, y cuántas filas no se pudieron leer.
+({List<SsiPlanEntry> entries, int skipped}) planSsiImport(
+    DivemateDb db, String text) {
   final parsed = parseSsiCsv(text);
   final dives = [...parsed.dives]..sort((a, b) {
       final c = a.date.compareTo(b.date);
       return c != 0 ? c : (a.number ?? 0).compareTo(b.number ?? 0);
     });
   final used = <int>{}; // buceos existentes ya emparejados con una fila
-  var added = 0, dup = 0;
+  final entries = <SsiPlanEntry>[];
   for (final d in dives) {
-    final existing = db.divesOnDay(d.date);
     _Existing? match;
     double? best;
-    for (final e in existing) {
+    for (final e in db.divesOnDay(d.date)) {
       final x = used.contains(e.id) ? null : _distance(d, e);
       if (x != null && (best == null || x < best)) (match, best) = (e, x);
     }
-    if (match != null) {
-      used.add(match.id);
-      dup++;
-      continue;
-    }
-    var when = d.date;
-    while (db.hasDiveAt(when)) {
-      if (d.hasTime) break; // hora real ocupada: es la misma
-      when = when.add(const Duration(minutes: 1));
-    }
-    final ok = db.importExternalDive(
-      dateTime: when,
-      placeName: d.site,
-      country: d.country,
-      maxDepth: d.depth,
-      durationMin: d.minutes,
-      buddies: d.buddies,
-      tagNames: d.tags,
-      computer: d.computer,
-    );
-    if (ok) {
-      added++;
-      // Que otra fila del CSV no la tome por duplicada.
-      String p(int v) => v.toString().padLeft(2, '0');
-      final hhmm = '${p(when.hour)}:${p(when.minute)}';
-      used.addAll(db
-          .divesOnDay(when)
-          .where((e) => e.time?.startsWith(hhmm) ?? false)
-          .map((e) => e.id));
-    } else {
-      dup++;
-    }
+    if (match != null) used.add(match.id);
+    entries.add(SsiPlanEntry(d, duplicate: match != null));
+  }
+  return (entries: entries, skipped: parsed.skipped);
+}
+
+/// Importa [dives] por bloques (una transacción cada uno) cediendo el hilo
+/// entre bloques: la UI pinta el progreso y Android no da "no responde".
+/// Devuelve cuántas añadió.
+Future<int> applySsiImport(DivemateDb db, List<SsiDive> dives,
+    {void Function(int done, int total)? onProgress}) async {
+  const chunk = 25;
+  var added = 0;
+  for (var i = 0; i < dives.length; i += chunk) {
+    final part = dives.sublist(i, (i + chunk).clamp(0, dives.length));
+    added += db.inTransaction(() => part.where((d) => _insert(db, d)).length);
+    onProgress?.call(i + part.length, dives.length);
+    await Future<void>.delayed(Duration.zero);
   }
   if (added > 0) db.autoRenumber();
-  return (added: added, duplicates: dup, skipped: parsed.skipped);
+  return added;
+}
+
+bool _insert(DivemateDb db, SsiDive d) {
+  var when = d.date;
+  // Sin hora: 12:00, +1 min por cada una que ya ocupe ese minuto. Con hora
+  // real ocupada es la misma inmersión y importExternalDive la rechaza.
+  while (!d.hasTime && db.hasDiveAt(when)) {
+    when = when.add(const Duration(minutes: 1));
+  }
+  return db.importExternalDive(
+    dateTime: when,
+    placeName: d.site,
+    country: d.country,
+    maxDepth: d.depth,
+    durationMin: d.minutes,
+    buddies: d.buddies,
+    tagNames: d.tags,
+    computer: d.computer,
+  );
+}
+
+/// Plan + importar las nuevas, sin pantalla (tests y scripts).
+Future<SsiImportResult> importSsiCsv(DivemateDb db, String text) async {
+  final plan = planSsiImport(db, text);
+  final fresh = [for (final e in plan.entries) if (!e.duplicate) e.dive];
+  final added = await applySsiImport(db, fresh);
+  return (
+    added: added,
+    duplicates: plan.entries.length - added,
+    skipped: plan.skipped,
+  );
 }

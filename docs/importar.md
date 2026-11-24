@@ -48,8 +48,12 @@ SSI deja exportar el logbook digital desde su web en un fichero CSV.
    fichero en el móvil o en el PC.
 2. En Pandive: **menú lateral → Herramientas → Importar de SSI (CSV)** y
    elige el fichero.
-3. Un aviso dice cuántas inmersiones se han importado y cuántas ya estaban
-   en el logbook.
+3. Sale la **lista de inmersiones del CSV** para revisarla: en verde las
+   nuevas (marcadas) y en ámbar las que parecen estar ya en tu logbook
+   (desmarcadas; márcalas si no lo están, el emparejamiento es aproximado).
+   Desmarca lo que no quieras.
+4. **Importar**: una barra muestra el progreso y al terminar vuelves a la
+   lista de buceos, ya con las nuevas.
 
 Funciona con el CSV en cualquier idioma. La cabecera viene en el idioma de
 tu cuenta de SSI, pero Pandive lee las columnas por su posición, no por su

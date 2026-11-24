@@ -435,13 +435,6 @@
     }
   },
   "importSsi": "Import from SSI (CSV)",
-  "importSsiResult": "{added} dives imported, {duplicates} already in the logbook",
-  "@importSsiResult": {
-    "placeholders": {
-      "added": {},
-      "duplicates": {}
-    }
-  },
   "importSites": "Import sites (JSON)",
   "updateOnly": "Update existing",
   "updateAndNew": "Update + add new",
@@ -765,6 +758,21 @@
   "@yesterdayAt": {
     "placeholders": {
       "time": {}
+    }
+  },
+  "importSsiHeader": "{newCount} new · {dupCount} seem to be in your logbook already (unticked: tick them if they aren't)",
+  "importSsiDuplicate": "Seems to be in your logbook already",
+  "importSsiDone": "{count} dives imported",
+  "readingFile": "Reading the file…",
+  "@importSsiHeader": {
+    "placeholders": {
+      "newCount": {},
+      "dupCount": {}
+    }
+  },
+  "@importSsiDone": {
+    "placeholders": {
+      "count": {}
     }
   }
 }

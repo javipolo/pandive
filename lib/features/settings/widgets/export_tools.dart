@@ -14,6 +14,9 @@ import 'package:pandive/core/export/subsurface_export.dart';
 import 'package:pandive/core/import/ssi_csv_import.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/import_progress.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
+import 'package:pandive/features/settings/screens/import_ssi_screen.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 /// Copia el .ddb activo a un temporal con nombre limpio y lo comparte (igual
 /// que la exportación a Subsurface; snapshot, no comparte el fichero en uso).
@@ -46,11 +49,16 @@ Future<int?> importSubsurface(BuildContext context, DivemateDb db) async {
   return importSsrfWithProgress(context, db, xml);
 }
 
-/// Elige el CSV exportado de MySSI e importa sus inmersiones. Devuelve el
-/// resultado, o null si se canceló.
-Future<SsiImportResult?> importSsi(DivemateDb db) async {
+/// Elige el CSV exportado de MySSI, lo analiza (con aviso de "leyendo") y
+/// abre la lista para revisar y desmarcar antes de importar.
+Future<void> importSsi(BuildContext context, DivemateDb db) async {
   final res = await FilePicker.platform.pickFiles(withData: false);
   final path = res?.files.single.path;
-  if (path == null) return null;
-  return importSsiCsv(db, await File(path).readAsString());
+  if (path == null || !context.mounted) return;
+  final t = AppLocalizations.of(context);
+  final plan = await withProgress(context, t.readingFile,
+      () async => planSsiImport(db, await File(path).readAsString()));
+  if (!context.mounted) return;
+  await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => ImportSsiScreen(db: db, entries: plan.entries)));
 }

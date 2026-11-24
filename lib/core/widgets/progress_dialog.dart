@@ -24,7 +24,9 @@ Future<T> withProgress<T>(
     ),
   );
   try {
-    await Future<void>.delayed(Duration.zero); // deja pintar el diálogo
+    // Que el diálogo llegue a pintarse antes de empezar (si la tarea es
+    // síncrona, bloquea el hilo y sin esto no se vería nada).
+    await WidgetsBinding.instance.endOfFrame;
     return await task();
   } finally {
     if (nav.canPop()) nav.pop();

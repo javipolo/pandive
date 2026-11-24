@@ -267,7 +267,6 @@
   "importSubsurface": "Subsurface-tik inportatu (.ssrf)",
   "importSubsurfaceResult": "{count} murgilketa inportatu dira",
   "importSsi": "Inportatu SSItik (CSV)",
-  "importSsiResult": "{added} murgilketa inportatu dira, {duplicates} logbookean zeuden jada",
   "importSites": "Inportatu lekuak (JSON)",
   "updateOnly": "Eguneratu soilik",
   "updateAndNew": "Eguneratu + berriak",
@@ -421,5 +420,9 @@
   "chartCopied": "Grafikoa arbelean kopiatu da",
   "chartCopyFailed": "Ezin izan da grafikoa kopiatu",
   "todayAt": "Gaur {time}",
-  "yesterdayAt": "Atzo {time}"
+  "yesterdayAt": "Atzo {time}",
+  "importSsiHeader": "{newCount} berri · {dupCount} dagoeneko zure koadernoan daudela dirudi (markatu gabe: markatu ez badaude)",
+  "importSsiDuplicate": "Dagoeneko zure koadernoan dagoela dirudi",
+  "importSsiDone": "{count} murgilketa inportatu dira",
+  "readingFile": "Fitxategia irakurtzen…"
 }

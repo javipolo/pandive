@@ -267,7 +267,6 @@
   "importSubsurface": "Importar de Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} inmersiones importadas",
   "importSsi": "Importar de SSI (CSV)",
-  "importSsiResult": "{added} inmersiones importadas, {duplicates} ya estaban en el logbook",
   "importSites": "Importar sitios (JSON)",
   "updateOnly": "Solo actualizar",
   "updateAndNew": "Actualizar + nuevos",
@@ -421,5 +420,9 @@
   "chartCopied": "Gráfica copiada al portapapeles",
   "chartCopyFailed": "No se pudo copiar la gráfica",
   "todayAt": "Hoy {time}",
-  "yesterdayAt": "Ayer {time}"
+  "yesterdayAt": "Ayer {time}",
+  "importSsiHeader": "{newCount} nuevas · {dupCount} parecen estar ya en tu logbook (desmarcadas: márcalas si no lo están)",
+  "importSsiDuplicate": "Parece que ya está en tu logbook",
+  "importSsiDone": "{count} inmersiones importadas",
+  "readingFile": "Leyendo el fichero…"
 }

@@ -75,6 +75,21 @@ class DivemateDb {
 
   void close() => _db.dispose();
 
+  /// Ejecuta [f] en una transacción (todo o nada). Agrupar muchas escrituras
+  /// así es mucho más rápido: sin ella cada sentencia hace su propio commit
+  /// a disco. No anidar (ni llamar dentro a algo que abra otra).
+  T inTransaction<T>(T Function() f) {
+    _db.execute('BEGIN');
+    try {
+      final r = f();
+      _db.execute('COMMIT');
+      return r;
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
   /// Si existe una tabla (las tablas Pandive no están en .ddb read-only externas).
   bool _hasTable(String name) => _db
       .select("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", [name])

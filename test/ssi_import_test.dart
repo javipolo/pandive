@@ -128,12 +128,12 @@ void main() {
       tmp.deleteSync(recursive: true);
     });
 
-    test('dos del mismo día, sitio/compañeros/etiqueta; reimportar = 0', () {
+    test('dos del mismo día, sitio/compañeros/etiqueta; reimportar = 0', () async {
       final csv = _header +
           _row(2, 'Tres Pics', '15. Apr 2026', '50 min', '18 m (59 ft)') +
           _row(1, 'El Fitó', '15. Apr 2026', '56 min', '21 m (69 ft)',
               'Ana, Pep');
-      final r = importSsiCsv(db, csv);
+      final r = await importSsiCsv(db, csv);
       expect((r.added, r.duplicates, r.skipped), (2, 0, 0));
       final dives = db.listDives().reversed.toList(); // cronológico
       expect(dives.map((d) => d.place), ['El Fitó', 'Tres Pics']);
@@ -144,36 +144,36 @@ void main() {
       expect(db.effectiveTagsForDive(dives.first.id).map((t) => t.name),
           contains('Inmersión desde embarcación'));
 
-      final again = importSsiCsv(db, csv);
+      final again = await importSsiCsv(db, csv);
       expect((again.added, again.duplicates), (0, 2));
       expect(db.listDives(), hasLength(2));
     });
 
-    test('no duplica un buceo descargado del ordenador (con hora real)', () {
+    test('no duplica un buceo descargado del ordenador (con hora real)', () async {
       db.createDive(dateTime: DateTime(2026, 4, 15, 10, 12));
       final id = db.listDives().single.id;
       db.updateDive(id, {'Depth': 21.3, 'Divetime': 57.0});
-      final r = importSsiCsv(
+      final r = await importSsiCsv(
           db, _header + _row(1, 'X', '15. Apr 2026', '56 min', '21 m'));
       expect((r.added, r.duplicates), (0, 1));
       // Pero una distinta ese mismo día sí entra.
-      final r2 = importSsiCsv(
+      final r2 = await importSsiCsv(
           db, _header + _row(2, 'Y', '15. Apr 2026', '40 min', '12 m'));
       expect(r2.added, 1);
     });
 
-    test('con hora: igual perfil pero a horas lejanas no es duplicado', () {
+    test('con hora: igual perfil pero a horas lejanas no es duplicado', () async {
       db.createDive(dateTime: DateTime(2026, 4, 15, 10, 12));
       db.updateDive(db.listDives().single.id, {'Depth': 21.0, 'Divetime': 56.0});
       String row(String t) =>
           _row(1, 'X', '15. Apr 2026 $t', '56 min', '21 m');
-      expect(importSsiCsv(db, _header + row('10:40')).duplicates, 1);
-      final r = importSsiCsv(db, _header + row('19:59'));
+      expect((await importSsiCsv(db, _header + row('10:40'))).duplicates, 1);
+      final r = await importSsiCsv(db, _header + row('19:59'));
       expect(r.added, 1);
       expect(db.listDives().first.date, DateTime(2026, 4, 15, 19, 59));
     });
 
-    test('desfase de ~1 h y diferencias entre ordenadores; elige la más parecida', () {
+    test('desfase de ~1 h y diferencias entre ordenadores; elige la más parecida', () async {
       // Dos buceos tuyos ese día; el CSV trae el de las 10:31 con 1 h de
       // desfase (11:32) y lecturas de otro ordenador.
       db.createDive(dateTime: DateTime(2025, 11, 20, 9, 5));
@@ -181,13 +181,32 @@ void main() {
       final ds = db.listDives(); // más reciente primero
       db.updateDive(ds[0].id, {'Depth': 32.2, 'Divetime': 83.8});
       db.updateDive(ds[1].id, {'Depth': 31.0, 'Divetime': 80.0});
-      final r = importSsiCsv(db,
+      final r = await importSsiCsv(db,
           _header + _row(1, 'Panorama', '20. Nov 2025 11:32', '84 min', '32.2 m'));
       expect((r.added, r.duplicates), (0, 1));
       // Otro buceo del mismo día con perfil distinto sí entra.
-      final r2 = importSsiCsv(db,
+      final r2 = await importSsiCsv(db,
           _header + _row(2, 'Otro', '20. Nov 2025 17:35', '85 min', '16.2 m'));
       expect(r2.added, 1);
+    });
+
+    test('plan: marca existentes sin escribir; importa solo lo elegido', () async {
+      db.createDive(dateTime: DateTime(2026, 4, 15, 10, 12));
+      db.updateDive(db.listDives().single.id, {'Depth': 21.0, 'Divetime': 56.0});
+      final csv = _header +
+          _row(1, 'A', '15. Apr 2026 10:10', '56 min', '21 m') +
+          _row(2, 'B', '16. Apr 2026 10:00', '40 min', '12 m') +
+          _row(3, 'C', '17. Apr 2026 10:00', '45 min', '15 m');
+      final plan = planSsiImport(db, csv);
+      expect(plan.entries.map((e) => e.duplicate), [true, false, false]);
+      expect(db.listDives(), hasLength(1)); // el plan no escribe
+      final done = <int>[];
+      final added = await applySsiImport(db, [plan.entries[2].dive],
+          onProgress: (d, _) => done.add(d));
+      expect(added, 1);
+      expect(done, [1]);
+      expect(db.listDives().map((d) => d.place), contains('C'));
+      expect(db.listDives().map((d) => d.place), isNot(contains('B')));
     });
   });
 }

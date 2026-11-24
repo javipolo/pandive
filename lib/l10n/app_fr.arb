@@ -267,7 +267,6 @@
   "importSubsurface": "Importer depuis Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} plongées importées",
   "importSsi": "Importer depuis SSI (CSV)",
-  "importSsiResult": "{added} plongées importées, {duplicates} déjà dans le carnet",
   "importSites": "Importer des sites (JSON)",
   "updateOnly": "Mettre à jour",
   "updateAndNew": "Mettre à jour + ajouter",
@@ -421,5 +420,9 @@
   "chartCopied": "Graphique copié dans le presse-papiers",
   "chartCopyFailed": "Impossible de copier le graphique",
   "todayAt": "Aujourd'hui {time}",
-  "yesterdayAt": "Hier {time}"
+  "yesterdayAt": "Hier {time}",
+  "importSsiHeader": "{newCount} nouvelles · {dupCount} semblent déjà dans votre carnet (décochées : cochez-les si ce n'est pas le cas)",
+  "importSsiDuplicate": "Semble déjà dans votre carnet",
+  "importSsiDone": "{count} plongées importées",
+  "readingFile": "Lecture du fichier…"
 }

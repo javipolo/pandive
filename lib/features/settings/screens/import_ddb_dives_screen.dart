@@ -3,7 +3,6 @@
 /// uno existente (se ignora). Al terminar muestra un resumen.
 library;
 
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -11,6 +10,7 @@ import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/features/settings/logic/import_dives.dart';
+import 'package:pandive/features/settings/widgets/import_dive_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class ImportDdbDivesScreen extends StatefulWidget {
@@ -110,13 +110,24 @@ class _ImportDdbDivesScreenState extends State<ImportDdbDivesScreen> {
               Expanded(
                 child: ListView.builder(
                   itemCount: _entries.length,
-                  itemBuilder: (context, i) => _ImportDiveTile(
-                    entry: _entries[i],
-                    selected: _sel.contains(_entries[i].dive.id),
-                    onChanged: (v) => setState(() => v
-                        ? _sel.add(_entries[i].dive.id)
-                        : _sel.remove(_entries[i].dive.id)),
-                  ),
+                  itemBuilder: (context, i) {
+                    final e = _entries[i];
+                    final d = e.dive;
+                    return ImportDiveTile(
+                      place: [d.place, d.country]
+                          .whereType<String>()
+                          .where((x) => x.isNotEmpty)
+                          .join(', '),
+                      date: d.date!,
+                      minutes: d.durationMin,
+                      depth: d.maxDepth,
+                      duplicate: e.duplicate,
+                      duplicateText: t.importDiveDuplicate,
+                      selected: _sel.contains(d.id),
+                      onChanged: (v) => setState(
+                          () => v ? _sel.add(d.id) : _sel.remove(d.id)),
+                    );
+                  },
                 ),
               ),
             ]),
@@ -131,44 +142,6 @@ class _ImportDdbDivesScreenState extends State<ImportDdbDivesScreen> {
                 label: Text('${t.importDivesAction} (${_sel.length})'),
               ),
             ),
-    );
-  }
-}
-
-/// Fila: checkbox + sitio + fecha/duración/profundidad; color según estado.
-class _ImportDiveTile extends StatelessWidget {
-  final DdbImportEntry entry;
-  final bool selected;
-  final ValueChanged<bool> onChanged;
-  const _ImportDiveTile(
-      {required this.entry, required this.selected, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-    final locale = Localizations.localeOf(context).languageCode;
-    final d = entry.dive;
-    final dup = entry.duplicate;
-    final place = [d.place, d.country]
-        .whereType<String>()
-        .where((e) => e.isNotEmpty)
-        .join(', ');
-    final info = [
-      DateFormat('dd/MM/yyyy HH:mm', locale).format(d.date!),
-      if (d.durationMin != null) '${d.durationMin!.round()} min',
-      if (d.maxDepth != null)
-        '${NumberFormat('0.0', locale).format(d.maxDepth)} m',
-    ].join('   ');
-    return CheckboxListTile(
-      value: dup ? false : selected,
-      onChanged: dup ? null : (v) => onChanged(v == true),
-      tileColor:
-          (dup ? Colors.amber : Colors.green).withValues(alpha: 0.12),
-      title: Text(place.isEmpty ? t.dive : place,
-          maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(dup ? '$info\n${t.importDiveDuplicate}' : info),
-      isThreeLine: dup,
-      secondary: Icon(dup ? Icons.block : Icons.add_circle_outline),
     );
   }
 }

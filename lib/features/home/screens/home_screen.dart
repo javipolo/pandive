@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/doc_notifications.dart';
+import 'package:pandive/core/services/home_navigation.dart';
 import 'package:pandive/core/services/opened_file.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
@@ -68,6 +69,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     // Notificación pulsada con la app abierta/en segundo plano.
     tappedDocId.addListener(_onTappedDoc);
+    homeSectionRequest.addListener(_onSectionRequest);
+  }
+  void _onSectionRequest() {
+    final i = homeSectionRequest.value;
+    if (i == null || !mounted) return;
+    homeSectionRequest.value = null;
+    _go(i);
   }
   void _onTappedDoc() {
     final id = tappedDocId.value;
@@ -96,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     tappedDocId.removeListener(_onTappedDoc);
+    homeSectionRequest.removeListener(_onSectionRequest);
     _openSub?.cancel();
     _searchCtrl.dispose();
     super.dispose();

@@ -267,7 +267,6 @@
   "importSubsurface": "Importa de Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} immersions importades",
   "importSsi": "Importar d'SSI (CSV)",
-  "importSsiResult": "{added} immersions importades, {duplicates} ja eren al logbook",
   "importSites": "Importa llocs (JSON)",
   "updateOnly": "Només actualitzar",
   "updateAndNew": "Actualitzar + nous",
@@ -421,5 +420,9 @@
   "chartCopied": "Gràfic copiat al porta-retalls",
   "chartCopyFailed": "No s'ha pogut copiar el gràfic",
   "todayAt": "Avui {time}",
-  "yesterdayAt": "Ahir {time}"
+  "yesterdayAt": "Ahir {time}",
+  "importSsiHeader": "{newCount} noves · {dupCount} semblen ja al teu quadern (desmarcades: marca-les si no hi són)",
+  "importSsiDuplicate": "Sembla que ja és al teu quadern",
+  "importSsiDone": "{count} immersions importades",
+  "readingFile": "Llegint el fitxer…"
 }
