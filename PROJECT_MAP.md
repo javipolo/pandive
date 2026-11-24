@@ -58,7 +58,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
-- `lib/core/import/ssi_csv_import.dart` -> importa el CSV del logbook de SSI (columnas por posición; fechas multi-idioma; dedupe por día+prof.+duración)
+- `lib/core/import/ssi_csv_import.dart` -> importa el CSV del logbook de SSI (columnas por posición; etiquetas; dedupe por día+prof.+duración+hora con la candidata más parecida)
+- `lib/core/import/ssi_csv_fields.dart` -> lectura de celdas del CSV de SSI: CSV, fechas multi-idioma, duración, profundidad, compañeros pegados + centro + ordenador
 - `lib/core/widgets/import_progress.dart` -> diálogo de progreso reutilizable para importar .ssrf
 - `lib/core/db/db_import_ext.dart` -> inserta inmersión externa (perfil, botellas, sitio, buddies, tags) + copyDiveDetailsFrom (copia ordenador/botellas/tags/perfil entre .ddb)
 - `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos

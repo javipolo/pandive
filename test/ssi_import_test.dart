@@ -30,7 +30,7 @@ void main() {
       expect(d.hasTime, isTrue);
       expect(d.site, 'El Fitó / Tres Pics');
       expect(d.country, 'España');
-      expect(d.specialty, 'Inmersión desde embarcación');
+      expect(d.tags, ['Inmersión desde embarcación']);
       expect(d.minutes, 56);
       expect(d.depth, 21);
       expect(d.buddies, ['Ana Pérez']);
@@ -42,6 +42,42 @@ void main() {
       final p = parseSsiCsv(f.readAsStringSync());
       expect(p.skipped, 0);
       expect(p.dives, isNotEmpty);
+    });
+
+    test('celda de compañeros: nombres pegados + centro + ordenador', () {
+      const tabs8 = '\t\t\t\t\t\t\t\t';
+      final a = parseSsiPeople('Ana  PérezLuis Gil Ruiz$tabs8       '
+          'MAR AZUL DIVE');
+      expect(a.people, ['Ana Pérez', 'Luis Gil Ruiz']);
+      expect(a.center, 'MAR AZUL DIVE');
+      expect(a.computer, isNull);
+      final b = parseSsiPeople('José  NúñezÁlvaro Sanz$tabs8$tabs8\t Puck4');
+      expect(b.people, ['José Núñez', 'Álvaro Sanz']);
+      expect(b.center, isNull);
+      expect(b.computer, 'Puck4');
+      final c = parseSsiPeople('Ana Pérez$tabs8    SSI Europe - Spain    '
+          '$tabs8\t Puck4');
+      expect(c.people, ['Ana Pérez']);
+      expect((c.center, c.computer), ('SSI Europe - Spain', 'Puck4'));
+      expect(parseSsiPeople('Pablo Soto, Eva Mas').people,
+          ['Pablo Soto', 'Eva Mas']);
+      expect(parseSsiPeople('').people, isEmpty);
+    });
+
+    test('etiquetas: especialidades + actividad/tipo no habituales', () {
+      String row(String act, String spec, String type) =>
+          '"1","X","España","15. Apr 2026 10:00","$act","$spec","$type",'
+          '"40 min","10 m",""\n';
+      final p = parseSsiCsv(_header +
+          row('Buceo', 'Nitrox, Buceo Profundo', 'Inmersión de ocio') +
+          row('Buceo\t\t\t\tInmersión con descompresión', '',
+              'Inmersión de ocio') +
+          row('Extended Range', 'Nitrox', 'Educación'));
+      expect(p.dives.map((d) => d.tags), [
+        ['Nitrox', 'Buceo Profundo'],
+        ['Inmersión con descompresión'],
+        ['Nitrox', 'Extended Range', 'Educación'],
+      ]);
     });
 
     test('fechas en varios formatos e idiomas', () {
@@ -135,6 +171,23 @@ void main() {
       final r = importSsiCsv(db, _header + row('19:59'));
       expect(r.added, 1);
       expect(db.listDives().first.date, DateTime(2026, 4, 15, 19, 59));
+    });
+
+    test('desfase de ~1 h y diferencias entre ordenadores; elige la más parecida', () {
+      // Dos buceos tuyos ese día; el CSV trae el de las 10:31 con 1 h de
+      // desfase (11:32) y lecturas de otro ordenador.
+      db.createDive(dateTime: DateTime(2025, 11, 20, 9, 5));
+      db.createDive(dateTime: DateTime(2025, 11, 20, 10, 31));
+      final ds = db.listDives(); // más reciente primero
+      db.updateDive(ds[0].id, {'Depth': 32.2, 'Divetime': 83.8});
+      db.updateDive(ds[1].id, {'Depth': 31.0, 'Divetime': 80.0});
+      final r = importSsiCsv(db,
+          _header + _row(1, 'Panorama', '20. Nov 2025 11:32', '84 min', '32.2 m'));
+      expect((r.added, r.duplicates), (0, 1));
+      // Otro buceo del mismo día con perfil distinto sí entra.
+      final r2 = importSsiCsv(db,
+          _header + _row(2, 'Otro', '20. Nov 2025 17:35', '85 min', '16.2 m'));
+      expect(r2.added, 1);
     });
   });
 }

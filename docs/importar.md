@@ -62,11 +62,11 @@ nombre.
 | Inmersión # | Solo para ordenar las del mismo día. El nº final lo pone la numeración de Pandive. |
 | Lugar de buceo + País | Sitio de buceo (se reutiliza si ya existe uno con ese nombre; si no, se crea) |
 | Fecha / Tiempo | Fecha y, si se rellenó en MySSI, hora de entrada |
-| Inmersión de especialidad | Etiqueta (p.ej. "Inmersión desde embarcación") |
+| Inmersión de especialidad | Una etiqueta por especialidad ("Nitrox, Buceo Profundo" → dos etiquetas) |
 | Duración | Duración |
 | Profundidad | Profundidad máxima, en metros. Si viene en pies, se convierte. |
-| Compañero de buceo / Instructor / Center | Compañeros (uno por cada nombre separado por comas) |
-| Tipo de actividad de buceo, Tipo de inmersión | No se importan ("Buceo", "Inmersión de ocio": no aportan nada) |
+| Compañero de buceo / Instructor / Center | MySSI junta aquí tres cosas: **las personas** (pegadas sin separador, "Ana PérezLuis Gil": se separan y cada una es un compañero), **el centro** ("POSIDONIA DIVE": etiqueta) y **el ordenador** ("Puck4": campo Ordenador) |
+| Tipo de actividad de buceo, Tipo de inmersión | El valor que llevan casi todas ("Buceo", "Inmersión de ocio") se ignora porque no aporta; los demás ("Inmersión con descompresión", "Extended Range", "Educación") van como etiqueta |
 
 Formatos aceptados: fechas como `15. Apr 2026`, `3 dic. 2025`, `15.04.2026` o
 `2026-04-15`, con o sin hora, y con meses en inglés, castellano, catalán,
@@ -96,12 +96,16 @@ Como el CSV casi nunca trae la hora, no se puede comparar por fecha y hora
 como en el resto. Una fila del CSV se da por **ya existente** si ese día hay
 una inmersión con:
 
-- profundidad máxima parecida (±2 m), y
-- duración parecida (±5 min), y
-- si el CSV trae hora, una hora parecida (±60 min).
+- profundidad máxima parecida (±3 m), y
+- duración parecida (±6 min), y
+- si el CSV trae hora, una hora parecida (±90 min).
 
-Así no se duplican las que ya bajaste del ordenador, y reimportar el mismo
-CSV no añade nada.
+Si hay varias candidatas, se empareja con la más parecida. Los márgenes se
+ajustaron con una exportación real de 309 inmersiones comparada con un
+logbook de 732: los ordenadores de dos buzos difieren 2–3 m y unos minutos, y
+la hora de MySSI puede ir ~1 h desfasada respecto a la del ordenador (zona
+horaria). Así no se duplican las que ya bajaste del ordenador, y reimportar
+el mismo CSV no añade nada.
 
 ### Hora de las inmersiones sin hora
 
@@ -115,6 +119,14 @@ corrige la hora editando la inmersión y la numeración se recoloca.
 - Si SSI cambiara el orden de las columnas, o las cambiara en algún idioma, la
   importación leería mal los campos. Hasta ahora solo se ha probado con
   exportaciones en castellano.
+- Los nombres pegados se separan donde una minúscula va seguida de una
+  mayúscula: un apellido como "McDonald" se partiría en dos. Se corrige
+  editando el compañero.
+- Distinguir el centro del ordenador depende de cómo MySSI pone los
+  tabuladores en esa celda. Si cambia, alguno puede acabar en el sitio
+  equivocado.
+- El nº de inmersión de SSI no se conserva: Pandive numera con su propia
+  numeración (Ajustes → Numeración de buceos).
 - Dos inmersiones del mismo día con perfil casi idéntico y sin hora en el CSV
   pueden emparejarse con la que ya tenías y no importarse. Si te falta alguna,
   créala a mano.
