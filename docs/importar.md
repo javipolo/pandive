@@ -125,7 +125,7 @@ Abre un fichero `.ddb` desde otra app (por ejemplo, desde el gestor de archivos
 o un adjunto, con *Abrir con… Pandive*). Se previsualiza en solo lectura, y el
 botón **Opciones de importación** ofrece:
 
-- **Rellenar sitios de buceo**: completa tus inmersiones con el perfil, el
+- **Rellenar mis buceos con este logbook**: completa tus inmersiones con el perfil, el
   ordenador, las botellas y las etiquetas de las mismas inmersiones del
   logbook de un compañero (útil si buceaste sin ordenador). También está en
   Herramientas → *Rellenar buceos desde el logbook de un compañero*.

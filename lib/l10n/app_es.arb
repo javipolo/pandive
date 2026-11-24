@@ -373,7 +373,7 @@
   "importSummaryNewSites": "Sitios nuevos: {count}",
   "importSummaryNewBuddies": "Compañeros nuevos: {count}",
   "useDdb": "Opciones de importación",
-  "useDdbFill": "Rellenar sitios de buceo",
+  "useDdbFill": "Rellenar mis buceos con este logbook",
   "useDdbImport": "Seleccionar buceos para importar",
   "useDdbReplace": "Sustituir mi base de datos por esta",
   "exportTripsIntro": "Vas a exportar los siguientes viajes:",

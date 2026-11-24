@@ -373,7 +373,7 @@
   "importSummaryNewSites": "Nouveaux sites : {count}",
   "importSummaryNewBuddies": "Nouveaux binômes : {count}",
   "useDdb": "Options d'importation",
-  "useDdbFill": "Compléter les sites de plongée",
+  "useDdbFill": "Compléter mes plongées avec ce carnet",
   "useDdbImport": "Sélectionner les plongées à importer",
   "useDdbReplace": "Remplacer ma base de données par celle-ci",
   "exportTripsIntro": "Tu vas exporter les voyages suivants :",

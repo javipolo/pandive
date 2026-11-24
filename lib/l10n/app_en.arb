@@ -655,7 +655,7 @@
     }
   },
   "useDdb": "Import options",
-  "useDdbFill": "Fill in dive sites",
+  "useDdbFill": "Fill my dives from this logbook",
   "useDdbImport": "Select dives to import",
   "useDdbReplace": "Replace my database with this one",
   "exportTripsIntro": "You are going to export the following trips:",

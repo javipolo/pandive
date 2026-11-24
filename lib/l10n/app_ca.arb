@@ -373,7 +373,7 @@
   "importSummaryNewSites": "Llocs nous: {count}",
   "importSummaryNewBuddies": "Companys nous: {count}",
   "useDdb": "Opcions d'importació",
-  "useDdbFill": "Omplir llocs d'immersió",
+  "useDdbFill": "Omplir les meves immersions amb aquest quadern",
   "useDdbImport": "Seleccionar immersions per importar",
   "useDdbReplace": "Substituir la meva base de dades per aquesta",
   "exportTripsIntro": "Exportaràs els viatges següents:",

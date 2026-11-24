@@ -373,7 +373,7 @@
   "importSummaryNewSites": "Leku berriak: {count}",
   "importSummaryNewBuddies": "Lagun berriak: {count}",
   "useDdb": "Inportazio-aukerak",
-  "useDdbFill": "Murgiltze-lekuak bete",
+  "useDdbFill": "Bete nire murgilketak koaderno honekin",
   "useDdbImport": "Hautatu inportatzeko murgilketak",
   "useDdbReplace": "Ordeztu nire datu-basea honekin",
   "exportTripsIntro": "Bidaia hauek esportatuko dituzu:",
