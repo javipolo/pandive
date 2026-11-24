@@ -127,6 +127,9 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Relee del disco (otro isolate, p.ej. WorkManager, pudo cambiarlas).
+  Future<void> reload() => _prefs.reload();
+
   /// Base de la última sync: md5 del fichero en Drive y sello local
   /// (lastWriteUtc en bruto) en ese momento. Sin notificar (estado interno).
   String? get syncBaseMd5 => _prefs.getString(_kSyncMd5);

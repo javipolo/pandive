@@ -302,7 +302,9 @@ cuenta). Mantiene el mismo logbook vía `sync-logbook.ddb.gz` (comprimido: 12 MB
 Drive, sin perder nunca datos en silencio:
 
 - Si solo cambió un lado, se sube o se baja solo (al abrir o volver a la app,
-  ~1 min después de dejar de editar, cada ~2 min y al salir). Una bajada con
+  ~2 min después de dejar de editar, cada ~2 min y al salir). En Android, al
+  bloquear o salir se encarga además la subida a WorkManager, que la completa
+  en cuanto haya red aunque Android congele o cierre la app. Una bajada con
   pantallas abiertas queda pendiente ("Actualizar") para no interrumpir.
 - Si cambiaron los dos, el icono de la barra se pone rojo y se elige con qué
   versión quedarse; la otra se guarda como backup (Restaurar).

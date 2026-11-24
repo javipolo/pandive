@@ -22,8 +22,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/downloadBackup+applyRestore/poda
 - `lib/core/services/drive_sync_ops.dart` -> Drive para la sync: fichero sync-logbook.ddb.gz (gzip, md5), versión descartada como backup, zip de documentos si cambió, presencia por dispositivo
 - `lib/core/services/sync_logic.dart` -> decisión pura de la sync (none/upload/download/diverged) a partir de md5 remoto + sello local vs base
-- `lib/core/services/sync_controller.dart` -> SyncController global (syncController): estado, disparadores (abrir/volver, tras editar, ~2 min, salir), subir/bajar/resolver divergencia
-- `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió
+- `lib/core/services/sync_controller.dart` -> SyncController global (syncController): estado, disparadores (abrir/volver, tras editar, ~2 min, salir), subir/bajar/resolver divergencia; syncUploadInBackground para el worker
+- `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió + subida de sync de respaldo al salir (enqueueSyncUpload)
 - `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)
 - `lib/core/storage/documents_storage.dart` -> carpeta documents/ en disco (guardar/borrar/ruta); usado por UI y backup
 - `lib/core/services/doc_notifications.dart` -> notis locales de caducidad (30/7/1/0 días); permiso solo si hay docs con caducidad; payload=docId, al pulsar abre el documento (tappedDocId / consumeNotificationLaunch)

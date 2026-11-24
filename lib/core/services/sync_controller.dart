@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
+import 'backup_worker.dart';
 import 'drive_backup.dart';
 import 'sync_logic.dart';
 
@@ -81,18 +82,22 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed && !recent) sync();
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       sync(allowDownload: false); // subir lo pendiente antes de irnos
+      // Android congela la app en segundo plano a los pocos segundos: si la
+      // subida no termina, la hace WorkManager en cuanto haya red.
+      final stamp = _db?.call()?.lastWriteRaw;
+      if (enabled && stamp != _s!.syncBaseStamp) enqueueSyncUpload();
     }
   }
 
-  // Sube tras ~1 min sin escrituras (debounce) y mira Drive cada ~2 min.
+  // Sube tras ~2 min sin escrituras (debounce) y mira Drive cada ~2 min.
   void _onTick() {
     if (!enabled || _running || status == SyncStatus.diverged) return;
     _ticks++;
     final stamp = _db?.call()?.lastWriteRaw;
     _quietTicks = stamp == _lastSeenStamp ? _quietTicks + 1 : 0;
-    // Subir tras 2 ticks (~40-60 s) sin escribir: agrupa una sesión de
-    // edición en una sola subida.
-    if (stamp != _s!.syncBaseStamp && _quietTicks >= 2) {
+    // Subir tras 6 ticks (~2 min) sin escribir: agrupa una sesión de edición
+    // (con pausas para buscar información) en una sola subida.
+    if (stamp != _s!.syncBaseStamp && _quietTicks >= 6) {
       sync(allowDownload: false);
     } else if (_ticks % 6 == 0) {
       sync(allowDownload: false);
@@ -108,6 +113,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     _running = true;
     _set(SyncStatus.syncing);
     try {
+      await _s!.reload(); // la base puede haberla movido el worker
       await _syncOnce(allowDownload, force);
     } catch (e) {
       lastError = '$e';
@@ -177,25 +183,8 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  // Instantánea consistente + su sello (leídos en el mismo instante).
-  Future<(List<int>, String?)> _snapshot(DivemateDb db) async {
-    final f = File('${Directory.systemTemp.path}/pandive-snap-'
-        '${DateTime.now().microsecondsSinceEpoch}.ddb');
-    final stamp = db.lastWriteRaw;
-    db.snapshotTo(f.path);
-    final bytes = await f.readAsBytes();
-    await f.delete();
-    return (bytes, stamp);
-  }
-
-  Future<void> _upload(DivemateDb db, RemoteSync remote) async {
-    final (bytes, stamp) = await _snapshot(db);
-    final md5 = await _svc.uploadSync(bytes, remote);
-    if (md5 == null) throw StateError('upload sin md5');
-    await _s!.setSyncBase(md5, stamp);
-    await _saveBaseCopy(bytes);
-    await _svc.syncDocumentsUp(_s!);
-  }
+  Future<void> _upload(DivemateDb db, RemoteSync remote) =>
+      _uploadSnapshot(_svc, _s!, db, remote);
 
   Future<void> _download(RemoteSync remote) async {
     final bytes = await _svc.downloadSync(remote);
@@ -210,11 +199,6 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     await _saveBaseCopy(bytes);
   }
 
-  // Copia de la versión base (la necesitará la fusión de tres vías, capa 2).
-  Future<void> _saveBaseCopy(List<int> bytes) async {
-    final dir = await getApplicationSupportDirectory();
-    await File('${dir.path}/sync-base.ddb').writeAsBytes(bytes, flush: true);
-  }
 
   Future<void> _presence() async {
     final now = DateTime.now();
@@ -244,5 +228,61 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   void _set(SyncStatus st) {
     status = st;
     notifyListeners();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Compartido con el worker de segundo plano
+// ---------------------------------------------------------------------------
+
+// Instantánea consistente + su sello (leídos en el mismo instante).
+Future<(List<int>, String?)> _snapshot(DivemateDb db) async {
+  final f = File('${Directory.systemTemp.path}/pandive-snap-'
+      '${DateTime.now().microsecondsSinceEpoch}.ddb');
+  final stamp = db.lastWriteRaw;
+  db.snapshotTo(f.path);
+  final bytes = await f.readAsBytes();
+  await f.delete();
+  return (bytes, stamp);
+}
+
+Future<void> _uploadSnapshot(DriveBackupService svc, Settings s, DivemateDb db,
+    RemoteSync remote) async {
+  final (bytes, stamp) = await _snapshot(db);
+  final md5 = await svc.uploadSync(bytes, remote);
+  if (md5 == null) throw StateError('upload sin md5');
+  await s.setSyncBase(md5, stamp);
+  await _saveBaseCopy(bytes);
+  await svc.syncDocumentsUp(s);
+}
+
+// Copia de la versión base (la necesitará la fusión de tres vías, capa 2).
+Future<void> _saveBaseCopy(List<int> bytes) async {
+  final dir = await getApplicationSupportDirectory();
+  await File('${dir.path}/sync-base.ddb').writeAsBytes(bytes, flush: true);
+}
+
+/// Subida desde WorkManager (app congelada o cerrada): abre la DB en solo
+/// lectura y sube solo si el único cambio es local. Nunca baja ni resuelve
+/// divergencias (eso necesita la UI).
+Future<void> syncUploadInBackground(Settings s) async {
+  final path = s.dbPath;
+  if (!s.syncEnabled || path == null) return;
+  final svc = DriveBackupService();
+  final remote = await svc.remoteSync();
+  if (remote == null) throw StateError('sin red'); // WorkManager reintenta
+  final db = DivemateDb.open(path, readOnly: true);
+  try {
+    final action = decideSync(SyncObservation(
+      baseMd5: s.syncBaseMd5,
+      baseStamp: s.syncBaseStamp,
+      localStamp: db.lastWriteRaw,
+      localEmpty: db.listDives().isEmpty,
+      remoteExists: remote.exists,
+      remoteMd5: remote.md5,
+    ));
+    if (action == SyncAction.upload) await _uploadSnapshot(svc, s, db, remote);
+  } finally {
+    db.close();
   }
 }
