@@ -1,3 +1,4 @@
+import 'dart:io';
 // Smoke test básico de Pandive.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/models/models.dart';
@@ -14,9 +15,17 @@ void main() {
 
   test('backupFileName da nombre con timestamp', () {
     expect(backupFileName(DateTime(2026, 3, 4, 9, 5, 7)),
-        'pandive-20260304-090507.ddb');
-    expect(isTimestampedBackup('pandive-20260304-090507.ddb'), isTrue);
-    expect(isTimestampedBackup('latest.ddb'), isFalse);
+        'pandive-20260304-090507.ddb.gz');
+    expect(isTimestampedBackup('pandive-20260304-090507.ddb.gz'), isTrue);
+    expect(isTimestampedBackup('pandive-20260304-090507.ddb'), isTrue); // antiguo
+    expect(isTimestampedBackup('latest.ddb.gz'), isFalse);
+    expect(isTimestampedBackup('sync-logbook.ddb.gz'), isFalse);
+  });
+
+  test('maybeGunzip: gzip se descomprime, .ddb antiguo tal cual', () {
+    final raw = 'SQLite format 3\x00 datos'.codeUnits;
+    expect(maybeGunzip(gzip.encode(raw)), raw);
+    expect(maybeGunzip(raw), raw);
   });
 
   test('idsToPrune conserva las 10 más nuevas', () {

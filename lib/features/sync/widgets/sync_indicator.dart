@@ -25,6 +25,7 @@ class SyncIndicator extends StatelessWidget {
           SyncStatus.syncing => (Icons.sync, null),
           SyncStatus.pendingRemote => (Icons.cloud_download_outlined, scheme.primary),
           SyncStatus.diverged => (Icons.sync_problem, scheme.error),
+          SyncStatus.manual => (Icons.signal_cellular_alt, null),
           _ => (Icons.cloud_off_outlined, null),
         };
         return IconButton(
@@ -48,5 +49,6 @@ String syncStatusText(AppLocalizations t, SyncStatus s) => switch (s) {
       SyncStatus.pendingRemote => t.syncStatusPending,
       SyncStatus.diverged => t.syncStatusDiverged,
       SyncStatus.offline => t.syncStatusOffline,
+      SyncStatus.manual => t.syncStatusManual,
       SyncStatus.off => '',
     };

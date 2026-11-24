@@ -710,5 +710,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "backupWifiOnly": "Back up on WiFi only",
+  "backupWifiOnlyHint": "Automatic backups wait for WiFi; manual backup always works",
+  "syncWifiOnly": "Sync on WiFi only",
+  "syncWifiOnlyHint": "On mobile data it won't sync by itself: use the sync button",
+  "syncStatusManual": "Mobile data: manual sync"
 }

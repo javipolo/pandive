@@ -13,9 +13,13 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'backup_worker.dart';
 import 'drive_backup.dart';
+import 'network.dart';
 import 'sync_logic.dart';
 
-enum SyncStatus { off, synced, syncing, pendingRemote, diverged, offline }
+enum SyncStatus {
+  off, synced, syncing, pendingRemote, diverged, offline,
+  manual, // datos móviles con "solo WiFi": no se sincroniza solo
+}
 
 /// Instancia única (la conecta AppRoot con [SyncController.attach]).
 final syncController = SyncController();
@@ -79,13 +83,15 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     // acaba de sincronizar.
     final recent = lastSync != null &&
         DateTime.now().difference(lastSync!) < const Duration(seconds: 30);
-    if (state == AppLifecycleState.resumed && !recent) sync();
+    if (state == AppLifecycleState.resumed && !recent) sync(auto: true);
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
-      sync(allowDownload: false); // subir lo pendiente antes de irnos
+      sync(allowDownload: false, auto: true); // subir lo pendiente al irnos
       // Android congela la app en segundo plano a los pocos segundos: si la
       // subida no termina, la hace WorkManager en cuanto haya red.
       final stamp = _db?.call()?.lastWriteRaw;
-      if (enabled && stamp != _s!.syncBaseStamp) enqueueSyncUpload();
+      if (enabled && stamp != _s!.syncBaseStamp) {
+        enqueueSyncUpload(wifiOnly: _s!.syncWifiOnly);
+      }
     }
   }
 
@@ -98,18 +104,28 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     // Subir tras 6 ticks (~2 min) sin escribir: agrupa una sesión de edición
     // (con pausas para buscar información) en una sola subida.
     if (stamp != _s!.syncBaseStamp && _quietTicks >= 6) {
-      sync(allowDownload: false);
+      sync(allowDownload: false, auto: true);
     } else if (_ticks % 6 == 0) {
-      sync(allowDownload: false);
+      sync(allowDownload: false, auto: true);
     }
     _lastSeenStamp = stamp;
   }
 
   /// Una pasada. Si hay que bajar y [allowDownload] (o [force]) lo permite y
-  /// no molesta, sustituye la DB local; si no, queda pendiente.
-  Future<void> sync({bool allowDownload = true, bool force = false}) async {
+  /// no molesta, sustituye la DB local; si no, queda pendiente. [auto]: la
+  /// lanza un disparador (no el usuario); con "solo WiFi" y datos móviles no
+  /// hace nada (ni comprobar) y marca la sync como manual.
+  Future<void> sync(
+      {bool allowDownload = true, bool force = false, bool auto = false}) async {
     if (!enabled) return _set(SyncStatus.off);
     if (_running) return;
+    if (auto && _s!.syncWifiOnly && !await onUnmeteredNetwork()) {
+      // conservar avisos importantes ya conocidos
+      if (status != SyncStatus.diverged && status != SyncStatus.pendingRemote) {
+        _set(SyncStatus.manual);
+      }
+      return;
+    }
     _running = true;
     _set(SyncStatus.syncing);
     try {

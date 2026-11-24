@@ -397,5 +397,10 @@
   "syncApplyRemote": "Eguneratu beste gailuaren aldaketekin",
   "syncDivergedExplain": "Logbook-a hemen eta beste gailu batean aldatu da azken sinkronizaziotik. Aukeratu zein bertsio gorde; bestea babeskopia gisa gordetzen da (Leheneratu).",
   "syncKeepLocal": "Gailu honetakoa gorde",
-  "syncKeepRemote": "Beste gailukoa gorde"
+  "syncKeepRemote": "Beste gailukoa gorde",
+  "backupWifiOnly": "Babeskopiak WiFiarekin bakarrik",
+  "backupWifiOnlyHint": "Automatikoek WiFiaren zain daude; eskuzkoak beti funtzionatzen du",
+  "syncWifiOnly": "Sinkronizatu WiFiarekin bakarrik",
+  "syncWifiOnlyHint": "Datu mugikorrekin ez da berez sinkronizatzen: erabili sinkronizatzeko botoia",
+  "syncStatusManual": "Datu mugikorrak: eskuzko sinkronizazioa"
 }

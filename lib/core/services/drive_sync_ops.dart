@@ -81,7 +81,7 @@ extension DriveSyncOps on DriveBackupService {
     final a = await _syncApi();
     if (a == null) return;
     final (api, folder) = a;
-    await _upload(api, folder, backupFileName(DateTime.now()), bytes);
+    await _upload(api, folder, backupFileName(DateTime.now()), gzip.encode(bytes));
     await _prune(api, folder);
   }
 

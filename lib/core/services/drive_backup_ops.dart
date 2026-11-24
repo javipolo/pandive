@@ -54,9 +54,10 @@ extension DriveBackupOps on DriveBackupService {
     final api = await _api(interactive: interactive);
     if (api == null) return false;
     final bytes = await File(path).readAsBytes();
+    final gz = gzip.encode(bytes);
     final folder = await _ensureFolder(api);
-    await _upload(api, folder, latestBackupName, bytes, replace: true);
-    await _upload(api, folder, backupFileName(DateTime.now()), bytes);
+    await _upload(api, folder, latestBackupName, gz, replace: true);
+    await _upload(api, folder, backupFileName(DateTime.now()), gz);
     await _prune(api, folder);
     await _backupDocuments(api, folder);
     await s.setBackupState(
@@ -120,6 +121,7 @@ extension DriveBackupOps on DriveBackupService {
     if (now - s.backupLastTime < const Duration(hours: 24).inMilliseconds) {
       return;
     }
+    if (s.backupWifiOnly && !await onUnmeteredNetwork()) return;
     if (!await signInSilently()) return;
     final hash = await dbHash(s.dbPath);
     if (hash == null) return;
@@ -143,7 +145,8 @@ extension DriveBackupOps on DriveBackupService {
     for (final f in res.files ?? const <drive.File>[]) {
       final name = f.name ?? '';
       final latest = name == latestBackupName;
-      if (latest || isTimestampedBackup(name)) {
+      // latest.ddb antiguo (sin comprimir): se lista como una copia más.
+      if (latest || name == legacyLatestBackupName || isTimestampedBackup(name)) {
         out.add(BackupEntry(f.id!, name, f.modifiedTime, latest));
       }
     }
@@ -168,7 +171,7 @@ extension DriveBackupOps on DriveBackupService {
     }
     final f = File('${Directory.systemTemp.path}/pandive-restore-'
         '${DateTime.now().millisecondsSinceEpoch}.ddb');
-    await f.writeAsBytes(bytes, flush: true);
+    await f.writeAsBytes(maybeGunzip(bytes), flush: true);
     return f;
   }
 

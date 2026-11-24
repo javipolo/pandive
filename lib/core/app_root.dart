@@ -88,7 +88,9 @@ class _AppRootState extends State<AppRoot> {
   // automático está activo, (re)programa la tarea periódica en segundo plano.
   void _maybeBackup() {
     DriveBackupService().backupIfNeeded(widget.settings);
-    if (widget.settings.autoBackup) registerAutoBackup();
+    if (widget.settings.autoBackup) {
+      registerAutoBackup(wifiOnly: widget.settings.backupWifiOnly);
+    }
   }
 
   // Sync entre dispositivos: conectar el controlador a esta DB y sincronizar
@@ -100,7 +102,7 @@ class _AppRootState extends State<AppRoot> {
       replace: _replaceFromSync,
       canAutoReplace: () => mounted && !Navigator.of(context).canPop(),
     );
-    Future.microtask(syncController.sync);
+    Future.microtask(() => syncController.sync(auto: true));
   }
 
   // Sustituye la DB activa por la versión bajada de Drive (cerrar, copiar,

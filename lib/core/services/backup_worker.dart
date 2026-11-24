@@ -1,5 +1,5 @@
 /// Backup automático en segundo plano con WorkManager. Tarea periódica que,
-/// aunque la app esté cerrada, sube la DB a Drive si cambió (solo WiFi).
+/// aunque la app esté cerrada, sube la DB a Drive si cambió (WiFi si se pide).
 /// La auth es silenciosa; si no hay cuenta o no es WiFi, no-opea.
 library;
 
@@ -44,14 +44,16 @@ Future<void> initBackupWorker() async {
   if (_supported) await Workmanager().initialize(backupCallbackDispatcher);
 }
 
-/// Programa la tarea periódica (~12 h, solo WiFi). Idempotente.
-Future<void> registerAutoBackup() async {
+/// Programa la tarea periódica (~12 h; solo WiFi si [wifiOnly]). Idempotente:
+/// al cambiar la opción se vuelve a llamar y actualiza la restricción de red.
+Future<void> registerAutoBackup({required bool wifiOnly}) async {
   if (!_supported) return;
   await Workmanager().registerPeriodicTask(
     _uniqueName,
     _taskName,
     frequency: const Duration(hours: 12),
-    constraints: Constraints(networkType: NetworkType.unmetered),
+    constraints: Constraints(
+        networkType: wifiOnly ? NetworkType.unmetered : NetworkType.connected),
     existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
   );
 }
@@ -62,15 +64,16 @@ Future<void> cancelAutoBackup() async {
 }
 
 /// Subida de sync de respaldo al salir de la app (Android congela la app en
-/// segundo plano): una vez, en cuanto haya red. Si la subida en primer plano
-/// llegó a terminar, la tarea ve que no hay nada que subir.
-Future<void> enqueueSyncUpload() async {
+/// segundo plano): una vez, en cuanto haya red (WiFi si [wifiOnly]). Si la
+/// subida en primer plano llegó a terminar, la tarea ve que no hay nada.
+Future<void> enqueueSyncUpload({required bool wifiOnly}) async {
   if (!_supported) return;
   await Workmanager().registerOneOffTask(
     _syncTask,
     _syncTask,
     initialDelay: const Duration(seconds: 30),
-    constraints: Constraints(networkType: NetworkType.connected),
+    constraints: Constraints(
+        networkType: wifiOnly ? NetworkType.unmetered : NetworkType.connected),
     existingWorkPolicy: ExistingWorkPolicy.replace,
   );
 }

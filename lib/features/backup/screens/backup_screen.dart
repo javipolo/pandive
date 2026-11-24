@@ -63,7 +63,7 @@ class _BackupScreenState extends State<BackupScreen> {
         // Al conectar, activar el backup automático por defecto.
         if (_svc.connected) {
           await widget.settings.setAutoBackup(true);
-          await registerAutoBackup();
+          await registerAutoBackup(wifiOnly: widget.settings.backupWifiOnly);
         }
       }
     } catch (e) {
@@ -72,9 +72,18 @@ class _BackupScreenState extends State<BackupScreen> {
     if (mounted) setState(() => _busy = false);
   }
 
+  // Cambia la restricción de red de la tarea periódica (si está activa).
+  Future<void> _toggleBackupWifi(bool v) async {
+    await widget.settings.setBackupWifiOnly(v);
+    if (widget.settings.autoBackup) await registerAutoBackup(wifiOnly: v);
+    if (mounted) setState(() {});
+  }
+
   Future<void> _toggleAutoBackup(bool v) async {
     await widget.settings.setAutoBackup(v);
-    await (v ? registerAutoBackup() : cancelAutoBackup());
+    await (v
+        ? registerAutoBackup(wifiOnly: widget.settings.backupWifiOnly)
+        : cancelAutoBackup());
     if (mounted) setState(() {});
   }
 
@@ -115,6 +124,13 @@ class _BackupScreenState extends State<BackupScreen> {
               title: Text(t.autoBackupAndroidOnly),
             ),
           SwitchListTile(
+            title: Text(t.backupWifiOnly),
+            subtitle: Text(t.backupWifiOnlyHint),
+            value: widget.settings.backupWifiOnly,
+            onChanged: connected ? _toggleBackupWifi : null,
+          ),
+          const Divider(),
+          SwitchListTile(
             title: Text(t.syncToggle),
             subtitle: Text(t.syncToggleHint),
             value: widget.settings.syncEnabled,
@@ -125,6 +141,18 @@ class _BackupScreenState extends State<BackupScreen> {
                   }
                 : null,
           ),
+          SwitchListTile(
+            title: Text(t.syncWifiOnly),
+            subtitle: Text(t.syncWifiOnlyHint),
+            value: widget.settings.syncWifiOnly,
+            onChanged: connected && widget.settings.syncEnabled
+                ? (v) async {
+                    await widget.settings.setSyncWifiOnly(v);
+                    if (mounted) setState(() {});
+                  }
+                : null,
+          ),
+          const Divider(),
           ListTile(
             leading: const Icon(Icons.backup_outlined),
             title: Text(t.backupNow),

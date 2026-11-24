@@ -77,6 +77,7 @@ dependencies:
   flutter_map: ^8.3.2
   latlong2: ^0.10.1
   geolocator: ^14.0.2
+  connectivity_plus: ^7.3.1
 
 # pdf limita archive <4.1 -> pub coge archive 4.0.9, e image 4.11.0 llama a un
 # método (decodeLazy) que esa archive no tiene. Fijamos image <4.11 (compatible).

@@ -21,6 +21,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
 import 'backup_util.dart';
 import 'desktop_oauth.dart';
+import 'network.dart';
 
 part 'drive_backup_ops.dart';
 part 'drive_sync_ops.dart';

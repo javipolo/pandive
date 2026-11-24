@@ -23,6 +23,8 @@ class Settings extends ChangeNotifier {
   static const _kSyncStamp = 'sync_base_stamp';
   static const _kSyncDocs = 'sync_docs_sig';
   static const _kDeviceId = 'device_id';
+  static const _kBackupWifi = 'backup_wifi_only';
+  static const _kSyncWifi = 'sync_wifi_only';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -108,6 +110,20 @@ class Settings extends ChangeNotifier {
   bool get autoBackup => _prefs.getBool(_kBackupAuto) ?? false;
   Future<void> setAutoBackup(bool v) async {
     await _prefs.setBool(_kBackupAuto, v);
+    notifyListeners();
+  }
+
+  /// Backups automáticos solo con WiFi (los manuales siempre).
+  bool get backupWifiOnly => _prefs.getBool(_kBackupWifi) ?? false;
+  Future<void> setBackupWifiOnly(bool v) async {
+    await _prefs.setBool(_kBackupWifi, v);
+    notifyListeners();
+  }
+
+  /// Con datos móviles, la sync no hace nada sola (solo el botón manual).
+  bool get syncWifiOnly => _prefs.getBool(_kSyncWifi) ?? false;
+  Future<void> setSyncWifiOnly(bool v) async {
+    await _prefs.setBool(_kSyncWifi, v);
     notifyListeners();
   }
 

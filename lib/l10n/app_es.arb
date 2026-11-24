@@ -397,5 +397,10 @@
   "syncApplyRemote": "Actualizar con los cambios del otro dispositivo",
   "syncDivergedExplain": "El logbook se ha modificado aquí y en otro dispositivo desde la última sincronización. Elige qué versión conservar; la otra se guarda como backup (Restaurar).",
   "syncKeepLocal": "Quedarme con la de este dispositivo",
-  "syncKeepRemote": "Quedarme con la del otro dispositivo"
+  "syncKeepRemote": "Quedarme con la del otro dispositivo",
+  "backupWifiOnly": "Backups solo con WiFi",
+  "backupWifiOnlyHint": "Los automáticos esperan a tener WiFi; el manual funciona siempre",
+  "syncWifiOnly": "Sincronizar solo con WiFi",
+  "syncWifiOnlyHint": "Con datos móviles no sincroniza sola: usa el botón de sincronizar",
+  "syncStatusManual": "Datos móviles: sincronización manual"
 }
