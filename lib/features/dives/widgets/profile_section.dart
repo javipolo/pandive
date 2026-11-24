@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
+import 'package:pandive/features/dives/logic/dive_facts.dart';
 import 'package:pandive/features/dives/logic/share_profile.dart';
 import 'package:pandive/features/dives/screens/profile_fullscreen_screen.dart';
 import 'package:pandive/features/dives/widgets/gas_segments.dart';
@@ -29,6 +30,7 @@ class ProfileSection extends StatelessWidget {
     final shareTitle = dive.date != null
         ? '${DateFormat('dd/MM/yyyy', locale).format(dive.date!)} - $title'
         : title;
+    final facts = DiveFacts.of(dive, profile);
     final gasChanges = buildGasChanges(
         db.gasPerSample(dive.id), profile.timesMinutes, db.cylinders(dive.id));
     return Column(
@@ -46,7 +48,10 @@ class ProfileSection extends StatelessWidget {
                 icon: Icon(shareProfileIcon),
                 tooltip: shareProfileTooltip(t),
                 onPressed: () => shareProfileImage(context,
-                    profile: profile, title: shareTitle, gasChanges: gasChanges),
+                    profile: profile,
+                    title: shareTitle,
+                    facts: facts,
+                    gasChanges: gasChanges),
               ),
               const SizedBox(width: 8),
               IconButton.filledTonal(
@@ -57,6 +62,7 @@ class ProfileSection extends StatelessWidget {
                       profile: profile,
                       title: title,
                       shareTitle: shareTitle,
+                      facts: facts,
                       gasChanges: gasChanges),
                 )),
               ),

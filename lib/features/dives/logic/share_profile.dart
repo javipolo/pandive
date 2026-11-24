@@ -1,4 +1,6 @@
-/// Genera una imagen PNG del perfil de inmersión (con el nombre del sitio) y la
+/// Genera una imagen PNG del perfil de inmersión (título, gráfica y un pie con
+/// duración, temperatura mínima, profundidades y, si hubo deco, TTS y techo
+/// máximos; la misma imagen en todas las plataformas) y la
 /// comparte con otra app o, en escritorio (Linux), la copia al portapapeles.
 /// Renderiza la tarjeta fuera de pantalla y la captura.
 library;
@@ -15,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/image_clipboard.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
+import 'package:pandive/features/dives/logic/dive_facts.dart';
 import 'package:pandive/features/dives/widgets/gas_segments.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -28,12 +31,13 @@ Future<void> shareProfileImage(
   BuildContext context, {
   required DiveProfile profile,
   required String title,
+  required DiveFacts facts,
   List<GasChange> gasChanges = const [],
 }) async {
   final t = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   final png = await _renderProfilePng(context,
-      profile: profile, title: title, gasChanges: gasChanges);
+      profile: profile, title: title, facts: facts, gasChanges: gasChanges);
   if (png == null) return;
   if (canCopyImages) {
     final ok = await copyPngToClipboard(png);
@@ -54,6 +58,7 @@ Future<Uint8List?> _renderProfilePng(
   BuildContext context, {
   required DiveProfile profile,
   required String title,
+  required DiveFacts facts,
   required List<GasChange> gasChanges,
 }) async {
   final overlay = Overlay.of(context);
@@ -71,8 +76,11 @@ Future<Uint8List?> _renderProfilePng(
           key: key,
           child: Theme(
             data: theme,
-            child: _ProfileCard(
-                profile: profile, title: title, gasChanges: gasChanges),
+            child: ProfileShareCard(
+                profile: profile,
+                title: title,
+                facts: facts,
+                gasChanges: gasChanges),
           ),
         ),
       ),
@@ -96,19 +104,45 @@ Future<Uint8List?> _renderProfilePng(
   }
 }
 
-class _ProfileCard extends StatelessWidget {
+/// Tarjeta que se exporta como imagen (título, gráfica y pie de datos).
+class ProfileShareCard extends StatelessWidget {
   final DiveProfile profile;
   final String title;
+  final DiveFacts facts;
   final List<GasChange> gasChanges;
-  const _ProfileCard(
-      {required this.profile, required this.title, required this.gasChanges});
+  const ProfileShareCard(
+      {super.key,
+      required this.profile,
+      required this.title,
+      required this.facts,
+      required this.gasChanges});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final t = AppLocalizations.of(context);
+    String? one(double? v, String unit) =>
+        v == null ? null : '${v.toStringAsFixed(1)} $unit';
+    final rows = [
+      (
+        (t.statDuration, facts.durationMin == null
+            ? null
+            : '${facts.durationMin!.round()} min'),
+        (t.statTempMin, one(facts.minTemp, '°C')),
+      ),
+      (
+        (t.statMaxDepth, one(facts.maxDepth, 'm')),
+        (t.statAvgDepth, one(facts.avgDepth, 'm')),
+      ),
+      if (facts.isDeco)
+        (
+          (t.statsMaxTts, facts.maxTts == null ? null : '${facts.maxTts} min'),
+          (t.statsMaxCeiling, one(facts.maxCeiling, 'm')),
+        ),
+    ];
     return Container(
       width: 1100,
-      height: 680,
+      height: 680 + 24 + rows.length * 40,
       color: cs.surface,
       padding: const EdgeInsets.fromLTRB(16, 16, 20, 20),
       child: Column(
@@ -133,8 +167,37 @@ class _ProfileCard extends StatelessWidget {
           Expanded(
             child: ProfileChart(profile: profile, gasChanges: gasChanges),
           ),
+          Divider(height: 24, color: cs.outlineVariant),
+          for (final (left, right) in rows)
+            SizedBox(
+              height: 40,
+              child: Row(children: [
+                Expanded(child: _Fact(left.$1, left.$2)),
+                Expanded(child: _Fact(right.$1, right.$2)),
+              ]),
+            ),
         ],
       ),
     );
+  }
+}
+
+// "Etiqueta  valor" de una línea del pie de la imagen.
+class _Fact extends StatelessWidget {
+  final String label;
+  final String? value;
+  const _Fact(this.label, this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+    return Row(children: [
+      Text(label,
+          style: tt.titleMedium?.copyWith(color: cs.onSurfaceVariant)),
+      const SizedBox(width: 12),
+      Text(value ?? '—',
+          style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+    ]);
   }
 }

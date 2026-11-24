@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/sac.dart';
+import 'package:pandive/features/dives/logic/dive_facts.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
 import 'package:pandive/features/dives/widgets/profile_section.dart';
@@ -33,10 +34,9 @@ class DiveDetailBody extends StatelessWidget {
     final buddies = db.diveBuddies(dive.id).map((b) => b.name).join(', ');
     final tags = db.effectiveTagsForDive(dive.id);
 
-    final avg = dive.avgDepth ?? _avg(profile?.depths.where((d) => d > 0));
+    final facts = DiveFacts.of(dive, profile);
+    final avg = facts.avgDepth;
     final temps = profile?.temps.whereType<double>().toList() ?? const <double>[];
-    final minTemp = dive.waterTemp ??
-        (temps.isEmpty ? null : temps.reduce((a, b) => a < b ? a : b));
     final avgTemp = db.diveAvgTemp(dive.id) ?? _avg(temps);
 
     final fO2 = (cyls.isNotEmpty && cyls.first.o2 != null
@@ -50,24 +50,6 @@ class DiveDetailBody extends StatelessWidget {
         computeSacBar(cyls, divetimeMin: dive.durationMin, avgDepthM: avg);
 
     String? f1(double? v, String u) => v == null ? null : '${v.toStringAsFixed(1)} $u';
-
-    final isDeco = dive.deco == 1 || (profile?.hasDeco ?? false);
-    int maxTts = 0;
-    double maxCeiling = 0;
-    int ceilSamples = 0;
-    if (isDeco && profile != null) {
-      for (final c in profile.ceiling) {
-        if (c > 0) {
-          ceilSamples++;
-          if (c > maxCeiling) maxCeiling = c;
-        }
-      }
-      for (final x in profile.tts) {
-        if (x != null && x > maxTts) maxTts = x;
-      }
-    }
-    final maxCeilMin =
-        ceilSamples > 0 ? ceilSamples * (profile!.intervalSeconds) / 60.0 : null;
 
     return ListView(
       controller: controller,
@@ -96,7 +78,7 @@ class DiveDetailBody extends StatelessWidget {
         twoCol(LabeledValue(t.statAvgDepth, _m(avg)),
             LabeledValue(t.statMaxDepth, _m(dive.maxDepth))),
         twoCol(LabeledValue(t.statTempAvg, _c(avgTemp)),
-            LabeledValue(t.statTempMin, _c(minTemp))),
+            LabeledValue(t.statTempMin, _c(facts.minTemp))),
         sectionLine(),
         twoCol(LabeledValue(t.sacBarLabel, f1(sac, 'bar/min')),
             LabeledValue(t.rmvLabel, f1(rmv, 'l/min'))),
@@ -109,16 +91,17 @@ class DiveDetailBody extends StatelessWidget {
           LabeledValue(
               t.statWeight, '${dive.weight!.toStringAsFixed(1)} kg'),
         ],
-        if (isDeco) ...[
+        if (facts.isDeco) ...[
           sectionLine(),
           twoCol(
               LabeledValue(t.decoLabel, t.decoYes),
               LabeledValue(
-                  t.statsMaxTts, maxTts > 0 ? '$maxTts min' : null)),
+                  t.statsMaxTts,
+                  facts.maxTts != null ? '${facts.maxTts} min' : null)),
           twoCol(
-              LabeledValue(t.statsMaxCeiling,
-                  maxCeiling > 0 ? '${maxCeiling.toStringAsFixed(1)} m' : null),
-              LabeledValue(t.statsMaxCeilingTime, f1(maxCeilMin, 'min'))),
+              LabeledValue(t.statsMaxCeiling, _m(facts.maxCeiling)),
+              LabeledValue(
+                  t.statsMaxCeilingTime, f1(facts.ceilingMinutes, 'min'))),
         ],
         sectionLine(),
         Text(t.tanks, style: Theme.of(context).textTheme.titleMedium),

@@ -162,7 +162,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/dives_action_list.dart` -> lista de buceos con selección en lote + acciones (stats/fusionar/exportar/borrar); usada por el tab y las listas filtradas
 - `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle por secciones (nº/fecha, sitio, perfil+métricas, gases, deco, botellas)
 - `lib/features/dives/widgets/profile_section.dart` -> sección perfil: gráfica compacta + botones compartir / pantalla completa
-- `lib/features/dives/logic/share_profile.dart` -> genera PNG del perfil (fuera de pantalla) y lo comparte (móvil) o lo copia al portapapeles (Linux)
+- `lib/features/dives/logic/share_profile.dart` -> imagen PNG del perfil (ProfileShareCard: título, gráfica y pie con duración/temp. mín./profundidades/deco; igual en todas las plataformas): compartir (móvil) o copiar al portapapeles (Linux)
+- `lib/features/dives/logic/dive_facts.dart` -> DiveFacts: duración, prof. máx/media, temp. mínima, deco (TTS/techo máx., tiempo con techo) del registro + perfil; lo usan el detalle y la imagen exportada
 - `lib/features/dives/logic/apply_dive_type.dart` -> aplicar tipo: descarta botellas vacías (sin presiones) y añade las del tipo
 - `lib/features/dives/logic/renumber_after_save.dart` -> tras crear/editar: renumera (automática) u ofrece renumerar si el buceo queda fuera de orden
 - `lib/features/dives/widgets/dive_detail_fields.dart` -> celda etiqueta/valor, filas 2/3 columnas, separador de sección
