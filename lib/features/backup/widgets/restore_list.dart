@@ -1,13 +1,19 @@
 /// Lista de backups en Drive para restaurar (latest primero). Al elegir uno,
-/// confirma y sobrescribe la DB activa, luego recarga.
+/// confirma, lo descarga, avisa si la DB actual tiene cambios más recientes
+/// (sello de última escritura) y sobrescribe la DB activa; luego recarga.
 library;
+
+import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/services/backup_util.dart';
 import 'package:pandive/core/services/drive_backup.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class RestoreList extends StatefulWidget {
@@ -36,7 +42,19 @@ class _RestoreListState extends State<RestoreList> {
         confirmLabel: t.restore)) {
       return;
     }
-    final ok = await widget.svc.restore(e.id, widget.settings);
+    if (!mounted) return;
+    final file = await withProgress(
+        context, t.working, () => widget.svc.downloadBackup(e.id));
+    if (!mounted) return;
+    if (file == null) {
+      messenger.showSnackBar(SnackBar(content: Text(t.backupFailed)));
+      return;
+    }
+    if (!await _confirmIfOlder(file)) {
+      await file.delete();
+      return;
+    }
+    final ok = await widget.svc.applyRestore(file, widget.settings);
     if (!mounted) return;
     messenger.showSnackBar(
         SnackBar(content: Text(ok ? t.restoreDone : t.backupFailed)));
@@ -44,6 +62,23 @@ class _RestoreListState extends State<RestoreList> {
       widget.onReloadDb();
       nav.popUntil((r) => r.isFirst); // volver al inicio con la DB recargada
     }
+  }
+
+  /// Failsafe: si la DB actual tiene escrituras más recientes que el backup,
+  /// avisa con ambas fechas antes de pisarla. true = seguir.
+  Future<bool> _confirmIfOlder(File backup) async {
+    final dbPath = widget.settings.dbPath;
+    final local = dbPath == null ? null : lastWriteUtcOf(dbPath);
+    final remote = lastWriteUtcOf(backup.path);
+    if (!restoreWouldLoseData(local, remote) || !mounted) return true;
+    final t = AppLocalizations.of(context);
+    final fmt = DateFormat.yMd(Localizations.localeOf(context).languageCode).add_Hm();
+    return confirmDialog(
+      context,
+      t.restoreOlderWarning(fmt.format(local!.toLocal()),
+          remote == null ? t.unknownDate : fmt.format(remote.toLocal())),
+      confirmLabel: t.restoreAnyway,
+    );
   }
 
   @override

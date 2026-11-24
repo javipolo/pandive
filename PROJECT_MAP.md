@@ -19,7 +19,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
 - `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth OAuth nativo (flutter_appauth + refresh token en secure_storage, headless), carpeta, hash (parts)
 - `lib/core/services/desktop_oauth.dart` -> OAuth Google en escritorio (Linux): loopback 127.0.0.1 + PKCE, refresh por HTTP
-- `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/restore/poda
+- `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/downloadBackup+applyRestore/poda
 - `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió
 - `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)
 - `lib/core/storage/documents_storage.dart` -> carpeta documents/ en disco (guardar/borrar/ruta); usado por UI y backup
@@ -46,6 +46,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_pending.dart` -> caché de descargados no guardados (reaparecen una vez)
 - `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
 - `lib/core/db/db_computers.dart` -> ordenadores de buceo guardados (por MAC)
+- `lib/core/db/db_meta.dart` -> sello UTC de última escritura (PandiveMeta + triggers por tabla); lastWriteUtc / lastWriteUtcOf(path)
 - `lib/core/db/db_documents.dart` -> documentación (PandiveDocument): CRUD de metadatos (imagen en disco)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 - `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
@@ -98,7 +99,7 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### backup (copia de seguridad en Drive)
 - `lib/features/backup/screens/backup_screen.dart` -> conectar cuenta, backup manual, auto diario, restaurar
-- `lib/features/backup/widgets/restore_list.dart` -> lista de backups de Drive para restaurar
+- `lib/features/backup/widgets/restore_list.dart` -> lista de backups de Drive para restaurar; avisa si la DB local es más reciente que el backup
 
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, DB

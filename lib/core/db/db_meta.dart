@@ -1,0 +1,52 @@
+part of 'divemate_db.dart';
+
+// Sello de "última escritura" (UTC) de la base de datos, para avisar al
+// restaurar un backup más viejo que los datos actuales. Lo mantienen triggers
+// de SQLite en cada tabla, así cuenta cualquier escritura (la app, imports, o
+// divemate-cli) sin tocar las ~100 sentencias de escritura. Tabla propia
+// PandiveMeta (clave/valor): DiveMate la ignora.
+
+const _kLastWrite = 'lastWriteUtc';
+
+/// Crea PandiveMeta y un trigger INSERT/UPDATE/DELETE por tabla (idempotente).
+void _ensureLastWriteTriggers(Database db) {
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveMeta '
+      '(Key TEXT PRIMARY KEY, Value TEXT)');
+  final tables = db.select("SELECT name FROM sqlite_master WHERE type='table' "
+      "AND name NOT LIKE 'sqlite_%' AND name <> 'PandiveMeta'");
+  for (final r in tables) {
+    final t = r['name'] as String;
+    for (final op in const ['INSERT', 'UPDATE', 'DELETE']) {
+      db.execute('CREATE TRIGGER IF NOT EXISTS "pandive_lw_${t}_$op" '
+          'AFTER $op ON "$t" BEGIN '
+          "INSERT OR REPLACE INTO PandiveMeta (Key, Value) VALUES "
+          "('$_kLastWrite', strftime('%Y-%m-%dT%H:%M:%fZ', 'now')); END");
+    }
+  }
+}
+
+extension DivemateDbMeta on DivemateDb {
+  /// Momento (UTC) de la última escritura, o null si la DB es anterior a esto
+  /// o no tiene la tabla (p.ej. un .ddb de DiveMate).
+  DateTime? get lastWriteUtc {
+    if (!_hasTable('PandiveMeta')) return null;
+    final r = _db.select(
+        'SELECT Value FROM PandiveMeta WHERE Key = ?', [_kLastWrite]);
+    if (r.isEmpty) return null;
+    return DateTime.tryParse(r.first['Value'] as String? ?? '');
+  }
+}
+
+/// [DivemateDb.lastWriteUtc] de un fichero (abre en solo lectura).
+DateTime? lastWriteUtcOf(String path) {
+  try {
+    final db = DivemateDb.open(path, readOnly: true);
+    try {
+      return db.lastWriteUtc;
+    } finally {
+      db.close();
+    }
+  } catch (_) {
+    return null;
+  }
+}

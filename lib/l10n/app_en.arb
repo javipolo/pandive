@@ -664,5 +664,19 @@
   "autoBackupAndroidOnly": "Automatic backup is only available on Android",
   "@autoBackupAndroidOnly": {
     "description": "Backup screen note on desktop instead of the auto-backup switch"
+  },
+  "restoreOlderWarning": "Your logbook has changes ({local}) newer than this backup ({backup}). Restoring will lose them.",
+  "restoreAnyway": "Restore anyway",
+  "unknownDate": "unknown date",
+  "@restoreOlderWarning": {
+    "description": "Restore failsafe: local DB was written after the backup",
+    "placeholders": {
+      "local": {
+        "type": "String"
+      },
+      "backup": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -379,5 +379,8 @@
   "exportAction": "Exporta",
   "driveNotConfigured": "L'inici de sessió de Google no està configurat en aquesta compilació (falta el client ID d'OAuth).",
   "oauthBrowserDone": "Pandive ja està connectat a Google. Pots tancar aquesta pestanya.",
-  "autoBackupAndroidOnly": "La còpia automàtica només està disponible a Android"
+  "autoBackupAndroidOnly": "La còpia automàtica només està disponible a Android",
+  "restoreOlderWarning": "El teu logbook té canvis ({local}) més recents que aquesta còpia ({backup}). Si restaures, els perdràs.",
+  "restoreAnyway": "Restaura igualment",
+  "unknownDate": "data desconeguda"
 }

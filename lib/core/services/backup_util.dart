@@ -11,6 +11,12 @@ String backupFileName(DateTime t) =>
     'pandive-${t.year}${_p2(t.month)}${_p2(t.day)}-'
     '${_p2(t.hour)}${_p2(t.minute)}${_p2(t.second)}.ddb';
 
+/// ¿Restaurar un backup con sello [backup] pisaría datos más nuevos que los
+/// locales ([local])? Sin sello local no se sabe: no avisa. Backup sin sello
+/// (anterior a la función) y local con sello: casi seguro más viejo, avisa.
+bool restoreWouldLoseData(DateTime? local, DateTime? backup) =>
+    local != null && (backup == null || local.isAfter(backup));
+
 /// ¿Es una copia con timestamp (no la "latest")?
 bool isTimestampedBackup(String name) =>
     name.startsWith('pandive-') && name.endsWith('.ddb');

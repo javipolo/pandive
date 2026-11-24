@@ -379,5 +379,8 @@
   "exportAction": "Exportar",
   "driveNotConfigured": "El login de Google no está configurado en esta compilación (falta el client ID de OAuth).",
   "oauthBrowserDone": "Pandive ya está conectado a Google. Puedes cerrar esta pestaña.",
-  "autoBackupAndroidOnly": "La copia automática solo está disponible en Android"
+  "autoBackupAndroidOnly": "La copia automática solo está disponible en Android",
+  "restoreOlderWarning": "Tu logbook tiene cambios ({local}) más recientes que este backup ({backup}). Si restauras, los perderás.",
+  "restoreAnyway": "Restaurar igualmente",
+  "unknownDate": "fecha desconocida"
 }

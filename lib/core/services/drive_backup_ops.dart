@@ -155,19 +155,31 @@ extension DriveBackupOps on DriveBackupService {
     return out;
   }
 
-  /// Descarga el backup [fileId] y sobrescribe la DB activa.
-  Future<bool> restore(String fileId, Settings s) async {
-    final path = s.dbPath;
-    if (path == null) return false;
+  /// Descarga el backup [fileId] a un temporal, para revisarlo (sello de
+  /// última escritura) antes de aplicarlo con [applyRestore]. Null si falla.
+  Future<File?> downloadBackup(String fileId) async {
     final api = await _api(interactive: true);
-    if (api == null) return false;
+    if (api == null) return null;
     final media = await api.files.get(fileId,
         downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
     final bytes = <int>[];
     await for (final chunk in media.stream) {
       bytes.addAll(chunk);
     }
-    await File(path).writeAsBytes(bytes, flush: true);
+    final f = File('${Directory.systemTemp.path}/pandive-restore-'
+        '${DateTime.now().millisecondsSinceEpoch}.ddb');
+    await f.writeAsBytes(bytes, flush: true);
+    return f;
+  }
+
+  /// Sustituye la DB activa por [file] (de [downloadBackup]) y restaura los
+  /// documentos. Borra el temporal.
+  Future<bool> applyRestore(File file, Settings s) async {
+    final path = s.dbPath;
+    final api = await _api(interactive: true);
+    if (path == null || api == null) return false;
+    await file.copy(path);
+    await file.delete();
     await _restoreDocuments(api, await _ensureFolder(api));
     return true;
   }

@@ -35,6 +35,7 @@ part 'db_encode.dart';
 part 'db_sync.dart';
 part 'db_import_ext.dart';
 part 'db_documents.dart';
+part 'db_meta.dart';
 
 class DivemateDb {
   final Database _db;
@@ -48,7 +49,10 @@ class DivemateDb {
       path,
       mode: readOnly ? OpenMode.readOnly : OpenMode.readWrite,
     );
-    if (!readOnly) _ensureSyncTable(db); // fingerprints por dispositivo
+    if (!readOnly) {
+      _ensureSyncTable(db); // fingerprints por dispositivo
+      _ensureLastWriteTriggers(db); // sello UTC de última escritura
+    }
     final inst = DivemateDb._(db);
     // Persistir prof. media (exportable) y SAC (columna propia) donde falten.
     if (!readOnly) {
@@ -64,6 +68,7 @@ class DivemateDb {
     final db = sqlite3.open(path, mode: OpenMode.readWriteCreate);
     _createSchema(db);
     _ensureSyncTable(db);
+    _ensureLastWriteTriggers(db);
     return DivemateDb._(db);
   }
 

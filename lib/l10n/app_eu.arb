@@ -379,5 +379,8 @@
   "exportAction": "Esportatu",
   "driveNotConfigured": "Google saio-hasiera ez dago konfiguratuta konpilazio honetan (OAuth client IDa falta da).",
   "oauthBrowserDone": "Pandive Googlera konektatuta dago. Fitxa hau itxi dezakezu.",
-  "autoBackupAndroidOnly": "Babeskopia automatikoa Androiden bakarrik dago erabilgarri"
+  "autoBackupAndroidOnly": "Babeskopia automatikoa Androiden bakarrik dago erabilgarri",
+  "restoreOlderWarning": "Zure logbook-ak babeskopia honek ({backup}) baino aldaketa berriagoak ditu ({local}). Leheneratzen baduzu, galdu egingo dituzu.",
+  "restoreAnyway": "Leheneratu hala ere",
+  "unknownDate": "data ezezaguna"
 }

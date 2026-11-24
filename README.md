@@ -297,7 +297,10 @@ Android): se hace al abrir la app y con el botón manual.
 
 Backups: se guarda `latest.ddb` + copias con timestamp (se conservan las 10 más
 recientes) y un zip con las imágenes de documentos. Al restaurar, por defecto se
-ofrece `latest`. Disparadores:
+ofrece `latest`. **Failsafe:** cada escritura en la DB guarda su hora UTC
+(tabla `PandiveMeta`, mantenida por triggers SQLite); si el backup elegido es
+más viejo que la última escritura local, se avisa con ambas fechas antes de
+sobrescribir. Disparadores:
 - Al abrir la app (si pasaron >24 h y la DB cambió).
 - **En segundo plano** (WorkManager, ~cada 12 h, **solo WiFi**), aunque la app
   esté cerrada, si la DB cambió desde el último backup. Se activa con el toggle
