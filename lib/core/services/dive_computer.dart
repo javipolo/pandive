@@ -3,6 +3,7 @@
 library;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -62,17 +63,19 @@ class DiveComputerService {
     return modelForDeviceName(name);
   }
 
-  /// ¿Está el Bluetooth encendido en el teléfono?
+  /// ¿Está el Bluetooth encendido (teléfono o adaptador del PC)?
   Future<bool> isBluetoothOn() async =>
       await _channel.invokeMethod<bool>('btEnabled') ?? false;
 
-  /// Lanza el diálogo del sistema para encender el Bluetooth.
+  /// Enciende el Bluetooth (Android: diálogo del sistema; Linux: BlueZ).
   Future<void> requestEnableBluetooth() =>
       _channel.invokeMethod<void>('enableBt');
 
   /// Pide los permisos de Bluetooth necesarios. Devuelve true si concedidos.
   /// En Android 12+ usa BLUETOOTH_SCAN/CONNECT; en <=11, localización.
+  /// En Linux no hay permisos de app: BlueZ decide por D-Bus/polkit.
   Future<bool> requestBlePermissions() async {
+    if (Platform.isLinux) return true;
     final statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,

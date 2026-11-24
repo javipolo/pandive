@@ -224,6 +224,12 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/tank_types/screens/tank_types_screen.dart` -> gestión de tipos de botella (presets)
 - `lib/features/tank_types/widgets/tank_type_edit_sheet.dart` -> hoja crear/editar tipo de botella
 
-Nativo (fuera de lib/): `android/app/src/main/kotlin/org/drslump/pandive/`
-(DiveComputer, BleScanner, BleConnection, MainActivity) y
-`android/app/src/main/cpp/pandive_dc.c` (wrapper JNI de libdivecomputer).
+Nativo (fuera de lib/), mismos canales `pandive/dc`, `pandive/dc/scan`,
+`pandive/dc/progress` en ambas plataformas:
+- `native/pandive_dc_core.{c,h}` -> núcleo común sobre libdivecomputer (matchName, descarga a JSON; I/O por `pdc_io_t`)
+- Android: `android/app/src/main/kotlin/org/drslump/pandive/` (DiveComputer,
+  BleScanner, BleConnection, MainActivity) y `android/app/src/main/cpp/pandive_dc.c`
+  (adaptador JNI del núcleo).
+- Linux: `linux/runner/dc/dc_plugin.c` (MethodChannel + progreso + hilo de descarga),
+  `dc_scanner.c` (escaneo BlueZ), `bluez_ble.c` (conexión GATT por D-Bus);
+  `linux/ldc/libdivecomputer.a` (estática, `make ldc-linux`).

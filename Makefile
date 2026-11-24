@@ -86,7 +86,7 @@ clean: ## Limpia artefactos de build (Flutter + Gradle), conserva los .so nativo
 .PHONY: distclean
 distclean: clean ## clean + borra libdivecomputer compilado (.so + headers); fuerza re-cross-compile
 	@rm -rf android/app/src/main/jniLibs \
-		android/app/src/main/cpp/include/libdivecomputer
+		android/app/src/main/cpp/include/libdivecomputer linux/ldc
 	@echo "Artefactos nativos borrados: reconstruye con 'make dc-libs'"
 
 .PHONY: ldc-android
@@ -102,6 +102,17 @@ dc-libs: ldc-android ## Cross-compila y copia .so + headers al proyecto Android
 	@rm -rf android/app/src/main/cpp/include/libdivecomputer
 	@cp -r build/android/arm64-v8a/install/include/libdivecomputer android/app/src/main/cpp/include/
 	@echo "libdivecomputer .so + headers copiados a android/app/src/main/"
+
+.PHONY: ldc-linux
+ldc-linux: ## Compila libdivecomputer estática para la app Linux (linux/ldc/)
+	./scripts/build-libdivecomputer-linux.sh
+	@mkdir -p linux/ldc
+	@cp build/linux-ldc/install/lib/libdivecomputer.a linux/ldc/
+	@echo "libdivecomputer.a copiada a linux/ldc/"
+
+.PHONY: linux
+linux: ## Compila la app Linux (release)
+	$(FLUTTER) build linux --release $(DART_DEFINES)
 
 .PHONY: doctor
 doctor: ## flutter doctor
