@@ -1,6 +1,8 @@
 # Plan: sincronización móvil ↔ PC vía Google Drive
 
-Estado: **borrador para revisar**. Nada implementado.
+Estado: **borrador para revisar**. Nada implementado salvo el sello de última
+escritura (`PandiveMeta.lastWriteUtc`, triggers SQLite), que es la pieza base
+de la detección de cambios. Ver "Propuesta recomendada" al final.
 
 ## Objetivo
 
@@ -96,3 +98,55 @@ Drive, comparando por nombre + hash.
 1. Choque en el mismo campo: ¿gana el más reciente o preguntar?
 2. ¿Sync automática desde el principio o solo manual al inicio?
 3. ¿Empezar móvil ↔ Drive y dejar el PC para cuando la app Linux esté lista?
+
+## Propuesta recomendada (2026-11-24)
+
+Dos capas: primero una sync que **nunca pierde datos** (sin fusión), después la
+fusión automática para que el caso raro tampoco moleste.
+
+### Capa 1: sync con avance rápido + detección de divergencia
+
+Estado por dispositivo (local, no en la DB): `baseRevision` (revisión de Drive
+de la última sync) y `baseStamp` (`lastWriteUtc` local en ese momento).
+
+- **¿Cambié yo?** `lastWriteUtc local > baseStamp` (exacto gracias a los
+  triggers: cuenta cualquier escritura).
+- **¿Cambió el otro?** `headRevisionId` de `sync/pandive.ddb` en Drive ≠
+  `baseRevision`.
+
+| yo | otro | acción |
+|----|------|--------|
+| no | no | nada |
+| sí | no | subir (y volver a comprobar la revisión justo antes de subir) |
+| no | sí | bajar y sustituir la local (con backup previo) |
+| sí | sí | **divergencia**: no se toca nada automáticamente |
+
+En divergencia: aviso "Hay cambios en el móvil y en este equipo" con *quedarme
+con esta* / *quedarme con la otra*. La versión descartada no se borra: va a
+los backups con timestamp (recuperable). En la capa 2 se añade *fusionar*.
+
+Cuándo: al abrir y al volver a la app, unos segundos tras editar (debounce),
+al pasar a segundo plano y con un botón. Indicador en la barra superior:
+✓ sincronizado · ↑ subiendo · ↓ bajando · ⚠ divergencia · ⌀ sin conexión.
+
+**Aviso de uso simultáneo** (no es un candado): cada dispositivo escribe en
+Drive un pequeño `presence.json` (dispositivo + hora) mientras está abierto.
+Si el otro lo ve reciente: "Pandive está abierto en el móvil (hace 2 min)".
+Evita la mayoría de divergencias sin bloquear a nadie sin conexión.
+
+Coste: pequeño (reutiliza auth/subida de backups). Garantía: ninguna edición se
+pierde sin que el usuario lo decida.
+
+### Capa 2: fusión de tres vías
+
+La de "Diseño" arriba (por fila/UUID, por columna, edición gana a borrado,
+renumerar IDs). Necesita los prerrequisitos de esquema. La base para fusionar
+es la copia local guardada en la última sync (añadirla en la capa 1 desde el
+principio para tenerla disponible).
+
+### Respuesta propuesta a las decisiones pendientes
+
+1. Choque en el mismo campo: gana el más reciente, y se lista en el resumen.
+2. Capa 1 automática desde el principio (es segura por diseño); fusión manual
+   ("Fusionar") hasta que la capa 2 tenga muchas horas de tests.
+3. Móvil y Linux a la vez: el login de Google ya funciona en ambos.
