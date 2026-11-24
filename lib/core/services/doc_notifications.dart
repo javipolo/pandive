@@ -3,7 +3,10 @@
 /// hay algún documento con fecha de caducidad (si no, no molesta al usuario).
 /// El payload de cada notificación es el id del documento, para que al pulsarla
 /// la app abra ese documento ([tappedDocId] / [consumeNotificationLaunch]).
+/// Solo Android: en Linux no hay notificaciones programadas (zonedSchedule).
 library;
+
+import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -31,6 +34,7 @@ void _onTap(NotificationResponse r) {
 /// Si la app se abrió (en frío) al pulsar una notificación, devuelve el id del
 /// documento una sola vez; si no, null.
 Future<int?> consumeNotificationLaunch() async {
+  if (!Platform.isAndroid) return null;
   await _init();
   final d = await _plugin.getNotificationAppLaunchDetails();
   if (d?.didNotificationLaunchApp != true) return null;
@@ -54,6 +58,7 @@ Future<void> _init() async {
 
 /// Reprograma todas las notificaciones de caducidad a partir del estado actual.
 Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
+  if (!Platform.isAndroid) return;
   await _init();
   await _plugin.cancelAll();
 

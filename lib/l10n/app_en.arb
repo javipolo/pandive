@@ -660,5 +660,9 @@
   },
   "@oauthBrowserDone": {
     "description": "Shown in the browser tab after desktop Google login"
+  },
+  "autoBackupAndroidOnly": "Automatic backup is only available on Android",
+  "@autoBackupAndroidOnly": {
+    "description": "Backup screen note on desktop instead of the auto-backup switch"
   }
 }

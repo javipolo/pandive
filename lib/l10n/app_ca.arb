@@ -378,5 +378,6 @@
   "exportWithProfiles": "Exportar també els perfils d'immersió",
   "exportAction": "Exporta",
   "driveNotConfigured": "L'inici de sessió de Google no està configurat en aquesta compilació (falta el client ID d'OAuth).",
-  "oauthBrowserDone": "Pandive ja està connectat a Google. Pots tancar aquesta pestanya."
+  "oauthBrowserDone": "Pandive ja està connectat a Google. Pots tancar aquesta pestanya.",
+  "autoBackupAndroidOnly": "La còpia automàtica només està disponible a Android"
 }

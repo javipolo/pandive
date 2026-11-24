@@ -378,5 +378,6 @@
   "exportWithProfiles": "Esportatu murgilketa-profilak ere",
   "exportAction": "Esportatu",
   "driveNotConfigured": "Google saio-hasiera ez dago konfiguratuta konpilazio honetan (OAuth client IDa falta da).",
-  "oauthBrowserDone": "Pandive Googlera konektatuta dago. Fitxa hau itxi dezakezu."
+  "oauthBrowserDone": "Pandive Googlera konektatuta dago. Fitxa hau itxi dezakezu.",
+  "autoBackupAndroidOnly": "Babeskopia automatikoa Androiden bakarrik dago erabilgarri"
 }

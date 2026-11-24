@@ -378,5 +378,6 @@
   "exportWithProfiles": "Exportar también los perfiles de buceo",
   "exportAction": "Exportar",
   "driveNotConfigured": "El login de Google no está configurado en esta compilación (falta el client ID de OAuth).",
-  "oauthBrowserDone": "Pandive ya está conectado a Google. Puedes cerrar esta pestaña."
+  "oauthBrowserDone": "Pandive ya está conectado a Google. Puedes cerrar esta pestaña.",
+  "autoBackupAndroidOnly": "La copia automática solo está disponible en Android"
 }

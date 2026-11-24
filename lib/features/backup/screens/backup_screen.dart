@@ -2,6 +2,8 @@
 /// de backup diario automático y acceso a la restauración.
 library;
 
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/services/backup_worker.dart';
@@ -97,12 +99,19 @@ class _BackupScreenState extends State<BackupScreen> {
                   ),
           ),
           const Divider(),
-          SwitchListTile(
-            title: Text(t.autoBackupDaily),
-            subtitle: Text(t.autoBackupHint),
-            value: widget.settings.autoBackup,
-            onChanged: connected ? _toggleAutoBackup : null,
-          ),
+          // WorkManager solo existe en Android: en escritorio, solo un aviso.
+          if (Platform.isAndroid)
+            SwitchListTile(
+              title: Text(t.autoBackupDaily),
+              subtitle: Text(t.autoBackupHint),
+              value: widget.settings.autoBackup,
+              onChanged: connected ? _toggleAutoBackup : null,
+            )
+          else
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(t.autoBackupAndroidOnly),
+            ),
           ListTile(
             leading: const Icon(Icons.backup_outlined),
             title: Text(t.backupNow),
