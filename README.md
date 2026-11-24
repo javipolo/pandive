@@ -252,6 +252,7 @@ Por fases (ver plan de desarrollo):
 - **Un solo buceador**: la `.ddb` puede tener varios `DiverID` (demo/imports); el owner es el de más inmersiones. Pandive opera solo sobre el owner.
 - **Perfiles**: en `Logbook.Profile` (profundidad, 12 chars/muestra, 4 primeros = decímetros) y `Profile2` (temperatura, 11 chars/muestra, 4 primeros = centi-°C); `ProfileInt` = intervalo en segundos. Decode portado de `divemate-cli`.
 - **Mares Puck 4**: soporte confirmado en `libdivecomputer` (modelo `0x35`, BLE).
+- **Numeración de buceos**: con la *numeración automática* (Ajustes, activada por defecto) los buceos van siempre numerados de forma consecutiva y en orden cronológico (fecha, hora), sin contar los de la papelera. Se renumera al crear, borrar, restaurar, fusionar, importar o cambiar la fecha de un buceo, y al cambiar el *primer número* (por defecto el más bajo que hubiera; útil si traes buceos de otro logbook). Solo se marca `Updated` en los buceos cuyo número cambia. La configuración se guarda en la propia `.ddb` (`PandiveMeta`), así móvil y PC numeran igual. Sin numeración automática, al guardar un buceo fuera de orden se ofrece renumerar; y en Herramientas está *Renumerar buceos* con vista previa.
 
 ---
 

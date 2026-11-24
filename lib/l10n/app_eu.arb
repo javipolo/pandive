@@ -402,5 +402,17 @@
   "backupWifiOnlyHint": "Automatikoek WiFiaren zain daude; eskuzkoak beti funtzionatzen du",
   "syncWifiOnly": "Sinkronizatu WiFiarekin bakarrik",
   "syncWifiOnlyHint": "Datu mugikorrekin ez da berez sinkronizatzen: erabili sinkronizatzeko botoia",
-  "syncStatusManual": "Datu mugikorrak: eskuzko sinkronizazioa"
+  "syncStatusManual": "Datu mugikorrak: eskuzko sinkronizazioa",
+  "diveNumbering": "Urpekaldien zenbakitzea",
+  "autoNumbering": "Zenbakitze automatikoa",
+  "autoNumberingHint": "Urpekaldiak beti jarraian eta ordena kronologikoan zenbakituta",
+  "firstDiveNumber": "Lehen zenbakia",
+  "firstDiveNumberHint": "Logbook honetako zure lehen urpekaldiaren zenbakia (adib. beste logbook batean aurreko urpekaldiak badituzu)",
+  "renumberDives": "Urpekaldiak berriro zenbakitu",
+  "renumberResult": "{count} urpekaldi berriro zenbakituta",
+  "renumberNothing": "Zenbakiak jarraian eta ordenan daude dagoeneko",
+  "renumberPreview": "{count} urpekaldik zenbakia aldatuko dute ({first}-tik hasita):",
+  "renumberOutOfOrderTitle": "Urpekaldia ordenaz kanpo",
+  "renumberOutOfOrderBody": "Urpekaldi honen zenbakiak ez du ordena kronologikoa jarraitzen. Orain berriro zenbakitu? {count} urpekaldik aldatuko lukete zenbakia.",
+  "notNow": "Orain ez"
 }

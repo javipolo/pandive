@@ -15,6 +15,7 @@ import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
 import 'package:pandive/features/settings/logic/link_buddies_tool.dart';
+import 'package:pandive/features/settings/logic/renumber_tool.dart';
 import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
 import 'package:pandive/features/settings/screens/trash_screen.dart';
 import 'package:pandive/features/sites/logic/site_import.dart';
@@ -156,6 +157,11 @@ class ToolsScreen extends StatelessWidget {
             title: Text(t.planTitle),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => PlanDiveScreen(db: db))),
+          ),
+          ListTile(
+            leading: const Icon(Icons.format_list_numbered),
+            title: Text(t.renumberDives),
+            onTap: () => runRenumberTool(context, db),
           ),
           ListTile(
             leading: const Icon(Icons.group_add_outlined),

@@ -58,6 +58,7 @@ Future<DdbImportResult> importDivesFromDb(DivemateDb target, DivemateDb source,
       imported++;
     }
   }
+  if (imported > 0) target.autoRenumber();
   return DdbImportResult(
     imported: imported,
     duplicates: dups,

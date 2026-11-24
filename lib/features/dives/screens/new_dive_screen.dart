@@ -9,6 +9,7 @@ import 'package:pandive/core/sac.dart';
 import 'package:pandive/core/widgets/save_action.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/logic/apply_dive_type.dart';
+import 'package:pandive/features/dives/logic/renumber_after_save.dart';
 import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
 import 'package:pandive/features/dives/widgets/dive_editor_form.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
@@ -34,7 +35,6 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
   List<Cylinder> _tanks = [];
   String? _typeName;
   late final List<TankPreset> _presets = widget.db.listTankPresets();
-  late final int _number = widget.db.nextDiveNumber();
   bool _saving = false;
 
   @override
@@ -77,6 +77,11 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
     });
   }
 
+  // Con numeración automática, el que le tocará por fecha; si no, max + 1.
+  int get _number => widget.db.autoNumber
+      ? widget.db.numberForNewDive(_when)
+      : widget.db.nextDiveNumber();
+
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
@@ -100,6 +105,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
       if (_typeName != null) widget.db.updateDive(id, {'Divetype': _typeName});
       widget.db.setDiveTanks(id, _tanks);
       widget.db.setDiveTags(id, _tags);
+      if (mounted) await renumberAfterSave(context, widget.db, id);
       if (mounted) Navigator.of(context).pop(id);
     } catch (e) {
       setState(() => _saving = false);

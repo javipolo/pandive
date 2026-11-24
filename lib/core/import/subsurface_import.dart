@@ -52,6 +52,7 @@ Future<int> importSubsurfaceXml(DivemateDb db, String xml,
       await Future<void>.delayed(Duration.zero);
     }
   }
+  if (added > 0) db.autoRenumber();
   return added;
 }
 

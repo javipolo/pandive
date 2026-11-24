@@ -30,6 +30,7 @@ class _TrashScreenState extends State<TrashScreen> {
 
   void _restore() {
     widget.db.restoreDives(_selected.toList());
+    widget.db.autoRenumber();
     bumpDataRevision();
     _refresh();
   }

@@ -50,7 +50,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/db/db_pending.dart` -> caché de descargados no guardados (reaparecen una vez)
 - `lib/core/db/db_dive_types.dart` -> tipos de buceo + plantilla de botellas
 - `lib/core/db/db_computers.dart` -> ordenadores de buceo guardados (por MAC)
-- `lib/core/db/db_meta.dart` -> sello UTC de última escritura (PandiveMeta + triggers por tabla); lastWriteUtc / lastWriteUtcOf(path)
+- `lib/core/db/db_meta.dart` -> sello UTC de última escritura (PandiveMeta + triggers por tabla); lastWriteUtc / lastWriteUtcOf(path); clave/valor en PandiveMeta
+- `lib/core/db/db_numbering.dart` -> numeración automática (consecutiva, cronológica, desde primer número; config en PandiveMeta): renumberPlan/renumberDives/autoRenumber, isOutOfOrder, numberForNewDive
 - `lib/core/db/db_documents.dart` -> documentación (PandiveDocument): CRUD de metadatos (imagen en disco)
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 - `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
@@ -110,12 +111,13 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/backup/widgets/restore_list.dart` -> lista de backups de Drive para restaurar; avisa si la DB local es más reciente que el backup
 
 ### settings
-- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, hueco fusión, nocturno, DB
-- `lib/features/settings/screens/tools_screen.dart` -> herramientas: importar hashtags, export DDB/Subsurface, papelera, debug sync (desde drawer)
+- `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, numeración, hueco fusión, nocturno, DB
+- `lib/features/settings/screens/tools_screen.dart` -> herramientas: renumerar buceos, importar hashtags, export DDB/Subsurface, papelera, debug sync (desde drawer)
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
 - `lib/features/settings/logic/import_dives.dart` -> plan (nuevo/duplicado por fecha/hora) + copia de inmersiones seleccionadas de otro .ddb (perfil/sitio/buddies/tags/botellas) con resumen (DdbImportResult)
 - `lib/features/settings/logic/enrich_logbook.dart` -> empareja por fecha/hora y copia datos entre logbooks
+- `lib/features/settings/logic/renumber_tool.dart` -> herramienta "Renumerar buceos": vista previa de cambios + confirmación
 - `lib/features/settings/logic/link_buddies_tool.dart` -> herramienta: rellena BuddyIDs de buceos antiguos (texto Buddy sin IDs) para que cuenten
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previsualiza un .ddb en solo lectura; FAB "Opciones de importación" con menú (rellenar / importar buceos / sustituir DB)
 - `lib/features/settings/screens/import_ddb_dives_screen.dart` -> elegir buceos del .ddb a importar (verde nuevo / ámbar ya existe, ignorado) + diálogo resumen
@@ -125,6 +127,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf) e importar de Subsurface
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
+- `lib/features/settings/widgets/numbering_control.dart` -> ajustes de numeración: automática sí/no + primer número (renumera)
 - `lib/features/settings/widgets/night_hours_control.dart` -> franja horaria de inmersión nocturna (desde/hasta)
 
 ### buddies (compañeros)
@@ -159,6 +162,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/profile_section.dart` -> sección perfil: gráfica compacta + botones compartir / pantalla completa
 - `lib/features/dives/logic/share_profile.dart` -> genera PNG del perfil (con sitio) y lo comparte (share_plus)
 - `lib/features/dives/logic/apply_dive_type.dart` -> aplicar tipo: descarta botellas vacías (sin presiones) y añade las del tipo
+- `lib/features/dives/logic/renumber_after_save.dart` -> tras crear/editar: renumera (automática) u ofrece renumerar si el buceo queda fuera de orden
 - `lib/features/dives/widgets/dive_detail_fields.dart` -> celda etiqueta/valor, filas 2/3 columnas, separador de sección
 - `lib/features/dives/widgets/dive_form.dart` -> campos escalares editables (+ controllers)
 - `lib/features/dives/widgets/site_picker_field.dart` -> campo de sitio elegido

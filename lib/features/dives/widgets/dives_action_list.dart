@@ -105,6 +105,7 @@ class _DivesActionListState extends State<DivesActionList> {
       return;
     }
     widget.db.deleteDives([for (final d in _picked) d.id]);
+    widget.db.autoRenumber();
     _exitSel();
     widget.onChanged();
   }
@@ -120,6 +121,7 @@ class _DivesActionListState extends State<DivesActionList> {
     }
     try {
       widget.db.mergeDives(ids, maxGapMin: gap);
+      widget.db.autoRenumber();
     } on MergeTooFarException catch (e) {
       messenger
           .showSnackBar(SnackBar(content: Text(t.mergeTooFar(e.gapMinutes, gap))));

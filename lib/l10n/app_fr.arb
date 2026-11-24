@@ -402,5 +402,17 @@
   "backupWifiOnlyHint": "Les automatiques attendent le WiFi ; la manuelle fonctionne toujours",
   "syncWifiOnly": "Synchroniser en WiFi uniquement",
   "syncWifiOnlyHint": "Avec les données mobiles, pas de synchronisation automatique : utilisez le bouton",
-  "syncStatusManual": "Données mobiles : synchronisation manuelle"
+  "syncStatusManual": "Données mobiles : synchronisation manuelle",
+  "diveNumbering": "Numérotation des plongées",
+  "autoNumbering": "Numérotation automatique",
+  "autoNumberingHint": "Plongées toujours numérotées de façon consécutive et dans l'ordre chronologique",
+  "firstDiveNumber": "Premier numéro",
+  "firstDiveNumberHint": "Numéro de votre première plongée dans ce carnet (p. ex. si vous avez des plongées antérieures dans un autre carnet)",
+  "renumberDives": "Renuméroter les plongées",
+  "renumberResult": "{count} plongées renumérotées",
+  "renumberNothing": "Les numéros sont déjà consécutifs et dans l'ordre",
+  "renumberPreview": "{count} plongées vont changer de numéro (à partir de {first}) :",
+  "renumberOutOfOrderTitle": "Plongée hors d'ordre",
+  "renumberOutOfOrderBody": "Le numéro de cette plongée ne suit pas l'ordre chronologique. Renuméroter maintenant ? {count} plongées changeraient de numéro.",
+  "notNow": "Pas maintenant"
 }

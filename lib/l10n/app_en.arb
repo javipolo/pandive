@@ -715,5 +715,33 @@
   "backupWifiOnlyHint": "Automatic backups wait for WiFi; manual backup always works",
   "syncWifiOnly": "Sync on WiFi only",
   "syncWifiOnlyHint": "On mobile data it won't sync by itself: use the sync button",
-  "syncStatusManual": "Mobile data: manual sync"
+  "syncStatusManual": "Mobile data: manual sync",
+  "diveNumbering": "Dive numbering",
+  "autoNumbering": "Automatic numbering",
+  "autoNumberingHint": "Dives always numbered consecutively in chronological order",
+  "firstDiveNumber": "First number",
+  "firstDiveNumberHint": "Number of your first dive in this logbook (e.g. if you have earlier dives in another logbook)",
+  "renumberDives": "Renumber dives",
+  "renumberResult": "{count} dives renumbered",
+  "@renumberResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "renumberNothing": "Numbers are already consecutive and in order",
+  "renumberPreview": "{count} dives will change number (starting at {first}):",
+  "@renumberPreview": {
+    "placeholders": {
+      "count": {},
+      "first": {}
+    }
+  },
+  "renumberOutOfOrderTitle": "Dive out of order",
+  "renumberOutOfOrderBody": "This dive's number doesn't follow the chronological order. Renumber now? {count} dives would change number.",
+  "@renumberOutOfOrderBody": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "notNow": "Not now"
 }

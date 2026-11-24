@@ -402,5 +402,17 @@
   "backupWifiOnlyHint": "Los automáticos esperan a tener WiFi; el manual funciona siempre",
   "syncWifiOnly": "Sincronizar solo con WiFi",
   "syncWifiOnlyHint": "Con datos móviles no sincroniza sola: usa el botón de sincronizar",
-  "syncStatusManual": "Datos móviles: sincronización manual"
+  "syncStatusManual": "Datos móviles: sincronización manual",
+  "diveNumbering": "Numeración de buceos",
+  "autoNumbering": "Numeración automática",
+  "autoNumberingHint": "Los buceos siempre numerados de forma consecutiva y en orden cronológico",
+  "firstDiveNumber": "Primer número",
+  "firstDiveNumberHint": "Número de tu primer buceo en este logbook (p. ej. si tienes buceos anteriores en otro logbook)",
+  "renumberDives": "Renumerar buceos",
+  "renumberResult": "{count} buceos renumerados",
+  "renumberNothing": "Los números ya son consecutivos y están en orden",
+  "renumberPreview": "{count} buceos cambiarán de número (empezando en {first}):",
+  "renumberOutOfOrderTitle": "Buceo fuera de orden",
+  "renumberOutOfOrderBody": "El número de este buceo no sigue el orden cronológico. ¿Renumerar ahora? Cambiarían de número {count} buceos.",
+  "notNow": "Ahora no"
 }

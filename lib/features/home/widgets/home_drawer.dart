@@ -72,7 +72,8 @@ class HomeDrawer extends StatelessWidget {
             _push(context, Icons.cloud_upload_outlined, t.backup,
                 (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
             _push(context, Icons.settings_outlined, t.settings,
-                (_) => SettingsScreen(settings: settings, onChangeDb: onChangeDb)),
+                (_) => SettingsScreen(
+                    settings: settings, db: db, onChangeDb: onChangeDb)),
             _push(context, Icons.info_outline, t.about, (_) => const AboutScreen()),
           ],
         ),

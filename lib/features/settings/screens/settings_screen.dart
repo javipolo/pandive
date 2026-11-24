@@ -3,19 +3,23 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/settings/widgets/language_theme_selectors.dart';
 import 'package:pandive/features/settings/widgets/merge_gap_control.dart';
 import 'package:pandive/features/settings/widgets/night_hours_control.dart';
+import 'package:pandive/features/settings/widgets/numbering_control.dart';
 import 'package:pandive/features/settings/widgets/text_scale_control.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Settings settings;
+  final DivemateDb db;
   final VoidCallback onChangeDb;
   const SettingsScreen({
     super.key,
     required this.settings,
+    required this.db,
     required this.onChangeDb,
   });
 
@@ -68,6 +72,9 @@ class SettingsScreen extends StatelessWidget {
                   child: Text(t.reset),
                 ),
               ),
+              const Divider(),
+              _header(context, t.diveNumbering),
+              NumberingControl(db: db),
               const Divider(),
               _header(context, t.mergeGapSetting),
               MergeGapControl(settings: settings),

@@ -9,6 +9,7 @@ import 'package:pandive/core/sac.dart';
 import 'package:pandive/core/widgets/save_action.dart';
 import 'package:pandive/features/buddies/screens/buddy_picker_screen.dart';
 import 'package:pandive/features/dives/logic/apply_dive_type.dart';
+import 'package:pandive/features/dives/logic/renumber_after_save.dart';
 import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
 import 'package:pandive/features/dives/widgets/dive_editor_form.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
@@ -104,6 +105,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
       });
       widget.db.setDiveTanks(widget.dive.id, _tanks);
       widget.db.setDiveTags(widget.dive.id, _tags);
+      if (mounted) await renumberAfterSave(context, widget.db, widget.dive.id);
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _saving = false);

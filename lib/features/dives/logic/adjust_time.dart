@@ -44,5 +44,6 @@ Future<bool> adjustDivesTime(
   for (final d in dives) {
     if (d.date != null) db.setDiveDateTime(d.id, d.date!.add(delta));
   }
+  db.autoRenumber();
   return true;
 }

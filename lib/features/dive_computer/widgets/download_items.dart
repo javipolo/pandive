@@ -44,6 +44,7 @@ int applyDownloadSelection({
     }
     db.removePending(deviceId, fp); // guardadas o descartadas: fuera de la caché
   }
+  if (added > 0) db.autoRenumber();
   if (deviceDives.isNotEmpty) {
     db.setFingerprintFor(deviceId, deviceDives.first.fingerprint);
   }

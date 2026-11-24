@@ -402,5 +402,17 @@
   "backupWifiOnlyHint": "Les automàtiques esperen la WiFi; la manual funciona sempre",
   "syncWifiOnly": "Sincronitzar només amb WiFi",
   "syncWifiOnlyHint": "Amb dades mòbils no sincronitza sola: fes servir el botó de sincronitzar",
-  "syncStatusManual": "Dades mòbils: sincronització manual"
+  "syncStatusManual": "Dades mòbils: sincronització manual",
+  "diveNumbering": "Numeració d'immersions",
+  "autoNumbering": "Numeració automàtica",
+  "autoNumberingHint": "Les immersions sempre numerades de manera consecutiva i en ordre cronològic",
+  "firstDiveNumber": "Primer número",
+  "firstDiveNumberHint": "Número de la teva primera immersió en aquest logbook (p. ex. si tens immersions anteriors en un altre logbook)",
+  "renumberDives": "Renumerar immersions",
+  "renumberResult": "{count} immersions renumerades",
+  "renumberNothing": "Els números ja són consecutius i estan en ordre",
+  "renumberPreview": "{count} immersions canviaran de número (començant per {first}):",
+  "renumberOutOfOrderTitle": "Immersió fora d'ordre",
+  "renumberOutOfOrderBody": "El número d'aquesta immersió no segueix l'ordre cronològic. Vols renumerar ara? Canviarien de número {count} immersions.",
+  "notNow": "Ara no"
 }
