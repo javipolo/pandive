@@ -754,5 +754,17 @@
   "notNow": "Not now",
   "copyChart": "Copy chart",
   "chartCopied": "Chart copied to clipboard",
-  "chartCopyFailed": "Could not copy the chart"
+  "chartCopyFailed": "Could not copy the chart",
+  "todayAt": "Today {time}",
+  "yesterdayAt": "Yesterday {time}",
+  "@todayAt": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "@yesterdayAt": {
+    "placeholders": {
+      "time": {}
+    }
+  }
 }

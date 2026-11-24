@@ -419,5 +419,7 @@
   "notNow": "Ara no",
   "copyChart": "Copiar el gràfic",
   "chartCopied": "Gràfic copiat al porta-retalls",
-  "chartCopyFailed": "No s'ha pogut copiar el gràfic"
+  "chartCopyFailed": "No s'ha pogut copiar el gràfic",
+  "todayAt": "Avui {time}",
+  "yesterdayAt": "Ahir {time}"
 }

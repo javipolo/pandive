@@ -6,7 +6,6 @@ library;
 import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:intl/intl.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/backup_util.dart';
@@ -14,6 +13,7 @@ import 'package:pandive/core/services/drive_backup.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/progress_dialog.dart';
+import 'package:pandive/core/text/relative_date.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class RestoreList extends StatefulWidget {
@@ -72,11 +72,12 @@ class _RestoreListState extends State<RestoreList> {
     final remote = lastWriteUtcOf(backup.path);
     if (!restoreWouldLoseData(local, remote) || !mounted) return true;
     final t = AppLocalizations.of(context);
-    final fmt = DateFormat.yMd(Localizations.localeOf(context).languageCode).add_Hm();
+    final locale = Localizations.localeOf(context).languageCode;
+    String fmt(DateTime d) => relativeDateTime(d.toLocal(), t, locale);
     return confirmDialog(
       context,
-      t.restoreOlderWarning(fmt.format(local!.toLocal()),
-          remote == null ? t.unknownDate : fmt.format(remote.toLocal())),
+      t.restoreOlderWarning(
+          fmt(local!), remote == null ? t.unknownDate : fmt(remote)),
       confirmLabel: t.restoreAnyway,
     );
   }
@@ -84,8 +85,7 @@ class _RestoreListState extends State<RestoreList> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final fmt = DateFormat(
-        'd MMM yyyy, HH:mm', Localizations.localeOf(context).languageCode);
+    final locale = Localizations.localeOf(context).languageCode;
     return Scaffold(
       appBar: AppBar(title: Text(t.restore)),
       body: FutureBuilder<List<BackupEntry>>(
@@ -108,7 +108,7 @@ class _RestoreListState extends State<RestoreList> {
                 title: Text(e.isLatest ? t.latest : e.name),
                 subtitle: e.modified == null
                     ? null
-                    : Text(fmt.format(e.modified!.toLocal())),
+                    : Text(relativeDateTime(e.modified!.toLocal(), t, locale)),
                 onTap: () => _restore(e),
               );
             },

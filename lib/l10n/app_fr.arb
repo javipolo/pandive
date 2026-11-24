@@ -419,5 +419,7 @@
   "notNow": "Pas maintenant",
   "copyChart": "Copier le graphique",
   "chartCopied": "Graphique copié dans le presse-papiers",
-  "chartCopyFailed": "Impossible de copier le graphique"
+  "chartCopyFailed": "Impossible de copier le graphique",
+  "todayAt": "Aujourd'hui {time}",
+  "yesterdayAt": "Hier {time}"
 }

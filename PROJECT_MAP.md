@@ -11,6 +11,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/main.dart` -> arranque: init locale, carga settings, lanza la app
 - `lib/core/app.dart` -> MaterialApp, escala de texto global
 - `lib/core/app_root.dart` -> AppRoot: elige pantalla; crea DB vacía en el primer arranque, o pantalla de carga (Cambiar DB / error)
+- `lib/core/text/relative_date.dart` -> fecha "humana": "Hoy 17:12" / "Ayer 21:23" / fecha completa (lista de backups)
 - `lib/core/services/opened_file.dart` -> fichero .ddb entrante (abrir con / compartir): consume + stream
 - `lib/core/services/data_revision.dart` -> señal global para refresco blando de pestañas (sin reabrir DB)
 - `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)

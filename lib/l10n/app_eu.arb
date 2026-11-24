@@ -419,5 +419,7 @@
   "notNow": "Orain ez",
   "copyChart": "Kopiatu grafikoa",
   "chartCopied": "Grafikoa arbelean kopiatu da",
-  "chartCopyFailed": "Ezin izan da grafikoa kopiatu"
+  "chartCopyFailed": "Ezin izan da grafikoa kopiatu",
+  "todayAt": "Gaur {time}",
+  "yesterdayAt": "Atzo {time}"
 }
