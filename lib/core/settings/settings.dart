@@ -2,6 +2,8 @@
 /// de la base de datos activa. Persistido con shared_preferences.
 library;
 
+import 'dart:math';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +18,11 @@ class Settings extends ChangeNotifier {
   static const _kBackupAuto = 'backup_auto';
   static const _kBackupTime = 'backup_last_time';
   static const _kBackupHash = 'backup_last_hash';
+  static const _kSyncOn = 'sync_enabled';
+  static const _kSyncMd5 = 'sync_base_md5';
+  static const _kSyncStamp = 'sync_base_stamp';
+  static const _kSyncDocs = 'sync_docs_sig';
+  static const _kDeviceId = 'device_id';
 
   /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
   static const double defaultTextScale = 1.4;
@@ -111,6 +118,39 @@ class Settings extends ChangeNotifier {
     await _prefs.setString(_kBackupHash, hash);
     await _prefs.setInt(_kBackupTime, timeMs);
     notifyListeners();
+  }
+
+  /// Sincronización entre dispositivos vía Drive (capa 1, ver sync_logic).
+  bool get syncEnabled => _prefs.getBool(_kSyncOn) ?? false;
+  Future<void> setSyncEnabled(bool v) async {
+    await _prefs.setBool(_kSyncOn, v);
+    notifyListeners();
+  }
+
+  /// Base de la última sync: md5 del fichero en Drive y sello local
+  /// (lastWriteUtc en bruto) en ese momento. Sin notificar (estado interno).
+  String? get syncBaseMd5 => _prefs.getString(_kSyncMd5);
+  String? get syncBaseStamp => _prefs.getString(_kSyncStamp);
+  Future<void> setSyncBase(String? md5, String? stamp) async {
+    await (md5 == null ? _prefs.remove(_kSyncMd5) : _prefs.setString(_kSyncMd5, md5));
+    await (stamp == null
+        ? _prefs.remove(_kSyncStamp)
+        : _prefs.setString(_kSyncStamp, stamp));
+  }
+
+  /// Firma (nombres+tamaños) de documents/ en la última subida del zip.
+  String? get syncDocsSig => _prefs.getString(_kSyncDocs);
+  Future<void> setSyncDocsSig(String sig) => _prefs.setString(_kSyncDocs, sig);
+
+  /// Id estable de este dispositivo (presencia en Drive).
+  String get deviceId {
+    var id = _prefs.getString(_kDeviceId);
+    if (id == null) {
+      final r = Random.secure();
+      id = List.generate(12, (_) => r.nextInt(16).toRadixString(16)).join();
+      _prefs.setString(_kDeviceId, id);
+    }
+    return id;
   }
 
   Future<void> setLocale(String? code) async {

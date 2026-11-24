@@ -678,5 +678,37 @@
         "type": "String"
       }
     }
+  },
+  "syncTitle": "Sync",
+  "syncToggle": "Sync between devices",
+  "syncToggleHint": "Keeps the same logbook on your phone and PC through Google Drive",
+  "syncStatusSynced": "Synced",
+  "syncStatusSyncing": "Syncing…",
+  "syncStatusPending": "Changes from the other device",
+  "syncStatusDiverged": "Changes on both devices",
+  "syncStatusOffline": "No connection to Drive",
+  "syncLast": "Last sync: {time}",
+  "syncOtherActive": "Pandive is open on {device} ({minutes} min ago). Editing on both at once means choosing one version.",
+  "syncNow": "Sync now",
+  "syncApplyRemote": "Update with the other device's changes",
+  "syncDivergedExplain": "The logbook changed here and on another device since the last sync. Choose which version to keep; the other is saved as a backup (Restore).",
+  "syncKeepLocal": "Keep this device's version",
+  "syncKeepRemote": "Keep the other device's version",
+  "@syncLast": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "@syncOtherActive": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -1,8 +1,11 @@
 # Plan: sincronización móvil ↔ PC vía Google Drive
 
-Estado: **borrador para revisar**. Nada implementado salvo el sello de última
-escritura (`PandiveMeta.lastWriteUtc`, triggers SQLite), que es la pieza base
-de la detección de cambios. Ver "Propuesta recomendada" al final.
+Estado: **capa 1 implementada** (2026-11-24: `sync_logic.dart`,
+`sync_controller.dart`, `drive_sync_ops.dart`). Detalles de la implementación:
+"cambió el otro" se mide con el md5 de `sync-logbook.ddb` en Drive (no con la
+revisión); la subida es una instantánea `VACUUM INTO`; un dispositivo nuevo y
+vacío adopta Drive sin preguntar. Capa 2 (fusión) pendiente. Ver "Propuesta
+recomendada" al final.
 
 ## Objetivo
 

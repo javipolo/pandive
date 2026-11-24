@@ -382,5 +382,20 @@
   "autoBackupAndroidOnly": "La sauvegarde automatique n'est disponible que sur Android",
   "restoreOlderWarning": "Votre carnet contient des modifications ({local}) plus récentes que cette sauvegarde ({backup}). Restaurer les fera perdre.",
   "restoreAnyway": "Restaurer quand même",
-  "unknownDate": "date inconnue"
+  "unknownDate": "date inconnue",
+  "syncTitle": "Synchronisation",
+  "syncToggle": "Synchroniser entre appareils",
+  "syncToggleHint": "Garde le même carnet sur le téléphone et le PC via Google Drive",
+  "syncStatusSynced": "Synchronisé",
+  "syncStatusSyncing": "Synchronisation…",
+  "syncStatusPending": "Modifications de l'autre appareil",
+  "syncStatusDiverged": "Modifications sur les deux appareils",
+  "syncStatusOffline": "Pas de connexion à Drive",
+  "syncLast": "Dernière synchronisation : {time}",
+  "syncOtherActive": "Pandive est ouvert sur {device} (il y a {minutes} min). Modifier sur les deux à la fois oblige à choisir une version.",
+  "syncNow": "Synchroniser maintenant",
+  "syncApplyRemote": "Mettre à jour avec les modifications de l'autre appareil",
+  "syncDivergedExplain": "Le carnet a été modifié ici et sur un autre appareil depuis la dernière synchronisation. Choisissez la version à garder ; l'autre est enregistrée comme sauvegarde (Restaurer).",
+  "syncKeepLocal": "Garder la version de cet appareil",
+  "syncKeepRemote": "Garder la version de l'autre appareil"
 }

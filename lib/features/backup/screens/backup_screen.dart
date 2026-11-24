@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/services/backup_worker.dart';
 import 'package:pandive/core/services/drive_backup.dart';
+import 'package:pandive/core/services/sync_controller.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/widgets/restore_list.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -54,6 +55,7 @@ class _BackupScreenState extends State<BackupScreen> {
       if (_svc.connected) {
         await _svc.signOut();
         await cancelAutoBackup();
+        await syncController.setEnabled(false);
       } else if (!DriveBackupService.configured) {
         messenger.showSnackBar(SnackBar(content: Text(t.driveNotConfigured)));
       } else {
@@ -112,6 +114,17 @@ class _BackupScreenState extends State<BackupScreen> {
               leading: const Icon(Icons.info_outline),
               title: Text(t.autoBackupAndroidOnly),
             ),
+          SwitchListTile(
+            title: Text(t.syncToggle),
+            subtitle: Text(t.syncToggleHint),
+            value: widget.settings.syncEnabled,
+            onChanged: connected
+                ? (v) async {
+                    await syncController.setEnabled(v);
+                    if (mounted) setState(() {});
+                  }
+                : null,
+          ),
           ListTile(
             leading: const Icon(Icons.backup_outlined),
             title: Text(t.backupNow),

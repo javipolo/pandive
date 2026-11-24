@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'db/divemate_db.dart';
 import 'services/backup_worker.dart';
 import 'services/drive_backup.dart';
+import 'services/sync_controller.dart';
 import 'settings/settings.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/load_db/screens/load_db_screen.dart';
@@ -58,6 +59,7 @@ class _AppRootState extends State<AppRoot> {
       } else {
         _db = db;
         _maybeBackup();
+        _startSync();
       }
     } catch (e) {
       _error = DbLoadError.openFailed;
@@ -87,6 +89,31 @@ class _AppRootState extends State<AppRoot> {
   void _maybeBackup() {
     DriveBackupService().backupIfNeeded(widget.settings);
     if (widget.settings.autoBackup) registerAutoBackup();
+  }
+
+  // Sync entre dispositivos: conectar el controlador a esta DB y sincronizar
+  // (también tras recargar/restaurar: un cambio local se sube).
+  void _startSync() {
+    syncController.attach(
+      settings: widget.settings,
+      db: () => _db,
+      replace: _replaceFromSync,
+      canAutoReplace: () => mounted && !Navigator.of(context).canPop(),
+    );
+    Future.microtask(syncController.sync);
+  }
+
+  // Sustituye la DB activa por la versión bajada de Drive (cerrar, copiar,
+  // reabrir). Vuelve a la pantalla principal: las abiertas usan la DB vieja.
+  Future<void> _replaceFromSync(File src) async {
+    final path = widget.settings.dbPath;
+    if (path == null) return;
+    if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+    _db?.close();
+    _db = null;
+    await src.copy(path);
+    await src.delete();
+    _tryOpen(path);
   }
 
   @override

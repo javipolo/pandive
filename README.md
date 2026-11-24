@@ -295,6 +295,21 @@ El refresh token se guarda en el llavero del escritorio (libsecret: GNOME
 Keyring / KWallet). En Linux no hay backup en segundo plano (WorkManager es de
 Android): se hace al abrir la app y con el botón manual.
 
+### Sincronizar móvil y PC
+
+Backup → **Sincronizar entre dispositivos** (en cada dispositivo, con la misma
+cuenta). Mantiene el mismo logbook vía `sync-logbook.ddb` en la carpeta de
+Drive, sin perder nunca datos en silencio:
+
+- Si solo cambió un lado, se sube o se baja solo (al abrir o volver a la app,
+  unos segundos después de editar, cada ~2 min y al salir). Una bajada con
+  pantallas abiertas queda pendiente ("Actualizar") para no interrumpir.
+- Si cambiaron los dos, el icono de la barra se pone rojo y se elige con qué
+  versión quedarse; la otra se guarda como backup (Restaurar).
+- Un dispositivo nuevo con el logbook vacío adopta directamente el de Drive.
+- Aviso si Pandive está abierto en el otro dispositivo (presencia en Drive).
+- Las imágenes de documentos viajan en el zip de documentos.
+
 Backups: se guarda `latest.ddb` + copias con timestamp (se conservan las 10 más
 recientes) y un zip con las imágenes de documentos. Al restaurar, por defecto se
 ofrece `latest`. **Failsafe:** cada escritura en la DB guarda su hora UTC

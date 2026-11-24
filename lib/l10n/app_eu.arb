@@ -382,5 +382,20 @@
   "autoBackupAndroidOnly": "Babeskopia automatikoa Androiden bakarrik dago erabilgarri",
   "restoreOlderWarning": "Zure logbook-ak babeskopia honek ({backup}) baino aldaketa berriagoak ditu ({local}). Leheneratzen baduzu, galdu egingo dituzu.",
   "restoreAnyway": "Leheneratu hala ere",
-  "unknownDate": "data ezezaguna"
+  "unknownDate": "data ezezaguna",
+  "syncTitle": "Sinkronizazioa",
+  "syncToggle": "Gailuen artean sinkronizatu",
+  "syncToggleHint": "Logbook bera mantentzen du mugikorrean eta PCan Google Driveren bidez",
+  "syncStatusSynced": "Sinkronizatuta",
+  "syncStatusSyncing": "Sinkronizatzen…",
+  "syncStatusPending": "Beste gailuaren aldaketak daude",
+  "syncStatusDiverged": "Bi gailuetan daude aldaketak",
+  "syncStatusOffline": "Ez dago Drive konexiorik",
+  "syncLast": "Azken sinkronizazioa: {time}",
+  "syncOtherActive": "Pandive irekita dago {device} gailuan (duela {minutes} min). Bietan batera editatzeak bertsio bat aukeratzera behartzen du.",
+  "syncNow": "Sinkronizatu orain",
+  "syncApplyRemote": "Eguneratu beste gailuaren aldaketekin",
+  "syncDivergedExplain": "Logbook-a hemen eta beste gailu batean aldatu da azken sinkronizaziotik. Aukeratu zein bertsio gorde; bestea babeskopia gisa gordetzen da (Leheneratu).",
+  "syncKeepLocal": "Gailu honetakoa gorde",
+  "syncKeepRemote": "Beste gailukoa gorde"
 }

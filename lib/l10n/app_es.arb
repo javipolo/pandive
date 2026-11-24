@@ -382,5 +382,20 @@
   "autoBackupAndroidOnly": "La copia automática solo está disponible en Android",
   "restoreOlderWarning": "Tu logbook tiene cambios ({local}) más recientes que este backup ({backup}). Si restauras, los perderás.",
   "restoreAnyway": "Restaurar igualmente",
-  "unknownDate": "fecha desconocida"
+  "unknownDate": "fecha desconocida",
+  "syncTitle": "Sincronización",
+  "syncToggle": "Sincronizar entre dispositivos",
+  "syncToggleHint": "Mantiene el mismo logbook en el móvil y el PC a través de Google Drive",
+  "syncStatusSynced": "Sincronizado",
+  "syncStatusSyncing": "Sincronizando…",
+  "syncStatusPending": "Hay cambios del otro dispositivo",
+  "syncStatusDiverged": "Hay cambios en los dos dispositivos",
+  "syncStatusOffline": "Sin conexión con Drive",
+  "syncLast": "Última sincronización: {time}",
+  "syncOtherActive": "Pandive está abierto en {device} (hace {minutes} min). Editar en los dos a la vez obliga a elegir una versión.",
+  "syncNow": "Sincronizar ahora",
+  "syncApplyRemote": "Actualizar con los cambios del otro dispositivo",
+  "syncDivergedExplain": "El logbook se ha modificado aquí y en otro dispositivo desde la última sincronización. Elige qué versión conservar; la otra se guarda como backup (Restaurar).",
+  "syncKeepLocal": "Quedarme con la de este dispositivo",
+  "syncKeepRemote": "Quedarme con la del otro dispositivo"
 }

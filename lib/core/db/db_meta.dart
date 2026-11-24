@@ -26,15 +26,20 @@ void _ensureLastWriteTriggers(Database db) {
 }
 
 extension DivemateDbMeta on DivemateDb {
-  /// Momento (UTC) de la última escritura, o null si la DB es anterior a esto
-  /// o no tiene la tabla (p.ej. un .ddb de DiveMate).
-  DateTime? get lastWriteUtc {
+  /// Sello tal cual está guardado (para comparar por igualdad en la sync).
+  String? get lastWriteRaw {
     if (!_hasTable('PandiveMeta')) return null;
     final r = _db.select(
         'SELECT Value FROM PandiveMeta WHERE Key = ?', [_kLastWrite]);
-    if (r.isEmpty) return null;
-    return DateTime.tryParse(r.first['Value'] as String? ?? '');
+    return r.isEmpty ? null : r.first['Value'] as String?;
   }
+
+  /// Copia consistente de la DB abierta en [path] (VACUUM INTO, atómico).
+  void snapshotTo(String path) => _db.execute('VACUUM INTO ?', [path]);
+
+  /// Momento (UTC) de la última escritura, o null si la DB es anterior a esto
+  /// o no tiene la tabla (p.ej. un .ddb de DiveMate).
+  DateTime? get lastWriteUtc => DateTime.tryParse(lastWriteRaw ?? '');
 }
 
 /// [DivemateDb.lastWriteUtc] de un fichero (abre en solo lectura).

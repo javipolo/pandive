@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/features/home/widgets/search_results_bar.dart';
+import 'package:pandive/features/sync/widgets/sync_indicator.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -105,6 +106,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               // hueco para que el resto de iconos no se muevan.
               else if (canSort && index == 1)
                 const SizedBox(width: 48),
+              const SyncIndicator(),
               IconButton(
                   tooltip: t.settings,
                   icon: const Icon(Icons.settings),

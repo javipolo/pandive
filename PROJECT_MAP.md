@@ -20,6 +20,9 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth OAuth nativo (flutter_appauth + refresh token en secure_storage, headless), carpeta, hash (parts)
 - `lib/core/services/desktop_oauth.dart` -> OAuth Google en escritorio (Linux): loopback 127.0.0.1 + PKCE, refresh por HTTP
 - `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/downloadBackup+applyRestore/poda
+- `lib/core/services/drive_sync_ops.dart` -> Drive para la sync: fichero sync-logbook.ddb (md5), versión descartada como backup, zip de documentos si cambió, presencia por dispositivo
+- `lib/core/services/sync_logic.dart` -> decisión pura de la sync (none/upload/download/diverged) a partir de md5 remoto + sello local vs base
+- `lib/core/services/sync_controller.dart` -> SyncController global (syncController): estado, disparadores (abrir/volver, tras editar, ~2 min, salir), subir/bajar/resolver divergencia
 - `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió
 - `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)
 - `lib/core/storage/documents_storage.dart` -> carpeta documents/ en disco (guardar/borrar/ruta); usado por UI y backup
@@ -97,8 +100,12 @@ con `screens/` y, si hace falta, `widgets/`).
 ### tags (etiquetas)
 - `lib/features/tags/screens/tags_tab.dart` -> lista de tags (crear/renombrar/borrar, ver buceos)
 
+### sync (sincronización entre dispositivos)
+- `lib/features/sync/widgets/sync_indicator.dart` -> icono de estado en la barra superior (+ syncStatusText)
+- `lib/features/sync/widgets/sync_sheet.dart` -> hoja: estado, otro dispositivo abierto, sincronizar/actualizar/elegir versión
+
 ### backup (copia de seguridad en Drive)
-- `lib/features/backup/screens/backup_screen.dart` -> conectar cuenta, backup manual, auto diario, restaurar
+- `lib/features/backup/screens/backup_screen.dart` -> conectar cuenta, backup manual, auto diario, sincronizar entre dispositivos, restaurar
 - `lib/features/backup/widgets/restore_list.dart` -> lista de backups de Drive para restaurar; avisa si la DB local es más reciente que el backup
 
 ### settings

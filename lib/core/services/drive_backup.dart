@@ -23,6 +23,7 @@ import 'backup_util.dart';
 import 'desktop_oauth.dart';
 
 part 'drive_backup_ops.dart';
+part 'drive_sync_ops.dart';
 
 /// OAuth client ID **de tipo iOS** del proyecto Google Cloud (sin secreto; da el
 /// esquema invertido `com.googleusercontent.apps.<id>`). Pásalo con
