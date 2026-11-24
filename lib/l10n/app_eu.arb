@@ -266,6 +266,8 @@
   "importing": "Inportatzen…",
   "importSubsurface": "Subsurface-tik inportatu (.ssrf)",
   "importSubsurfaceResult": "{count} murgilketa inportatu dira",
+  "importSsi": "Inportatu SSItik (CSV)",
+  "importSsiResult": "{added} murgilketa inportatu dira, {duplicates} logbookean zeuden jada",
   "importSites": "Inportatu lekuak (JSON)",
   "updateOnly": "Eguneratu soilik",
   "updateAndNew": "Eguneratu + berriak",

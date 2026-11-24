@@ -266,6 +266,8 @@
   "importing": "Important…",
   "importSubsurface": "Importa de Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} immersions importades",
+  "importSsi": "Importar d'SSI (CSV)",
+  "importSsiResult": "{added} immersions importades, {duplicates} ja eren al logbook",
   "importSites": "Importa llocs (JSON)",
   "updateOnly": "Només actualitzar",
   "updateAndNew": "Actualitzar + nous",

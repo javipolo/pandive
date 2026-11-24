@@ -434,6 +434,14 @@
       "count": {}
     }
   },
+  "importSsi": "Import from SSI (CSV)",
+  "importSsiResult": "{added} dives imported, {duplicates} already in the logbook",
+  "@importSsiResult": {
+    "placeholders": {
+      "added": {},
+      "duplicates": {}
+    }
+  },
   "importSites": "Import sites (JSON)",
   "updateOnly": "Update existing",
   "updateAndNew": "Update + add new",

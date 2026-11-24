@@ -107,6 +107,29 @@ extension DivemateDbImport on DivemateDb {
     return _db.select(sql, params).isNotEmpty;
   }
 
+  /// Buceos (vivos, del owner) de un día: id, hora, profundidad máx. y
+  /// duración (min). Para deduplicar importaciones sin hora (CSV de SSI).
+  List<({int id, String? time, double? depth, double? minutes})> divesOnDay(
+      DateTime day) {
+    final owner = ownerId;
+    String p(int v) => v.toString().padLeft(2, '0');
+    final date = '${day.year}-${p(day.month)}-${p(day.day)}';
+    final rows = _db.select(
+        'SELECT ID, Entrytime, Depth, Divetime FROM Logbook WHERE Divedate = ? '
+        'AND (Status IS NULL OR Status != 2)'
+        '${owner != null ? ' AND DiverID = ?' : ''} ORDER BY Entrytime',
+        [date, ?owner]);
+    return [
+      for (final r in rows)
+        (
+          id: r['ID'] as int,
+          time: r['Entrytime'] as String?,
+          depth: (r['Depth'] as num?)?.toDouble(),
+          minutes: (r['Divetime'] as num?)?.toDouble(),
+        ),
+    ];
+  }
+
   /// Importa una inmersión descargada. Devuelve true si se insertó, false si ya
   /// existía (dedupe por fecha/hora). Escribe perfil en formato DiveMate.
   bool importDownloaded(DownloadedDive d, {String? computer}) {

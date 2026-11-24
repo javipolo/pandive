@@ -14,7 +14,7 @@ App móvil de registro de inmersiones (un solo buceador, una base de datos por b
 
 - Importa inmersiones directamente del ordenador de buceo por Bluetooth (Shearwater Peregrine/Perdix, Mares Puck 4, y el resto que soporte `libdivecomputer`).
 - Almacena todo en un único archivo SQLite (fácil de respaldar y mover).
-- Exporta a formato Subsurface.
+- Exporta a formato Subsurface e importa de Subsurface y del CSV del logbook de SSI (MySSI; sin hora ni perfil: los duplicados se detectan por día + profundidad + duración).
 - Copia de seguridad / restauración en Google Drive (sube y baja el archivo SQLite completo).
 - Sin gestión de fotos (decisión de diseño).
 

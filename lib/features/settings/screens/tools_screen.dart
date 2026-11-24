@@ -91,6 +91,15 @@ class ToolsScreen extends StatelessWidget {
     messenger.showSnackBar(
         SnackBar(content: Text(t.importSubsurfaceResult(n))));
   }
+  Future<void> _importSsi(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final t = AppLocalizations.of(context);
+    final r = await importSsi(db);
+    if (r == null) return;
+    bumpDataRevision();
+    messenger.showSnackBar(SnackBar(
+        content: Text(t.importSsiResult(r.added, r.duplicates))));
+  }
   Future<void> _importSites(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
@@ -134,6 +143,11 @@ class ToolsScreen extends StatelessWidget {
             leading: const Icon(Icons.file_download_outlined),
             title: Text(t.importSubsurface),
             onTap: () => _importSubsurface(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.file_download_outlined),
+            title: Text(t.importSsi),
+            onTap: () => _importSsi(context),
           ),
           ListTile(
             leading: const Icon(Icons.place_outlined),

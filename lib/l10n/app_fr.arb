@@ -266,6 +266,8 @@
   "importing": "Importation…",
   "importSubsurface": "Importer depuis Subsurface (.ssrf)",
   "importSubsurfaceResult": "{count} plongées importées",
+  "importSsi": "Importer depuis SSI (CSV)",
+  "importSsiResult": "{added} plongées importées, {duplicates} déjà dans le carnet",
   "importSites": "Importer des sites (JSON)",
   "updateOnly": "Mettre à jour",
   "updateAndNew": "Mettre à jour + ajouter",

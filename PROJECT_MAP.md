@@ -57,6 +57,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
+- `lib/core/import/ssi_csv_import.dart` -> importa el CSV del logbook de SSI (columnas por posición; fechas multi-idioma; dedupe por día+prof.+duración)
 - `lib/core/widgets/import_progress.dart` -> diálogo de progreso reutilizable para importar .ssrf
 - `lib/core/db/db_import_ext.dart` -> inserta inmersión externa (perfil, botellas, sitio, buddies, tags) + copyDiveDetailsFrom (copia ordenador/botellas/tags/perfil entre .ddb)
 - `lib/core/text/collate.dart` -> comparación alfabética ignorando acentos
@@ -112,7 +113,7 @@ con `screens/` y, si hace falta, `widgets/`).
 
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> ajustes: idioma, tema, letra, numeración, hueco fusión, nocturno, DB
-- `lib/features/settings/screens/tools_screen.dart` -> herramientas: renumerar buceos, importar hashtags, export DDB/Subsurface, papelera, debug sync (desde drawer)
+- `lib/features/settings/screens/tools_screen.dart` -> herramientas: renumerar buceos, importar hashtags, export DDB/Subsurface, import SSI CSV, papelera, debug sync (desde drawer)
 - `lib/features/settings/screens/about_screen.dart` -> acerca de / contacto: descripción + email de reporte (mailto, desde drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> rellena buceos propios cruzando con el .ddb de un compañero (sitio/notas/buddies)
 - `lib/features/settings/logic/import_dives.dart` -> plan (nuevo/duplicado por fecha/hora) + copia de inmersiones seleccionadas de otro .ddb (perfil/sitio/buddies/tags/botellas) con resumen (DdbImportResult)
@@ -124,7 +125,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
-- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf) e importar de Subsurface
+- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf) e importar de Subsurface / CSV de SSI
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
 - `lib/features/settings/widgets/numbering_control.dart` -> ajustes de numeración: automática sí/no + primer número (renumera)
