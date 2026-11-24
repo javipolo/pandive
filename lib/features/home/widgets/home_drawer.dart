@@ -1,5 +1,5 @@
 /// Menú lateral (hamburguesa) con las secciones que no están en la barra
-/// inferior: etiquetas, equipo y estadísticas.
+/// inferior: etiquetas, equipo, estadísticas, herramientas, backup y ajustes.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -10,6 +10,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/screens/backup_screen.dart';
 import 'package:pandive/features/documents/screens/documents_screen.dart';
 import 'package:pandive/features/settings/screens/about_screen.dart';
+import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/features/settings/screens/tools_screen.dart';
 import 'package:pandive/features/trips/screens/trips_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -20,6 +21,7 @@ class HomeDrawer extends StatelessWidget {
   final DivemateDb db;
   final Settings settings;
   final VoidCallback onReloadDb;
+  final VoidCallback onChangeDb;
   const HomeDrawer({
     super.key,
     required this.selectedIndex,
@@ -27,6 +29,7 @@ class HomeDrawer extends StatelessWidget {
     required this.db,
     required this.settings,
     required this.onReloadDb,
+    required this.onChangeDb,
   });
 
   @override
@@ -68,6 +71,8 @@ class HomeDrawer extends StatelessWidget {
                 (_) => ToolsScreen(settings: settings, db: db)),
             _push(context, Icons.cloud_upload_outlined, t.backup,
                 (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
+            _push(context, Icons.settings_outlined, t.settings,
+                (_) => SettingsScreen(settings: settings, onChangeDb: onChangeDb)),
             _push(context, Icons.info_outline, t.about, (_) => const AboutScreen()),
           ],
         ),

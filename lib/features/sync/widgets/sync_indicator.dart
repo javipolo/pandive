@@ -21,7 +21,7 @@ class SyncIndicator extends StatelessWidget {
         if (c.status == SyncStatus.off) return const SizedBox.shrink();
         final scheme = Theme.of(context).colorScheme;
         final (icon, color) = switch (c.status) {
-          SyncStatus.synced => (Icons.cloud_done_outlined, null),
+          SyncStatus.synced => (Icons.cloud_done_outlined, Colors.green),
           SyncStatus.syncing => (Icons.sync, null),
           SyncStatus.pendingRemote => (Icons.cloud_download_outlined, scheme.primary),
           SyncStatus.diverged => (Icons.sync_problem, scheme.error),

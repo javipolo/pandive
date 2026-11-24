@@ -1,5 +1,5 @@
 /// AppBar de la pantalla principal: título o buscador, y acciones (buscar,
-/// colapsar grupos, ordenar por nº de buceos, ajustes).
+/// colapsar grupos, ordenar por nº de buceos) con el estado de sync delante.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -28,7 +28,6 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleCollapse;
   final VoidCallback onToggleSort;
   final VoidCallback onMap;
-  final VoidCallback onSettings;
   const HomeAppBar({
     super.key,
     required this.db,
@@ -49,7 +48,6 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onToggleCollapse,
     required this.onToggleSort,
     required this.onMap,
-    required this.onSettings,
   });
 
   @override
@@ -79,6 +77,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: searching
           ? [IconButton(icon: const Icon(Icons.clear), onPressed: onExitSearch)]
           : [
+              const SyncIndicator(),
               if (canSearch)
                 IconButton(
                     tooltip: t.search,
@@ -106,11 +105,6 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               // hueco para que el resto de iconos no se muevan.
               else if (canSort && index == 1)
                 const SizedBox(width: 48),
-              const SyncIndicator(),
-              IconButton(
-                  tooltip: t.settings,
-                  icon: const Icon(Icons.settings),
-                  onPressed: onSettings),
             ],
     );
   }

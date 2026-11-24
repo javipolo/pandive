@@ -20,7 +20,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth OAuth nativo (flutter_appauth + refresh token en secure_storage, headless), carpeta, hash (parts)
 - `lib/core/services/desktop_oauth.dart` -> OAuth Google en escritorio (Linux): loopback 127.0.0.1 + PKCE, refresh por HTTP
 - `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/downloadBackup+applyRestore/poda
-- `lib/core/services/drive_sync_ops.dart` -> Drive para la sync: fichero sync-logbook.ddb (md5), versión descartada como backup, zip de documentos si cambió, presencia por dispositivo
+- `lib/core/services/drive_sync_ops.dart` -> Drive para la sync: fichero sync-logbook.ddb.gz (gzip, md5), versión descartada como backup, zip de documentos si cambió, presencia por dispositivo
 - `lib/core/services/sync_logic.dart` -> decisión pura de la sync (none/upload/download/diverged) a partir de md5 remoto + sello local vs base
 - `lib/core/services/sync_controller.dart` -> SyncController global (syncController): estado, disparadores (abrir/volver, tras editar, ~2 min, salir), subir/bajar/resolver divergencia
 - `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió
@@ -89,9 +89,9 @@ con `screens/` y, si hace falta, `widgets/`).
 ### home
 - `lib/features/home/screens/home_screen.dart` -> shell con pestañas y menú
 - `lib/features/home/widgets/home_nav_bar.dart` -> barra inferior (Inmersiones/Sitios/Compañeros)
-- `lib/features/home/widgets/home_app_bar.dart` -> AppBar: título/buscador + acciones (buscar, colapsar, ordenar por buceos, ajustes)
+- `lib/features/home/widgets/home_app_bar.dart` -> AppBar: título/buscador + acciones (sync, buscar, mapa/ordenar, colapsar)
 - `lib/features/home/widgets/home_tabs.dart` -> pestañas (IndexedStack); escucha data_revision para refresco blando
-- `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats + Herramientas/Backup)
+- `lib/features/home/widgets/home_drawer.dart` -> menú lateral (Tags/Equipo/Stats + Viajes/Documentos/Herramientas/Backup/Ajustes)
 
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> elegir/crear un .ddb o importar .ssrf (con enum DbLoadError)

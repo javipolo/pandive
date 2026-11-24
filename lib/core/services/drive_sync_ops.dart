@@ -1,8 +1,9 @@
 part of 'drive_backup.dart';
 
 /// Fichero compartido de la sincronización (en la carpeta de backups; su
-/// nombre no casa con los backups con timestamp, así que no se poda).
-const syncFileName = 'sync-logbook.ddb';
+/// nombre no casa con los backups con timestamp, así que no se poda). Va
+/// comprimido con gzip: una DB de 12 MB queda en <1 MB (datos móviles).
+const syncFileName = 'sync-logbook.ddb.gz';
 const _presencePrefix = 'presence-';
 
 /// Estado del fichero de sync en Drive.
@@ -43,11 +44,12 @@ extension DriveSyncOps on DriveBackupService {
     return RemoteSync(f.first.id, f.first.md5Checksum);
   }
 
-  /// Sube [bytes] como fichero de sync; devuelve su md5 en Drive.
-  Future<String?> uploadSync(List<int> bytes, RemoteSync remote) async {
+  /// Sube [raw] (la DB sin comprimir) como fichero de sync; devuelve su md5.
+  Future<String?> uploadSync(List<int> raw, RemoteSync remote) async {
     final a = await _syncApi();
     if (a == null) return null;
     final (api, folder) = a;
+    final bytes = gzip.encode(raw);
     final media = drive.Media(Stream.value(bytes), bytes.length);
     final f = remote.exists
         ? await api.files.update(drive.File(), remote.id!,
@@ -70,7 +72,7 @@ extension DriveSyncOps on DriveBackupService {
     await for (final chunk in media.stream) {
       bytes.addAll(chunk);
     }
-    return bytes;
+    return gzip.decode(bytes);
   }
 
   /// Guarda la versión descartada en una divergencia como backup con

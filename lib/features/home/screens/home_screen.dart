@@ -15,7 +15,6 @@ import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_app_bar.dart';
 import 'package:pandive/features/home/widgets/home_nav_bar.dart';
 import 'package:pandive/features/home/widgets/home_tabs.dart';
-import 'package:pandive/features/settings/screens/settings_screen.dart';
 import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -126,7 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       drawer: HomeDrawer(
           selectedIndex: _index, onSelected: _go, db: widget.db,
-          settings: widget.settings, onReloadDb: widget.onReloadDb),
+          settings: widget.settings, onReloadDb: widget.onReloadDb,
+          onChangeDb: widget.onChangeDb),
       appBar: HomeAppBar(
         db: widget.db,
         index: _index,
@@ -148,9 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onMap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) =>
                 SitesMapScreen(db: widget.db, settings: widget.settings))),
-        onSettings: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => SettingsScreen(
-                settings: widget.settings, onChangeDb: widget.onChangeDb))),
       ),
       body: HomeTabs(
         db: widget.db,

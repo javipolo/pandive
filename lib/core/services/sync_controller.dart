@@ -32,6 +32,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _timer;
   int _ticks = 0;
   String? _lastSeenStamp;
+  int _quietTicks = 0; // ticks seguidos con el mismo sello local
   bool _running = false;
   DateTime _lastPresence = DateTime(0);
 
@@ -83,12 +84,15 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  // Sube tras un tick sin escrituras (debounce) y mira Drive cada ~2 min.
+  // Sube tras ~1 min sin escrituras (debounce) y mira Drive cada ~2 min.
   void _onTick() {
     if (!enabled || _running || status == SyncStatus.diverged) return;
     _ticks++;
     final stamp = _db?.call()?.lastWriteRaw;
-    if (stamp != _s!.syncBaseStamp && stamp == _lastSeenStamp) {
+    _quietTicks = stamp == _lastSeenStamp ? _quietTicks + 1 : 0;
+    // Subir tras 2 ticks (~40-60 s) sin escribir: agrupa una sesión de
+    // edición en una sola subida.
+    if (stamp != _s!.syncBaseStamp && _quietTicks >= 2) {
       sync(allowDownload: false);
     } else if (_ticks % 6 == 0) {
       sync(allowDownload: false);

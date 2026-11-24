@@ -298,11 +298,11 @@ Android): se hace al abrir la app y con el botón manual.
 ### Sincronizar móvil y PC
 
 Backup → **Sincronizar entre dispositivos** (en cada dispositivo, con la misma
-cuenta). Mantiene el mismo logbook vía `sync-logbook.ddb` en la carpeta de
+cuenta). Mantiene el mismo logbook vía `sync-logbook.ddb.gz` (comprimido: 12 MB → <1 MB) en la carpeta de
 Drive, sin perder nunca datos en silencio:
 
 - Si solo cambió un lado, se sube o se baja solo (al abrir o volver a la app,
-  unos segundos después de editar, cada ~2 min y al salir). Una bajada con
+  ~1 min después de dejar de editar, cada ~2 min y al salir). Una bajada con
   pantallas abiertas queda pendiente ("Actualizar") para no interrumpir.
 - Si cambiaron los dos, el icono de la barra se pone rojo y se elige con qué
   versión quedarse; la otra se guarda como backup (Restaurar).
