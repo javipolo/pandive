@@ -121,7 +121,7 @@ class Settings extends ChangeNotifier {
   }
 
   /// Con datos móviles, la sync no hace nada sola (solo el botón manual).
-  bool get syncWifiOnly => _prefs.getBool(_kSyncWifi) ?? false;
+  bool get syncWifiOnly => _prefs.getBool(_kSyncWifi) ?? true;
   Future<void> setSyncWifiOnly(bool v) async {
     await _prefs.setBool(_kSyncWifi, v);
     notifyListeners();
