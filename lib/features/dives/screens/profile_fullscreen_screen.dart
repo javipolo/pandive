@@ -29,8 +29,8 @@ class ProfileFullscreenScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title), actions: [
         IconButton(
-          icon: const Icon(Icons.share),
-          tooltip: t.share,
+          icon: Icon(shareProfileIcon),
+          tooltip: shareProfileTooltip(t),
           onPressed: () => shareProfileImage(context,
               profile: profile,
               title: shareTitle ?? title,

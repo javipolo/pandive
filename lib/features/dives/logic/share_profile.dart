@@ -1,8 +1,10 @@
 /// Genera una imagen PNG del perfil de inmersión (con el nombre del sitio) y la
-/// comparte con otra app. Renderiza la tarjeta fuera de pantalla y la captura.
+/// comparte con otra app o, en escritorio (Linux), la copia al portapapeles.
+/// Renderiza la tarjeta fuera de pantalla y la captura.
 library;
 
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:material_ui/material_ui.dart';
@@ -11,14 +13,48 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/services/image_clipboard.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
 import 'package:pandive/features/dives/widgets/gas_segments.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
+/// Icono y texto del botón: copiar en escritorio, compartir en el móvil.
+IconData get shareProfileIcon => canCopyImages ? Icons.copy : Icons.share;
+String shareProfileTooltip(AppLocalizations t) =>
+    canCopyImages ? t.copyChart : t.share;
+
+/// Comparte la gráfica (móvil) o la copia al portapapeles (escritorio).
 Future<void> shareProfileImage(
   BuildContext context, {
   required DiveProfile profile,
   required String title,
   List<GasChange> gasChanges = const [],
+}) async {
+  final t = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final png = await _renderProfilePng(context,
+      profile: profile, title: title, gasChanges: gasChanges);
+  if (png == null) return;
+  if (canCopyImages) {
+    final ok = await copyPngToClipboard(png);
+    messenger.showSnackBar(SnackBar(
+        content: Text(ok ? t.chartCopied : t.chartCopyFailed)));
+    return;
+  }
+  final dir = await getTemporaryDirectory();
+  final safe = title.replaceAll(RegExp(r'[^\w-]+'), '_');
+  final file = File('${dir.path}/pandive_$safe.png');
+  await file.writeAsBytes(png);
+  await SharePlus.instance
+      .share(ShareParams(files: [XFile(file.path)], text: title));
+}
+
+// Pinta la tarjeta (título + gráfica) fuera de pantalla y la captura en PNG.
+Future<Uint8List?> _renderProfilePng(
+  BuildContext context, {
+  required DiveProfile profile,
+  required String title,
+  required List<GasChange> gasChanges,
 }) async {
   final overlay = Overlay.of(context);
   final theme = Theme.of(context);
@@ -51,16 +87,10 @@ Future<void> shareProfileImage(
       await Future<void>.delayed(const Duration(milliseconds: 40));
     }
     final ro = key.currentContext?.findRenderObject();
-    if (ro is! RenderRepaintBoundary) return;
+    if (ro is! RenderRepaintBoundary) return null;
     final image = await ro.toImage(pixelRatio: 2);
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    if (data == null) return;
-    final dir = await getTemporaryDirectory();
-    final safe = title.replaceAll(RegExp(r'[^\w-]+'), '_');
-    final file = File('${dir.path}/pandive_$safe.png');
-    await file.writeAsBytes(data.buffer.asUint8List());
-    await SharePlus.instance
-        .share(ShareParams(files: [XFile(file.path)], text: title));
+    return data?.buffer.asUint8List();
   } finally {
     entry.remove();
   }

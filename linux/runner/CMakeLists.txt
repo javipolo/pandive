@@ -12,6 +12,7 @@ add_executable(${BINARY_NAME}
   "dc/dc_plugin.c"
   "dc/dc_scanner.c"
   "dc/bluez_ble.c"
+  "clipboard/image_clipboard.c"
   "${CMAKE_SOURCE_DIR}/../native/pandive_dc_core.c"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
 )

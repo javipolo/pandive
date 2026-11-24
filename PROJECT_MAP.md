@@ -23,6 +23,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/services/drive_sync_ops.dart` -> Drive para la sync: fichero sync-logbook.ddb.gz (gzip, md5), versión descartada como backup, zip de documentos si cambió, presencia por dispositivo
 - `lib/core/services/network.dart` -> onUnmeteredNetwork (WiFi/cable vs datos móviles) para las opciones "solo WiFi"
 - `lib/core/services/sync_logic.dart` -> decisión pura de la sync (none/upload/download/diverged) a partir de md5 remoto + sello local vs base
+- `lib/core/services/image_clipboard.dart` -> copiar PNG al portapapeles (Linux: canal nativo `pandive/clipboard`, GTK)
 - `lib/core/services/sync_controller.dart` -> SyncController global (syncController): estado, disparadores (abrir/volver, tras editar, ~2 min, salir), subir/bajar/resolver divergencia; syncUploadInBackground para el worker
 - `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió + subida de sync de respaldo al salir (enqueueSyncUpload)
 - `lib/core/services/backup_util.dart` -> helpers puros: nombres (.ddb.gz, compat .ddb antiguos), maybeGunzip, poda a 10, restoreWouldLoseData
@@ -161,7 +162,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/dives/widgets/dives_action_list.dart` -> lista de buceos con selección en lote + acciones (stats/fusionar/exportar/borrar); usada por el tab y las listas filtradas
 - `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle por secciones (nº/fecha, sitio, perfil+métricas, gases, deco, botellas)
 - `lib/features/dives/widgets/profile_section.dart` -> sección perfil: gráfica compacta + botones compartir / pantalla completa
-- `lib/features/dives/logic/share_profile.dart` -> genera PNG del perfil (con sitio) y lo comparte (share_plus)
+- `lib/features/dives/logic/share_profile.dart` -> genera PNG del perfil (fuera de pantalla) y lo comparte (móvil) o lo copia al portapapeles (Linux)
 - `lib/features/dives/logic/apply_dive_type.dart` -> aplicar tipo: descarta botellas vacías (sin presiones) y añade las del tipo
 - `lib/features/dives/logic/renumber_after_save.dart` -> tras crear/editar: renumera (automática) u ofrece renumerar si el buceo queda fuera de orden
 - `lib/features/dives/widgets/dive_detail_fields.dart` -> celda etiqueta/valor, filas 2/3 columnas, separador de sección

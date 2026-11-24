@@ -4,6 +4,7 @@
 
 #include "flutter/generated_plugin_registrant.h"
 #include "dc/dc_plugin.h"
+#include "clipboard/image_clipboard.h"
 
 struct _MyApplication {
   GtkApplication parent_instance;
@@ -81,6 +82,10 @@ static void my_application_activate(GApplication* application) {
       fl_plugin_registry_get_registrar_for_plugin(FL_PLUGIN_REGISTRY(view),
                                                   "PandiveDcPlugin");
   dc_plugin_register_with_registrar(dc_registrar);
+  g_autoptr(FlPluginRegistrar) clip_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(FL_PLUGIN_REGISTRY(view),
+                                                  "PandiveImageClipboard");
+  image_clipboard_register_with_registrar(clip_registrar);
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }

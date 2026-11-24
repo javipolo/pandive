@@ -416,5 +416,8 @@
   "renumberPreview": "{count} buceos cambiarán de número (empezando en {first}):",
   "renumberOutOfOrderTitle": "Buceo fuera de orden",
   "renumberOutOfOrderBody": "El número de este buceo no sigue el orden cronológico. ¿Renumerar ahora? Cambiarían de número {count} buceos.",
-  "notNow": "Ahora no"
+  "notNow": "Ahora no",
+  "copyChart": "Copiar gráfica",
+  "chartCopied": "Gráfica copiada al portapapeles",
+  "chartCopyFailed": "No se pudo copiar la gráfica"
 }

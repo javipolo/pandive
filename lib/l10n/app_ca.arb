@@ -416,5 +416,8 @@
   "renumberPreview": "{count} immersions canviaran de número (començant per {first}):",
   "renumberOutOfOrderTitle": "Immersió fora d'ordre",
   "renumberOutOfOrderBody": "El número d'aquesta immersió no segueix l'ordre cronològic. Vols renumerar ara? Canviarien de número {count} immersions.",
-  "notNow": "Ara no"
+  "notNow": "Ara no",
+  "copyChart": "Copiar el gràfic",
+  "chartCopied": "Gràfic copiat al porta-retalls",
+  "chartCopyFailed": "No s'ha pogut copiar el gràfic"
 }

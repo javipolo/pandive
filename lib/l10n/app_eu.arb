@@ -416,5 +416,8 @@
   "renumberPreview": "{count} urpekaldik zenbakia aldatuko dute ({first}-tik hasita):",
   "renumberOutOfOrderTitle": "Urpekaldia ordenaz kanpo",
   "renumberOutOfOrderBody": "Urpekaldi honen zenbakiak ez du ordena kronologikoa jarraitzen. Orain berriro zenbakitu? {count} urpekaldik aldatuko lukete zenbakia.",
-  "notNow": "Orain ez"
+  "notNow": "Orain ez",
+  "copyChart": "Kopiatu grafikoa",
+  "chartCopied": "Grafikoa arbelean kopiatu da",
+  "chartCopyFailed": "Ezin izan da grafikoa kopiatu"
 }

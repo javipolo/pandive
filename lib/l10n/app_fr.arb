@@ -416,5 +416,8 @@
   "renumberPreview": "{count} plongées vont changer de numéro (à partir de {first}) :",
   "renumberOutOfOrderTitle": "Plongée hors d'ordre",
   "renumberOutOfOrderBody": "Le numéro de cette plongée ne suit pas l'ordre chronologique. Renuméroter maintenant ? {count} plongées changeraient de numéro.",
-  "notNow": "Pas maintenant"
+  "notNow": "Pas maintenant",
+  "copyChart": "Copier le graphique",
+  "chartCopied": "Graphique copié dans le presse-papiers",
+  "chartCopyFailed": "Impossible de copier le graphique"
 }

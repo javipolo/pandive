@@ -751,5 +751,8 @@
       "count": {}
     }
   },
-  "notNow": "Not now"
+  "notNow": "Not now",
+  "copyChart": "Copy chart",
+  "chartCopied": "Chart copied to clipboard",
+  "chartCopyFailed": "Could not copy the chart"
 }
