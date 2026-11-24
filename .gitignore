@@ -27,6 +27,8 @@ key.properties
 # OAuth Web client ID de Google Drive (no secreto, pero específico de tu proyecto)
 android/gdrive_client_id.txt
 android/gdrive_native_client_id.txt
+linux/gdrive_desktop_client_id.txt
+linux/gdrive_desktop_client_secret.txt
 
 # Varios
 .DS_Store

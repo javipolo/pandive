@@ -652,5 +652,13 @@
   "useDdbReplace": "Replace my database with this one",
   "exportTripsIntro": "You are going to export the following trips:",
   "exportWithProfiles": "Also export dive profiles",
-  "exportAction": "Export"
+  "exportAction": "Export",
+  "driveNotConfigured": "Google login is not configured in this build (missing OAuth client ID).",
+  "oauthBrowserDone": "Pandive is now connected to Google. You can close this tab.",
+  "@driveNotConfigured": {
+    "description": "Snackbar when the build lacks the Google OAuth client ID"
+  },
+  "@oauthBrowserDone": {
+    "description": "Shown in the browser tab after desktop Google login"
+  }
 }

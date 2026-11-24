@@ -18,6 +18,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/l10n/app_en.arb` / `app_es.arb` -> traducciones (plantilla EN + ES); `AppLocalizations` se genera con `flutter gen-l10n`
 - `lib/core/services/dive_computer.dart` -> puente libdivecomputer: modelos, escaneo BLE, permisos
 - `lib/core/services/drive_backup.dart` -> backup/restore Google Drive: auth OAuth nativo (flutter_appauth + refresh token en secure_storage, headless), carpeta, hash (parts)
+- `lib/core/services/desktop_oauth.dart` -> OAuth Google en escritorio (Linux): loopback 127.0.0.1 + PKCE, refresh por HTTP
 - `lib/core/services/drive_backup_ops.dart` -> operaciones: backupNow/backupIfNeeded/backupIfChanged/list/restore/poda
 - `lib/core/services/backup_worker.dart` -> WorkManager: backup periódico en segundo plano (~12h, WiFi) si la DB cambió
 - `lib/core/services/backup_util.dart` -> helpers puros: nombre con timestamp y poda a 10 (+ nombre del zip de documentos)

@@ -376,5 +376,7 @@
   "useDdbReplace": "Ordeztu nire datu-basea honekin",
   "exportTripsIntro": "Bidaia hauek esportatuko dituzu:",
   "exportWithProfiles": "Esportatu murgilketa-profilak ere",
-  "exportAction": "Esportatu"
+  "exportAction": "Esportatu",
+  "driveNotConfigured": "Google saio-hasiera ez dago konfiguratuta konpilazio honetan (OAuth client IDa falta da).",
+  "oauthBrowserDone": "Pandive Googlera konektatuta dago. Fitxa hau itxi dezakezu."
 }

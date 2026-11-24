@@ -47,12 +47,15 @@ class _BackupScreenState extends State<BackupScreen> {
   Future<void> _toggleAccount() async {
     setState(() => _busy = true);
     final messenger = ScaffoldMessenger.of(context);
+    final t = AppLocalizations.of(context);
     try {
       if (_svc.connected) {
         await _svc.signOut();
         await cancelAutoBackup();
+      } else if (!DriveBackupService.configured) {
+        messenger.showSnackBar(SnackBar(content: Text(t.driveNotConfigured)));
       } else {
-        await _svc.signIn();
+        await _svc.signIn(browserDoneText: t.oauthBrowserDone);
         // Al conectar, activar el backup automático por defecto.
         if (_svc.connected) {
           await widget.settings.setAutoBackup(true);

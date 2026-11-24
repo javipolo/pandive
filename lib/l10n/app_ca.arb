@@ -376,5 +376,7 @@
   "useDdbReplace": "Substituir la meva base de dades per aquesta",
   "exportTripsIntro": "Exportaràs els viatges següents:",
   "exportWithProfiles": "Exportar també els perfils d'immersió",
-  "exportAction": "Exporta"
+  "exportAction": "Exporta",
+  "driveNotConfigured": "L'inici de sessió de Google no està configurat en aquesta compilació (falta el client ID d'OAuth).",
+  "oauthBrowserDone": "Pandive ja està connectat a Google. Pots tancar aquesta pestanya."
 }

@@ -3,6 +3,8 @@
 /// La auth es silenciosa; si no hay cuenta o no es WiFi, no-opea.
 library;
 
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -27,19 +29,28 @@ void backupCallbackDispatcher() {
   });
 }
 
+/// WorkManager solo existe en Android; en escritorio todo esto es no-op (el
+/// backup al abrir la app sigue funcionando).
+bool get _supported => Platform.isAndroid;
+
 /// Registra el dispatcher (una vez, en el isolate principal al arrancar).
-Future<void> initBackupWorker() =>
-    Workmanager().initialize(backupCallbackDispatcher);
+Future<void> initBackupWorker() async {
+  if (_supported) await Workmanager().initialize(backupCallbackDispatcher);
+}
 
 /// Programa la tarea periódica (~12 h, solo WiFi). Idempotente.
-Future<void> registerAutoBackup() => Workmanager().registerPeriodicTask(
-      _uniqueName,
-      _taskName,
-      frequency: const Duration(hours: 12),
-      constraints: Constraints(networkType: NetworkType.unmetered),
-      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
-    );
+Future<void> registerAutoBackup() async {
+  if (!_supported) return;
+  await Workmanager().registerPeriodicTask(
+    _uniqueName,
+    _taskName,
+    frequency: const Duration(hours: 12),
+    constraints: Constraints(networkType: NetworkType.unmetered),
+    existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
+  );
+}
 
 /// Cancela la tarea periódica (al desactivar el backup automático).
-Future<void> cancelAutoBackup() =>
-    Workmanager().cancelByUniqueName(_uniqueName);
+Future<void> cancelAutoBackup() async {
+  if (_supported) await Workmanager().cancelByUniqueName(_uniqueName);
+}

@@ -17,6 +17,12 @@ GDRIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_client_id.txt 2>/dev/null
 GDRIVE_NATIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_native_client_id.txt 2>/dev/null))
 DART_DEFINES := $(if $(GDRIVE_CLIENT_ID),--dart-define=GDRIVE_SERVER_CLIENT_ID=$(GDRIVE_CLIENT_ID),)
 DART_DEFINES += $(if $(GDRIVE_NATIVE_CLIENT_ID),--dart-define=GDRIVE_NATIVE_CLIENT_ID=$(GDRIVE_NATIVE_CLIENT_ID),)
+# App Linux: OAuth client "Desktop app" (mismo proyecto Google Cloud) para el
+# login de Google. linux/gdrive_desktop_client_{id,secret}.txt (no versionados).
+GDRIVE_DESKTOP_CLIENT_ID ?= $(strip $(shell cat linux/gdrive_desktop_client_id.txt 2>/dev/null))
+GDRIVE_DESKTOP_CLIENT_SECRET ?= $(strip $(shell cat linux/gdrive_desktop_client_secret.txt 2>/dev/null))
+LINUX_DEFINES := $(if $(GDRIVE_DESKTOP_CLIENT_ID),--dart-define=GDRIVE_DESKTOP_CLIENT_ID=$(GDRIVE_DESKTOP_CLIENT_ID),)
+LINUX_DEFINES += $(if $(GDRIVE_DESKTOP_CLIENT_SECRET),--dart-define=GDRIVE_DESKTOP_CLIENT_SECRET=$(GDRIVE_DESKTOP_CLIENT_SECRET),)
 
 .DEFAULT_GOAL := help
 
@@ -112,7 +118,11 @@ ldc-linux: ## Compila libdivecomputer estática para la app Linux (linux/ldc/)
 
 .PHONY: linux
 linux: ## Compila la app Linux (release)
-	$(FLUTTER) build linux --release $(DART_DEFINES)
+	$(FLUTTER) build linux --release $(LINUX_DEFINES)
+
+.PHONY: run-linux
+run-linux: ## Compila y lanza la app Linux (debug) con el client de Google
+	$(FLUTTER) run -d linux $(LINUX_DEFINES)
 
 .PHONY: doctor
 doctor: ## flutter doctor

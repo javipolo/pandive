@@ -376,5 +376,7 @@
   "useDdbReplace": "Remplacer ma base de données par celle-ci",
   "exportTripsIntro": "Tu vas exporter les voyages suivants :",
   "exportWithProfiles": "Exporter aussi les profils de plongée",
-  "exportAction": "Exporter"
+  "exportAction": "Exporter",
+  "driveNotConfigured": "La connexion Google n'est pas configurée dans cette version (client ID OAuth manquant).",
+  "oauthBrowserDone": "Pandive est connecté à Google. Vous pouvez fermer cet onglet."
 }

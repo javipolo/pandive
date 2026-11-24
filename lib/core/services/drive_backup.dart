@@ -3,7 +3,8 @@
 /// persiste un refresh token (en `flutter_secure_storage`), de modo que el
 /// backup en segundo plano puede refrescar el access token sin Activity (headless).
 /// Requiere un OAuth client **de tipo iOS** (da el esquema invertido sin secreto);
-/// ver README. La lógica de operaciones está en el `part`.
+/// ver README. En Linux (sin flutter_appauth) usa [DesktopOAuth] con un client
+/// **Desktop app** del mismo proyecto (así ve los mismos backups). La lógica de operaciones está en el `part`.
 library;
 
 import 'dart:convert';
@@ -19,6 +20,7 @@ import 'package:http/http.dart' as http;
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
 import 'backup_util.dart';
+import 'desktop_oauth.dart';
 
 part 'drive_backup_ops.dart';
 
@@ -29,6 +31,12 @@ const _clientId = String.fromEnvironment(
   'GDRIVE_NATIVE_CLIENT_ID',
   defaultValue: '',
 );
+
+/// OAuth client **Desktop app** (mismo proyecto Google Cloud) para la app Linux.
+/// Por `--dart-define=GDRIVE_DESKTOP_CLIENT_ID=...` / `..._SECRET=...`.
+const _desktopClientId = String.fromEnvironment('GDRIVE_DESKTOP_CLIENT_ID');
+const _desktopClientSecret =
+    String.fromEnvironment('GDRIVE_DESKTOP_CLIENT_SECRET');
 
 // Endpoints explícitos de Google (sin discovery: evita el fetch a
 // accounts.google.com/.well-known, frágil en el isolate de background).
@@ -63,14 +71,29 @@ class DriveBackupService {
   String? get email => _email;
   bool get connected => _refreshToken != null;
 
+  /// Escritorio: OAuth loopback propio (flutter_appauth es solo móvil).
+  static bool get _desktop => Platform.isLinux;
+  static const _desktopAuth = DesktopOAuth(_desktopClientId, _desktopClientSecret);
+
+  /// ¿Se compiló con el client ID de esta plataforma? Sin él no hay login.
+  static bool get configured => _desktop
+      ? _desktopClientId.isNotEmpty && _desktopClientSecret.isNotEmpty
+      : _clientId.isNotEmpty;
+
   // scheme invertido a partir del client id -> redirect de AppAuth.
   String get _scheme =>
       'com.googleusercontent.apps.${_clientId.replaceAll('.apps.googleusercontent.com', '')}';
   String get _redirectUrl => '$_scheme:/oauth2redirect';
 
   /// Conexión interactiva: consentimiento en el navegador y guarda el refresh
-  /// token. Lanza si falla (para mostrar el error).
-  Future<void> signIn() async {
+  /// token. Lanza si falla (para mostrar el error). [browserDoneText]: texto
+  /// de la pestaña del navegador al volver (solo escritorio).
+  Future<void> signIn({String browserDoneText = ''}) async {
+    if (_desktop) {
+      final r = await _desktopAuth.authorize(_scopes, doneText: browserDoneText);
+      await _saveTokens(r.accessToken, r.expiresAt, r.refreshToken, r.idToken);
+      return;
+    }
     final res = await _appAuth.authorizeAndExchangeCode(
       AuthorizationTokenRequest(
         _clientId,
@@ -81,11 +104,17 @@ class DriveBackupService {
         additionalParameters: const {'access_type': 'offline'},
       ),
     );
-    _accessToken = res.accessToken;
-    _accessExp = res.accessTokenExpirationDateTime;
-    _email = _emailFromIdToken(res.idToken);
-    if (res.refreshToken != null) {
-      _refreshToken = res.refreshToken;
+    await _saveTokens(res.accessToken, res.accessTokenExpirationDateTime,
+        res.refreshToken, res.idToken);
+  }
+
+  Future<void> _saveTokens(String? access, DateTime? exp, String? refresh,
+      String? idToken) async {
+    _accessToken = access;
+    _accessExp = exp;
+    _email = _emailFromIdToken(idToken);
+    if (refresh != null) {
+      _refreshToken = refresh;
       await _storage.write(key: _kRefresh, value: _refreshToken);
     }
     if (_email != null) await _storage.write(key: _kEmail, value: _email);
@@ -116,6 +145,12 @@ class DriveBackupService {
     }
     final refresh = _refreshToken ??= await _storage.read(key: _kRefresh);
     if (refresh == null) return null;
+    if (_desktop) {
+      final r = await _desktopAuth.refresh(refresh);
+      _accessToken = r.accessToken;
+      _accessExp = r.expiresAt;
+      return _accessToken;
+    }
     final res = await _appAuth.token(TokenRequest(
       _clientId,
       _redirectUrl,

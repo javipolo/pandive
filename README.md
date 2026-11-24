@@ -179,8 +179,11 @@ Se compila **sin** libusb/hidapi/bluez: el transporte BLE lo pone la app (Kotlin
 
 ```bash
 make linux                      # build release -> build/linux/x64/release/bundle/pandive
-flutter run -d linux            # o compilar + ejecutar en modo debug
+make run-linux                  # o compilar + ejecutar en modo debug
 ```
+
+Usa `make` (no `flutter run` a pelo) para que se inyecte el client de Google
+del login (ver "Backup en Google Drive" → *App Linux*).
 
 ### Bluetooth en Linux
 
@@ -268,6 +271,29 @@ puede refrescar el access token sin abrir la app (headless). Configuración úni
 > defecto solo para ese paso). Una vez conectado, el refresh es por HTTP puro
 > (`oauth2.googleapis.com`), sin navegador: puedes volver a poner Brave. Solo
 > necesitarás Chrome de nuevo si desconectas y reconectas.
+
+### App Linux (login de Google en el escritorio)
+
+`flutter_appauth` no existe en Linux, así que el escritorio usa el flujo OAuth
+oficial para apps instaladas: abre el navegador del sistema y recoge la
+respuesta en un servidor local efímero (`http://127.0.0.1:<puerto>`, con PKCE).
+Necesita **otro** ID de cliente, en el **mismo proyecto** (así ve los mismos
+backups que el móvil: `drive.file` va por proyecto, no por cliente):
+
+1. **Credenciales → Crear → ID de cliente OAuth → App de escritorio** (*Desktop app*).
+2. Guarda su ID y su secreto (en apps instaladas Google no lo considera
+   confidencial, pero no se versiona):
+   ```
+   echo 'TU_DESKTOP_CLIENT_ID.apps.googleusercontent.com' > linux/gdrive_desktop_client_id.txt
+   echo 'TU_DESKTOP_CLIENT_SECRET' > linux/gdrive_desktop_client_secret.txt
+   ```
+3. `make linux` / `make run-linux` los inyectan como `--dart-define`. Ajustes →
+   Copia de seguridad → Conectar abre el navegador; al aceptar, la pestaña dice
+   que ya puedes cerrarla.
+
+El refresh token se guarda en el llavero del escritorio (libsecret: GNOME
+Keyring / KWallet). En Linux no hay backup en segundo plano (WorkManager es de
+Android): se hace al abrir la app y con el botón manual.
 
 Backups: se guarda `latest.ddb` + copias con timestamp (se conservan las 10 más
 recientes) y un zip con las imágenes de documentos. Al restaurar, por defecto se
