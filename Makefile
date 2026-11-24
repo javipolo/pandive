@@ -124,6 +124,44 @@ linux: ## Compila la app Linux (release)
 run-linux: ## Compila y lanza la app Linux (debug) con el client de Google
 	$(FLUTTER) run -d linux $(LINUX_DEFINES)
 
+# Instalación de la app Linux (el bundle de `make linux`, sin recompilar).
+#   make install-linux                          -> en tu home (~/.local, ~/.local/opt/pandive)
+#   sudo make install-linux PREFIX=/usr/local   -> sistema (/usr/local, /opt/pandive)
+PREFIX ?= $(HOME)/.local
+APPDIR ?= $(if $(filter $(HOME)/%,$(PREFIX)),$(PREFIX)/opt/pandive,/opt/pandive)
+LINUX_BUNDLE := build/linux/x64/release/bundle
+APP_ID := org.drslump.pandive
+
+.PHONY: check-appdir
+check-appdir:
+	@case "$(APPDIR)" in */pandive) ;; *) echo "APPDIR debe acabar en /pandive: '$(APPDIR)'"; exit 1;; esac
+
+.PHONY: install-linux
+install-linux: check-appdir ## Instala la app Linux (PREFIX=~/.local; sudo ... PREFIX=/usr/local)
+	@test -x $(LINUX_BUNDLE)/pandive || { echo "Falta el bundle: ejecuta 'make linux' antes (sin sudo)"; exit 1; }
+	rm -rf "$(DESTDIR)$(APPDIR)"
+	mkdir -p "$(DESTDIR)$(APPDIR)"
+	cp -r $(LINUX_BUNDLE)/. "$(DESTDIR)$(APPDIR)/"
+	install -d "$(DESTDIR)$(PREFIX)/bin"
+	ln -sf "$(APPDIR)/pandive" "$(DESTDIR)$(PREFIX)/bin/pandive"
+	install -Dm644 linux/packaging/$(APP_ID).png \
+		"$(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps/$(APP_ID).png"
+	sed 's|@APPDIR@|$(APPDIR)|' linux/packaging/$(APP_ID).desktop | \
+		install -Dm644 /dev/stdin "$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
+	-@gtk-update-icon-cache -q -t -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor" 2>/dev/null
+	-@update-desktop-database -q "$(DESTDIR)$(PREFIX)/share/applications" 2>/dev/null
+	@echo "Pandive instalado en $(APPDIR) (lanzador: $(PREFIX)/bin/pandive)"
+
+.PHONY: uninstall-linux
+uninstall-linux: check-appdir ## Desinstala la app Linux (mismo PREFIX que al instalar)
+	rm -rf "$(DESTDIR)$(APPDIR)"
+	rm -f "$(DESTDIR)$(PREFIX)/bin/pandive" \
+		"$(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps/$(APP_ID).png" \
+		"$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
+	-@gtk-update-icon-cache -q -t -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor" 2>/dev/null
+	-@update-desktop-database -q "$(DESTDIR)$(PREFIX)/share/applications" 2>/dev/null
+	@echo "Pandive desinstalado (los datos de cada usuario en su home se conservan)"
+
 .PHONY: doctor
 doctor: ## flutter doctor
 	$(FLUTTER) doctor

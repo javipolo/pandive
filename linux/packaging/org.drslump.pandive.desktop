@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Pandive
+Comment=Dive logbook
+Comment[es]=Logbook de buceo
+Exec=@APPDIR@/pandive
+Icon=org.drslump.pandive
+Terminal=false
+Categories=Utility;Sports;
+StartupWMClass=org.drslump.pandive

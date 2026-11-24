@@ -185,6 +185,21 @@ make run-linux                  # o compilar + ejecutar en modo debug
 Usa `make` (no `flutter run` a pelo) para que se inyecte el client de Google
 del login (ver "Backup en Google Drive" → *App Linux*).
 
+### Instalar la app Linux
+
+Tras `make linux` (como tu usuario, nunca con sudo):
+
+```bash
+make install-linux                          # en tu home: ~/.local/opt/pandive + ~/.local/bin/pandive
+sudo make install-linux PREFIX=/usr/local   # para todos: /opt/pandive + /usr/local/bin/pandive
+```
+
+Copia el bundle entero (ejecutable + `lib/` + `data/`, que van juntos), crea
+el enlace en `bin`, el icono y la entrada de menú (`org.drslump.pandive.desktop`,
+de `linux/packaging/`). Para actualizar, `make linux` y repetir; para quitarla,
+`make uninstall-linux` con el mismo `PREFIX`. Los datos de cada usuario (ajustes,
+sesión de Google, logbook) viven en su home y no se tocan.
+
 ### Bluetooth en Linux
 
 La descarga del ordenador de buceo usa **BlueZ** (el servicio `bluetooth` del sistema). No hace falta ser root ni pedir permisos: basta con que el adaptador esté encendido (`bluetoothctl show` → `Powered: yes`; la app ofrece encenderlo si está apagado).
