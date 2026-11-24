@@ -17,6 +17,26 @@ static void first_frame_cb(MyApplication* self, FlView* view) {
   gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
 }
 
+// Pone el icono de la ventana en varios tamaños (data/icons/<n>.png junto al
+// ejecutable). Sin esto, gestores como xfwm4 buscan el icono en el tema y,
+// si solo hay uno grande, lo pintan recortado en la barra de título.
+static void set_window_icon(GtkWindow* window) {
+  g_autofree gchar* exe = g_file_read_link("/proc/self/exe", nullptr);
+  if (exe == nullptr) return;
+  g_autofree gchar* dir = g_path_get_dirname(exe);
+  GList* icons = nullptr;
+  static const int kSizes[] = {16, 22, 24, 32, 48, 64, 128, 256};
+  for (int size : kSizes) {
+    g_autofree gchar* name = g_strdup_printf("%d.png", size);
+    g_autofree gchar* path =
+        g_build_filename(dir, "data", "icons", name, nullptr);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(path, nullptr);
+    if (pixbuf != nullptr) icons = g_list_append(icons, pixbuf);
+  }
+  if (icons != nullptr) gtk_window_set_icon_list(window, icons);
+  g_list_free_full(icons, g_object_unref);
+}
+
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
@@ -34,7 +54,8 @@ static void my_application_activate(GApplication* application) {
   // gtk_header_bar_set_show_close_button(header_bar, TRUE);
   // gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
 
-  gtk_window_set_title(window, "pandive");
+  gtk_window_set_title(window, "Pandive");
+  set_window_icon(window);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(

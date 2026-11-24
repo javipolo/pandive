@@ -131,6 +131,7 @@ PREFIX ?= $(HOME)/.local
 APPDIR ?= $(if $(filter $(HOME)/%,$(PREFIX)),$(PREFIX)/opt/pandive,/opt/pandive)
 LINUX_BUNDLE := build/linux/x64/release/bundle
 APP_ID := org.drslump.pandive
+ICON_SIZES := 16 22 24 32 48 64 128 256 512
 
 .PHONY: check-appdir
 check-appdir:
@@ -144,8 +145,10 @@ install-linux: check-appdir ## Instala la app Linux (PREFIX=~/.local; sudo ... P
 	cp -r $(LINUX_BUNDLE)/. "$(DESTDIR)$(APPDIR)/"
 	install -d "$(DESTDIR)$(PREFIX)/bin"
 	ln -sf "$(APPDIR)/pandive" "$(DESTDIR)$(PREFIX)/bin/pandive"
-	install -Dm644 linux/packaging/$(APP_ID).png \
-		"$(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps/$(APP_ID).png"
+	for n in $(ICON_SIZES); do \
+		install -Dm644 linux/packaging/icons/$$n.png \
+			"$(DESTDIR)$(PREFIX)/share/icons/hicolor/$${n}x$$n/apps/$(APP_ID).png"; \
+	done
 	sed 's|@APPDIR@|$(APPDIR)|' linux/packaging/$(APP_ID).desktop | \
 		install -Dm644 /dev/stdin "$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
 	-@gtk-update-icon-cache -q -t -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor" 2>/dev/null
@@ -156,8 +159,10 @@ install-linux: check-appdir ## Instala la app Linux (PREFIX=~/.local; sudo ... P
 uninstall-linux: check-appdir ## Desinstala la app Linux (mismo PREFIX que al instalar)
 	rm -rf "$(DESTDIR)$(APPDIR)"
 	rm -f "$(DESTDIR)$(PREFIX)/bin/pandive" \
-		"$(DESTDIR)$(PREFIX)/share/icons/hicolor/512x512/apps/$(APP_ID).png" \
 		"$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
+	for n in $(ICON_SIZES); do \
+		rm -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor/$${n}x$$n/apps/$(APP_ID).png"; \
+	done
 	-@gtk-update-icon-cache -q -t -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor" 2>/dev/null
 	-@update-desktop-database -q "$(DESTDIR)$(PREFIX)/share/applications" 2>/dev/null
 	@echo "Pandive desinstalado (los datos de cada usuario en su home se conservan)"
