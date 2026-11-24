@@ -123,7 +123,7 @@ class ProfileShareCard extends StatelessWidget {
     final t = AppLocalizations.of(context);
     String? one(double? v, String unit) =>
         v == null ? null : '${v.toStringAsFixed(1)} $unit';
-    final rows = [
+    final rows = <_FactRow>[
       (
         (t.statDuration, facts.durationMin == null
             ? null
@@ -168,36 +168,51 @@ class ProfileShareCard extends StatelessWidget {
             child: ProfileChart(profile: profile, gasChanges: gasChanges),
           ),
           Divider(height: 24, color: cs.outlineVariant),
-          for (final (left, right) in rows)
-            SizedBox(
-              height: 40,
-              child: Row(children: [
-                Expanded(child: _Fact(left.$1, left.$2)),
-                Expanded(child: _Fact(right.$1, right.$2)),
-              ]),
-            ),
+          _FactsTable(rows),
         ],
       ),
     );
   }
 }
 
-// "Etiqueta  valor" de una línea del pie de la imagen.
-class _Fact extends StatelessWidget {
-  final String label;
-  final String? value;
-  const _Fact(this.label, this.value);
+typedef _FactRow = ((String, String?), (String, String?));
+
+// Pie de la imagen tabulado: etiqueta | valor | etiqueta | valor. Las columnas
+// de etiquetas toman el ancho de la más larga, así los valores van alineados
+// sea cual sea el idioma.
+class _FactsTable extends StatelessWidget {
+  final List<_FactRow> rows;
+  const _FactsTable(this.rows);
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
-    return Row(children: [
-      Text(label,
-          style: tt.titleMedium?.copyWith(color: cs.onSurfaceVariant)),
-      const SizedBox(width: 12),
-      Text(value ?? '—',
-          style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-    ]);
+    final labelStyle = tt.titleMedium?.copyWith(color: cs.onSurfaceVariant);
+    final valueStyle = tt.titleLarge?.copyWith(fontWeight: FontWeight.w600);
+    Widget cell(String text, TextStyle? style, {double left = 0}) => Container(
+          height: 40,
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(left: left),
+          child: Text(text, style: style, maxLines: 1),
+        );
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      columnWidths: const {
+        0: IntrinsicColumnWidth(),
+        1: FlexColumnWidth(),
+        2: IntrinsicColumnWidth(),
+        3: FlexColumnWidth(),
+      },
+      children: [
+        for (final ((l1, v1), (l2, v2)) in rows)
+          TableRow(children: [
+            cell(l1, labelStyle),
+            cell(v1 ?? '—', valueStyle, left: 16),
+            cell(l2, labelStyle),
+            cell(v2 ?? '—', valueStyle, left: 16),
+          ]),
+      ],
+    );
   }
 }
