@@ -49,10 +49,10 @@ class BleConnection(private val context: Context, private val address: String) {
         // "Terminal I/O" con control de flujo por créditos.
         private val HW_TELIT_SERVICE =
             UUID.fromString("0000fefb-0000-1000-8000-00805f9b34fb")
-        private val T_DATA_TX = UUID.fromString("00000001-0000-1000-8000-008025000000")
-        private val T_DATA_RX = UUID.fromString("00000002-0000-1000-8000-008025000000")
-        private val T_CRED_TX = UUID.fromString("00000003-0000-1000-8000-008025000000")
-        private val T_CRED_RX = UUID.fromString("00000004-0000-1000-8000-008025000000")
+        private val T_DATA_TX = UUID.fromString("00000002-0000-1000-8000-008025000000")
+        private val T_DATA_RX = UUID.fromString("00000001-0000-1000-8000-008025000000")
+        private val T_CRED_TX = UUID.fromString("00000004-0000-1000-8000-008025000000")
+        private val T_CRED_RX = UUID.fromString("00000003-0000-1000-8000-008025000000")
         private const val MAX_CREDIT = 254
         private const val MIN_CREDIT = 32
     }
@@ -168,16 +168,28 @@ class BleConnection(private val context: Context, private val address: String) {
             if (d.characteristic.uuid == T_CRED_TX) {
                 writeCccd(g, dataTx!!, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
             } else if (d.characteristic.uuid == T_DATA_TX) {
+                // Listo cuando el crédito inicial se confirme (onCharacteristicWrite):
+                // Android solo admite una operación GATT a la vez.
                 hwCredit = MAX_CREDIT
                 writeCredit(g, MAX_CREDIT)
-                ready = true
-                connectLatch.countDown()
             }
         }
 
         override fun onCharacteristicWrite(
             g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int
         ) {
+            if (creditMode && c.uuid == T_CRED_RX) {
+                // Créditos: no es la escritura de datos que espera bleWrite.
+                if (!ready) {
+                    if (status != BluetoothGatt.GATT_SUCCESS) {
+                        fail("No se pudo enviar el crédito inicial ($status)")
+                        return
+                    }
+                    ready = true
+                    connectLatch.countDown()
+                }
+                return
+            }
             writeAck.offer(status == BluetoothGatt.GATT_SUCCESS)
         }
     }
