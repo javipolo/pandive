@@ -8,6 +8,21 @@ import 'package:pandive/core/text/collate.dart';
 import 'package:pandive/features/sites/widgets/site_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
+/// Los sitios que casan con la búsqueda [query] (nombre, país, región o
+/// etiquetas; sin distinguir mayúsculas ni acentos). Vacía = todos.
+List<DiveSite> filterSites(List<DiveSite> sites, String query) {
+  final q = query.trim();
+  if (q.isEmpty) return sites;
+  return [
+    for (final s in sites)
+      if (foldContains(
+          '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''} '
+          '${s.tags.join(' ')}',
+          q))
+        s
+  ];
+}
+
 class SitesGroupedList extends StatefulWidget {
   final List<DiveSite> sites;
   final void Function(DiveSite) onTap;
@@ -62,18 +77,8 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
             : const []);
     }
   }
-  List<DiveSite> _filtered() {
-    final q = (widget.externalQuery ?? _q).trim();
-    if (q.isEmpty) return widget.sites;
-    return [
-      for (final s in widget.sites)
-        if (foldContains(
-            '${s.name ?? ''} ${s.country ?? ''} ${s.region ?? ''} '
-            '${s.tags.join(' ')}',
-            q))
-          s
-    ];
-  }
+  List<DiveSite> _filtered() =>
+      filterSites(widget.sites, widget.externalQuery ?? _q);
   Map<String, List<DiveSite>> _grouped() {
     final map = <String, List<DiveSite>>{};
     for (final s in _filtered()) {

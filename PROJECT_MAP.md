@@ -132,7 +132,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
-- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf) con aviso/barra de progreso e importar de Subsurface / CSV de SSI
+- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf)/todos los sitios (JSON) con aviso/barra de progreso e importar de Subsurface / CSV de SSI
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
 - `lib/features/settings/widgets/numbering_control.dart` -> ajustes de numeración: automática sí/no + primer número (renumera)
@@ -213,12 +213,12 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info; multi-select (exportar JSON / borrar)
 - `lib/features/sites/screens/import_sites_screen.dart` -> preview del import JSON (modo solo-actualizar/+nuevos, checkbox por fila, color add/modify, confirma recuento)
 - `lib/features/sites/logic/site_import.dart` -> plan de import JSON (add/modify, null no pisa) + applySiteImport
-- `lib/features/sites/logic/export_sites.dart` -> exporta sitios a JSON y comparte (sitesToJson/writeSitesJson; se comparte o guarda con shareOrSaveFile)
+- `lib/features/sites/logic/export_sites.dart` -> exporta sitios a JSON y comparte (sitesToJson/writeSitesJson, JSON generado en otro isolate; se comparte o guarda con shareOrSaveFile)
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, tags, editar/borrar, swipe entre sitios)
 - `lib/features/sites/screens/site_edit_screen.dart` -> alta/edición de sitio (campos + ubicación GPS + tags)
 - `lib/features/sites/screens/map_picker_screen.dart` -> elegir ubicación en mapa (tocar + mi GPS)
 - `lib/features/sites/screens/sites_map_screen.dart` -> visor de todos los sitios con coords (marcadores -> ver buceos)
-- `lib/features/sites/widgets/sites_grouped_list.dart` -> lista agrupada por país (colapsar/buscar por nombre/país/región/tags/ordenar por buceos)
+- `lib/features/sites/widgets/sites_grouped_list.dart` -> lista agrupada por país (colapsar/buscar por nombre/país/región/tags/ordenar por buceos); filterSites = el filtro de búsqueda, usado también por "seleccionar todos"
 - `lib/features/sites/widgets/site_tile.dart` -> fila de sitio (avatar, región · nº buceos, chips de tags, ojo info)
 
 ### stats (estadísticas)

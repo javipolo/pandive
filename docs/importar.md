@@ -153,6 +153,16 @@ botón **Opciones de importación** ofrece:
 
 ## Sitios (JSON)
 
-**Herramientas → Importar sitios (JSON)** importa un fichero exportado desde la lista
-de sitios de Pandive. Se puede elegir entre solo actualizar los sitios
-existentes o actualizar y además añadir los nuevos.
+**Herramientas → Importar sitios (JSON)** importa un fichero exportado desde
+Pandive. Se puede elegir entre solo actualizar los sitios existentes o
+actualizar y además añadir los nuevos.
+
+Para sacar ese fichero:
+
+- **Todos los sitios**: Herramientas → *Exportar sitios (JSON)*.
+- **Solo algunos**: en *Sitios*, mantén pulsado uno para entrar en modo
+  selección, marca los que quieras (o usa *Seleccionar todos*, que marca los
+  que se ven con la búsqueda actual) y pulsa el icono de compartir.
+
+En el móvil se abre la hoja de compartir; en el PC, un diálogo de *Guardar
+como…*.

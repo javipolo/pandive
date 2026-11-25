@@ -1,8 +1,9 @@
-/// Exporta sitios de buceo a un JSON (mismo formato que el import) y lo comparte.
+/// Exporta sitios de buceo a un JSON (mismo formato que el import).
 library;
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:path_provider/path_provider.dart';
 
@@ -23,9 +24,15 @@ String sitesToJson(List<DiveSite> sites) {
   return const JsonEncoder.withIndent('  ').convert(list);
 }
 
-/// Escribe los sitios en un JSON temporal (para shareOrSaveFile).
+/// Escribe los sitios en un JSON temporal (para shareOrSaveFile). El JSON se
+/// genera en otro isolate: con miles de sitios no congela la UI.
 Future<File> writeSitesJson(List<DiveSite> sites) async {
+  final json = await _encodeOffThread(sites);
   final dir = await getTemporaryDirectory();
   final f = File('${dir.path}/dive-sites-PanDive.json');
-  return f.writeAsString(sitesToJson(sites));
+  return f.writeAsString(json);
 }
+
+// Top-level: el closure solo captura la lista (enviable entre isolates).
+Future<String> _encodeOffThread(List<DiveSite> sites) =>
+    Isolate.run(() => sitesToJson(sites));

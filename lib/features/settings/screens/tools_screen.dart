@@ -141,6 +141,11 @@ class ToolsScreen extends StatelessWidget {
             onTap: () => importSsi(context, db),
           ),
           ListTile(
+            leading: const Icon(Icons.ios_share),
+            title: Text(t.exportSites),
+            onTap: () => exportAllSites(context, db),
+          ),
+          ListTile(
             leading: const Icon(Icons.place_outlined),
             title: Text(t.importSites),
             onTap: () => _importSites(context),

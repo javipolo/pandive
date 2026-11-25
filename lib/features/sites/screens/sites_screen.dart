@@ -54,6 +54,19 @@ class _SitesTabState extends State<SitesTab> {
         if (_sel.isEmpty) _select = false;
       });
 
+  // "Todos" = los que se ven con la búsqueda actual.
+  List<DiveSite> get _visible => filterSites(_sites, widget.query);
+
+  bool get _allSelected {
+    final v = _visible;
+    return v.isNotEmpty && v.every((s) => _sel.contains(s.id));
+  }
+
+  void _toggleAll() => setState(() {
+        final ids = _visible.map((s) => s.id);
+        _allSelected ? _sel.removeAll(ids) : _sel.addAll(ids);
+      });
+
   List<DiveSite> get _picked =>
       _sites.where((s) => _sel.contains(s.id)).toList();
 
@@ -61,7 +74,7 @@ class _SitesTabState extends State<SitesTab> {
     final t = AppLocalizations.of(context);
     final picked = _picked;
     final f =
-        await withProgress(context, t.working, () => writeSitesJson(picked));
+        await withProgress(context, t.exporting, () => writeSitesJson(picked));
     await shareOrSaveFile(f);
     _exitSel();
   }
@@ -120,6 +133,11 @@ class _SitesTabState extends State<SitesTab> {
       body: Column(children: [
         if (_select)
           SelectionBar(count: _sel.length, onClose: _exitSel, actions: [
+            IconButton(
+              tooltip: _allSelected ? t.deselectAll : t.selectAll,
+              icon: Icon(_allSelected ? Icons.deselect : Icons.select_all),
+              onPressed: _toggleAll,
+            ),
             IconButton(
               tooltip: t.exportSites,
               icon: const Icon(Icons.ios_share),

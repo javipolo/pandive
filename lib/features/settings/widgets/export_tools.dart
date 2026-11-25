@@ -1,5 +1,5 @@
 /// Acciones de exportación/importación: DiveMate (.ddb nativo), Subsurface
-/// (.ssrf XML) y CSV de SSI.
+/// (.ssrf XML), CSV de SSI y sitios (JSON).
 library;
 
 import 'dart:io';
@@ -16,6 +16,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/import_progress.dart';
 import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/features/settings/screens/import_ssi_screen.dart';
+import 'package:pandive/features/sites/logic/export_sites.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 /// Copia el .ddb activo a un temporal con nombre limpio y lo comparte (igual
@@ -28,6 +29,13 @@ Future<void> exportDdb(BuildContext context, Settings settings) async {
     final dir = await getTemporaryDirectory();
     return File(path).copy('${dir.path}/pandive.ddb');
   });
+  await shareOrSaveFile(f);
+}
+
+/// Exporta todos los sitios a JSON (el formato de "Importar sitios").
+Future<void> exportAllSites(BuildContext context, DivemateDb db) async {
+  final f = await withProgress(context, AppLocalizations.of(context).exporting,
+      () => writeSitesJson(db.listSites()));
   await shareOrSaveFile(f);
 }
 
