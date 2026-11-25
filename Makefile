@@ -36,20 +36,19 @@ deps: ## Install Dart dependencies (flutter pub get)
 	$(FLUTTER) pub get
 
 .PHONY: run
-run: ## Build, install and launch on the connected device
-	$(FLUTTER) run
+run: ## Build (release), install and launch on the connected device
+	$(FLUTTER) run --release $(DART_DEFINES)
 
 .PHONY: apk
-apk: ## Build a debug APK (sideload)
-	$(FLUTTER) build apk --debug $(DART_DEFINES)
-
-.PHONY: apk-release
-apk-release: ## Build an arm64 release APK (sideload)
+apk: ## Build an arm64 release APK (sideload)
 	# --no-tree-shake-icons: bundles the full icon font. Tree-shaking
 	# produced an OTF that some Android devices fail to parse, leaving all
 	# icons as grey squares (tofu): hamburger, bottom bar, FAB...
 	$(FLUTTER) build apk --release --target-platform android-arm64 \
 		--no-tree-shake-icons $(DART_DEFINES)
+
+.PHONY: apk-release
+apk-release: apk ## Alias of apk
 
 APK := build/app/outputs/flutter-apk/app-release.apk
 
@@ -122,8 +121,8 @@ linux: ## Build the Linux app (release)
 	$(FLUTTER) build linux --release $(LINUX_DEFINES)
 
 .PHONY: run-linux
-run-linux: ## Build and launch the Linux app (debug) with the Google client
-	$(FLUTTER) run -d linux $(LINUX_DEFINES)
+run-linux: ## Build (release) and launch the Linux app with the Google client
+	$(FLUTTER) run --release -d linux $(LINUX_DEFINES)
 
 # Linux app install (the `make linux` bundle, without rebuilding).
 #   make install-linux                          -> in your home (~/.local, ~/.local/opt/pandive)

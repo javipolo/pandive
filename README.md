@@ -129,11 +129,10 @@ adb devices   # debe listar tu dispositivo
 > Disponible una vez exista el proyecto Flutter en este repositorio.
 
 ```bash
-flutter pub get                 # instalar dependencias Dart
-flutter run                     # compilar + instalar + ejecutar en el device conectado
-flutter build apk --debug       # APK de depuración (sideload directo)
-flutter build apk --release     # APK de release (requiere keystore propio)
-flutter install                 # instalar el último APK en el device
+make deps                       # instalar dependencias Dart
+make run                        # compilar (release) + instalar + ejecutar en el device conectado
+make apk                        # APK de release arm64 (sideload; requiere keystore propio)
+make install                    # instalar el último APK en el device (usuario principal)
 ```
 
 ### APK de release (firmado)
@@ -179,7 +178,7 @@ Se compila **sin** libusb/hidapi/bluez: el transporte BLE lo pone la app (Kotlin
 
 ```bash
 make linux                      # build release -> build/linux/x64/release/bundle/pandive
-make run-linux                  # o compilar + ejecutar en modo debug
+make run-linux                  # o compilar + ejecutar (release)
 ```
 
 Usa `make` (no `flutter run` a pelo) para que se inyecte el client de Google
@@ -276,7 +275,7 @@ puede refrescar el access token sin abrir la app (headless). Configuración úni
      ```
      echo 'TU_IOS_CLIENT_ID.apps.googleusercontent.com' > android/gdrive_native_client_id.txt
      ```
-     (fichero no versionado; `make apk`/`apk-release` lo inyecta como
+     (fichero no versionado; `make apk` lo inyecta como
      `--dart-define=GDRIVE_NATIVE_CLIENT_ID` y `build.gradle.kts` deriva de él el
      `appAuthRedirectScheme`). Sin él, Conectar no funciona.
 5. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
