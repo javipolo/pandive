@@ -774,5 +774,6 @@
     "placeholders": {
       "count": {}
     }
-  }
+  },
+  "exporting": "Exporting…"
 }

@@ -11,14 +11,17 @@ import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 /// Ejecuta [task] con el diálogo abierto; [task] informa con (hechas, total).
+/// [title] por defecto "Importando…".
 Future<T> withProgressBar<T>(BuildContext context,
-    Future<T> Function(void Function(int done, int total) onProgress) task) async {
+    Future<T> Function(void Function(int done, int total) onProgress) task,
+    {String? title}) async {
   final nav = Navigator.of(context, rootNavigator: true);
   final progress = ValueNotifier<(int, int)>((0, 0));
   showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => PopScope(canPop: false, child: _ProgressDialog(progress)),
+    builder: (_) =>
+        PopScope(canPop: false, child: _ProgressDialog(progress, title)),
   );
   try {
     await WidgetsBinding.instance.endOfFrame; // que se vea antes de empezar
@@ -38,12 +41,13 @@ Future<int> importSsrfWithProgress(
 
 class _ProgressDialog extends StatelessWidget {
   final ValueListenable<(int, int)> progress;
-  const _ProgressDialog(this.progress);
+  final String? title;
+  const _ProgressDialog(this.progress, this.title);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalizations.of(context).importing),
+      title: Text(title ?? AppLocalizations.of(context).importing),
       content: ValueListenableBuilder<(int, int)>(
         valueListenable: progress,
         builder: (context, v, _) {

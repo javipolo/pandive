@@ -424,5 +424,6 @@
   "importSsiHeader": "{newCount} nuevas · {dupCount} parecen estar ya en tu logbook (desmarcadas: márcalas si no lo están)",
   "importSsiDuplicate": "Parece que ya está en tu logbook",
   "importSsiDone": "{count} inmersiones importadas",
-  "readingFile": "Leyendo el fichero…"
+  "readingFile": "Leyendo el fichero…",
+  "exporting": "Exportando…"
 }

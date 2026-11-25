@@ -424,5 +424,6 @@
   "importSsiHeader": "{newCount} berri · {dupCount} dagoeneko zure koadernoan daudela dirudi (markatu gabe: markatu ez badaude)",
   "importSsiDuplicate": "Dagoeneko zure koadernoan dagoela dirudi",
   "importSsiDone": "{count} murgilketa inportatu dira",
-  "readingFile": "Fitxategia irakurtzen…"
+  "readingFile": "Fitxategia irakurtzen…",
+  "exporting": "Esportatzen…"
 }

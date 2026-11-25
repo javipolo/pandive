@@ -131,7 +131,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/settings/screens/trash_screen.dart` -> papelera: lista inmersiones borradas (Status=2) y restaura (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: fijar punto de sync y borrar posteriores
 - `lib/features/settings/widgets/text_scale_control.dart` -> control de tamaño de letra (slider + −/+)
-- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf) e importar de Subsurface / CSV de SSI
+- `lib/features/settings/widgets/export_tools.dart` -> exportar a DiveMate (.ddb)/Subsurface (.ssrf) con aviso/barra de progreso e importar de Subsurface / CSV de SSI
 - `lib/features/settings/widgets/language_theme_selectors.dart` -> radios de idioma y tema
 - `lib/features/settings/widgets/merge_gap_control.dart` -> control del hueco de fusión (slider + valor visible)
 - `lib/features/settings/widgets/numbering_control.dart` -> ajustes de numeración: automática sí/no + primer número (renumera)

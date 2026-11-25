@@ -424,5 +424,6 @@
   "importSsiHeader": "{newCount} nouvelles · {dupCount} semblent déjà dans votre carnet (décochées : cochez-les si ce n'est pas le cas)",
   "importSsiDuplicate": "Semble déjà dans votre carnet",
   "importSsiDone": "{count} plongées importées",
-  "readingFile": "Lecture du fichier…"
+  "readingFile": "Lecture du fichier…",
+  "exporting": "Exportation…"
 }

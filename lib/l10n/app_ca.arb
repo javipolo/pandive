@@ -424,5 +424,6 @@
   "importSsiHeader": "{newCount} noves · {dupCount} semblen ja al teu quadern (desmarcades: marca-les si no hi són)",
   "importSsiDuplicate": "Sembla que ja és al teu quadern",
   "importSsiDone": "{count} immersions importades",
-  "readingFile": "Llegint el fitxer…"
+  "readingFile": "Llegint el fitxer…",
+  "exporting": "Exportant…"
 }

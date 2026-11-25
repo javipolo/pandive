@@ -20,21 +20,25 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 /// Copia el .ddb activo a un temporal con nombre limpio y lo comparte (igual
 /// que la exportación a Subsurface; snapshot, no comparte el fichero en uso).
-Future<void> exportDdb(Settings settings) async {
+Future<void> exportDdb(BuildContext context, Settings settings) async {
   final path = settings.dbPath;
   if (path == null) return;
-  final dir = await getTemporaryDirectory();
-  final f = File('${dir.path}/pandive.ddb');
-  await File(path).copy(f.path);
+  final f = await withProgress(
+      context, AppLocalizations.of(context).exporting, () async {
+    final dir = await getTemporaryDirectory();
+    return File(path).copy('${dir.path}/pandive.ddb');
+  });
   await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
 }
 
-/// Genera el XML Subsurface y lo comparte.
-Future<void> exportSubsurface(DivemateDb db) async {
-  final xml = buildSubsurfaceXml(db);
-  final dir = await getTemporaryDirectory();
-  final f = File('${dir.path}/pandive.ssrf');
-  await f.writeAsString(xml);
+/// Genera el XML Subsurface (con barra de progreso) y lo comparte.
+Future<void> exportSubsurface(BuildContext context, DivemateDb db) async {
+  final t = AppLocalizations.of(context);
+  final f = await withProgressBar(context, title: t.exporting, (p) async {
+    final xml = await buildSubsurfaceXml(db, onProgress: p);
+    final dir = await getTemporaryDirectory();
+    return File('${dir.path}/pandive.ssrf').writeAsString(xml);
+  });
   await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
 }
 

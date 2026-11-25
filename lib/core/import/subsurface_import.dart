@@ -2,6 +2,8 @@
 /// `subsurface_export.dart`. Devuelve cuántas inmersiones nuevas se añadieron.
 library;
 
+import 'dart:isolate';
+
 import 'package:xml/xml.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -27,9 +29,15 @@ int _secs(String? s) {
   return sec;
 }
 
+// Analiza el XML (MB con miles de muestras) en otro isolate para no
+// bloquear la UI. Función aparte: el cierre solo debe capturar [xml] (si
+// capturase la DB, no se podría enviar al isolate).
+Future<XmlDocument> _parseOffThread(String xml) =>
+    Isolate.run(() => XmlDocument.parse(xml));
+
 Future<int> importSubsurfaceXml(DivemateDb db, String xml,
     {void Function(int done, int total)? onProgress}) async {
-  final doc = XmlDocument.parse(xml);
+  final doc = await _parseOffThread(xml);
   final sites = <String, ({String name, double? lat, double? lon})>{};
   for (final s in doc.findAllElements('site')) {
     final uuid = s.getAttribute('uuid');
@@ -44,13 +52,16 @@ Future<int> importSubsurfaceXml(DivemateDb db, String xml,
 
   final dives = doc.findAllElements('dive').toList();
   var added = 0;
-  for (var i = 0; i < dives.length; i++) {
-    if (_importOne(db, dives[i], sites)) added++;
-    // Ceder al bucle de eventos para refrescar el progreso de la UI.
-    if (i % 5 == 4 || i == dives.length - 1) {
-      onProgress?.call(i + 1, dives.length);
-      await Future<void>.delayed(Duration.zero);
-    }
+  // Por bloques: una transacción cada uno (mucho más rápido que un commit por
+  // sentencia) y ceder el hilo entre bloques para que la barra avance y
+  // Android no dé "la app no responde".
+  const chunk = 20;
+  for (var i = 0; i < dives.length; i += chunk) {
+    final part = dives.sublist(i, (i + chunk).clamp(0, dives.length));
+    added += db.inTransaction(
+        () => part.where((d) => _importOne(db, d, sites)).length);
+    onProgress?.call(i + part.length, dives.length);
+    await Future<void>.delayed(Duration.zero);
   }
   if (added > 0) db.autoRenumber();
   return added;

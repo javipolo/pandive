@@ -123,12 +123,12 @@ class ToolsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.ios_share),
             title: Text(t.exportLogbook),
-            onTap: () => exportDdb(settings),
+            onTap: () => exportDdb(context, settings),
           ),
           ListTile(
             leading: const Icon(Icons.ios_share),
             title: Text(t.exportSubsurface),
-            onTap: () => exportSubsurface(db),
+            onTap: () => exportSubsurface(context, db),
           ),
           ListTile(
             leading: const Icon(Icons.file_download_outlined),

@@ -38,26 +38,30 @@ List<DdbImportEntry> planDdbImport(DivemateDb target, DivemateDb source) => [
     ];
 
 /// Importa en [target] los buceos de [source] (solo los de [only] si se da).
-/// Los que coinciden en fecha/hora con uno existente se ignoran. Cede frames
-/// cada pocos para no congelar la UI.
+/// Los que coinciden en fecha/hora con uno existente se ignoran. Escribe por
+/// bloques (una transacción cada uno) y cede el hilo entre bloques para no
+/// congelar la UI (en Android, >5 s seguidos = "la app no responde").
 Future<DdbImportResult> importDivesFromDb(DivemateDb target, DivemateDb source,
-    {Set<int>? only}) async {
+    {Set<int>? only, void Function(int done, int total)? onProgress}) async {
   final all = planDdbImport(target, source);
   final sitesBefore = target.listSites().length;
   final buddiesBefore = target.listBuddies().length;
-  var imported = 0, dups = 0, notSel = 0, i = 0;
-  for (final e in all) {
-    if (only != null && !only.contains(e.dive.id)) {
-      notSel++;
-      continue;
-    }
-    if (i++ % 10 == 9) await Future<void>.delayed(Duration.zero);
-    if (e.duplicate || !_importOne(target, source, e.dive)) {
-      dups++;
-    } else {
-      imported++;
-    }
+  final chosen = [
+    for (final e in all)
+      if (only == null || only.contains(e.dive.id)) e
+  ];
+  final notSel = all.length - chosen.length;
+  var imported = 0;
+  const chunk = 20;
+  for (var i = 0; i < chosen.length; i += chunk) {
+    final part = chosen.sublist(i, (i + chunk).clamp(0, chosen.length));
+    imported += target.inTransaction(() => part
+        .where((e) => !e.duplicate && _importOne(target, source, e.dive))
+        .length);
+    onProgress?.call(i + part.length, chosen.length);
+    await Future<void>.delayed(Duration.zero);
   }
+  final dups = chosen.length - imported;
   if (imported > 0) target.autoRenumber();
   return DdbImportResult(
     imported: imported,

@@ -644,7 +644,7 @@ void main() {
     }
   });
 
-  test('buildSubsurfaceXml genera XML con sitio, botella y perfil', () {
+  test('buildSubsurfaceXml genera XML con sitio, botella y perfil', () async {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_ss_${DateTime.now().microsecondsSinceEpoch}.ddb');
     addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
@@ -663,7 +663,7 @@ void main() {
       w.updateDive(id, {'PlaceID': sid, 'Place': 'Cala', 'Country': 'España'});
       w.setDiveTanks(
           id, const [Cylinder(size: 12, pressureStart: 200, pressureEnd: 50)]);
-      final xml = buildSubsurfaceXml(w);
+      final xml = await buildSubsurfaceXml(w);
       expect(xml, contains("<divelog program='pandive'"));
       expect(xml, contains("name='Cala'"));
       expect(xml, contains('divesiteid='));

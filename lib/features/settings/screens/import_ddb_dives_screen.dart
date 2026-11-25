@@ -8,7 +8,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
-import 'package:pandive/core/widgets/progress_dialog.dart';
+import 'package:pandive/core/widgets/import_progress.dart';
 import 'package:pandive/features/settings/logic/import_dives.dart';
 import 'package:pandive/features/settings/widgets/import_dive_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
@@ -48,8 +48,10 @@ class _ImportDdbDivesScreenState extends State<ImportDdbDivesScreen> {
       return;
     }
     if (!mounted) return;
-    final r = await withProgress(context, t.working,
-        () => importDivesFromDb(widget.target, widget.source, only: _sel));
+    final r = await withProgressBar(
+        context,
+        (p) => importDivesFromDb(widget.target, widget.source,
+            only: _sel, onProgress: p));
     bumpDataRevision();
     if (!mounted) return;
     await _showSummary(r);

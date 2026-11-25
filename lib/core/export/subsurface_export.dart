@@ -15,8 +15,11 @@ String _p2(int v) => v.toString().padLeft(2, '0');
 String _mmss(int sec) => '${sec ~/ 60}:${_p2(sec % 60)} min';
 String _siteId(int id) => id.toRadixString(16).padLeft(8, '0');
 
-/// Construye el XML Subsurface con todas las inmersiones del owner.
-String buildSubsurfaceXml(DivemateDb db) {
+/// Construye el XML Subsurface con todas las inmersiones del owner. Cede el
+/// hilo cada pocos buceos (perfiles largos: no congelar la UI) e informa con
+/// [onProgress] (hechas, total).
+Future<String> buildSubsurfaceXml(DivemateDb db,
+    {void Function(int done, int total)? onProgress}) async {
   final dives = db.listDives();
   final sites = <int, DiveSite>{};
   for (final d in dives) {
@@ -38,8 +41,12 @@ String buildSubsurfaceXml(DivemateDb db) {
   b
     ..writeln('</divesites>')
     ..writeln('<dives>');
-  for (final d in dives) {
-    _writeDive(b, db, d);
+  for (var i = 0; i < dives.length; i++) {
+    _writeDive(b, db, dives[i]);
+    if (i % 20 == 19 || i == dives.length - 1) {
+      onProgress?.call(i + 1, dives.length);
+      await Future<void>.delayed(Duration.zero);
+    }
   }
   b
     ..writeln('</dives>')
