@@ -4,6 +4,7 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 import 'app_root.dart';
 import 'settings/settings.dart';
@@ -21,6 +22,7 @@ class PandiveApp extends StatelessWidget {
         return MaterialApp(
           title: 'PanDive',
           debugShowCheckedModeBanner: false,
+          scaffoldMessengerKey: appMessengerKey,
           theme: appTheme(Brightness.light),
           darkTheme: appTheme(Brightness.dark),
           themeMode: settings.themeMode,

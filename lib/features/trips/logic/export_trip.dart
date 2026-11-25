@@ -7,23 +7,17 @@ library;
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-Future<void> exportTripDdb(DivemateDb source, Trip trip,
+/// Genera el .ddb de uno o varios viajes (fichero temporal) para compartirlo
+/// o guardarlo con shareOrSaveFile. null si no hay viajes.
+Future<File?> buildTripsDdb(DivemateDb source, List<Trip> trips,
     {bool withProfiles = false}) async {
-  final f = await buildTripDdb(source, trip, withProfiles: withProfiles);
-  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
-}
-
-/// Exporta/comparte varios viajes en un solo .ddb.
-Future<void> exportTripsDdb(DivemateDb source, List<Trip> trips,
-    {bool withProfiles = false}) async {
-  if (trips.isEmpty) return;
+  if (trips.isEmpty) return null;
   if (trips.length == 1) {
-    return exportTripDdb(source, trips.first, withProfiles: withProfiles);
+    return buildTripDdb(source, trips.first, withProfiles: withProfiles);
   }
   final dir = await getTemporaryDirectory();
   final f = File('${dir.path}/${tripsFileBase(trips)}.ddb');
@@ -37,7 +31,7 @@ Future<void> exportTripsDdb(DivemateDb source, List<Trip> trips,
   } finally {
     out.close();
   }
-  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
+  return f;
 }
 
 /// Nombre base para varios viajes: nombres unidos por "_", o "N-trips" si es largo.

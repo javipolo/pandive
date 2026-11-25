@@ -4,6 +4,7 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/data_revision.dart';
@@ -59,7 +60,9 @@ class _SitesTabState extends State<SitesTab> {
   Future<void> _exportSel() async {
     final t = AppLocalizations.of(context);
     final picked = _picked;
-    await withProgress(context, t.working, () => exportSitesJson(picked));
+    final f =
+        await withProgress(context, t.working, () => writeSitesJson(picked));
+    await shareOrSaveFile(f);
     _exitSel();
   }
 

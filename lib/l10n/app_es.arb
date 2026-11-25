@@ -425,5 +425,7 @@
   "importSsiDuplicate": "Parece que ya está en tu logbook",
   "importSsiDone": "{count} inmersiones importadas",
   "readingFile": "Leyendo el fichero…",
-  "exporting": "Exportando…"
+  "exporting": "Exportando…",
+  "saveAs": "Guardar como",
+  "savedTo": "Guardado en {path}"
 }

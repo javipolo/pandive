@@ -86,7 +86,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
           IconButton(
               tooltip: t.exportSelection,
               icon: const Icon(Icons.share),
-              onPressed: () => exportDocumentsPdf([_doc])),
+              onPressed: () => exportDocumentsPdf(context, [_doc])),
           IconButton(
               tooltip: t.edit,
               icon: const Icon(Icons.edit_outlined),

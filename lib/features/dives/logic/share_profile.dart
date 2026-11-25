@@ -12,8 +12,8 @@ import 'dart:ui' as ui;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
+import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/image_clipboard.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
@@ -49,8 +49,7 @@ Future<void> shareProfileImage(
   final safe = title.replaceAll(RegExp(r'[^\w-]+'), '_');
   final file = File('${dir.path}/pandive_$safe.png');
   await file.writeAsBytes(png);
-  await SharePlus.instance
-      .share(ShareParams(files: [XFile(file.path)], text: title));
+  await shareOrSaveFile(file, text: title);
 }
 
 // Pinta la tarjeta (título + gráfica) fuera de pantalla y la captura en PNG.

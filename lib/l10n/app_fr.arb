@@ -425,5 +425,7 @@
   "importSsiDuplicate": "Semble déjà dans votre carnet",
   "importSsiDone": "{count} plongées importées",
   "readingFile": "Lecture du fichier…",
-  "exporting": "Exportation…"
+  "exporting": "Exportation…",
+  "saveAs": "Enregistrer sous",
+  "savedTo": "Enregistré dans {path}"
 }

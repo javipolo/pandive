@@ -4,6 +4,7 @@ library;
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
+import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
@@ -48,8 +49,9 @@ class _TripsScreenState extends State<TripsScreen> {
     if (trips.isEmpty) return;
     final profiles = await showExportTripsDialog(context, trips);
     if (profiles == null || !mounted) return;
-    await withProgress(context, AppLocalizations.of(context).working,
-        () => exportTripsDdb(widget.db, trips, withProfiles: profiles));
+    final f = await withProgress(context, AppLocalizations.of(context).working,
+        () => buildTripsDdb(widget.db, trips, withProfiles: profiles));
+    if (f != null) await shareOrSaveFile(f);
     _exitSel();
   }
 

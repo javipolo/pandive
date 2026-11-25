@@ -73,7 +73,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   Future<void> _export() async {
     await exportDocumentsPdf(
-        _docs.where((d) => _sel.contains(d.id)).toList());
+        context, _docs.where((d) => _sel.contains(d.id)).toList());
     _exitSel();
   }
 

@@ -425,5 +425,7 @@
   "importSsiDuplicate": "Sembla que ja és al teu quadern",
   "importSsiDone": "{count} immersions importades",
   "readingFile": "Llegint el fitxer…",
-  "exporting": "Exportant…"
+  "exporting": "Exportant…",
+  "saveAs": "Desa com a",
+  "savedTo": "Desat a {path}"
 }

@@ -13,6 +13,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/app_root.dart` -> AppRoot: elige pantalla; crea DB vacía en el primer arranque, o pantalla de carga (Cambiar DB / error)
 - `lib/core/text/relative_date.dart` -> fecha "humana": "Hoy 17:12" / "Ayer 21:23" / fecha completa (lista de backups)
 - `lib/core/services/home_navigation.dart` -> peticiones de sección a HomeScreen (requestDivesList: volver a la lista de buceos tras importar)
+- `lib/core/services/share_file.dart` -> shareOrSaveFile: compartir (móvil) o "Guardar como…" (Linux) un fichero generado + appMessengerKey (avisos sin context)
 - `lib/core/services/opened_file.dart` -> fichero .ddb entrante (abrir con / compartir): consume + stream
 - `lib/core/services/data_revision.dart` -> señal global para refresco blando de pestañas (sin reabrir DB)
 - `lib/core/theme/app_theme.dart` -> tema Material 3 (azul buceo)
@@ -212,7 +213,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/features/sites/screens/sites_screen.dart` -> lista de sitios: tocar nombre = buceos; ojo = info; multi-select (exportar JSON / borrar)
 - `lib/features/sites/screens/import_sites_screen.dart` -> preview del import JSON (modo solo-actualizar/+nuevos, checkbox por fila, color add/modify, confirma recuento)
 - `lib/features/sites/logic/site_import.dart` -> plan de import JSON (add/modify, null no pisa) + applySiteImport
-- `lib/features/sites/logic/export_sites.dart` -> exporta sitios a JSON y comparte (sitesToJson/exportSitesJson)
+- `lib/features/sites/logic/export_sites.dart` -> exporta sitios a JSON y comparte (sitesToJson/writeSitesJson; se comparte o guarda con shareOrSaveFile)
 - `lib/features/sites/screens/site_info_screen.dart` -> info del sitio (campos, tags, editar/borrar, swipe entre sitios)
 - `lib/features/sites/screens/site_edit_screen.dart` -> alta/edición de sitio (campos + ubicación GPS + tags)
 - `lib/features/sites/screens/map_picker_screen.dart` -> elegir ubicación en mapa (tocar + mi GPS)

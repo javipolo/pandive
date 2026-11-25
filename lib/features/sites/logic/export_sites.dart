@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/core/models/models.dart';
 
@@ -24,9 +23,9 @@ String sitesToJson(List<DiveSite> sites) {
   return const JsonEncoder.withIndent('  ').convert(list);
 }
 
-Future<void> exportSitesJson(List<DiveSite> sites) async {
+/// Escribe los sitios en un JSON temporal (para shareOrSaveFile).
+Future<File> writeSitesJson(List<DiveSite> sites) async {
   final dir = await getTemporaryDirectory();
   final f = File('${dir.path}/dive-sites-PanDive.json');
-  await f.writeAsString(sitesToJson(sites));
-  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
+  return f.writeAsString(sitesToJson(sites));
 }

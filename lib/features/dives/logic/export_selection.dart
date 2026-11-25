@@ -6,10 +6,11 @@ import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
+import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/core/widgets/text_prompt_dialog.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -20,6 +21,16 @@ Future<void> exportSelectionDdb(
   final name =
       await showTextPrompt(context, title: AppLocalizations.of(context).exportName);
   if (name == null) return;
+  if (!context.mounted) return;
+  final f = await withProgress(context, AppLocalizations.of(context).exporting,
+      () => _writeSelection(source, dives, name));
+  await shareOrSaveFile(f);
+}
+
+// Escribe [dives] en un .ddb temporal "<nombre> - PanDive.ddb". Por bloques
+// en transacción, cediendo el hilo entre bloques (no congelar la UI).
+Future<File> _writeSelection(
+    DivemateDb source, List<Dive> dives, String name) async {
   final dir = await getTemporaryDirectory();
   final safe = name.trim().replaceAll(RegExp(r'[\\/:*?"<>|]'), '').trim();
   final base = safe.isEmpty ? 'PanDive' : '$safe - PanDive';
@@ -27,28 +38,36 @@ Future<void> exportSelectionDdb(
   if (f.existsSync()) f.deleteSync();
   final out = DivemateDb.createEmpty(f.path);
   try {
-    for (final d in dives) {
-      final dt = d.date;
-      if (dt == null) continue;
-      final site = d.placeId != null ? source.getSite(d.placeId!) : null;
-      final name = site?.name ?? d.place;
-      int? placeId;
-      if (name != null && name.trim().isNotEmpty) {
-        placeId = out.findOrCreateSite(name,
-            country: site?.country ?? d.country,
-            lat: site?.lat,
-            lon: site?.lon);
-      }
-      out.createDive(
-        dateTime: dt,
-        number: d.number,
-        place: name,
-        country: site?.country ?? d.country,
-        placeId: placeId,
-      );
+    for (var i = 0; i < dives.length; i += 50) {
+      final part = dives.sublist(i, (i + 50).clamp(0, dives.length));
+      out.inTransaction(() {
+        for (final d in part) {
+          _copyDive(source, out, d);
+        }
+      });
+      await Future<void>.delayed(Duration.zero);
     }
   } finally {
     out.close();
   }
-  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
+  return f;
+}
+
+void _copyDive(DivemateDb source, DivemateDb out, Dive d) {
+  final dt = d.date;
+  if (dt == null) return;
+  final site = d.placeId != null ? source.getSite(d.placeId!) : null;
+  final name = site?.name ?? d.place;
+  int? placeId;
+  if (name != null && name.trim().isNotEmpty) {
+    placeId = out.findOrCreateSite(name,
+        country: site?.country ?? d.country, lat: site?.lat, lon: site?.lon);
+  }
+  out.createDive(
+    dateTime: dt,
+    number: d.number,
+    place: name,
+    country: site?.country ?? d.country,
+    placeId: placeId,
+  );
 }

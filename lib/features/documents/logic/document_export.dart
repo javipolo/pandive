@@ -5,16 +5,28 @@ library;
 
 import 'dart:io';
 
+import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:share_plus/share_plus.dart';
 
+import 'package:pandive/core/services/share_file.dart';
+import 'package:pandive/core/widgets/progress_dialog.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
 
-Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
+/// Genera el PDF de [docs] con un aviso de "Exportando…" y lo comparte (o lo
+/// guarda, en Linux).
+Future<void> exportDocumentsPdf(BuildContext context, List<DiveDoc> docs) async {
   if (docs.isEmpty) return;
+  final out = await withProgress(
+      context, AppLocalizations.of(context).exporting, () => _buildPdf(docs));
+  if (out != null) await shareOrSaveFile(out);
+}
+
+// null si ningún documento tiene imagen.
+Future<File?> _buildPdf(List<DiveDoc> docs) async {
   const margin = 24.0;
   // Tope físico ~ tamaño carnet (8,5 cm ≈ 240 pt) por lado; nunca se amplía.
   const cardMax = 240.0;
@@ -39,7 +51,7 @@ Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
       ],
     ));
   }
-  if (items.isEmpty) return;
+  if (items.isEmpty) return null;
 
   final pdf = pw.Document();
   pdf.addPage(pw.MultiPage(
@@ -52,8 +64,7 @@ Future<void> exportDocumentsPdf(List<DiveDoc> docs) async {
   final dir = await getTemporaryDirectory();
   final out = File('${dir.path}/pandive_docs_'
       '${DateTime.now().millisecondsSinceEpoch}.pdf');
-  await out.writeAsBytes(bytes, flush: true);
-  await SharePlus.instance.share(ShareParams(files: [XFile(out.path)]));
+  return out.writeAsBytes(bytes, flush: true);
 }
 
 /// Tamaño en puntos sin ampliar: ~150 dpi, limitado al ancho/alto disponible.

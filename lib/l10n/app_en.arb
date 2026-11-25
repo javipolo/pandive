@@ -775,5 +775,12 @@
       "count": {}
     }
   },
-  "exporting": "Exporting…"
+  "exporting": "Exporting…",
+  "saveAs": "Save as",
+  "savedTo": "Saved to {path}",
+  "@savedTo": {
+    "placeholders": {
+      "path": {}
+    }
+  }
 }

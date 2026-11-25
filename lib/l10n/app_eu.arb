@@ -425,5 +425,7 @@
   "importSsiDuplicate": "Dagoeneko zure koadernoan dagoela dirudi",
   "importSsiDone": "{count} murgilketa inportatu dira",
   "readingFile": "Fitxategia irakurtzen…",
-  "exporting": "Esportatzen…"
+  "exporting": "Esportatzen…",
+  "saveAs": "Gorde honela",
+  "savedTo": "Hemen gorde da: {path}"
 }

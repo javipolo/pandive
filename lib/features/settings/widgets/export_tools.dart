@@ -7,8 +7,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
+import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/export/subsurface_export.dart';
 import 'package:pandive/core/import/ssi_csv_import.dart';
@@ -28,7 +28,7 @@ Future<void> exportDdb(BuildContext context, Settings settings) async {
     final dir = await getTemporaryDirectory();
     return File(path).copy('${dir.path}/pandive.ddb');
   });
-  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
+  await shareOrSaveFile(f);
 }
 
 /// Genera el XML Subsurface (con barra de progreso) y lo comparte.
@@ -39,7 +39,7 @@ Future<void> exportSubsurface(BuildContext context, DivemateDb db) async {
     final dir = await getTemporaryDirectory();
     return File('${dir.path}/pandive.ssrf').writeAsString(xml);
   });
-  await SharePlus.instance.share(ShareParams(files: [XFile(f.path)]));
+  await shareOrSaveFile(f);
 }
 
 /// Elige un .ssrf e importa sus inmersiones, mostrando un diálogo de progreso.
