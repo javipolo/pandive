@@ -1,8 +1,8 @@
-/// Capa de acceso a la base de datos DiveMate (.ddb, SQLite).
+/// Access layer for the DiveMate database (.ddb, SQLite).
 ///
-/// Pandive usa el mismo formato que DiveMate (sin migración). Abre el fichero y
-/// expone consultas/escrituras sobre el subconjunto de columnas que usa la app.
-/// La implementación se reparte en `part`s: lecturas, perfil, stats y escritura.
+/// Pandive uses the same format as DiveMate (no migration). Opens the file and
+/// exposes queries/writes over the subset of columns the app uses.
+/// The implementation is split into `part`s: reads, profile, stats and writes.
 library;
 
 import 'dart:convert';
@@ -44,18 +44,18 @@ class DivemateDb {
 
   DivemateDb._(this._db);
 
-  /// Abre una .ddb existente en [path].
+  /// Opens an existing .ddb at [path].
   factory DivemateDb.open(String path, {bool readOnly = false}) {
     final db = sqlite3.open(
       path,
       mode: readOnly ? OpenMode.readOnly : OpenMode.readWrite,
     );
     if (!readOnly) {
-      _ensureSyncTable(db); // fingerprints por dispositivo
-      _ensureLastWriteTriggers(db); // sello UTC de última escritura
+      _ensureSyncTable(db); // fingerprints per device
+      _ensureLastWriteTriggers(db); // UTC last-write stamp
     }
     final inst = DivemateDb._(db);
-    // Persistir prof. media (exportable) y SAC (columna propia) donde falten.
+    // Persist avg depth (exportable) and SAC (own column) where missing.
     if (!readOnly) {
       inst.fillMissingAvgDepth();
       inst.fillMissingTemps();
@@ -64,7 +64,7 @@ class DivemateDb {
     return inst;
   }
 
-  /// Crea una base de datos DiveMate vacía nueva en [path] (con un buceador).
+  /// Creates a new empty DiveMate database at [path] (with one diver).
   factory DivemateDb.createEmpty(String path) {
     final db = sqlite3.open(path, mode: OpenMode.readWriteCreate);
     _createSchema(db);
@@ -75,9 +75,9 @@ class DivemateDb {
 
   void close() => _db.dispose();
 
-  /// Ejecuta [f] en una transacción (todo o nada). Agrupar muchas escrituras
-  /// así es mucho más rápido: sin ella cada sentencia hace su propio commit
-  /// a disco. No anidar (ni llamar dentro a algo que abra otra).
+  /// Runs [f] in a transaction (all or nothing). Grouping many writes
+  /// like this is much faster: without it each statement does its own commit
+  /// to disk. Don't nest (nor call something inside that opens another).
   T inTransaction<T>(T Function() f) {
     _db.execute('BEGIN');
     try {
@@ -90,13 +90,13 @@ class DivemateDb {
     }
   }
 
-  /// Si existe una tabla (las tablas Pandive no están en .ddb read-only externas).
+  /// Whether a table exists (Pandive tables aren't in external read-only .ddb files).
   bool _hasTable(String name) => _db
       .select("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", [name])
       .isNotEmpty;
 
-  /// DiverID "dueño" = el perfil con más inmersiones (ver owner_id en la CLI).
-  /// Una .ddb puede contener varios diver profiles (demo/imports).
+  /// "Owner" DiverID = the profile with the most dives (see owner_id in the CLI).
+  /// A .ddb may contain several diver profiles (demo/imports).
   int? get ownerId {
     if (_ownerId != null) return _ownerId;
     final rows = _db.select(
@@ -107,7 +107,7 @@ class DivemateDb {
     return _ownerId = rows.first['DiverID'] as int?;
   }
 
-  /// Comprueba que el fichero parece una DB DiveMate válida.
+  /// Checks that the file looks like a valid DiveMate DB.
   bool get looksValid {
     try {
       final t = _db.select(

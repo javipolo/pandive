@@ -1,17 +1,17 @@
-/// Perfil muestreado de una inmersión (profundidad y, si existe, temperatura).
+/// Sampled profile of a dive (depth and, if present, temperature).
 library;
 
 class DiveProfile {
   final int intervalSeconds;
   final List<double> timesMinutes;
   final List<double> depths; // metros
-  final List<double?> temps; // °C, null donde no hay muestra
-  final List<double> ceiling; // techo de deco (m), 0 si no hay (alineado)
-  final List<int?> ndl; // min sin deco (null en deco)
-  final List<int?> tts; // min hasta superficie (null fuera de deco)
+  final List<double?> temps; // °C, null where there is no sample
+  final List<double> ceiling; // deco ceiling (m), 0 if none (aligned)
+  final List<int?> ndl; // no-deco min (null in deco)
+  final List<int?> tts; // min to surface (null out of deco)
   final List<double?> ppo2; // bar
   final List<double?> cns; // %
-  final List<double?> pressure; // presión botella (bar)
+  final List<double?> pressure; // cylinder pressure (bar)
   final List<int?> rbt; // min
 
   const DiveProfile({

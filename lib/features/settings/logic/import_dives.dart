@@ -1,20 +1,20 @@
-/// Copia inmersiones de otro .ddb al logbook propio (p.ej. pasar el viaje a un
-/// compañero sin ordenador). Reutiliza `importExternalDive` (dedupe por
-/// fecha/hora, copia perfil, sitio con coords, compañeros, tags y botellas).
+/// Copies dives from another .ddb into our own logbook (e.g. handing the trip to a
+/// buddy without a computer). Reuses `importExternalDive` (dedupe by
+/// date/time, copies profile, site with coords, buddies, tags and cylinders).
 library;
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-/// Un buceo del .ddb origen y si ya existe en el logbook (misma fecha/hora).
+/// A source .ddb dive and whether it already exists in the logbook (same date/time).
 class DdbImportEntry {
   final Dive dive;
   final bool duplicate;
   const DdbImportEntry(this.dive, {required this.duplicate});
 }
 
-/// Resumen de un import: añadidos, ignorados por coincidir en hora con uno
-/// existente, no seleccionados y sitios/compañeros nuevos creados.
+/// Import summary: added, ignored for matching the time of an
+/// existing one, not selected, and new sites/buddies created.
 class DdbImportResult {
   final int imported;
   final int duplicates;
@@ -30,17 +30,17 @@ class DdbImportResult {
   });
 }
 
-/// Buceos de [source] con fecha, marcando los que ya están en [target].
+/// Dated dives of [source], marking those already in [target].
 List<DdbImportEntry> planDdbImport(DivemateDb target, DivemateDb source) => [
       for (final d in source.listDives())
         if (d.date != null)
           DdbImportEntry(d, duplicate: target.hasDiveAt(d.date!)),
     ];
 
-/// Importa en [target] los buceos de [source] (solo los de [only] si se da).
-/// Los que coinciden en fecha/hora con uno existente se ignoran. Escribe por
-/// bloques (una transacción cada uno) y cede el hilo entre bloques para no
-/// congelar la UI (en Android, >5 s seguidos = "la app no responde").
+/// Imports the dives of [source] into [target] (only those in [only] if given).
+/// Those matching the date/time of an existing one are ignored. Writes in
+/// chunks (one transaction each) and yields the thread between chunks so as not
+/// to freeze the UI (on Android, >5 s in a row = "app not responding").
 Future<DdbImportResult> importDivesFromDb(DivemateDb target, DivemateDb source,
     {Set<int>? only, void Function(int done, int total)? onProgress}) async {
   final all = planDdbImport(target, source);

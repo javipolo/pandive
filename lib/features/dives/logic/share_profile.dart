@@ -1,8 +1,8 @@
-/// Genera una imagen PNG del perfil de inmersión (título, gráfica y un pie con
-/// duración, temperatura mínima, profundidades y, si hubo deco, TTS y techo
-/// máximos; la misma imagen en todas las plataformas) y la
-/// comparte con otra app o, en escritorio (Linux), la copia al portapapeles.
-/// Renderiza la tarjeta fuera de pantalla y la captura.
+/// Generates a PNG image of the dive profile (title, chart and a footer with
+/// duration, minimum temperature, depths and, if there was deco, max TTS and
+/// ceiling; the same image on all platforms) and
+/// shares it with another app or, on desktop (Linux), copies it to the clipboard.
+/// Renders the card off-screen and captures it.
 library;
 
 import 'dart:io';
@@ -21,12 +21,12 @@ import 'package:pandive/features/dives/logic/dive_facts.dart';
 import 'package:pandive/features/dives/widgets/gas_segments.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Icono y texto del botón: copiar en escritorio, compartir en el móvil.
+/// Button icon and text: copy on desktop, share on mobile.
 IconData get shareProfileIcon => canCopyImages ? Icons.copy : Icons.share;
 String shareProfileTooltip(AppLocalizations t) =>
     canCopyImages ? t.copyChart : t.share;
 
-/// Comparte la gráfica (móvil) o la copia al portapapeles (escritorio).
+/// Shares the chart (mobile) or copies it to the clipboard (desktop).
 Future<void> shareProfileImage(
   BuildContext context, {
   required DiveProfile profile,
@@ -52,7 +52,7 @@ Future<void> shareProfileImage(
   await shareOrSaveFile(file, text: title);
 }
 
-// Pinta la tarjeta (título + gráfica) fuera de pantalla y la captura en PNG.
+// Paints the card (title + chart) off-screen and captures it as PNG.
 Future<Uint8List?> _renderProfilePng(
   BuildContext context, {
   required DiveProfile profile,
@@ -63,8 +63,8 @@ Future<Uint8List?> _renderProfilePng(
   final overlay = Overlay.of(context);
   final theme = Theme.of(context);
   final key = GlobalKey();
-  // Colocar la tarjeta justo debajo del viewport (invisible) con un offset
-  // pequeño: un offset enorme corrompe el layer al capturar (imagen "tileada").
+  // Place the card just below the viewport (invisible) with a small
+  // offset: a huge offset corrupts the layer on capture ("tiled" image).
   final below = MediaQuery.sizeOf(context).height + 20;
   final entry = OverlayEntry(
     builder: (_) => Positioned(
@@ -87,8 +87,8 @@ Future<Uint8List?> _renderProfilePng(
   );
   overlay.insert(entry);
   try {
-    // Esperar frames reales para que termine el layout + la animación de entrada
-    // de la gráfica (no vale debugNeedsPaint: en release siempre es false).
+    // Wait for real frames so layout + the chart's entry animation finish
+    // (debugNeedsPaint won't do: in release it's always false).
     for (var i = 0; i < 10; i++) {
       await WidgetsBinding.instance.endOfFrame;
       await Future<void>.delayed(const Duration(milliseconds: 40));
@@ -103,7 +103,7 @@ Future<Uint8List?> _renderProfilePng(
   }
 }
 
-/// Tarjeta que se exporta como imagen (título, gráfica y pie de datos).
+/// Card exported as an image (title, chart and data footer).
 class ProfileShareCard extends StatelessWidget {
   final DiveProfile profile;
   final String title;
@@ -176,9 +176,9 @@ class ProfileShareCard extends StatelessWidget {
 
 typedef _FactRow = ((String, String?), (String, String?));
 
-// Pie de la imagen tabulado: etiqueta | valor | etiqueta | valor. Las columnas
-// de etiquetas toman el ancho de la más larga, así los valores van alineados
-// sea cual sea el idioma.
+// Tabulated image footer: label | value | label | value. The label
+// columns take the width of the longest one, so values stay aligned
+// whatever the language.
 class _FactsTable extends StatelessWidget {
   final List<_FactRow> rows;
   const _FactsTable(this.rows);

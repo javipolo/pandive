@@ -19,7 +19,7 @@ void main() {
     expect(filterSites(sites, 'BLUE').map((s) => s.id), [2]);
   });
 
-  // writeSitesJson codifica en otro isolate: los sitios han de poder viajar.
+  // writeSitesJson encodes in another isolate: sites must be sendable.
   test('sites JSON can be encoded in another isolate', () async {
     final json = await Isolate.run(() => sitesToJson(sites));
     final list = jsonDecode(json) as List;

@@ -1,5 +1,5 @@
-/// Pestaña de inmersiones: lista por mes con acciones en lote, añadir, búsqueda
-/// (externa, desde la barra superior). La lista y sus acciones viven en
+/// Dives tab: monthly list with batch actions, add, search
+/// (external, from the top bar). The list and its actions live in
 /// `DivesActionList`.
 library;
 
@@ -34,7 +34,7 @@ class _DivesTabState extends State<DivesTab> {
   late List<Dive> _dives = filterDives(widget.db.listDives(), widget.query);
   late Set<int> _cave = widget.db.diveIdsWithTag('cave');
   bool _selecting = false;
-  int? _highlightId; // buceo recién añadido, para destacar/desplazar
+  int? _highlightId; // newly added dive, to highlight/scroll to
   Timer? _hlTimer;
 
   @override

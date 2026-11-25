@@ -1,6 +1,6 @@
-/// Backup automático en segundo plano con WorkManager. Tarea periódica que,
-/// aunque la app esté cerrada, sube la DB a Drive si cambió (WiFi si se pide).
-/// La auth es silenciosa; si no hay cuenta o no es WiFi, no-opea.
+/// Automatic background backup with WorkManager. Periodic task that,
+/// even with the app closed, uploads the DB to Drive if it changed (WiFi if requested).
+/// Auth is silent; if there is no account or no WiFi, it's a no-op.
 library;
 
 import 'dart:io';
@@ -16,7 +16,7 @@ const _taskName = 'pandive.autoBackup';
 const _uniqueName = 'pandive.autoBackup.periodic';
 const _syncTask = 'pandive.syncUpload';
 
-/// Punto de entrada del isolate de background (lo invoca WorkManager).
+/// Entry point of the background isolate (invoked by WorkManager).
 @pragma('vm:entry-point')
 void backupCallbackDispatcher() {
   Workmanager().executeTask((task, _) async {
@@ -30,22 +30,22 @@ void backupCallbackDispatcher() {
       }
       return true;
     } catch (_) {
-      return false; // WorkManager reintentará según backoff
+      return false; // WorkManager will retry per backoff
     }
   });
 }
 
-/// WorkManager solo existe en Android; en escritorio todo esto es no-op (el
-/// backup al abrir la app sigue funcionando).
+/// WorkManager only exists on Android; on desktop all this is a no-op (the
+/// backup on app open still works).
 bool get _supported => Platform.isAndroid;
 
-/// Registra el dispatcher (una vez, en el isolate principal al arrancar).
+/// Registers the dispatcher (once, in the main isolate at startup).
 Future<void> initBackupWorker() async {
   if (_supported) await Workmanager().initialize(backupCallbackDispatcher);
 }
 
-/// Programa la tarea periódica (~12 h; solo WiFi si [wifiOnly]). Idempotente:
-/// al cambiar la opción se vuelve a llamar y actualiza la restricción de red.
+/// Schedules the periodic task (~12 h; WiFi only if [wifiOnly]). Idempotent:
+/// when the option changes it's called again and updates the network constraint.
 Future<void> registerAutoBackup({required bool wifiOnly}) async {
   if (!_supported) return;
   await Workmanager().registerPeriodicTask(
@@ -58,14 +58,14 @@ Future<void> registerAutoBackup({required bool wifiOnly}) async {
   );
 }
 
-/// Cancela la tarea periódica (al desactivar el backup automático).
+/// Cancels the periodic task (when automatic backup is turned off).
 Future<void> cancelAutoBackup() async {
   if (_supported) await Workmanager().cancelByUniqueName(_uniqueName);
 }
 
-/// Subida de sync de respaldo al salir de la app (Android congela la app en
-/// segundo plano): una vez, en cuanto haya red (WiFi si [wifiOnly]). Si la
-/// subida en primer plano llegó a terminar, la tarea ve que no hay nada.
+/// Fallback sync upload when leaving the app (Android freezes the app in the
+/// background): once, as soon as there is network (WiFi if [wifiOnly]). If the
+/// foreground upload managed to finish, the task sees there's nothing to do.
 Future<void> enqueueSyncUpload({required bool wifiOnly}) async {
   if (!_supported) return;
   await Workmanager().registerOneOffTask(

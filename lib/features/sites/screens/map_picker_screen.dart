@@ -1,5 +1,5 @@
-/// Selector de ubicación: mueve el mapa (mira fija en el centro) y guarda el
-/// centro. Botón "mi ubicación" (GPS) y buscador por nombre (geocoding Nominatim).
+/// Location picker: move the map (fixed crosshair at the centre) and save the
+/// centre. "My location" button (GPS) and search by name (Nominatim geocoding).
 library;
 
 import 'dart:convert';
@@ -105,7 +105,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
             center: widget.initial ?? const LatLng(20, 0),
             zoom: widget.initial == null ? 2 : 13,
           ),
-          // Mira fija: el pin apunta siempre al centro del mapa.
+          // Fixed crosshair: the pin always points at the map centre.
           const IgnorePointer(
             child: Center(
               child: Padding(

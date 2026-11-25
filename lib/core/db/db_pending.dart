@@ -1,7 +1,7 @@
 part of 'divemate_db.dart';
 
-/// Caché de buceos descargados pero no guardados. Permiten reaparecer en la
-/// siguiente descarga sin volver a bajarlos del ordenador (ver download_screen).
+/// Cache of downloaded but unsaved dives. Lets them reappear in the
+/// next download without fetching them from the computer again (see download_screen).
 extension DivemateDbPending on DivemateDb {
   List<DownloadedDive> listPending(String deviceId) {
     final rows = _db.select(
@@ -16,7 +16,7 @@ extension DivemateDbPending on DivemateDb {
         out.add(DownloadedDive.fromJson(
             jsonDecode(s) as Map<String, dynamic>));
       } catch (_) {
-        // entrada corrupta: se ignora
+        // corrupt entry: ignored
       }
     }
     return out;

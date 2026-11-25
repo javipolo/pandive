@@ -1,6 +1,6 @@
-/// Icono de estado de la sincronización en la barra superior (oculto si está
-/// desactivada). Punto rojo si hay divergencia u otro dispositivo abierto.
-/// Al pulsarlo abre [SyncSheet].
+/// Sync status icon in the top bar (hidden when
+/// disabled). Red dot if there's a divergence or another device open.
+/// Tapping it opens [SyncSheet].
 library;
 
 import 'package:material_ui/material_ui.dart';

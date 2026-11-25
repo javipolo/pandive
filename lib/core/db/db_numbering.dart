@@ -1,15 +1,15 @@
 part of 'divemate_db.dart';
 
-// Numeración automática: los buceos del owner (sin los de la papelera) van
-// numerados de forma consecutiva y en orden cronológico, empezando en un
-// "primer número" (para quien trae buceos de un logbook anterior). La
-// configuración vive en la propia DB (PandiveMeta), no en los ajustes del
-// dispositivo: así el móvil y el PC numeran igual y la sync no oscila.
+// Automatic numbering: the owner's dives (excluding trashed ones) are
+// numbered consecutively in chronological order, starting at a
+// "first number" (for those bringing dives from a previous logbook). The
+// setting lives in the DB itself (PandiveMeta), not in the device
+// settings: so phone and PC number alike and sync doesn't oscillate.
 
 const _kAutoNumber = 'autoNumber';
 const _kFirstNumber = 'firstNumber';
 
-/// Un buceo que cambiaría de número al renumerar.
+/// A dive that would change number when renumbering.
 class RenumberChange {
   final int id;
   final int? from;
@@ -18,12 +18,12 @@ class RenumberChange {
 }
 
 extension DivemateDbNumbering on DivemateDb {
-  /// Numeración automática activada (por defecto sí).
+  /// Automatic numbering enabled (yes by default).
   bool get autoNumber => _metaGet(_kAutoNumber) != '0';
 
-  /// Primer número de la numeración. Si nunca se fijó: el número más bajo
-  /// del owner (papelera incluida, para que borrar el primero no lo mueva),
-  /// o 1 si no hay buceos.
+  /// First number of the numbering. If never set: the owner's lowest
+  /// number (trash included, so deleting the first doesn't move it),
+  /// or 1 if there are no dives.
   int get firstNumber {
     final v = int.tryParse(_metaGet(_kFirstNumber) ?? '');
     if (v != null) return v;
@@ -36,24 +36,24 @@ extension DivemateDbNumbering on DivemateDb {
     return m != null && m > 0 ? m : 1;
   }
 
-  /// Activa o desactiva la numeración automática; al activarla, renumera.
-  /// Devuelve cuántos buceos cambiaron de número.
+  /// Turns automatic numbering on or off; turning it on renumbers.
+  /// Returns how many dives changed number.
   int setAutoNumber(bool v) {
     _pinFirstNumber();
     _metaSet(_kAutoNumber, v ? '1' : '0');
-    _touchLastWrite(); // que viaje con la sync aunque no cambie ningún nº
+    _touchLastWrite(); // so it travels with sync even if no number changes
     return v ? renumberDives() : 0;
   }
 
-  /// Cambia el primer número; con la numeración automática, renumera.
-  /// Devuelve cuántos buceos cambiaron de número.
+  /// Changes the first number; with automatic numbering, renumbers.
+  /// Returns how many dives changed number.
   int setFirstNumber(int n) {
     _metaSet(_kFirstNumber, '${n < 0 ? 0 : n}');
     _touchLastWrite();
     return autoNumber ? renumberDives() : 0;
   }
 
-  /// Qué buceos cambiarían de número (orden: fecha, hora, nº actual, ID).
+  /// Which dives would change number (order: date, time, current number, ID).
   List<RenumberChange> renumberPlan() {
     final owner = ownerId;
     final rows = _db.select(
@@ -71,8 +71,8 @@ extension DivemateDbNumbering on DivemateDb {
     return out;
   }
 
-  /// Número que tendría un buceo nuevo en [when] con la numeración
-  /// automática (va detrás de los que tienen la misma fecha y hora).
+  /// Number a new dive at [when] would get with automatic
+  /// numbering (goes after those with the same date and time).
   int numberForNewDive(DateTime when) {
     String p(int v) => v.toString().padLeft(2, '0');
     final date = '${when.year}-${p(when.month)}-${p(when.day)}';
@@ -86,8 +86,8 @@ extension DivemateDbNumbering on DivemateDb {
     return firstNumber + ((rows.first['c'] as int?) ?? 0);
   }
 
-  /// ¿El buceo [id] rompe el orden cronológico de los números? (hay uno
-  /// posterior con número menor o uno anterior con número mayor).
+  /// Does dive [id] break the chronological order of numbers? (there is a
+  /// later one with a lower number or an earlier one with a higher number).
   bool isOutOfOrder(int id) {
     final r = _db.select(
         'SELECT Number, Divedate, Entrytime, DiverID FROM Logbook WHERE ID = ?',
@@ -105,8 +105,8 @@ extension DivemateDbNumbering on DivemateDb {
     return rows.isNotEmpty;
   }
 
-  /// Aplica [renumberPlan]; solo toca (y marca Updated en) los que cambian.
-  /// Devuelve cuántos cambiaron.
+  /// Applies [renumberPlan]; only touches (and marks Updated on) those that change.
+  /// Returns how many changed.
   int renumberDives() {
     _pinFirstNumber();
     final plan = renumberPlan();
@@ -126,12 +126,12 @@ extension DivemateDbNumbering on DivemateDb {
     return plan.length;
   }
 
-  /// Renumera si la numeración automática está activa. Llamar tras crear,
-  /// borrar, restaurar, fusionar, importar o cambiar la fecha de buceos.
+  /// Renumbers if automatic numbering is on. Call after creating,
+  /// deleting, restoring, merging, importing or changing the date of dives.
   int autoRenumber() => autoNumber ? renumberDives() : 0;
 
-  // Fija el primer número calculado antes de que un borrado definitivo o un
-  // cambio lo pueda mover.
+  // Pins the computed first number before a permanent delete or a
+  // change can move it.
   void _pinFirstNumber() {
     if (_metaGet(_kFirstNumber) == null) _metaSet(_kFirstNumber, '$firstNumber');
   }

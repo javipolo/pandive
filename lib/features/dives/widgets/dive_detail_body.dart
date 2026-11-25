@@ -1,5 +1,5 @@
-/// Cuerpo del detalle de una inmersión: secciones compactas (nº/fecha, sitio,
-/// compañero, perfil + métricas, gases, deco, botellas, ordenador).
+/// Body of a dive's detail: compact sections (no./date, site,
+/// buddy, profile + metrics, gases, deco, cylinders, computer).
 library;
 
 import 'package:material_ui/material_ui.dart';

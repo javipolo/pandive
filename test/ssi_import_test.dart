@@ -1,4 +1,4 @@
-// Importación del CSV de MySSI (columnas por posición, cabecera localizada).
+// MySSI CSV import (columns by position, localised header).
 import 'dart:ffi';
 import 'dart:io';
 
@@ -135,7 +135,7 @@ void main() {
               'Ana, Pep');
       final r = await importSsiCsv(db, csv);
       expect((r.added, r.duplicates, r.skipped), (2, 0, 0));
-      final dives = db.listDives().reversed.toList(); // cronológico
+      final dives = db.listDives().reversed.toList(); // chronological
       expect(dives.map((d) => d.place), ['El Fitó', 'Tres Pics']);
       expect(dives.map((d) => d.number), [1, 2]);
       expect(dives.first.maxDepth, 21);
@@ -156,7 +156,7 @@ void main() {
       final r = await importSsiCsv(
           db, _header + _row(1, 'X', '15. Apr 2026', '56 min', '21 m'));
       expect((r.added, r.duplicates), (0, 1));
-      // Pero una distinta ese mismo día sí entra.
+      // But a different one that same day does get in.
       final r2 = await importSsiCsv(
           db, _header + _row(2, 'Y', '15. Apr 2026', '40 min', '12 m'));
       expect(r2.added, 1);
@@ -174,17 +174,17 @@ void main() {
     });
 
     test('desfase de ~1 h y diferencias entre ordenadores; elige la más parecida', () async {
-      // Dos buceos tuyos ese día; el CSV trae el de las 10:31 con 1 h de
-      // desfase (11:32) y lecturas de otro ordenador.
+      // Two of your dives that day; the CSV has the 10:31 one with a 1 h
+      // offset (11:32) and readings from another computer.
       db.createDive(dateTime: DateTime(2025, 11, 20, 9, 5));
       db.createDive(dateTime: DateTime(2025, 11, 20, 10, 31));
-      final ds = db.listDives(); // más reciente primero
+      final ds = db.listDives(); // most recent first
       db.updateDive(ds[0].id, {'Depth': 32.2, 'Divetime': 83.8});
       db.updateDive(ds[1].id, {'Depth': 31.0, 'Divetime': 80.0});
       final r = await importSsiCsv(db,
           _header + _row(1, 'Panorama', '20. Nov 2025 11:32', '84 min', '32.2 m'));
       expect((r.added, r.duplicates), (0, 1));
-      // Otro buceo del mismo día con perfil distinto sí entra.
+      // Another dive the same day with a different profile does get in.
       final r2 = await importSsiCsv(db,
           _header + _row(2, 'Otro', '20. Nov 2025 17:35', '85 min', '16.2 m'));
       expect(r2.added, 1);
@@ -199,7 +199,7 @@ void main() {
           _row(3, 'C', '17. Apr 2026 10:00', '45 min', '15 m');
       final plan = planSsiImport(db, csv);
       expect(plan.entries.map((e) => e.duplicate), [true, false, false]);
-      expect(db.listDives(), hasLength(1)); // el plan no escribe
+      expect(db.listDives(), hasLength(1)); // the plan doesn't write
       final done = <int>[];
       final added = await applySsiImport(db, [plan.entries[2].dive],
           onProgress: (d, _) => done.add(d));

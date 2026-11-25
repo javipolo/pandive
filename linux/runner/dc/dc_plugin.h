@@ -1,6 +1,6 @@
-// Plugin Linux del ordenador de buceo: mismos canales que Android
-// (pandive/dc, pandive/dc/scan, pandive/dc/progress) sobre BlueZ +
-// el núcleo común de libdivecomputer (native/pandive_dc_core.c).
+// Linux dive computer plugin: same channels as Android
+// (pandive/dc, pandive/dc/scan, pandive/dc/progress) over BlueZ +
+// the shared libdivecomputer core (native/pandive_dc_core.c).
 #ifndef PANDIVE_DC_PLUGIN_H
 #define PANDIVE_DC_PLUGIN_H
 

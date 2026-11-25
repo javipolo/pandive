@@ -1,5 +1,5 @@
-// Valida la capa DB contra la .ddb real (si está presente) comparando con los
-// valores que da divemate-cli. Se salta si no existe el fichero.
+// Validates the DB layer against the real .ddb (if present) comparing with the
+// values divemate-cli gives. Skipped if the file doesn't exist.
 import 'dart:ffi';
 import 'dart:io';
 
@@ -18,8 +18,8 @@ void main() {
     return;
   }
 
-  // En el host de test Fedora solo está libsqlite3.so.0 (el .so sin versión
-  // vive en sqlite-devel). En Android se usa sqlite3_flutter_libs.
+  // On the Fedora test host only libsqlite3.so.0 exists (the unversioned .so
+  // lives in sqlite-devel). On Android sqlite3_flutter_libs is used.
   open.overrideFor(
     OperatingSystem.linux,
     () => DynamicLibrary.open('libsqlite3.so.0'),
@@ -49,7 +49,7 @@ void main() {
     expect(s.divesPerYear[2013], 9);
     expect(s.divesPerYear[2014], 69);
     expect(s.divesPerYear[2015], 86);
-    // Deco: hay buceos con deco; TTS/ceiling máx. salen del decode de Profile4.
+    // Deco: there are dives with deco; max TTS/ceiling come from decoding Profile4.
     expect(s.decoDives, greaterThan(0));
     expect(s.maxTts, greaterThan(0));
     expect(s.maxCeiling, greaterThan(0));
@@ -58,7 +58,7 @@ void main() {
   test('lista sitios con conteo de inmersiones', () {
     final sites = db.listSites();
     expect(sites, isNotEmpty);
-    // Ordenados por nº de inmersiones desc.
+    // Sorted by dive count desc.
     expect(sites.first.diveCount, greaterThan(0));
     for (var i = 1; i < sites.length; i++) {
       expect(sites[i].diveCount, lessThanOrEqualTo(sites[i - 1].diveCount));
@@ -98,7 +98,7 @@ void main() {
     try {
       final before = w.countDives();
       final nextNum = w.nextDiveNumber();
-      expect(nextNum, 731); // owner tenía hasta la 730
+      expect(nextNum, 731); // owner had up to 730
 
       final id = w.createDive(
         dateTime: DateTime(2026, 11, 12, 10, 30),
@@ -139,7 +139,7 @@ void main() {
       expect(w.looksValid, isTrue);
       expect(w.countDives(), 0);
       expect(w.nextDiveNumber(), 1);
-      // se puede importar en ella
+      // can be imported into it
       final ok = w.importDownloaded(
         const DownloadedDive(
           fingerprint: 'x',
@@ -148,7 +148,7 @@ void main() {
       );
       expect(ok, isTrue);
       expect(w.countDives(), 1);
-      // fingerprint vive en la DB: nueva => vacío; roundtrip
+      // fingerprint lives in the DB: new => empty; roundtrip
       expect(w.fingerprintFor('AA:BB'), isNull);
       w.setFingerprintFor('AA:BB', 'cafe');
       expect(w.fingerprintFor('AA:BB'), 'cafe');
@@ -195,7 +195,7 @@ void main() {
       expect(w.diveBuddies(d.id).length, 2);
       expect(w.tagsForDive(d.id).length, 2);
       expect(w.diveProfile(d.id)?.depths.length, 3);
-      // dedupe: reimportar no añade
+      // dedupe: reimporting adds nothing
       expect(await importSubsurfaceXml(w, xml), 0);
     } finally {
       w.close();
@@ -223,10 +223,10 @@ void main() {
       final d = her.getDive(hid)!;
       expect(d.place, 'Cova Negra');
       final buds = her.diveBuddies(hid).map((b) => b.name).toSet();
-      // Solo el buddy elegido; no se copian los del origen (evita auto-buddy).
+      // Only the chosen buddy; the source's aren't copied (avoids self-buddy).
       expect(buds.contains('Ana'), isTrue);
       expect(buds.contains('Javi'), isFalse);
-      // fuera de la ventana: no empareja
+      // outside the window: doesn't pair
       expect(findSourceMatch(src, dt.add(const Duration(hours: 3))), isNull);
     } finally {
       src.close();
@@ -260,7 +260,7 @@ void main() {
       final id = w.createDive(dateTime: dt, place: 'X');
       w.deleteDives([id]); // Status=2
       expect(w.listDeletedDives().length, 1);
-      expect(w.hasDiveAt(dt), isFalse); // borrada no cuenta para dedupe
+      expect(w.hasDiveAt(dt), isFalse); // deleted doesn't count for dedupe
       w.purgeDives([id]);
       expect(w.listDeletedDives().length, 0);
       expect(w.getDive(id), isNull);
@@ -315,7 +315,7 @@ void main() {
       final before = w.countDives();
       expect(w.importDownloaded(dl, computer: 'Shearwater Peregrine'), isTrue);
       expect(w.countDives(), before + 1);
-      // re-import: dedupe por fecha/hora
+      // re-import: dedupe by date/time
       expect(w.importDownloaded(dl, computer: 'Shearwater Peregrine'), isFalse);
       expect(w.countDives(), before + 1);
 
@@ -358,24 +358,24 @@ void main() {
       final a = w.listDives().firstWhere((d) => d.date == DateTime(2031, 5, 1, 10, 0));
       final b = w.listDives().firstWhere((d) => d.date == DateTime(2031, 5, 1, 10, 3));
 
-      // hueco (2 min) mayor que el límite => excepción, nada cambia
+      // gap (2 min) larger than the limit => exception, nothing changes
       expect(() => w.mergeDives([a.id, b.id], maxGapMin: 1),
           throwsA(isA<MergeTooFarException>()));
       expect(w.countDives(), 2);
 
       final id = w.mergeDives([a.id, b.id], maxGapMin: 15);
-      expect(id, a.id); // conserva el más antiguo
-      expect(w.countDives(), 1); // el otro queda borrado (Status=2)
+      expect(id, a.id); // keeps the oldest
+      expect(w.countDives(), 1); // the other one is deleted (Status=2)
 
       final merged = w.getDive(id)!;
       expect(merged.durationMin, closeTo(2, 0.01)); // 1 + 1 min
-      expect(merged.maxDepth, 18); // máx de ambos
-      expect(w.cylinders(id), hasLength(2)); // unión de botellas
+      expect(merged.maxDepth, 18); // max of both
+      expect(w.cylinders(id), hasLength(2)); // union of cylinders
 
       final p = w.diveProfile(id)!;
-      expect(p.depths.first, 5.0); // empieza con el primer buceo
-      expect(p.depths.last, 18.0); // acaba con el segundo
-      expect(p.depths.length, greaterThan(4)); // con hueco en superficie
+      expect(p.depths.first, 5.0); // starts with the first dive
+      expect(p.depths.last, 18.0); // ends with the second
+      expect(p.depths.length, greaterThan(4)); // with a surface gap
     } finally {
       w.close();
     }
@@ -389,7 +389,7 @@ void main() {
     try {
       final bid = w.findOrCreateBuddy('Marina');
       w.createDive(dateTime: DateTime(2030, 6, 1, 10, 0), buddyIds: '$bid');
-      w.createDive(dateTime: DateTime(2030, 6, 2, 10, 0)); // sin compañero
+      w.createDive(dateTime: DateTime(2030, 6, 2, 10, 0)); // no buddy
       expect(w.listDives(search: 'mari'), hasLength(1));
       expect(w.listDives(search: 'nadie'), isEmpty);
     } finally {
@@ -444,7 +444,7 @@ void main() {
       expect(types.first.tanks.first.name, 'Izquierda');
       expect(types.first.tanks.first.size, 11.1);
       expect(types.first.tanks.first.material, TankMaterial.aluminium);
-      // Las plantillas no llevan presiones.
+      // Templates carry no pressures.
       expect(types.first.tanks.first.pressureStart, isNull);
 
       w.updateDiveType(id, 'Monobotella 15L',
@@ -574,7 +574,7 @@ void main() {
         samples: [DiveSample(0, 6, 20), DiveSample(10000, 10, 20)],
       ));
       final d = w.listDives().single;
-      expect(d.avgDepth, closeTo(8, 0.01)); // media de 6 y 10
+      expect(d.avgDepth, closeTo(8, 0.01)); // average of 6 and 10
     } finally {
       w.close();
     }
@@ -596,7 +596,7 @@ void main() {
         ],
       ));
       final d = w.listDives().single;
-      expect(d.waterTemp, closeTo(18, 0.01)); // mínima
+      expect(d.waterTemp, closeTo(18, 0.01)); // minimum
       expect(w.diveAvgTemp(d.id), closeTo(20, 0.01)); // media (22+18+20)/3
     } finally {
       w.close();
@@ -678,15 +678,15 @@ void main() {
 
   test('decode de deco (Profile4): techo/NDL/TTS en el buceo 460 (nº 399)', () {
     final p = db.diveProfile(460);
-    if (p == null) return; // DB sin ese buceo
+    if (p == null) return; // DB without that dive
     expect(p.hasDeco, isTrue);
-    // El techo máximo del buceo 399 (ID 460) fue 15 m.
+    // The max ceiling of dive 399 (ID 460) was 15 m.
     final maxCeil = p.ceiling.reduce((a, b) => a > b ? a : b);
     expect(maxCeil, closeTo(15, 0.5));
-    // Hay muestras con NDL (fase sin deco) y muestras con TTS (en deco).
+    // There are samples with NDL (no-deco phase) and samples with TTS (in deco).
     expect(p.ndl.any((v) => v != null && v > 0), isTrue);
     expect(p.tts.any((v) => v != null), isTrue);
-    // Donde hay techo, no hay NDL y sí TTS.
+    // Where there's a ceiling, there's no NDL but there is TTS.
     for (var i = 0; i < p.ceiling.length; i++) {
       if (p.ceiling[i] > 0) {
         expect(p.ndl[i], isNull);
@@ -697,7 +697,7 @@ void main() {
   test('buceo sin deco: ceiling todo 0, NDL poblado', () {
     final p = db.diveProfile(684);
     if (p == null) return;
-    // 684 tuvo una parada corta a 3 m; comprobamos consistencia general.
+    // 684 had a short stop at 3 m; we check general consistency.
     expect(p.ndl.any((v) => v != null), isTrue);
   });
 
@@ -708,7 +708,7 @@ void main() {
     final p = db.diveProfile(dive.id)!;
     expect(p.isEmpty, isFalse);
     final maxDepth = p.depths.reduce((a, b) => a > b ? a : b);
-    expect(maxDepth, closeTo(25.7, 0.3)); // muestreo puede no tocar el pico exacto
+    expect(maxDepth, closeTo(25.7, 0.3)); // sampling may not hit the exact peak
     expect(p.timesMinutes.last, closeTo(65.9, 1.0));
     expect(p.hasTemp, isTrue);
     final temps = p.temps.whereType<double>().toList();

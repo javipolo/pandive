@@ -1,10 +1,10 @@
-/// Tipo de red actual, para las opciones "solo con WiFi" de backup y sync.
+/// Current network type, for the "WiFi only" backup and sync options.
 library;
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-/// ¿Estamos en una red sin coste (WiFi o cable)? Si no se puede saber,
-/// true (no bloquear por un fallo del detector).
+/// Are we on an unmetered network (WiFi or cable)? If it can't be known,
+/// true (don't block because of a detector failure).
 Future<bool> onUnmeteredNetwork() async {
   try {
     final r = await Connectivity().checkConnectivity();

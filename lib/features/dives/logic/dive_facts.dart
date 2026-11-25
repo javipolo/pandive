@@ -1,6 +1,6 @@
-/// Datos resumen de una inmersión (duración, profundidades, temperatura
-/// mínima, deco) a partir del registro y, si falta algo, del perfil. Lo usan
-/// el detalle de la inmersión y la imagen exportada de la gráfica.
+/// Summary data of a dive (duration, depths, minimum
+/// temperature, deco) from the record and, if something is missing, the profile. Used by
+/// the dive detail and the exported chart image.
 library;
 
 import 'package:pandive/core/models/models.dart';
@@ -13,7 +13,7 @@ class DiveFacts {
   final bool isDeco;
   final int? maxTts; // min
   final double? maxCeiling; // m
-  final double? ceilingMinutes; // tiempo con techo
+  final double? ceilingMinutes; // time under a ceiling
 
   const DiveFacts({
     this.durationMin,

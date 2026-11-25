@@ -1,4 +1,4 @@
-/// Acción de fusionar compañeros: pide cuál conservar y fusiona el resto en él.
+/// Merge buddies action: asks which one to keep and merges the rest into it.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -8,7 +8,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/data_revision.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Devuelve true si fusionó. [selected] deben ser 2+ compañeros.
+/// Returns true if it merged. [selected] must be 2+ buddies.
 Future<bool> runMergeBuddies(
     BuildContext context, DivemateDb db, List<Buddy> selected) async {
   if (selected.length < 2) return false;

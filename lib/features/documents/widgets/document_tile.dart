@@ -1,4 +1,4 @@
-/// Fila de documento: miniatura + título + estado de caducidad.
+/// Document row: thumbnail + title + expiry status.
 library;
 
 import 'dart:io';

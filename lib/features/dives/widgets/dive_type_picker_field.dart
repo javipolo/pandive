@@ -1,5 +1,5 @@
-/// Campo selector de "tipo de buceo". Al elegir uno, el formulario añade sus
-/// botellas-plantilla. Muestra una hoja con los tipos configurados.
+/// "Dive type" picker field. When one is picked, the form adds its
+/// template cylinders. Shows a sheet with the configured types.
 library;
 
 import 'package:material_ui/material_ui.dart';

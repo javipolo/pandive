@@ -7,8 +7,8 @@ import 'core/settings/settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting(); // todos los locales (es + en)
-  await initBackupWorker(); // backup automático en segundo plano (WorkManager)
+  await initializeDateFormatting(); // all locales (es + en)
+  await initBackupWorker(); // automatic background backup (WorkManager)
   final settings = await Settings.load();
   runApp(PandiveApp(settings: settings));
 }

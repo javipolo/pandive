@@ -1,6 +1,6 @@
-/// Importar la imagen de un documento: elegir origen (cámara / galería / PDF),
-/// (si PDF, renderizar la página elegida), recortar con nuestra pantalla y
-/// guardar como JPG. Devuelve el nombre de fichero guardado, o null si se
+/// Import a document image: choose the source (camera / gallery / PDF),
+/// (if PDF, render the chosen page), crop with our screen and
+/// save as JPG. Returns the saved file name, or null if
 /// cancela.
 library;
 

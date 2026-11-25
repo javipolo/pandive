@@ -1,5 +1,5 @@
-/// Lista seleccionable de buceos a importar (nuevos + pendientes). Gestiona su
-/// propia selección y permite elegir cuáles guardar y marcar/desmarcar todos.
+/// Selectable list of dives to import (new + pending). Manages its
+/// own selection and lets you choose which to save and tick/untick all.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -12,8 +12,8 @@ typedef DownloadItem = ({DownloadedDive dive, bool pending});
 
 class DownloadResultList extends StatefulWidget {
   final List<DownloadItem> items;
-  final Set<String> initialSelected; // fingerprints marcados por defecto
-  final int existing; // ya en la DB (para el resumen)
+  final Set<String> initialSelected; // fingerprints ticked by default
+  final int existing; // already in the DB (for the summary)
   final bool saving;
   final ValueChanged<Set<String>> onSave;
 
@@ -58,8 +58,8 @@ class _DownloadResultListState extends State<DownloadResultList> {
     }
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        // Permite guardar 0: descarta de golpe las no elegidas y avanza el
-        // fingerprint, aunque no guardes ninguna. (Atrás no cambia nada.)
+        // Allows saving 0: discards the unchosen ones at once and advances the
+        // fingerprint, even if you save none. (Back changes nothing.)
         onPressed: widget.saving ? null : () => widget.onSave(_sel),
         icon: const Icon(Icons.save),
         label: Text(widget.saving ? t.saving : t.saveN(_sel.length)),

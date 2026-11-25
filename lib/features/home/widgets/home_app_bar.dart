@@ -1,5 +1,5 @@
-/// AppBar de la pantalla principal: título o buscador, y acciones (buscar,
-/// colapsar grupos, ordenar por nº de buceos) con el estado de sync delante.
+/// Main screen AppBar: title or search box, and actions (search,
+/// collapse groups, sort by dive count) with the sync status in front.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -101,8 +101,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: Icon(
                         collapseAll ? Icons.unfold_more : Icons.unfold_less),
                     onPressed: onToggleCollapse)
-              // En sitios, al ordenar por buceos desaparece colapsar: deja el
-              // hueco para que el resto de iconos no se muevan.
+              // In sites, sorting by dives removes collapse: leave the
+              // gap so the other icons don't move.
               else if (canSort && index == 1)
                 const SizedBox(width: 48),
             ],

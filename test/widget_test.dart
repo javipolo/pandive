@@ -1,5 +1,5 @@
 import 'dart:io';
-// Smoke test básico de Pandive.
+// Basic Pandive smoke test.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/backup_util.dart';
@@ -33,7 +33,7 @@ void main() {
       for (var i = 0; i < 13; i++) ('id$i', DateTime(2026, 1, 1 + i)),
     ];
     final prune = idsToPrune(items);
-    // Las 3 más antiguas (id0,id1,id2) se borran.
+    // The 3 oldest (id0,id1,id2) are deleted.
     expect(prune.toSet(), {'id0', 'id1', 'id2'});
   });
 
@@ -48,9 +48,9 @@ void main() {
         [('2024', 3), ('2025', 1)]);
     expect(bucketByPeriod(dates, StatsPeriod.month),
         [('24-01', 2), ('24-03', 1), ('25-06', 1)]);
-    // 1 enero 2024 = semana ISO 2024-W02; mismo bucket para 10 y 20 ene.
+    // 1 January 2024 = ISO week 2024-W02; same bucket for 10 and 20 Jan.
     final wk = bucketByPeriod(dates, StatsPeriod.week);
-    expect(wk.length, 4); // 10 y 20 ene caen en semanas distintas
+    expect(wk.length, 4); // 10 and 20 Jan fall in different weeks
     expect(wk.fold<int>(0, (s, e) => s + e.$2), 4);
   });
 }

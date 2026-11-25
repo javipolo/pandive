@@ -1,6 +1,6 @@
 part of 'divemate_db.dart';
 
-/// Etiquetas (tags) reutilizables y su enlace por inmersión.
+/// Reusable tags and their per-dive link.
 extension DivemateDbTags on DivemateDb {
   List<Tag> listTags() {
     final rows = _db.select('SELECT Id, Name FROM PandiveTag');
@@ -19,8 +19,8 @@ extension DivemateDbTags on DivemateDb {
     return _db.lastInsertRowId;
   }
 
-  /// IDs de inmersiones que tienen un tag por nombre (case-insensitive), ya sea
-  /// propio del buceo o heredado del tag de su sitio (Place).
+  /// IDs of dives that have a tag by name (case-insensitive), either
+  /// the dive's own or inherited from its site's (Place) tag.
   Set<int> diveIdsWithTag(String name) {
     final bySite = _hasTable('PandiveSiteTag')
         ? 'OR L.PlaceID IN (SELECT S.PlaceId FROM PandiveSiteTag S '
@@ -37,8 +37,8 @@ extension DivemateDbTags on DivemateDb {
     return {for (final r in rows) r['ID'] as int};
   }
 
-  /// Tags propios del buceo (solo el enlace PandiveDiveTag). Es lo que edita y
-  /// guarda el editor; no incluye los heredados del sitio.
+  /// The dive's own tags (only the PandiveDiveTag link). This is what the editor
+  /// edits and saves; it doesn't include those inherited from the site.
   List<Tag> tagsForDive(int diveId) {
     final rows = _db.select(
       'SELECT T.Id, T.Name FROM PandiveTag T '
@@ -51,8 +51,8 @@ extension DivemateDbTags on DivemateDb {
         .toList();
   }
 
-  /// Tags efectivos del buceo: propios + los del sitio (Place) al que pertenece.
-  /// Derivados en lectura (dinámicos): mostrar/contar, no persistir.
+  /// Effective tags of the dive: own + those of the site (Place) it belongs to.
+  /// Derived on read (dynamic): show/count, don't persist.
   List<Tag> effectiveTagsForDive(int diveId) {
     if (!_hasTable('PandiveSiteTag')) return tagsForDive(diveId);
     final rows = _db.select(
@@ -69,7 +69,7 @@ extension DivemateDbTags on DivemateDb {
         .toList();
   }
 
-  /// Tags asignados a un sitio (Place).
+  /// Tags assigned to a site (Place).
   List<Tag> tagsForSite(int placeId) {
     final rows = _db.select(
       'SELECT T.Id, T.Name FROM PandiveTag T '
@@ -92,10 +92,10 @@ extension DivemateDbTags on DivemateDb {
     }
   }
 
-  /// Recorre los comentarios de todas las inmersiones, extrae #hashtags y los
-  /// asigna como tags (creándolos si hace falta). No borra tags existentes.
-  /// Si [removeFromComments], quita los #hashtags del comentario. Devuelve el
-  /// nº de asignaciones (dive, tag) nuevas.
+  /// Walks the comments of all dives, extracts #hashtags and
+  /// assigns them as tags (creating them if needed). Doesn't delete existing tags.
+  /// If [removeFromComments], removes the #hashtags from the comment. Returns the
+  /// number of new (dive, tag) assignments.
   int importHashtagsFromComments({bool removeFromComments = false}) {
     final re = RegExp(r'#(\w+)', unicode: true);
     var added = 0;
@@ -125,9 +125,9 @@ extension DivemateDbTags on DivemateDb {
     return added;
   }
 
-  /// Añade los tags de cada inmersión como #hashtags al comentario (si no
-  /// están ya). Si [removeTags], desvincula los tags tras convertirlos.
-  /// Devuelve el nº de #hashtags añadidos.
+  /// Adds each dive's tags as #hashtags to the comment (if not
+  /// already there). If [removeTags], unlinks the tags after converting them.
+  /// Returns the number of #hashtags added.
   int exportTagsToComments({bool removeTags = false}) {
     final re = RegExp(r'#(\w+)', unicode: true);
     var added = 0;
@@ -164,7 +164,7 @@ extension DivemateDbTags on DivemateDb {
     _db.execute('DELETE FROM PandiveTag WHERE Id=?', [id]);
   }
 
-  /// Buceos con un tag (propio del buceo o heredado del tag de su sitio).
+  /// Dives with a tag (the dive's own or inherited from its site's tag).
   List<Dive> listDivesByTag(int tagId) {
     final owner = ownerId;
     final diver = owner != null ? 'AND L.DiverID = $owner' : '';

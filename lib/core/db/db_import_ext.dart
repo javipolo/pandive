@@ -1,10 +1,10 @@
 part of 'divemate_db.dart';
 
-/// Importación de inmersiones externas (p.ej. Subsurface) con perfil, botellas,
-/// sitio, compañeros y etiquetas.
+/// Import of external dives (e.g. Subsurface) with profile, cylinders,
+/// site, buddies and tags.
 extension DivemateDbImportExt on DivemateDb {
-  /// Inserta una inmersión externa. Dedupe por fecha/hora (ignora las ya
-  /// presentes, salvo borradas). Devuelve true si la insertó.
+  /// Inserts an external dive. Dedupe by date/time (ignores those already
+  /// present, except deleted ones). Returns true if it inserted it.
   bool importExternalDive({
     required DateTime dateTime,
     String? placeName,
@@ -65,7 +65,7 @@ extension DivemateDbImportExt on DivemateDb {
       ],
     );
     final id = _db.lastInsertRowId;
-    clearDiveAssoc(id); // evita heredar filas de un ID reutilizado
+    clearDiveAssoc(id); // avoids inheriting rows from a reused ID
     if (cylinders.isNotEmpty) setDiveTanks(id, cylinders);
     final tags = [
       for (final n in tagNames)
@@ -75,8 +75,8 @@ extension DivemateDbImportExt on DivemateDb {
     return true;
   }
 
-  /// Columnas de Logbook con el perfil y datos del ordenador (se copian tal
-  /// cual entre .ddb; solo las que existan en ambos lados).
+  /// Logbook columns with the profile and computer data (copied as is
+  /// between .ddb files; only those present on both sides).
   static const _profileCols = [
     'ProfileInt', 'Profile', 'Profile2', 'Profile3', 'Profile4', 'Profile10',
     'Deco', 'O2', 'MaxPPO2', 'PresS', 'PresE', 'PandiveAvgTemp', 'PandiveSac',
@@ -87,9 +87,9 @@ extension DivemateDbImportExt on DivemateDb {
           r['name'] as String
       };
 
-  /// Copia de [src] (buceo [srcId]) a este buceo [id]: ordenador, botellas y
-  /// tags propios; con [withProfile] también el perfil (Profile*, deco, extras
-  /// por muestra).
+  /// Copies from [src] (dive [srcId]) to this dive [id]: computer, cylinders and
+  /// own tags; with [withProfile] also the profile (Profile*, deco, per-sample
+  /// extras).
   void copyDiveDetailsFrom(int id, DivemateDb src, int srcId,
       {bool withProfile = false}) {
     final mine = _logbookCols();

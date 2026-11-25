@@ -1,6 +1,6 @@
-// Abrir un logbook no debe mover el sello de última escritura: si lo mueve,
-// la sync ve "modificado aquí" en cada arranque y, con dos dispositivos,
-// divergencia falsa (pasaba con el SAC no calculable: NULL -> NULL).
+// Opening a logbook must not move the last-write stamp: if it does,
+// sync sees "modified here" on every start and, with two devices,
+// a false divergence (happened with the non-computable SAC: NULL -> NULL).
 import 'dart:ffi';
 import 'dart:io';
 
@@ -24,13 +24,13 @@ void main() {
 
   test('reabrir no cambia el sello (SAC no calculable, perfiles)', () async {
     var db = DivemateDb.open(path);
-    // Sin duración: hay presiones pero el SAC no se puede calcular.
+    // No duration: there are pressures but the SAC can't be computed.
     db.createDive(dateTime: DateTime(2024, 1, 1, 10));
     final id = db.listDives().single.id;
     db.setDiveTanks(id, const [
       Cylinder(size: 12, pressureStart: 200, pressureEnd: 50),
     ]);
-    // Con perfil (prof. media / temperaturas se rellenan al abrir).
+    // With a profile (avg depth / temperatures are filled on open).
     db.importExternalDive(
       dateTime: DateTime(2024, 1, 2, 10),
       durationMin: 3,
@@ -40,7 +40,7 @@ void main() {
     );
     db.close();
 
-    // Primera apertura: puede rellenar lo que falte (una vez).
+    // First open: may fill in what's missing (once).
     DivemateDb.open(path).close();
     db = DivemateDb.open(path, readOnly: true);
     final before = db.lastWriteRaw;

@@ -1,11 +1,11 @@
-/// Compañero de buceo (tabla Buddy). Solo guardamos el nombre.
+/// Dive buddy (Buddy table). We only store the name.
 library;
 
 class Buddy {
   final int id;
   final String name;
   final int diveCount;
-  final DateTime? lastDive; // fecha del buceo más reciente con este buddy
+  final DateTime? lastDive; // date of the most recent dive with this buddy
 
   const Buddy({
     required this.id,

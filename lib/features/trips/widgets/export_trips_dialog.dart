@@ -1,5 +1,5 @@
-/// Confirmación antes de exportar viajes: lista los viajes y ofrece incluir
-/// los perfiles de buceo (desactivado por defecto).
+/// Confirmation before exporting trips: lists the trips and offers to include
+/// the dive profiles (off by default).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -7,7 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Devuelve null si se cancela; si no, si hay que exportar también perfiles.
+/// Returns null if cancelled; otherwise, whether to also export profiles.
 Future<bool?> showExportTripsDialog(BuildContext context, List<Trip> trips) =>
     showDialog<bool>(
         context: context, builder: (_) => _ExportTripsDialog(trips: trips));

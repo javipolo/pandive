@@ -1,5 +1,5 @@
-/// Pestañas principales (IndexedStack). Escucha `dataRevision` para refrescar
-/// sin reabrir la DB (reload blando tras escrituras en herramientas).
+/// Main tabs (IndexedStack). Listens to `dataRevision` to refresh
+/// without reopening the DB (soft reload after writes in tools).
 library;
 
 import 'package:material_ui/material_ui.dart';

@@ -1,4 +1,4 @@
-/// Crear o editar un sitio de buceo. Campos: nombre, país, masa de agua, región.
+/// Create or edit a dive site. Fields: name, country, body of water, region.
 library;
 
 import 'package:material_ui/material_ui.dart';

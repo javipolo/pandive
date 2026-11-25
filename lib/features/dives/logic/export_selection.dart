@@ -1,5 +1,5 @@
-/// Exporta un .ddb mínimo con solo los buceos seleccionados (fecha/hora + sitio).
-/// Pensado para que otro buceador use "Rellenar desde el logbook de un compañero".
+/// Exports a minimal .ddb with only the selected dives (date/time + site).
+/// Meant for another diver to use "Fill from a buddy's logbook".
 library;
 
 import 'dart:io';
@@ -14,8 +14,8 @@ import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/core/widgets/text_prompt_dialog.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Pide un nombre y crea un .ddb temporal con [dives] (solo fecha/hora y lugar)
-/// y lo comparte. El fichero se llama `name - PanDive.ddb`.
+/// Asks for a name, creates a temp .ddb with [dives] (date/time and place only)
+/// and shares it. The file is named `name - PanDive.ddb`.
 Future<void> exportSelectionDdb(
     BuildContext context, DivemateDb source, List<Dive> dives) async {
   final name =
@@ -27,8 +27,8 @@ Future<void> exportSelectionDdb(
   await shareOrSaveFile(f);
 }
 
-// Escribe [dives] en un .ddb temporal "<nombre> - PanDive.ddb". Por bloques
-// en transacción, cediendo el hilo entre bloques (no congelar la UI).
+// Writes [dives] to a temp .ddb "<name> - PanDive.ddb". In chunks
+// within a transaction, yielding the thread between chunks (don't freeze the UI).
 Future<File> _writeSelection(
     DivemateDb source, List<Dive> dives, String name) async {
   final dir = await getTemporaryDirectory();

@@ -1,6 +1,6 @@
 part of 'divemate_db.dart';
 
-/// Tipos de buceo configurables y su plantilla de botellas.
+/// Configurable dive types and their cylinder template.
 extension DivemateDbDiveTypes on DivemateDb {
   List<DiveType> listDiveTypes() {
     final rows = _db.select('SELECT Id, Name FROM PandiveDiveType');
@@ -14,7 +14,7 @@ extension DivemateDbDiveTypes on DivemateDb {
       ..sort((a, b) => compareFold(a.name, b.name));
   }
 
-  /// Botellas-plantilla de un tipo (nombre + litros + material; sin presiones).
+  /// Template cylinders of a type (name + litres + material; no pressures).
   List<Cylinder> diveTypeTanks(int typeId) {
     final rows = _db.select(
       'SELECT Litres, Material, Name FROM PandiveDiveTypeTank '

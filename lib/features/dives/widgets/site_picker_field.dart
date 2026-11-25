@@ -1,4 +1,4 @@
-/// Campo que muestra el sitio de buceo elegido y permite seleccionar/quitar.
+/// Field showing the chosen dive site and allowing selecting/removing it.
 library;
 
 import 'package:material_ui/material_ui.dart';

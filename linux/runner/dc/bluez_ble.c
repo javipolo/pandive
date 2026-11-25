@@ -1,7 +1,7 @@
-// Conexión GATT con BlueZ por D-Bus (ver bluez_ble.h). Mismo criterio que
-// BleConnection.kt: servicio serie preferido (Shearwater, Mares) o el primero
-// con una característica de escritura y otra de notificación; OSTC (Telit)
-// con control de flujo por créditos.
+// GATT connection with BlueZ over D-Bus (see bluez_ble.h). Same criteria as
+// BleConnection.kt: preferred serial service (Shearwater, Mares) or the first
+// with a write characteristic and a notify one; OSTC (Telit)
+// with credit-based flow control.
 #include "bluez_ble.h"
 
 #include <string.h>
@@ -95,7 +95,7 @@ struct _BleConn {
     gboolean disconnected;
 };
 
-// Busca el objeto Device1 con esa MAC; devuelve su ruta o NULL.
+// Finds the Device1 object with that MAC; returns its path or NULL.
 static gchar *find_device(GDBusConnection *bus, const gchar *address) {
     g_autoptr(GVariant) res = managed_objects(bus);
     if (!res) return NULL;
@@ -139,7 +139,7 @@ static GVariant *discovery_filter(void) {
     return g_variant_new("(a{sv})", &b);
 }
 
-// Si BlueZ aún no conoce el dispositivo, descubrir hasta que aparezca.
+// If BlueZ doesn't know the device yet, discover until it shows up.
 static gchar *discover_device(GDBusConnection *bus, const gchar *address, int timeout_ms) {
     gchar *path = find_device(bus, address);
     if (path) return path;
@@ -162,7 +162,7 @@ static gchar *discover_device(GDBusConnection *bus, const gchar *address, int ti
 }
 
 // ---------------------------------------------------------------------------
-// Selección de características GATT
+// GATT characteristic selection
 // ---------------------------------------------------------------------------
 
 typedef struct { gchar *path, *uuid, *service; gboolean w, wnr, n; } GattChar;
@@ -172,7 +172,7 @@ static void gatt_char_free(gpointer p) {
     g_free(g->path); g_free(g->uuid); g_free(g->service); g_free(g);
 }
 
-// Servicios (ruta -> uuid) y características bajo el dispositivo.
+// Services (path -> uuid) and characteristics under the device.
 static void list_gatt(BleConn *c, GHashTable *services, GPtrArray *chars) {
     g_autoptr(GVariant) res = managed_objects(c->bus);
     if (!res) return;
@@ -221,7 +221,7 @@ static GattChar *char_by_uuid(GPtrArray *chars, const gchar *svc, const gchar *u
     return NULL;
 }
 
-// Primera escritura + primera notificación del servicio svc.
+// First write + first notify of service svc.
 static gboolean pick_in_service(BleConn *c, GPtrArray *chars, const gchar *svc) {
     GattChar *w = NULL, *n = NULL;
     for (guint i = 0; i < chars->len; i++) {
@@ -241,7 +241,7 @@ static gboolean pick_in_service(BleConn *c, GPtrArray *chars, const gchar *svc) 
 static gboolean select_chars(BleConn *c, GHashTable *services, GPtrArray *chars) {
     GHashTableIter hi;
     gpointer k, v;
-    // OSTC Telit: 4 características fijas con créditos.
+    // OSTC Telit: 4 fixed characteristics with credits.
     g_hash_table_iter_init(&hi, services);
     while (g_hash_table_iter_next(&hi, &k, &v)) {
         if (strcmp(v, HW_TELIT_SERVICE)) continue;
@@ -254,7 +254,7 @@ static gboolean select_chars(BleConn *c, GHashTable *services, GPtrArray *chars)
             c->write_cmd = drx->wnr && !drx->w;
             c->cred_tx_path = g_strdup(ctx->path);
             c->cred_rx_path = g_strdup(crx->path);
-            g_message("PandiveBLE: OSTC Telit, control de flujo por créditos");
+            g_message("PandiveBLE: OSTC Telit, credit-based flow control");
             return TRUE;
         }
     }
@@ -270,7 +270,7 @@ static gboolean select_chars(BleConn *c, GHashTable *services, GPtrArray *chars)
 }
 
 // ---------------------------------------------------------------------------
-// Notificaciones y escritura
+// Notifications and writing
 // ---------------------------------------------------------------------------
 
 static int write_value(BleConn *c, const gchar *path, const void *data, gsize size,
@@ -332,8 +332,8 @@ static gboolean auth_error(const GError *e) {
                  strstr(e->message, "Authentication") || strstr(e->message, "Insufficient"));
 }
 
-// StartNotify; si falla por seguridad, emparejar (el agente del escritorio
-// pide el PIN si hace falta) y reintentar.
+// StartNotify; if it fails for security, pair (the desktop agent
+// asks for the PIN if needed) and retry.
 static gboolean start_notify(BleConn *c, const gchar *path, gchar **error) {
     g_autoptr(GError) err = NULL;
     g_autoptr(GVariant) r = call(c, path, IFACE_CHAR, "StartNotify", NULL, 10000, &err);
@@ -376,7 +376,7 @@ static gboolean do_connect(BleConn *c, int timeout_ms, gchar **error) {
 
 BleConn *ble_conn_open(const gchar *address, int timeout_ms, gchar **error) {
     BleConn *c = g_new0(BleConn, 1);
-    // declaradas antes de cualquier goto (limpieza automática al salir)
+    // declared before any goto (automatic cleanup on exit)
     g_autoptr(GHashTable) services =
         g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_autoptr(GPtrArray) chars = g_ptr_array_new_with_free_func(gatt_char_free);
@@ -400,7 +400,7 @@ BleConn *ble_conn_open(const gchar *address, int timeout_ms, gchar **error) {
         goto fail;
     }
 
-    // Suscripciones (despachadas en c->ctx, el contexto de este hilo).
+    // Subscriptions (dispatched on c->ctx, this thread's context).
     c->sub_char = g_dbus_connection_signal_subscribe(c->bus, BLUEZ, IFACE_PROPS,
         "PropertiesChanged", NULL, IFACE_CHAR, G_DBUS_SIGNAL_FLAGS_NONE,
         on_char_changed, c, NULL);
@@ -409,7 +409,7 @@ BleConn *ble_conn_open(const gchar *address, int timeout_ms, gchar **error) {
         on_dev_changed, c, NULL);
 
     if (c->credit) {
-        // Secuencia Telit: créditos (indicate) -> datos (notify) -> crédito inicial.
+        // Telit sequence: credits (indicate) -> data (notify) -> initial credit.
         if (!start_notify(c, c->cred_tx_path, error)) goto fail;
         if (!start_notify(c, c->notify_path, error)) goto fail;
         c->balance = MAX_CREDIT;
@@ -427,7 +427,7 @@ fail:
 int ble_conn_read(BleConn *c, unsigned char *buf, gsize cap, int timeout_ms) {
     gint64 end = g_get_monotonic_time() + (gint64) timeout_ms * 1000;
     while (g_queue_is_empty(&c->queue)) {
-        // atender señales ya llegadas antes de mirar el reloj o la conexión
+        // handle signals already received before checking the clock or the connection
         while (g_main_context_iteration(c->ctx, FALSE)) {}
         if (!g_queue_is_empty(&c->queue)) break;
         if (c->disconnected) return -1;

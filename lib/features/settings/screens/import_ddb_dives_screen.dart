@@ -1,6 +1,6 @@
-/// Elegir qué buceos de un .ddb externo (abierto en solo lectura) importar al
-/// logbook. Verde = nuevo (marcado por defecto); ámbar = coincide en hora con
-/// uno existente (se ignora). Al terminar muestra un resumen.
+/// Choose which dives of an external .ddb (opened read-only) to import into the
+/// logbook. Green = new (ticked by default); amber = matches the time of
+/// an existing one (ignored). Shows a summary when done.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -15,7 +15,7 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class ImportDdbDivesScreen extends StatefulWidget {
   final DivemateDb target; // logbook propio
-  final DivemateDb source; // .ddb abierto en solo lectura
+  final DivemateDb source; // .ddb opened read-only
   const ImportDdbDivesScreen(
       {super.key, required this.target, required this.source});
 

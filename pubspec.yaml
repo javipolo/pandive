@@ -35,35 +35,35 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  # Acceso directo a SQLite (abre el .ddb de DiveMate en cualquier ruta)
+  # Direct SQLite access (opens the DiveMate .ddb at any path)
   sqlite3: ^2.4.0
-  sqlite3_flutter_libs: ^0.5.24   # empaqueta la lib nativa de sqlite en el APK
-  # Seleccionar/abrir un fichero .ddb
+  sqlite3_flutter_libs: ^0.5.24   # bundles the native sqlite lib in the APK
+  # Pick/open a .ddb file
   file_picker: ^8.1.2
   path_provider: ^2.1.4
-  # Gráfico de perfil de inmersión
+  # Dive profile chart
   fl_chart: ^0.69.0
-  # Formato de fechas/números (versión que exige flutter_localizations)
+  # Date/number formatting (version required by flutter_localizations)
   intl: ^0.20.2
-  # Persistencia de preferencias (tamaño de letra, DB activa)
+  # Preference persistence (font size, active DB)
   shared_preferences: ^2.3.2
-  # Abrir coordenadas de un sitio en la app de mapas
+  # Open a site's coordinates in the maps app
   url_launcher: ^6.3.1
-  # Permisos runtime (Bluetooth para la descarga del ordenador de buceo)
+  # Runtime permissions (Bluetooth for the dive computer download)
   permission_handler: ^11.3.1
-  # Mantener la pantalla encendida durante la descarga
+  # Keep the screen on during the download
   wakelock_plus: ^1.2.8
   googleapis: ^19.0.0
   crypto: ^3.0.8
   share_plus: ^12.0.2
-  # Parseo del XML de Subsurface (.ssrf) al importar
+  # Subsurface XML (.ssrf) parsing on import
   xml: ^6.5.0
-  # Material de este SDK de Flutter (fork: flutter/material está deprecado aquí).
+  # This Flutter SDK's Material (fork: flutter/material is deprecated here).
   material_ui: ^1.11.1
   cupertino_ui: ^1.1.7
   image_picker: ^1.2.4
   crop_your_image: ^2.0.1
-  image: ^4.1.0 # recorte/rotación propia (ver dependency_overrides)
+  image: ^4.1.0 # our own crop/rotation (see dependency_overrides)
   pdfx: ^2.11.0
   pdf: ^3.12.0
   archive: ^4.0.9
@@ -79,8 +79,8 @@ dependencies:
   geolocator: ^14.0.2
   connectivity_plus: ^7.3.1
 
-# pdf limita archive <4.1 -> pub coge archive 4.0.9, e image 4.11.0 llama a un
-# método (decodeLazy) que esa archive no tiene. Fijamos image <4.11 (compatible).
+# pdf caps archive <4.1 -> pub picks archive 4.0.9, and image 4.11.0 calls a
+# method (decodeLazy) that archive doesn't have. We pin image <4.11 (compatible).
 dependency_overrides:
   image: 4.10.0
 
@@ -102,11 +102,11 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
-  generate: true   # genera AppLocalizations desde lib/l10n/*.arb
+  generate: true   # generates AppLocalizations from lib/l10n/*.arb
   assets:
     - assets/logo/pandive_splash.png
 
-# Icono de la app (oso panda buceando). Genera con:
+# App icon (diving panda). Generate with:
 #   dart run flutter_launcher_icons
 flutter_launcher_icons:
   android: true

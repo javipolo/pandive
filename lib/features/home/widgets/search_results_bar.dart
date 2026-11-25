@@ -1,4 +1,4 @@
-/// Línea pequeña bajo la barra de búsqueda con el nº de resultados del tab.
+/// Small line under the search bar with the tab's result count.
 library;
 
 import 'package:material_ui/material_ui.dart';

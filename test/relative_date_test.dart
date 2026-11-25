@@ -1,4 +1,4 @@
-// "Hoy 17:12" / "Ayer 21:23" / fecha completa en la lista de backups.
+// "Today 17:12" / "Yesterday 21:23" / full date in the backups list.
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';

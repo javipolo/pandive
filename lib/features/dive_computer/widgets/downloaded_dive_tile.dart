@@ -1,5 +1,5 @@
-/// Fila seleccionable de una inmersión descargada (fecha, prof, duración,
-/// nº muestras). Marca las "pendientes" (reaparecidas de una descarga previa).
+/// Selectable row of a downloaded dive (date, depth, duration,
+/// sample count). Marks the "pending" ones (reappeared from a previous download).
 library;
 
 import 'package:material_ui/material_ui.dart';

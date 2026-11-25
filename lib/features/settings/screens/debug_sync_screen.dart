@@ -1,5 +1,5 @@
-/// DEBUG: fija el punto de sincronización en un buceo (su fingerprint) y borra
-/// los posteriores, para poder probar "descargar nuevas inmersiones".
+/// DEBUG: sets the sync point at a dive (its fingerprint) and deletes
+/// the later ones, to be able to test "download new dives".
 library;
 
 import 'package:material_ui/material_ui.dart';

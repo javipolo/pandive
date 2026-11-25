@@ -2,9 +2,9 @@ part of 'divemate_db.dart';
 
 String _p3(int v) => v.clamp(0, 999).toString().padLeft(3, '0');
 
-/// Codifica las muestras al formato DiveMate: Profile (12 chars/muestra, 4
-/// primeros = decímetros), Profile2 (11 chars, 4 primeros = centi-°C), e
-/// intervalo en segundos. Asume muestreo uniforme (como el ordenador).
+/// Encodes samples in DiveMate format: Profile (12 chars/sample, first 4
+/// = decimetres), Profile2 (11 chars, first 4 = centi-°C), and
+/// interval in seconds. Assumes uniform sampling (like the computer).
 (int, String?, String?) _encodeProfile(List<DiveSample> samples) {
   if (samples.length < 2) return (0, null, null);
   final totalMs = samples.last.timeMs - samples.first.timeMs;
@@ -16,16 +16,16 @@ String _p3(int v) => v.clamp(0, 999).toString().padLeft(3, '0');
   for (final s in samples) {
     final dm = (s.depth * 10).round().clamp(0, 9999);
     prof.write(dm.toString().padLeft(4, '0'));
-    prof.write('00000000'); // 12 chars por registro
+    prof.write('00000000'); // 12 chars per record
     final centi = s.temp != null ? (s.temp! * 100).round().clamp(0, 9999) : 0;
     prof2.write(centi.toString().padLeft(4, '0'));
-    prof2.write('0000000'); // 11 chars por registro
+    prof2.write('0000000'); // 11 chars per record
   }
   return (interval, prof.toString(), prof2.toString());
 }
 
-/// Codifica Profile4 (formato DiveMate: NDL/TTS/parada + techo) desde muestras.
-/// Devuelve null si no hay datos de deco/NDL.
+/// Encodes Profile4 (DiveMate format: NDL/TTS/stop + ceiling) from samples.
+/// Returns null if there is no deco/NDL data.
 String? _encodeProfile4(List<DiveSample> samples) {
   final any = samples.any((s) => s.ceiling > 0 || s.ndl != null || s.tts != null);
   if (!any) return null;

@@ -1,5 +1,5 @@
-/// Info detallada de un sitio de buceo: campos, editar/borrar arriba, swipe
-/// lateral entre sitios, y acceso a sus inmersiones.
+/// Detailed dive site info: fields, edit/delete at the top, side swipe
+/// between sites, and access to its dives.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -141,7 +141,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
                 height: 200,
                 child: Stack(
                   children: [
-                    // Mapa no interactivo: el toque abre el mapa a pantalla completa.
+                    // Non-interactive map: a tap opens the fullscreen map.
                     IgnorePointer(
                       child: SiteMap(
                         center: LatLng(s.lat!, s.lon!),

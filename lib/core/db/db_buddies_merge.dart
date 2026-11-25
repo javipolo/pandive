@@ -1,10 +1,10 @@
 part of 'divemate_db.dart';
 
-/// Fusión de compañeros: unifica varios buddies en uno.
+/// Buddy merge: unifies several buddies into one.
 extension DivemateDbBuddiesMerge on DivemateDb {
-  /// Fusiona los buddies [fromIds] en [keepId]: reasigna las inmersiones que
-  /// los referencian (en BuddyIDs, sin duplicar), recompone el texto Buddy y
-  /// borra los buddies fusionados. [keepId] se preserva.
+  /// Merges buddies [fromIds] into [keepId]: reassigns the dives that
+  /// reference them (in BuddyIDs, without duplicates), rebuilds the Buddy text and
+  /// deletes the merged buddies. [keepId] is kept.
   void mergeBuddies(int keepId, Iterable<int> fromIds) {
     final from = fromIds.where((id) => id != keepId).toSet();
     if (from.isEmpty) return;
@@ -24,6 +24,6 @@ extension DivemateDbBuddiesMerge on DivemateDb {
     for (final id in from) {
       deleteBuddy(id);
     }
-    _refreshBuddyNames(keepId); // recompone Buddy (texto) de las afectadas
+    _refreshBuddyNames(keepId); // rebuilds Buddy (text) of the affected dives
   }
 }

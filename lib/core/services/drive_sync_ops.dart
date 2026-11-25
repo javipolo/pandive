@@ -1,27 +1,27 @@
 part of 'drive_backup.dart';
 
-/// Fichero compartido de la sincronización (en la carpeta de backups; su
-/// nombre no casa con los backups con timestamp, así que no se poda). Va
-/// comprimido con gzip: una DB de 12 MB queda en <1 MB (datos móviles).
+/// Shared sync file (in the backups folder; its
+/// name doesn't match the timestamped backups, so it isn't pruned). It's
+/// gzip-compressed: a 12 MB DB becomes <1 MB (mobile data).
 const syncFileName = 'sync-logbook.ddb.gz';
 const _presencePrefix = 'presence-';
 
-/// Estado del fichero de sync en Drive.
+/// State of the sync file on Drive.
 class RemoteSync {
-  final String? id; // null = no existe aún
+  final String? id; // null = doesn't exist yet
   final String? md5;
   const RemoteSync(this.id, this.md5);
   bool get exists => id != null;
 }
 
-/// Otro dispositivo con Pandive abierto recientemente.
+/// Another device with Pandive open recently.
 class DevicePresence {
   final String device;
   final DateTime time;
   const DevicePresence(this.device, this.time);
 }
 
-/// Operaciones de Drive para [SyncController] (auth silenciosa siempre).
+/// Drive operations for [SyncController] (always silent auth).
 extension DriveSyncOps on DriveBackupService {
   Future<(drive.DriveApi, String)?> _syncApi() async {
     if (!await signInSilently()) return null;
@@ -30,7 +30,7 @@ extension DriveSyncOps on DriveBackupService {
     return (api, await _ensureFolder(api));
   }
 
-  /// Estado del fichero de sync, o null sin sesión/red.
+  /// State of the sync file, or null without session/network.
   Future<RemoteSync?> remoteSync() async {
     final a = await _syncApi();
     if (a == null) return null;
@@ -44,7 +44,7 @@ extension DriveSyncOps on DriveBackupService {
     return RemoteSync(f.first.id, f.first.md5Checksum);
   }
 
-  /// Sube [raw] (la DB sin comprimir) como fichero de sync; devuelve su md5.
+  /// Uploads [raw] (the uncompressed DB) as the sync file; returns its md5.
   Future<String?> uploadSync(List<int> raw, RemoteSync remote) async {
     final a = await _syncApi();
     if (a == null) return null;
@@ -75,8 +75,8 @@ extension DriveSyncOps on DriveBackupService {
     return gzip.decode(bytes);
   }
 
-  /// Guarda la versión descartada en una divergencia como backup con
-  /// timestamp (aparece en Restaurar).
+  /// Saves the version discarded in a divergence as a timestamped
+  /// backup (shows up in Restore).
   Future<void> uploadDiscarded(List<int> bytes) async {
     final a = await _syncApi();
     if (a == null) return;
@@ -85,7 +85,7 @@ extension DriveSyncOps on DriveBackupService {
     await _prune(api, folder);
   }
 
-  /// Sube el zip de imágenes de documentos si cambiaron desde la última vez.
+  /// Uploads the document images zip if they changed since last time.
   Future<void> syncDocumentsUp(Settings s) async {
     final dir = await documentsDir();
     final parts = <String>[
@@ -105,7 +105,7 @@ extension DriveSyncOps on DriveBackupService {
     if (a != null) await _restoreDocuments(a.$1, a.$2);
   }
 
-  /// Marca este dispositivo como activo ahora.
+  /// Marks this device as active now.
   Future<void> writePresence(String deviceId, String deviceName) async {
     final a = await _syncApi();
     if (a == null) return;
@@ -117,7 +117,7 @@ extension DriveSyncOps on DriveBackupService {
         replace: true);
   }
 
-  /// Presencia de los demás dispositivos (cualquier antigüedad).
+  /// Presence of the other devices (any age).
   Future<List<DevicePresence>> otherPresence(String deviceId) async {
     final a = await _syncApi();
     if (a == null) return const [];

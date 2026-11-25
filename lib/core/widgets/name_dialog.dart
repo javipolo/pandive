@@ -1,4 +1,4 @@
-/// Diálogo simple de un campo de texto (nombre). Devuelve el texto o null.
+/// Simple one-field (name) text dialog. Returns the text or null.
 library;
 
 import 'package:material_ui/material_ui.dart';

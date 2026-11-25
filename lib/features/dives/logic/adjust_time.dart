@@ -1,5 +1,5 @@
-/// Ajuste de hora en lote: elige la hora nueva del primer buceo y aplica el
-/// mismo desfase a todos los seleccionados. Devuelve true si cambió algo.
+/// Batch time adjustment: pick the new time of the first dive and apply the
+/// same offset to all selected ones. Returns true if anything changed.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -16,7 +16,7 @@ Future<bool> adjustDivesTime(
   if (withDate.isEmpty) return false;
   final orig = withDate.first.date!;
   final t = AppLocalizations.of(context);
-  // Aviso previo: explica el ajuste en lote antes de abrir el calendario.
+  // Prior notice: explains the batch adjustment before opening the calendar.
   if (!await confirmDialog(context, t.adjustTimeExplain(withDate.length),
       confirmLabel: t.continueLabel)) {
     return false;

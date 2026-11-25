@@ -3,7 +3,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/features/dives/logic/apply_dive_type.dart';
 
 void main() {
-  const empty = Cylinder(size: 12); // sin presiones
+  const empty = Cylinder(size: 12); // no pressures
   const used = Cylinder(size: 15, pressureStart: 200, pressureEnd: 50);
   const typeA = Cylinder(size: 7, name: 'L');
   const typeB = Cylinder(size: 7, name: 'R');
@@ -11,7 +11,7 @@ void main() {
   test('tipo con botellas: descarta vacías, conserva con presiones, añade tipo', () {
     final r = applyDiveTypeTanks([empty, used], [typeA, typeB]);
     expect(r.map((c) => c.name ?? c.size.toString()),
-        ['15.0', 'L', 'R']); // empty fuera, used primero, luego tipo
+        ['15.0', 'L', 'R']); // empty out, used first, then type
     expect(r.length, 3);
   });
 

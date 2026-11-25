@@ -7,7 +7,7 @@ void main() {
         Buddy(id: 1, name: 'Ana', diveCount: 2, lastDive: DateTime(2020, 1, 1)),
         Buddy(id: 2, name: 'Zoe', diveCount: 10, lastDive: DateTime(2024, 6, 1)),
         Buddy(id: 3, name: 'bru', diveCount: 2, lastDive: DateTime(2023, 3, 1)),
-        const Buddy(id: 4, name: 'Cal', diveCount: 0), // sin buceos
+        const Buddy(id: 4, name: 'Cal', diveCount: 0), // no dives
       ];
 
   test('name: alfabético (fold)', () {
@@ -19,7 +19,7 @@ void main() {
   test('dives: desc por buceos, luego nombre (fold)', () {
     final l = sample();
     sortBuddiesBy(l, BuddySort.dives);
-    // Zoe(10), empate 2 -> Ana, bru, luego Cal(0)
+    // Zoe(10), tie at 2 -> Ana, bru, then Cal(0)
     expect(l.map((b) => b.name), ['Zoe', 'Ana', 'bru', 'Cal']);
   });
 

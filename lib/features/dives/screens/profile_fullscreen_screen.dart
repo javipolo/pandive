@@ -1,5 +1,5 @@
-/// Perfil de inmersión maximizado. Se ve en la orientación actual del móvil:
-/// en vertical ocupa toda la pantalla, y si giras el móvil, apaisado (mejor).
+/// Maximised dive profile. Shown in the phone's current orientation:
+/// in portrait it fills the screen, and if you rotate the phone, landscape (better).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -14,8 +14,8 @@ import 'package:pandive/l10n/app_localizations.dart';
 class ProfileFullscreenScreen extends StatelessWidget {
   final DiveProfile profile;
   final String title;
-  final String? shareTitle; // título de la imagen compartida (con fecha)
-  final DiveFacts facts; // pie de la imagen compartida
+  final String? shareTitle; // title of the shared image (with date)
+  final DiveFacts facts; // footer of the shared image
   final List<GasChange> gasChanges;
   const ProfileFullscreenScreen({
     super.key,
@@ -40,7 +40,7 @@ class ProfileFullscreenScreen extends StatelessWidget {
               facts: facts,
               gasChanges: gasChanges),
         ),
-        // Alinea el icono con el borde derecho del plot (antes del eje de temp.).
+        // Aligns the icon with the plot's right edge (before the temp axis).
         const SizedBox(width: 56),
       ]),
       body: Padding(

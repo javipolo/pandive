@@ -1,5 +1,5 @@
-/// Comparación/ordenación alfabética insensible a acentos y mayúsculas
-/// (Àliga/Álvaro ordenan antes que Baliza, no al final).
+/// Accent- and case-insensitive alphabetical comparison/sorting
+/// (Àliga/Álvaro sort before Baliza, not at the end).
 library;
 
 const _from = 'áàäâãéèëêíìïîóòöôõúùüûñçÁÀÄÂÃÉÈËÊÍÌÏÎÓÒÖÔÕÚÙÜÛÑÇ';
@@ -18,7 +18,7 @@ String foldAccents(String s) {
 int compareFold(String a, String b) =>
     foldAccents(a).toLowerCase().compareTo(foldAccents(b).toLowerCase());
 
-/// ¿[haystack] contiene [needle] ignorando acentos y mayúsculas?
-/// ("tomas" encuentra "Tomás"). [needle] se asume ya recortado por el llamador.
+/// Does [haystack] contain [needle] ignoring accents and case?
+/// ("tomas" finds "Tomás"). [needle] is assumed already trimmed by the caller.
 bool foldContains(String haystack, String needle) =>
     foldAccents(haystack).toLowerCase().contains(foldAccents(needle).toLowerCase());

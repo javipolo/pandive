@@ -1,4 +1,4 @@
-/// Detalle de un viaje: compañeros (editables) y acceso a sus inmersiones.
+/// Trip detail: buddies (editable) and access to its dives.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -47,7 +47,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   void _openMap() {
     final t = AppLocalizations.of(context);
     final dives = widget.db.listDivesByTrip(widget.trip.id);
-    // Fecha más temprana en que se visitó cada sitio durante el viaje (orden).
+    // Earliest date each site was visited during the trip (order).
     final firstAt = <int, DateTime>{};
     for (final d in dives) {
       final pid = d.placeId, date = d.date;

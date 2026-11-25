@@ -1,5 +1,5 @@
-/// Ejecuta [task] mostrando un diálogo de progreso modal (no cancelable) y lo
-/// cierra al terminar. Para operaciones que tardan (exportar/importar .ddb).
+/// Runs [task] showing a modal (non-cancellable) progress dialog and
+/// closes it when done. For slow operations (export/import .ddb).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -24,8 +24,8 @@ Future<T> withProgress<T>(
     ),
   );
   try {
-    // Que el diálogo llegue a pintarse antes de empezar (si la tarea es
-    // síncrona, bloquea el hilo y sin esto no se vería nada).
+    // Let the dialog get painted before starting (if the task is
+    // synchronous, it blocks the thread and without this nothing would show).
     await WidgetsBinding.instance.endOfFrame;
     return await task();
   } finally {

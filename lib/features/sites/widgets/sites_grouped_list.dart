@@ -1,5 +1,5 @@
-/// Lista de sitios de buceo agrupada por país, con cabeceras colapsables y
-/// buscador. Reutilizada por la pestaña de sitios y por el selector.
+/// Dive site list grouped by country, with collapsible headers and
+/// search box. Reused by the sites tab and by the picker.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -8,8 +8,8 @@ import 'package:pandive/core/text/collate.dart';
 import 'package:pandive/features/sites/widgets/site_tile.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Los sitios que casan con la búsqueda [query] (nombre, país, región o
-/// etiquetas; sin distinguir mayúsculas ni acentos). Vacía = todos.
+/// Sites matching the search [query] (name, country, region or
+/// tags; case- and accent-insensitive). Empty = all.
 List<DiveSite> filterSites(List<DiveSite> sites, String query) {
   final q = query.trim();
   if (q.isEmpty) return sites;
@@ -26,14 +26,14 @@ List<DiveSite> filterSites(List<DiveSite> sites, String query) {
 class SitesGroupedList extends StatefulWidget {
   final List<DiveSite> sites;
   final void Function(DiveSite) onTap;
-  /// Si se pasa, el tile muestra un icono "ojo" a la derecha para ver la info.
+  /// If given, the tile shows an "eye" icon on the right to see the info.
   final void Function(DiveSite)? onInfo;
-  /// Si se pasa, el filtro viene de fuera (barra superior) y se oculta la barra
-  /// de búsqueda interna. Si es null, se muestra la barra interna (p.ej. picker).
+  /// If given, the filter comes from outside (top bar) and the internal search
+  /// bar is hidden. If null, the internal bar is shown (e.g. picker).
   final String? externalQuery;
   final bool collapseAll;
   final bool sortByDives;
-  /// Selección múltiple (opcional): ids marcados, modo, y callbacks por sitio.
+  /// Multiple selection (optional): ticked ids, mode, and per-site callbacks.
   final Set<int> selectedIds;
   final bool selectMode;
   final void Function(DiveSite)? onToggle;
@@ -89,12 +89,12 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
     }
     return map;
   }
-  // Orden por nº de buceos: lista plana (sin agrupar por país) global.
+  // Order by dive count: global flat list (not grouped by country).
   List<DiveSite> _byDives() => _filtered().toList()
     ..sort((a, b) => a.diveCount != b.diveCount
         ? b.diveCount.compareTo(a.diveCount)
         : compareFold(a.name ?? '', b.name ?? ''));
-  // Filas agrupadas por país (cabeceras colapsables), orden alfabético.
+  // Rows grouped by country (collapsible headers), alphabetical order.
   List<Widget> _groupedRows(BuildContext context) {
     final grouped = _grouped();
     final countries = grouped.keys.toList()..sort(compareFold);
@@ -128,7 +128,7 @@ class _SitesGroupedListState extends State<SitesGroupedList> {
           child: rows.isEmpty
               ? Center(child: Text(t.noSitesYet))
               : ListView(
-                  padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
+                  padding: const EdgeInsets.only(bottom: 88), // room for the FAB
                   children: rows,
                 ),
         ),

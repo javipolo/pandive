@@ -15,7 +15,7 @@ void main() {
     const d = Dive(id: 1, buddy: 'Tomás Pérez', number: 42);
     expect(diveMatches(d, 'tomas'), isTrue);
     expect(diveMatches(d, 'perez'), isTrue);
-    expect(diveMatches(d, '42'), isTrue); // por número
+    expect(diveMatches(d, '42'), isTrue); // by number
     expect(diveMatches(d, 'juan'), isFalse);
   });
 }

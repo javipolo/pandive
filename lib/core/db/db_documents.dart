@@ -1,7 +1,7 @@
 part of 'divemate_db.dart';
 
-/// Documentación del buzo (tabla PandiveDocument). La imagen vive en disco; aquí
-/// solo metadatos. Específico de Pandive; divemate-cli lo ignora.
+/// Diver documents (PandiveDocument table). The image lives on disk; here
+/// only metadata. Pandive-specific; divemate-cli ignores it.
 extension DivemateDbDocuments on DivemateDb {
   DiveDoc _docFromRow(Row r) => DiveDoc(
         id: r['Id'] as int,
@@ -14,7 +14,7 @@ extension DivemateDbDocuments on DivemateDb {
         updated: _parseDate(_str(r['Updated']), null),
       );
 
-  /// Documentos en el orden manual del usuario (SortOrd); los sin orden al final.
+  /// Documents in the user's manual order (SortOrd); unordered ones last.
   List<DiveDoc> listDocuments() {
     final rows = _db.select(
         'SELECT Id, Title, Notes, Expires, ExpiryDate, FileName, Created, '
@@ -23,7 +23,7 @@ extension DivemateDbDocuments on DivemateDb {
     return rows.map(_docFromRow).toList();
   }
 
-  /// Persiste el orden manual: [ids] en el orden deseado.
+  /// Persists the manual order: [ids] in the desired order.
   void setDocumentOrder(List<int> ids) {
     for (var i = 0; i < ids.length; i++) {
       _db.execute('UPDATE PandiveDocument SET SortOrd = ? WHERE Id = ?',

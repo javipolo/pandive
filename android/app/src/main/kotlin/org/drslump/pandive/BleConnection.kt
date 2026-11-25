@@ -25,28 +25,28 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 /**
- * Conexión BLE GATT a un ordenador de buceo, expuesta como un flujo de bytes
- * síncrono (bleRead/bleWrite) que el puente nativo con libdivecomputer usa como
- * I/O personalizado. Las operaciones GATT (async) se serializan con latches.
+ * BLE GATT connection to a dive computer, exposed as a synchronous byte
+ * stream (bleRead/bleWrite) that the native libdivecomputer bridge uses as
+ * custom I/O. GATT operations (async) are serialized with latches.
  *
- * Selección de característica: genérica por propiedades (una con Write/
- * WriteNoResponse para escribir, otra con Notify/Indicate para leer), dando
- * preferencia a los servicios serie conocidos (Shearwater, Mares).
+ * Characteristic selection: generic by properties (one with Write/
+ * WriteNoResponse to write, another with Notify/Indicate to read), preferring
+ * the known serial services (Shearwater, Mares).
  */
 class BleConnection(private val context: Context, private val address: String) {
     companion object {
         private const val TAG = "PandiveBLE"
         private val CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
-        // Servicios "serie" conocidos, en orden de preferencia.
+        // Known "serial" services, in order of preference.
         private val PREFERRED_SERVICES = listOf(
             "fe25c237-0ece-443c-b0aa-e02033e7029d", // Shearwater Petrel/Perdix/Peregrine/Tern
             "1aa44039-1667-4b29-87cc-dfecaaf31d97", // Shearwater Perdix 3
             "544e326b-5b72-c6b0-1c46-41c1bc448118", // Mares BlueLink
         ).map { it.lowercase() }
 
-        // Heinrichs Weikamp (OSTC) con módulo BLE Telit/Stollmann: servicio
-        // "Terminal I/O" con control de flujo por créditos.
+        // Heinrichs Weikamp (OSTC) with Telit/Stollmann BLE module: "Terminal
+        // I/O" service with credit-based flow control.
         private val HW_TELIT_SERVICE =
             UUID.fromString("0000fefb-0000-1000-8000-00805f9b34fb")
         private val T_DATA_TX = UUID.fromString("00000002-0000-1000-8000-008025000000")
@@ -61,7 +61,7 @@ class BleConnection(private val context: Context, private val address: String) {
     private var writeChar: BluetoothGattCharacteristic? = null
     private var notifyChar: BluetoothGattCharacteristic? = null
 
-    // Modo crédito (Telit/HW): características dedicadas de datos y créditos.
+    // Credit mode (Telit/HW): dedicated data and credit characteristics.
     private var creditMode = false
     private var dataTx: BluetoothGattCharacteristic? = null // device->host (notify)
     private var dataRx: BluetoothGattCharacteristic? = null // host->device (write)
@@ -70,14 +70,14 @@ class BleConnection(private val context: Context, private val address: String) {
     @Volatile private var hwCredit = 0
 
     private val incoming = LinkedBlockingQueue<ByteArray>()
-    // Confirmación de escritura (with-response): Android solo admite una
-    // operación GATT a la vez, así que esperamos onCharacteristicWrite.
+    // Write confirmation (with-response): Android only allows one GATT
+    // operation at a time, so we wait for onCharacteristicWrite.
     private val writeAck = ArrayBlockingQueue<Boolean>(1)
     private val connectLatch = CountDownLatch(1)
     @Volatile private var connectError: String? = null
     @Volatile private var ready = false
-    @Volatile private var setupStarted = false // evita doble descubrimiento
-    // Emparejamiento LE en curso (OSTC): connect() espera más (diálogo de PIN).
+    @Volatile private var setupStarted = false // avoids double discovery
+    // LE pairing in progress (OSTC): connect() waits longer (PIN dialog).
     @Volatile private var bonding = false
     private var bondTried = false
     private var bondReceiver: BroadcastReceiver? = null
@@ -86,10 +86,10 @@ class BleConnection(private val context: Context, private val address: String) {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.i(TAG, "Conectado; prioridad alta + MTU")
-                // Intervalo de conexión corto -> descarga más rápida.
+                // Short connection interval -> faster download.
                 g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
-                // Nota: NO forzamos 2M PHY; algunos módulos (Mares) fallan la
-                // transferencia de datos aunque el control (ACK) funcione.
+                // Note: we do NOT force 2M PHY; some modules (Mares) fail data
+                // transfer even though control (ACK) works.
                 if (!g.requestMtu(247)) g.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (!ready) {
@@ -109,12 +109,12 @@ class BleConnection(private val context: Context, private val address: String) {
                 fail("Service discovery failed ($status)")
                 return
             }
-            if (setupStarted) return // el stack puede descubrir dos veces
+            if (setupStarted) return // the stack may discover twice
             setupStarted = true
             if (selectHwTelit(g)) {
                 creditMode = true
-                // Sin emparejar: el OSTC no lo exige (si rechaza el CCCD,
-                // onDescriptorWrite empareja y reintenta).
+                // Unpaired: the OSTC doesn't require it (if it rejects the CCCD,
+                // onDescriptorWrite pairs and retries).
                 startTelit(g)
                 return
             }
@@ -142,13 +142,13 @@ class BleConnection(private val context: Context, private val address: String) {
         ) {
             if (d.uuid != CCCD) return
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                // Red de seguridad (OSTC con firmware que exija cifrado): el
-                // Telit responde con un código propio que Android no trata como
-                // "falta autenticación", así que no empareja solo. Emparejar
-                // con el enlace LE abierto (createBond() va por LE) y reintentar.
+                // Safety net (OSTC firmware that requires encryption): the
+                // Telit answers with its own code that Android doesn't treat as
+                // "insufficient authentication", so it won't pair by itself. Pair
+                // with the LE link open (createBond() goes over LE) and retry.
                 if (creditMode && !bondTried &&
                         g.device.bondState == BluetoothDevice.BOND_NONE) {
-                    Log.i(TAG, "CCCD rechazado ($status); emparejando y reintentando")
+                    Log.i(TAG, "CCCD rejected ($status); pairing and retrying")
                     bondTried = true
                     bondThenStart(g)
                 } else {
@@ -161,12 +161,12 @@ class BleConnection(private val context: Context, private val address: String) {
                 connectLatch.countDown()
                 return
             }
-            // Secuencia Telit: créditos (indicate) -> datos (notify) -> crédito inicial.
+            // Telit sequence: credits (indicate) -> data (notify) -> initial credit.
             if (d.characteristic.uuid == T_CRED_TX) {
                 writeCccd(g, dataTx!!, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
             } else if (d.characteristic.uuid == T_DATA_TX) {
-                // Listo cuando el crédito inicial se confirme (onCharacteristicWrite):
-                // Android solo admite una operación GATT a la vez.
+                // Ready once the initial credit is confirmed (onCharacteristicWrite):
+                // Android only allows one GATT operation at a time.
                 hwCredit = MAX_CREDIT
                 writeCredit(g, MAX_CREDIT)
             }
@@ -176,7 +176,7 @@ class BleConnection(private val context: Context, private val address: String) {
             g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int
         ) {
             if (creditMode && c.uuid == T_CRED_RX) {
-                // Créditos: no es la escritura de datos que espera bleWrite.
+                // Credits: not the data write that bleWrite is waiting for.
                 if (!ready) {
                     if (status != BluetoothGatt.GATT_SUCCESS) {
                         fail("Could not send the initial credit ($status)")
@@ -191,7 +191,7 @@ class BleConnection(private val context: Context, private val address: String) {
         }
     }
 
-    // Enruta un paquete recibido: datos a la cola; créditos (Telit) suman saldo.
+    // Routes a received packet: data to the queue; credits (Telit) add to the balance.
     private fun onData(c: BluetoothGattCharacteristic, value: ByteArray) {
         if (creditMode && c.uuid == T_CRED_TX) {
             if (value.isNotEmpty()) hwCredit += value[0].toInt() and 0xFF
@@ -237,13 +237,13 @@ class BleConnection(private val context: Context, private val address: String) {
         return false
     }
 
-    // Paso 1 Telit: indicaciones en créditos TX (la secuencia sigue en onDescriptorWrite).
+    // Telit step 1: indications on credits TX (the sequence continues in onDescriptorWrite).
     private fun startTelit(g: BluetoothGatt) {
         writeCccd(g, credTx!!, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
     }
 
-    // Empareja por LE (Android abre su diálogo de confirmación)
-    // y, al quedar emparejado, sigue con la secuencia Telit.
+    // Pairs over LE (Android shows its confirmation dialog)
+    // and, once paired, continues with the Telit sequence.
     @SuppressLint("MissingPermission")
     private fun bondThenStart(g: BluetoothGatt) {
         val receiver = object : BroadcastReceiver() {
@@ -253,7 +253,7 @@ class BleConnection(private val context: Context, private val address: String) {
                 if (dev?.address?.equals(address, ignoreCase = true) != true) return
                 when (intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)) {
                     BluetoothDevice.BOND_BONDED -> {
-                        Log.i(TAG, "Emparejado por LE")
+                        Log.i(TAG, "Paired over LE")
                         unregisterBond()
                         bonding = false
                         startTelit(g)
@@ -269,7 +269,7 @@ class BleConnection(private val context: Context, private val address: String) {
         bondReceiver = receiver
         context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
         bonding = true
-        Log.i(TAG, "Sin emparejar; createBond() sobre el enlace LE")
+        Log.i(TAG, "Unpaired; createBond() over the LE link")
         if (!g.device.createBond()) {
             unregisterBond()
             bonding = false
@@ -282,7 +282,7 @@ class BleConnection(private val context: Context, private val address: String) {
         bondReceiver = null
     }
 
-    // Detecta el servicio Telit/HW (OSTC) y sus 4 características por UUID.
+    // Detects the Telit/HW (OSTC) service and its 4 characteristics by UUID.
     private fun selectHwTelit(g: BluetoothGatt): Boolean {
         val s = g.getService(HW_TELIT_SERVICE) ?: return false
         dataTx = s.getCharacteristic(T_DATA_TX)
@@ -290,7 +290,7 @@ class BleConnection(private val context: Context, private val address: String) {
         credTx = s.getCharacteristic(T_CRED_TX)
         credRx = s.getCharacteristic(T_CRED_RX)
         val ok = dataTx != null && dataRx != null && credTx != null && credRx != null
-        if (ok) Log.i(TAG, "OSTC Telit: control de flujo por créditos")
+        if (ok) Log.i(TAG, "OSTC Telit: credit-based flow control")
         return ok
     }
 
@@ -304,7 +304,7 @@ class BleConnection(private val context: Context, private val address: String) {
         run { cccd.value = value; g.writeDescriptor(cccd) }
     }
 
-    // Envía [n] créditos UART al módulo (característica de créditos RX).
+    // Sends [n] UART credits to the module (credits RX characteristic).
     @SuppressLint("MissingPermission")
     private fun writeCredit(g: BluetoothGatt, n: Int) {
         val c = credRx ?: return
@@ -332,16 +332,16 @@ class BleConnection(private val context: Context, private val address: String) {
     fun connect(timeoutMs: Long): Boolean {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val adapter = manager.adapter
-        // Descubrir por escaneo ANTES de conectar: conectar por MAC cruda a un
-        // dispositivo no cacheado da device_type=Unknown y el connect falla
-        // (timeout). El escaneo lo cachea con su tipo de dirección correcto
-        // (igual que la pantalla de escaneo, que sí funciona) y usamos su
-        // BluetoothDevice para conectar.
+        // Discover by scanning BEFORE connecting: connecting by raw MAC to a
+        // non-cached device gives device_type=Unknown and the connect fails
+        // (timeout). The scan caches it with its correct address type
+        // (same as the scan screen, which works) and we use its
+        // BluetoothDevice to connect.
         val scanned = scanFor(adapter, 15000)
         val device = scanned ?: adapter.getRemoteDevice(address)
         gatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE)
         var ok = connectLatch.await(timeoutMs, TimeUnit.MILLISECONDS)
-        // Emparejando (el usuario puede estar tecleando el PIN): margen extra.
+        // Pairing (the user may be typing the PIN): extra time.
         if (!ok && bonding) ok = connectLatch.await(60000, TimeUnit.MILLISECONDS)
         if (!ok) {
             connectError =
@@ -351,8 +351,8 @@ class BleConnection(private val context: Context, private val address: String) {
         return ready
     }
 
-    /** Escanea hasta encontrar [address] (o agotar [timeoutMs]); devuelve el
-     *  dispositivo descubierto (con su tipo correcto) o null. */
+    /** Scans until [address] is found (or [timeoutMs] runs out); returns the
+     *  discovered device (with its correct type) or null. */
     @SuppressLint("MissingPermission")
     private fun scanFor(adapter: BluetoothAdapter, timeoutMs: Long): BluetoothDevice? {
         val scanner = adapter.bluetoothLeScanner ?: return null
@@ -377,13 +377,13 @@ class BleConnection(private val context: Context, private val address: String) {
 
     fun error(): String? = connectError
 
-    /** Lee el siguiente paquete recibido, o null si no llega nada en [timeoutMs]. */
+    /** Reads the next received packet, or null if nothing arrives within [timeoutMs]. */
     fun bleRead(timeoutMs: Int): ByteArray? =
         incoming.poll(timeoutMs.toLong(), TimeUnit.MILLISECONDS)
 
-    /** Escribe [data] sin esperar confirmación (fire-and-forget, como
-     *  Subsurface): el protocolo alterna escritura->lectura, así que no hay
-     *  solape, y evitar la espera por callback acelera mucho la descarga. */
+    /** Writes [data] without waiting for confirmation (fire-and-forget, like
+     *  Subsurface): the protocol alternates write->read, so there is no
+     *  overlap, and skipping the callback wait speeds up the download a lot. */
     @SuppressLint("MissingPermission")
     fun bleWrite(data: ByteArray): Boolean {
         val g = gatt ?: return false
@@ -396,8 +396,8 @@ class BleConnection(private val context: Context, private val address: String) {
         @Suppress("DEPRECATION")
         val sent = run { c.writeType = mode; c.value = data; g.writeCharacteristic(c) }
         if (!sent) return false
-        // Android solo admite una operación GATT a la vez: esperar a que termine
-        // (también en no-response; evita perder paquetes). Timeout -> seguimos.
+        // Android only allows one GATT operation at a time: wait for it to finish
+        // (also for no-response; avoids losing packets). Timeout -> carry on.
         return writeAck.poll(2000, TimeUnit.MILLISECONDS) != false
     }
 

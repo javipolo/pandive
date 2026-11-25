@@ -1,4 +1,4 @@
-/// Selectores de idioma y tema (claro/oscuro/automático) para Ajustes.
+/// Language and theme (light/dark/automatic) selectors for Settings.
 library;
 
 import 'package:material_ui/material_ui.dart';

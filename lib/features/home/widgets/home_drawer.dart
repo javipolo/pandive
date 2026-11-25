@@ -1,5 +1,5 @@
-/// Menú lateral (hamburguesa) con las secciones que no están en la barra
-/// inferior: etiquetas, equipo, estadísticas, herramientas, backup y ajustes.
+/// Side (hamburger) menu with the sections not in the bottom
+/// bar: tags, equipment, statistics, tools, backup and settings.
 library;
 
 import 'package:material_ui/material_ui.dart';

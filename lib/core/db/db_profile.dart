@@ -1,13 +1,13 @@
 part of 'divemate_db.dart';
 
-/// Decode del perfil de inmersión (portado de divemate-cli/db.py).
+/// Dive profile decode (ported from divemate-cli/db.py).
 extension DivemateDbProfile on DivemateDb {
-  /// Perfil de profundidad (+ temperatura) de una inmersión.
+  /// Depth (+ temperature) profile of a dive.
   ///
-  ///  - `Profile`: profundidad, registros de 12 chars, 4 primeros = decímetros.
-  ///  - `Profile2`: temperatura, registros de 11 chars, 4 primeros = centi-°C;
-  ///    0 = sin muestra.
-  ///  - `ProfileInt`: intervalo de muestreo en segundos.
+  ///  - `Profile`: depth, 12-char records, first 4 = decimetres.
+  ///  - `Profile2`: temperature, 11-char records, first 4 = centi-°C;
+  ///    0 = no sample.
+  ///  - `ProfileInt`: sample interval in seconds.
   DiveProfile? diveProfile(int logId) {
     final rows = _db.select(
       'SELECT ProfileInt, Profile, Profile2, Profile4 FROM Logbook WHERE ID = ?',
@@ -44,8 +44,8 @@ extension DivemateDbProfile on DivemateDb {
       if (!anyTemp) temps = List<double?>.filled(depths.length, null);
     }
 
-    // Profile4 (9 chars/muestra = NDL/TTS/parada + techo), formato DiveMate.
-    // Fuera de deco: a==b==NDL, c=0. En deco: c=techo(m), a=TTS, b=parada(min).
+    // Profile4 (9 chars/sample = NDL/TTS/stop + ceiling), DiveMate format.
+    // Out of deco: a==b==NDL, c=0. In deco: c=ceiling(m), a=TTS, b=stop(min).
     final ceiling = List<double>.filled(depths.length, 0);
     final ndl = List<int?>.filled(depths.length, null);
     final tts = List<int?>.filled(depths.length, null);
@@ -79,15 +79,15 @@ extension DivemateDbProfile on DivemateDb {
     );
   }
 
-  /// Temp media persistida (columna propia `PandiveAvgTemp`), o null.
+  /// Persisted average temp (own column `PandiveAvgTemp`), or null.
   double? diveAvgTemp(int logId) {
     final r =
         _db.select('SELECT PandiveAvgTemp FROM Logbook WHERE ID=?', [logId]);
     return r.isEmpty ? null : _temp(r.first['PandiveAvgTemp']);
   }
 
-  /// Rellena temp media (`PandiveAvgTemp`) y mínima (`Watertemp`, si falta o es
-  /// centinela) a partir del perfil de temperatura. Devuelve cuántas actualizó.
+  /// Fills average temp (`PandiveAvgTemp`) and minimum (`Watertemp`, if missing or
+  /// sentinel) from the temperature profile. Returns how many were updated.
   int fillMissingTemps() {
     final owner = ownerId;
     final filter = owner != null ? 'AND DiverID = $owner' : '';
@@ -117,9 +117,9 @@ extension DivemateDbProfile on DivemateDb {
     return n;
   }
 
-  /// Rellena `DepthAvg` (prof. media) a partir del perfil en las inmersiones que
-  /// no la tienen, para que quede persistida (y exportable a DiveMate: su SAC se
-  /// deriva de DepthAvg + presiones + tiempo). Devuelve cuántas actualizó.
+  /// Fills `DepthAvg` (avg depth) from the profile on dives that
+  /// lack it, so it gets persisted (and exportable to DiveMate: its SAC is
+  /// derived from DepthAvg + pressures + time). Returns how many were updated.
   int fillMissingAvgDepth() {
     final owner = ownerId;
     final filter = owner != null ? 'AND DiverID = $owner' : '';

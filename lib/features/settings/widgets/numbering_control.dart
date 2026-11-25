@@ -1,5 +1,5 @@
-/// Ajustes de numeración de buceos: automática sí/no y primer número. Se
-/// guardan en la DB (iguales en todos los dispositivos sincronizados).
+/// Dive numbering settings: automatic yes/no and first number. Stored
+/// in the DB (the same on all synced devices).
 library;
 
 import 'package:flutter/services.dart';

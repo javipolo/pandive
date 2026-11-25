@@ -1,5 +1,5 @@
-/// Selector de sitio de buceo: elige uno existente (devuelve DiveSite) o crea
-/// uno nuevo. Cancelar devuelve null.
+/// Dive site picker: pick an existing one (returns DiveSite) or create
+/// a new one. Cancel returns null.
 library;
 
 import 'package:material_ui/material_ui.dart';

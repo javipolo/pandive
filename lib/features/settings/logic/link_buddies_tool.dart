@@ -1,6 +1,6 @@
-/// Herramienta: enlaza compañeros de inmersiones antiguas (texto `Buddy` sin
-/// `BuddyIDs`) para que cuenten en Pandive. Pide confirmación y reporta cuántas
-/// inmersiones actualizó.
+/// Tool: links buddies of old dives (`Buddy` text without
+/// `BuddyIDs`) so they count in Pandive. Asks for confirmation and reports how many
+/// dives were updated.
 library;
 
 import 'package:material_ui/material_ui.dart';

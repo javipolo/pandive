@@ -1,5 +1,5 @@
-/// Construye la lista de buceos a ofrecer: nuevos del aparato + pendientes de
-/// descargas previas, excluyendo los que ya están en la DB.
+/// Builds the list of dives to offer: new from the device + pending from
+/// previous downloads, excluding those already in the DB.
 library;
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -23,10 +23,10 @@ import 'package:pandive/features/dive_computer/widgets/download_result_list.dart
   return (items: items, existing: dives.length - deviceNew.length);
 }
 
-/// Aplica la selección: guarda los marcados y DESCARTA los no marcados de golpe.
-/// Avanza el fingerprint al más reciente del aparato (así no se vuelven a bajar).
-/// Salir con "atrás" (sin guardar) no avanza el fingerprint, y el aparato los
-/// reofrece en la siguiente descarga. Devuelve cuántos añadió.
+/// Applies the selection: saves the ticked ones and DISCARDS the unticked ones at once.
+/// Advances the fingerprint to the device's most recent (so they aren't downloaded again).
+/// Leaving with "back" (without saving) doesn't advance the fingerprint, and the device
+/// offers them again on the next download. Returns how many were added.
 int applyDownloadSelection({
   required DivemateDb db,
   required String deviceId,
@@ -42,7 +42,7 @@ int applyDownloadSelection({
         db.importDownloaded(it.dive, computer: computer)) {
       added++;
     }
-    db.removePending(deviceId, fp); // guardadas o descartadas: fuera de la caché
+    db.removePending(deviceId, fp); // saved or discarded: out of the cache
   }
   if (added > 0) db.autoRenumber();
   if (deviceDives.isNotEmpty) {

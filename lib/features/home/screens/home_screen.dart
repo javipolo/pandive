@@ -1,4 +1,4 @@
-/// Pantalla principal con navegación por pestañas: inmersiones, sitios, stats.
+/// Main screen with tab navigation: dives, sites, stats.
 library;
 
 import 'dart:async';
@@ -39,17 +39,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
-  int _dataVersion = 0; // se incrementa para forzar recarga de las pestañas
+  int _dataVersion = 0; // incremented to force the tabs to reload
   bool _searching = false;
   String _query = '';
   bool _collapseAll = false;
   bool _sortByDives = false;
   final _searchCtrl = TextEditingController();
   StreamSubscription<String>? _openSub;
-  bool get _canSearch => _index <= 3; // todas menos estadísticas
-  // sitios solo si NO se ordena por buceos (en ese modo no hay grupos de país)
+  bool get _canSearch => _index <= 3; // all but statistics
+  // sites only if NOT sorted by dives (in that mode there are no country groups)
   bool get _canCollapse => _index == 0 || (_index == 1 && !_sortByDives);
-  bool get _canSort => _index == 1; // sitios (buddies ordena desde su tab)
+  bool get _canSort => _index == 1; // sites (buddies sorts from its tab)
   @override
   void initState() {
     super.initState();
@@ -59,15 +59,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _openSub = OpenedFile.events().listen((p) {
       if (mounted) _onOpened(p);
     });
-    // Reprograma avisos de caducidad y abre el documento si la app se lanzó al
-    // pulsar una notificación (arranque en frío).
+    // Reschedules expiry notifications and opens the document if the app was launched by
+    // tapping a notification (cold start).
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       syncDocNotifications(widget.db, AppLocalizations.of(context));
       final coldId = await consumeNotificationLaunch();
       if (coldId != null && mounted) _openDocById(coldId);
     });
-    // Notificación pulsada con la app abierta/en segundo plano.
+    // Notification tapped with the app open/in the background.
     tappedDocId.addListener(_onTappedDoc);
     homeSectionRequest.addListener(_onSectionRequest);
   }
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
     tappedDocId.value = null;
     _openDocById(id);
   }
-  // Abre la sección Documentación y, si el documento existe, su detalle encima.
+  // Opens the Documents section and, if the document exists, its detail on top.
   Future<void> _openDocById(int id) async {
     final nav = Navigator.of(context);
     nav.push(MaterialPageRoute(builder: (_) => DocumentsScreen(db: widget.db)));
@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _query = '';
     });
   }
-  // Cambia de sección (barra inferior o menú lateral) y recarga datos.
+  // Switches section (bottom bar or side menu) and reloads data.
   void _go(int i) {
     _searchCtrl.clear();
     setState(() {

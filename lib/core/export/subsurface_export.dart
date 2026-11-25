@@ -1,4 +1,4 @@
-/// Exporta el logbook al XML de Subsurface (.ssrf). Formato `divelog version=3`.
+/// Exports the logbook to Subsurface XML (.ssrf). Format `divelog version=3`.
 library;
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -15,9 +15,9 @@ String _p2(int v) => v.toString().padLeft(2, '0');
 String _mmss(int sec) => '${sec ~/ 60}:${_p2(sec % 60)} min';
 String _siteId(int id) => id.toRadixString(16).padLeft(8, '0');
 
-/// Construye el XML Subsurface con todas las inmersiones del owner. Cede el
-/// hilo cada pocos buceos (perfiles largos: no congelar la UI) e informa con
-/// [onProgress] (hechas, total).
+/// Builds the Subsurface XML with all the owner's dives. Yields the
+/// thread every few dives (long profiles: don't freeze the UI) and reports with
+/// [onProgress] (done, total).
 Future<String> buildSubsurfaceXml(DivemateDb db,
     {void Function(int done, int total)? onProgress}) async {
   final dives = db.listDives();

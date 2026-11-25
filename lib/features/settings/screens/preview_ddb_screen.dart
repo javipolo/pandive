@@ -1,6 +1,6 @@
-/// Previsualiza un .ddb en solo lectura (lista de inmersiones) sin tocar la DB
-/// activa. El botón flotante "Usar DDB" ofrece: rellenar, importar buceos o
-/// sustituir la base de datos.
+/// Previews a .ddb read-only (dive list) without touching the active
+/// DB. The "Use DDB" floating button offers: fill in, import dives or
+/// replace the database.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -17,7 +17,7 @@ import 'package:pandive/l10n/app_localizations.dart';
 class PreviewDdbScreen extends StatefulWidget {
   final String path;
   final Settings settings;
-  final DivemateDb db; // base de datos activa (para rellenar)
+  final DivemateDb db; // active database (for filling in)
   final void Function(String path) onReplace;
   const PreviewDdbScreen({
     super.key,
@@ -48,7 +48,7 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
       } else {
         db.close();
       }
-    } catch (_) {/* fichero inválido */}
+    } catch (_) {/* invalid file */}
   }
 
   @override
@@ -98,7 +98,7 @@ class _PreviewDdbScreenState extends State<PreviewDdbScreen> {
     );
   }
 
-  /// Botón flotante "Usar DDB" que despliega las tres acciones.
+  /// "Use DDB" floating button that unfolds the three actions.
   Widget _useDdbMenu(AppLocalizations t) {
     return MenuAnchor(
       alignmentOffset: const Offset(0, 8),

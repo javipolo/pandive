@@ -1,4 +1,4 @@
-// Numeración automática: consecutiva, cronológica, desde el primer número.
+// Automatic numbering: consecutive, chronological, from the first number.
 import 'dart:ffi';
 import 'dart:io';
 
@@ -22,13 +22,13 @@ void main() {
     tmp.deleteSync(recursive: true);
   });
 
-  // Números en orden cronológico.
+  // Numbers in chronological order.
   List<int?> numbers() => db.listDives().reversed.map((d) => d.number).toList();
 
   test('buceo añadido a posteriori: renumera y queda en orden', () {
     db.createDive(dateTime: DateTime(2024, 1, 1, 10)); // 1
     db.createDive(dateTime: DateTime(2024, 1, 3, 10)); // 2
-    db.createDive(dateTime: DateTime(2024, 1, 2, 10)); // 3, pero va en medio
+    db.createDive(dateTime: DateTime(2024, 1, 2, 10)); // 3, but goes in the middle
     final mid = db.listDives()[1].id;
     expect(db.isOutOfOrder(mid), isTrue);
     expect(db.renumberPlan().length, 2);

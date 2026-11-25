@@ -1,5 +1,5 @@
-/// Estadísticas calculadas solo sobre una selección de inmersiones.
-/// Usa la misma plantilla y cálculos que las stats globales (computeStats).
+/// Statistics computed only over a selection of dives.
+/// Uses the same template and calculations as the global stats (computeStats).
 library;
 
 import 'package:material_ui/material_ui.dart';

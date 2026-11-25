@@ -1,4 +1,4 @@
-/// Botones de la pantalla de carga: abrir .ddb, crear nuevo, importar .ssrf.
+/// Load screen buttons: open .ddb, create new, import .ssrf.
 library;
 
 import 'package:material_ui/material_ui.dart';

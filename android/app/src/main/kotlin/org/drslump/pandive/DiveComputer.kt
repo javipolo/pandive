@@ -6,9 +6,9 @@ import android.os.Looper
 import io.flutter.plugin.common.EventChannel
 
 /**
- * Puente a libdivecomputer vía el wrapper JNI nativo (libpandive_dc.so).
- *  - Capacidad: nº y lista de modelos soportados.
- *  - Descarga: conecta por BLE (BleConnection) y vuelca las inmersiones a JSON.
+ * Bridge to libdivecomputer via the native JNI wrapper (libpandive_dc.so).
+ *  - Capability: number and list of supported models.
+ *  - Download: connects over BLE (BleConnection) and dumps the dives as JSON.
  */
 object DiveComputer {
     init {
@@ -25,11 +25,11 @@ object DiveComputer {
 
     private val main = Handler(Looper.getMainLooper())
 
-    /** Sink del EventChannel de progreso (lo fija MainActivity). */
+    /** Sink of the progress EventChannel (set by MainActivity). */
     @Volatile
     var progressSink: EventChannel.EventSink? = null
 
-    /** Llamado desde C (JNI) en cada DC_EVENT_PROGRESS. */
+    /** Called from C (JNI) on each DC_EVENT_PROGRESS. */
     @JvmStatic
     fun reportProgress(current: Int, maximum: Int) {
         val sink = progressSink ?: return
@@ -37,9 +37,9 @@ object DiveComputer {
     }
 
     /**
-     * Conecta al dispositivo [address], descarga las inmersiones del modelo
-     * [vendor]/[product] y devuelve el JSON del wrapper nativo. Bloqueante:
-     * llamar desde un hilo de trabajo.
+     * Connects to device [address], downloads the dives of model
+     * [vendor]/[product] and returns the native wrapper's JSON. Blocking:
+     * call from a worker thread.
      */
     fun download(
         context: Context, vendor: String, product: String, address: String,

@@ -1,5 +1,5 @@
-/// Vista de estadísticas en secciones (como el detalle de buceo) + barras por
-/// periodo. Reutilizada por la pestaña global y por las stats de una selección.
+/// Statistics view in sections (like the dive detail) + bars per
+/// period. Reused by the global tab and by the stats of a selection.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -15,7 +15,7 @@ import 'package:pandive/l10n/app_localizations.dart';
 class StatsView extends StatefulWidget {
   final LogbookStats stats;
   final List<DateTime> dates;
-  final PersonalRecords? records; // solo global: tarjeta de récords (tocable)
+  final PersonalRecords? records; // global only: records card (tappable)
   final void Function(int diveId)? onOpenRecord;
   const StatsView(
       {super.key,
@@ -31,8 +31,8 @@ class StatsView extends StatefulWidget {
 class _StatsViewState extends State<StatsView> {
   late StatsPeriod _period = _initialPeriod();
 
-  // Span inicial según el rango de fechas: >=13 meses año, 3-12 meses mes,
-  // <3 meses semana. El usuario puede cambiarlo luego.
+  // Initial span by date range: >=13 months year, 3-12 months month,
+  // <3 months week. The user can change it later.
   StatsPeriod _initialPeriod() {
     if (widget.dates.isEmpty) return StatsPeriod.year;
     final sorted = [...widget.dates]..sort();

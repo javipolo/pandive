@@ -1,4 +1,4 @@
-/// Color y etiqueta para el estado de caducidad de un documento.
+/// Colour and label for a document's expiry status.
 library;
 
 import 'package:material_ui/material_ui.dart';

@@ -1,5 +1,5 @@
-/// Sección "Documentación": lista de documentos con estado de caducidad, alta
-/// (imagen/PDF + recorte), y exportación múltiple a PDF.
+/// "Documents" section: list of documents with expiry status, create
+/// (image/PDF + crop), and multiple export to PDF.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -50,7 +50,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     if (ok == true) {
       _reload();
     } else {
-      await deleteDocFile(fileName); // alta cancelada: no dejar huérfano
+      await deleteDocFile(fileName); // create cancelled: don't leave an orphan
     }
   }
 
@@ -78,7 +78,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   void _reorder(int oldI, int newI) {
-    // onReorderItem ya ajusta newI para el item retirado en oldI.
+    // onReorderItem already adjusts newI for the item removed at oldI.
     setState(() {
       final d = _docs.removeAt(oldI);
       _docs.insert(newI, d);

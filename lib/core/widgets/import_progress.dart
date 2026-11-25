@@ -1,6 +1,6 @@
-/// Diálogo modal con barra de progreso para importaciones largas (Subsurface,
-/// SSI…). La tarea debe ceder el hilo de vez en cuando (await) para que la
-/// barra avance y Android no muestre "la app no responde".
+/// Modal dialog with a progress bar for long imports (Subsurface,
+/// SSI…). The task must yield the thread now and then (await) so the
+/// bar advances and Android doesn't show "app not responding".
 library;
 
 import 'package:flutter/foundation.dart';
@@ -10,8 +10,8 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/import/subsurface_import.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Ejecuta [task] con el diálogo abierto; [task] informa con (hechas, total).
-/// [title] por defecto "Importando…".
+/// Runs [task] with the dialog open; [task] reports (done, total).
+/// [title] defaults to "Importing…".
 Future<T> withProgressBar<T>(BuildContext context,
     Future<T> Function(void Function(int done, int total) onProgress) task,
     {String? title}) async {
@@ -24,7 +24,7 @@ Future<T> withProgressBar<T>(BuildContext context,
         PopScope(canPop: false, child: _ProgressDialog(progress, title)),
   );
   try {
-    await WidgetsBinding.instance.endOfFrame; // que se vea antes de empezar
+    await WidgetsBinding.instance.endOfFrame; // so it shows before starting
     return await task((d, t) => progress.value = (d, t));
   } finally {
     if (nav.canPop()) nav.pop();
@@ -32,8 +32,8 @@ Future<T> withProgressBar<T>(BuildContext context,
   }
 }
 
-/// Importa [xml] (Subsurface) en [db] con barra de progreso. Devuelve cuántas
-/// inmersiones añadió.
+/// Imports [xml] (Subsurface) into [db] with a progress bar. Returns how many
+/// dives were added.
 Future<int> importSsrfWithProgress(
         BuildContext context, DivemateDb db, String xml) =>
     withProgressBar(

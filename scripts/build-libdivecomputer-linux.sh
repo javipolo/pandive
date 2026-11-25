@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# Compila libdivecomputer para la app Linux (x86_64 nativo) como librería
-# estática con -fPIC, que se enlaza dentro del ejecutable de Flutter.
-# Produce build/linux-ldc/install/lib/libdivecomputer.a.
+# Builds libdivecomputer for the Linux app (native x86_64) as a static
+# library with -fPIC, linked into the Flutter executable.
+# Produces build/linux-ldc/install/lib/libdivecomputer.a.
 #
-# El transporte BLE lo pone la app (dc_custom_open + BlueZ por D-Bus), así que
-# no hace falta libusb/hidapi/bluez de libdivecomputer.
+# The app provides the BLE transport (dc_custom_open + BlueZ over D-Bus), so
+# libdivecomputer's libusb/hidapi/bluez aren't needed.
 #
-# Uso:
+# Usage:
 #   ./scripts/build-libdivecomputer-linux.sh
 #
 set -euo pipefail
@@ -18,10 +18,10 @@ OUT="$ROOT/build/linux-ldc"
 
 [ -d "$SRC" ] || { echo "Falta $SRC (clona libdivecomputer, ver README)"; exit 1; }
 
-# generar ./configure si falta (clon de git)
+# generate ./configure if missing (git clone)
 [ -x "$SRC/configure" ] || ( cd "$SRC" && autoreconf --install )
 
-# limpiar config previa en el árbol de fuentes (builds out-of-tree)
+# clean previous config in the source tree (out-of-tree builds)
 [ -f "$SRC/Makefile" ] && ( cd "$SRC" && make distclean >/dev/null 2>&1 || true )
 
 BUILDDIR="$OUT/build"

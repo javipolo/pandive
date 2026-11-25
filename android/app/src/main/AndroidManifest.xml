@@ -1,22 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Red para backup/restauración en Google Drive -->
+    <!-- Network for backup/restore on Google Drive -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Bluetooth LE para descargar del ordenador de buceo -->
+    <!-- Bluetooth LE to download from the dive computer -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <!-- Legacy (Android <= 11) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
-    <!-- Ubicación: BLE legacy (<=30) y "mi ubicación" en el mapa (geolocator). -->
+    <!-- Location: legacy BLE (<=30) and "my location" on the map (geolocator). -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
-    <!-- Notificaciones de caducidad de documentos -->
+    <!-- Document expiry notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- Entrega puntual de avisos de caducidad (alarma exacta). USE_EXACT_ALARM
-         se auto-concede; SCHEDULE_EXACT_ALARM cubre versiones previas. -->
+    <!-- Timely delivery of expiry reminders (exact alarm). USE_EXACT_ALARM
+         is auto-granted; SCHEDULE_EXACT_ALARM covers earlier versions. -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
@@ -44,7 +44,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Abrir un .ddb por extensión (file/content) desde un gestor. -->
+            <!-- Open a .ddb by extension (file/content) from a file manager. -->
             <intent-filter android:label="PanDive">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -58,7 +58,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\.ddb"/>
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.ddb"/>
             </intent-filter>
-            <!-- Abrir un .ddb por tipo MIME (content sin ruta usable). -->
+            <!-- Open a .ddb by MIME type (content without a usable path). -->
             <intent-filter android:label="PanDive">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -68,14 +68,14 @@
                 <data android:mimeType="application/x-sqlite3"/>
                 <data android:mimeType="application/vnd.sqlite3"/>
             </intent-filter>
-            <!-- Compartir un .ddb con PanDive. -->
+            <!-- Share a .ddb with PanDive. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="application/octet-stream"/>
             </intent-filter>
         </activity>
-        <!-- flutter_local_notifications: reprograma las notificaciones tras reiniciar. -->
+        <!-- flutter_local_notifications: reschedules notifications after reboot. -->
         <receiver android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <receiver android:exported="false"
@@ -102,12 +102,12 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- Abrir coordenadas de un sitio en una app de mapas -->
+        <!-- Open a site's coordinates in a maps app -->
         <intent>
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="geo"/>
         </intent>
-        <!-- Navegador para el consentimiento OAuth (flutter_appauth, Android 11+) -->
+        <!-- Browser for the OAuth consent (flutter_appauth, Android 11+) -->
         <intent>
             <action android:name="android.intent.action.VIEW"/>
             <category android:name="android.intent.category.BROWSABLE"/>

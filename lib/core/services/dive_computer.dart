@@ -1,5 +1,5 @@
-/// Servicio de ordenador de buceo (puente a libdivecomputer vía MethodChannel).
-/// Capacidad, escaneo BLE y descarga de inmersiones.
+/// Dive computer service (bridge to libdivecomputer via MethodChannel).
+/// Capability, BLE scan and dive download.
 library;
 
 import 'dart:convert';
@@ -10,12 +10,12 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'package:pandive/core/models/models.dart';
 
-/// Un dispositivo BLE encontrado durante el escaneo.
+/// A BLE device found during the scan.
 class ScannedDevice {
   final String name;
-  final String id; // dirección MAC
+  final String id; // MAC address
   final int rssi;
-  final bool likely; // parece un ordenador de buceo (por el nombre)
+  final bool likely; // looks like a dive computer (by name)
 
   const ScannedDevice({
     required this.name,
@@ -37,8 +37,8 @@ class DiveComputerService {
   static const _scanChannel = EventChannel('pandive/dc/scan');
   static const _progressChannel = EventChannel('pandive/dc/progress');
 
-  /// Progreso de descarga en curso (0.0–1.0). Suscríbete antes de llamar a
-  /// [download] para no perder eventos.
+  /// Progress of the ongoing download (0.0–1.0). Subscribe before calling
+  /// [download] so as not to miss events.
   Stream<double> progress() {
     return _progressChannel.receiveBroadcastStream().map((e) {
       final m = e as Map;
@@ -48,8 +48,8 @@ class DiveComputerService {
     });
   }
 
-  /// Resuelve (vendor, product) para un nombre BLE usando el matcher propio de
-  /// libdivecomputer (cubre todos los modelos). Fallback: lista local.
+  /// Resolves (vendor, product) for a BLE name using libdivecomputer's own
+  /// matcher (covers all models). Fallback: local list.
   Future<(String, String)?> matchModel(String name) async {
     try {
       final s = await _channel.invokeMethod<String>('matchName', {'name': name});
@@ -59,54 +59,54 @@ class DiveComputerService {
           return (parts[0], parts[1]);
         }
       }
-    } catch (_) {/* nativo no disponible */}
+    } catch (_) {/* native not available */}
     return modelForDeviceName(name);
   }
 
-  /// ¿Está el Bluetooth encendido (teléfono o adaptador del PC)?
+  /// Is Bluetooth on (phone or PC adapter)?
   Future<bool> isBluetoothOn() async =>
       await _channel.invokeMethod<bool>('btEnabled') ?? false;
 
-  /// Enciende el Bluetooth (Android: diálogo del sistema; Linux: BlueZ).
+  /// Turns Bluetooth on (Android: system dialog; Linux: BlueZ).
   Future<void> requestEnableBluetooth() =>
       _channel.invokeMethod<void>('enableBt');
 
-  /// Pide los permisos de Bluetooth necesarios. Devuelve true si concedidos.
-  /// En Android 12+ usa BLUETOOTH_SCAN/CONNECT; en <=11, localización.
-  /// En Linux no hay permisos de app: BlueZ decide por D-Bus/polkit.
+  /// Requests the needed Bluetooth permissions. Returns true if granted.
+  /// On Android 12+ uses BLUETOOTH_SCAN/CONNECT; on <=11, location.
+  /// On Linux there are no app permissions: BlueZ decides via D-Bus/polkit.
   Future<bool> requestBlePermissions() async {
     if (Platform.isLinux) return true;
     final statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,
-      Permission.locationWhenInUse, // necesario en Android <= 11
+      Permission.locationWhenInUse, // needed on Android <= 11
     ].request();
-    // En 12+ basta con scan+connect; location puede quedar denegado y no pasa nada.
+    // On 12+ scan+connect is enough; location may stay denied and that's fine.
     final scan = statuses[Permission.bluetoothScan];
     final connect = statuses[Permission.bluetoothConnect];
     if (scan != null && connect != null) {
       return scan.isGranted && connect.isGranted;
     }
-    // Fallback (plataformas antiguas): localización concedida.
+    // Fallback (old platforms): location granted.
     return statuses[Permission.locationWhenInUse]?.isGranted ?? false;
   }
 
-  /// Escaneo BLE en vivo. Cada evento es un dispositivo encontrado (puede
-  /// repetirse; deduplicar por [ScannedDevice.id] en el consumidor).
+  /// Live BLE scan. Each event is a device found (may
+  /// repeat; dedupe by [ScannedDevice.id] in the consumer).
   Stream<ScannedDevice> scan() {
     return _scanChannel
         .receiveBroadcastStream()
         .map((e) => ScannedDevice.fromMap(e as Map));
   }
 
-  /// Conecta por BLE a [address] y descarga las inmersiones del modelo
-  /// [vendor]/[product]. Bloqueante en nativo; puede tardar.
+  /// Connects over BLE to [address] and downloads the dives of model
+  /// [vendor]/[product]. Blocking on the native side; may take a while.
   Future<DownloadResult> download({
     required String vendor,
     required String product,
     required String address,
     String fingerprint = '',
-    int maxDives = 0, // 0 = todas; 1 = solo la más reciente (fingerprint)
+    int maxDives = 0, // 0 = all; 1 = only the most recent (fingerprint)
   }) async {
     final raw = await _channel.invokeMethod<String>('download', {
       'vendor': vendor,
@@ -127,8 +127,8 @@ class DiveComputerService {
   }
 }
 
-/// Mapea el nombre anunciado por BLE al (vendor, product) de libdivecomputer.
-/// Cobertura inicial de los modelos objetivo; ampliable.
+/// Maps the BLE advertised name to libdivecomputer's (vendor, product).
+/// Initial coverage of the target models; extensible.
 (String vendor, String product)? modelForDeviceName(String name) {
   final n = name.toLowerCase();
   if (n.contains('peregrine')) return ('Shearwater', 'Peregrine');

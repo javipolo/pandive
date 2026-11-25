@@ -1,6 +1,6 @@
-/// Mapa reutilizable con tiles de satélite de Esri World Imagery (gratis, sin
-/// API key, con atribución). Usado por el selector de ubicación y el visor de
-/// sitios.
+/// Reusable map with Esri World Imagery satellite tiles (free, no
+/// API key, with attribution). Used by the location picker and the viewer of
+/// sites.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -9,7 +9,7 @@ import 'package:latlong2/latlong.dart';
 
 const _esriUrl =
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-// Capa de referencia (transparente): nombres de países, regiones y poblaciones.
+// Reference layer (transparent): names of countries, regions and towns.
 const _esriLabels =
     'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
 
@@ -19,9 +19,9 @@ class SiteMap extends StatelessWidget {
   final List<Marker> markers;
   final void Function(LatLng)? onTap;
   final MapController? controller;
-  /// Si se pasan 2+ puntos, encuadra el mapa para mostrarlos todos.
+  /// If 2+ points are given, fits the map to show them all.
   final List<LatLng>? fitBounds;
-  /// Línea que une puntos en orden (p.ej. el recorrido de un viaje).
+  /// Line joining points in order (e.g. a trip's route).
   final List<LatLng>? route;
   const SiteMap({
     super.key,

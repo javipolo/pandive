@@ -1,5 +1,5 @@
-/// Importa inmersiones del XML de Subsurface (.ssrf) al logbook. Inverso de
-/// `subsurface_export.dart`. Devuelve cuántas inmersiones nuevas se añadieron.
+/// Imports dives from Subsurface XML (.ssrf) into the logbook. Inverse of
+/// `subsurface_export.dart`. Returns how many new dives were added.
 library;
 
 import 'dart:isolate';
@@ -9,7 +9,7 @@ import 'package:xml/xml.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-/// Primer número de un valor con unidad: "12.3 m" -> 12.3, "32.0%" -> 32.0.
+/// First number of a value with a unit: "12.3 m" -> 12.3, "32.0%" -> 32.0.
 double? _num(String? s) {
   if (s == null) return null;
   final m = RegExp(r'-?\d+(\.\d+)?').firstMatch(s);
@@ -18,7 +18,7 @@ double? _num(String? s) {
 
 XmlElement? _first(Iterable<XmlElement> e) => e.isEmpty ? null : e.first;
 
-/// "mm:ss" (o "h:mm:ss") -> segundos.
+/// "mm:ss" (or "h:mm:ss") -> seconds.
 int _secs(String? s) {
   if (s == null) return 0;
   final parts = s.trim().split(' ').first.split(':');
@@ -29,9 +29,9 @@ int _secs(String? s) {
   return sec;
 }
 
-// Analiza el XML (MB con miles de muestras) en otro isolate para no
-// bloquear la UI. Función aparte: el cierre solo debe capturar [xml] (si
-// capturase la DB, no se podría enviar al isolate).
+// Parses the XML (MBs with thousands of samples) in another isolate so as not
+// to block the UI. Separate function: the closure must only capture [xml] (if
+// it captured the DB, it couldn't be sent to the isolate).
 Future<XmlDocument> _parseOffThread(String xml) =>
     Isolate.run(() => XmlDocument.parse(xml));
 
@@ -52,9 +52,9 @@ Future<int> importSubsurfaceXml(DivemateDb db, String xml,
 
   final dives = doc.findAllElements('dive').toList();
   var added = 0;
-  // Por bloques: una transacción cada uno (mucho más rápido que un commit por
-  // sentencia) y ceder el hilo entre bloques para que la barra avance y
-  // Android no dé "la app no responde".
+  // In chunks: one transaction each (much faster than one commit per
+  // statement) and yield the thread between chunks so the bar advances and
+  // Android doesn't show "app not responding".
   const chunk = 20;
   for (var i = 0; i < dives.length; i += chunk) {
     final part = dives.sublist(i, (i + chunk).clamp(0, dives.length));

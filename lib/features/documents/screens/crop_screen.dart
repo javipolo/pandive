@@ -1,6 +1,6 @@
-/// Pantalla de recorte: muestra la imagen, permite rotar en bloques de 90° y
-/// arrastrar las esquinas de un rectángulo (sin relación de aspecto fija).
-/// Devuelve los bytes recortados (Uint8List) o null si se cancela.
+/// Crop screen: shows the image, allows rotating in 90° steps and
+/// dragging the corners of a rectangle (no fixed aspect ratio).
+/// Returns the cropped bytes (Uint8List) or null if cancelled.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -10,7 +10,7 @@ import 'package:image/image.dart' as img;
 
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Rota 90° en horario / antihorario (en isolate vía compute).
+/// Rotates 90° clockwise / counter-clockwise (in an isolate via compute).
 Uint8List rotateCw(Uint8List bytes) => _rotate(bytes, 90);
 Uint8List rotateCcw(Uint8List bytes) => _rotate(bytes, -90);
 
@@ -20,8 +20,8 @@ Uint8List _rotate(Uint8List bytes, int angle) {
   return img.encodeJpg(img.copyRotate(decoded, angle: angle), quality: 92);
 }
 
-/// Reduce a un máximo de 2200 px por lado (una vez al entrar), para que rotar
-/// después sea rápido. Suficiente resolución para un documento/carnet.
+/// Downscales to at most 2200 px per side (once on entry), so rotating
+/// later is fast. Enough resolution for a document/ID card.
 Uint8List downscaleForCrop(Uint8List bytes) {
   final d = img.decodeImage(bytes);
   if (d == null) return bytes;
@@ -44,9 +44,9 @@ class CropScreen extends StatefulWidget {
 class _CropScreenState extends State<CropScreen> {
   final _controller = CropController();
   late Uint8List _bytes = widget.bytes;
-  Uint8List? _original; // imagen reducida sin rotar (para reset)
+  Uint8List? _original; // downscaled unrotated image (for reset)
   int _rot = 0;
-  bool _busy = true; // empieza ocupado: reduce la imagen al entrar
+  bool _busy = true; // starts busy: downscales the image on entry
 
   @override
   void initState() {
@@ -115,8 +115,8 @@ class _CropScreenState extends State<CropScreen> {
               key: ValueKey(_rot),
               image: _bytes,
               controller: _controller,
-              aspectRatio: null, // relación libre
-              // Rectángulo inicial = imagen completa (maximizado); se encoge.
+              aspectRatio: null, // free ratio
+              // Initial rectangle = whole image (maximised); it shrinks.
               initialRectBuilder:
                   InitialRectBuilder.withBuilder((viewport, image) => image),
               baseColor: Colors.black,

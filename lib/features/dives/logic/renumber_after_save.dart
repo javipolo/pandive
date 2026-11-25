@@ -1,5 +1,5 @@
-/// Tras crear o editar un buceo: con numeración automática renumera; sin
-/// ella, si el buceo rompe el orden cronológico, ofrece renumerar.
+/// After creating or editing a dive: with automatic numbering it renumbers; without
+/// it, if the dive breaks the chronological order, offers to renumber.
 library;
 
 import 'package:material_ui/material_ui.dart';

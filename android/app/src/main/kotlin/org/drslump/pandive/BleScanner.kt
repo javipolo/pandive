@@ -11,18 +11,18 @@ import android.os.Looper
 import io.flutter.plugin.common.EventChannel
 
 /**
- * Escaneo BLE nativo. Emite por EventChannel un mapa {name, id, rssi, likely}
- * por cada dispositivo encontrado. onListen arranca el escaneo, onCancel lo para.
+ * Native BLE scan. Emits over the EventChannel a map {name, id, rssi, likely}
+ * for each device found. onListen starts the scan, onCancel stops it.
  *
- * Los permisos (BLUETOOTH_SCAN/CONNECT o localización en <=11) se piden desde
- * Dart antes de suscribirse.
+ * Permissions (BLUETOOTH_SCAN/CONNECT or location on <=11) are requested from
+ * Dart before subscribing.
  */
 class BleScanner(private val context: Context) : EventChannel.StreamHandler {
     private val main = Handler(Looper.getMainLooper())
     private var sink: EventChannel.EventSink? = null
     private var scanning = false
 
-    // Palabras clave de ordenadores de buceo habituales (para destacarlos).
+    // Keywords of common dive computers (to highlight them).
     private val keywords = listOf(
         "peregrine", "perdix", "petrel", "teric", "nerd", "tern", // Shearwater
         "mares", "puck", "quad", "genius", "sirius",               // Mares
@@ -48,7 +48,7 @@ class BleScanner(private val context: Context) : EventChannel.StreamHandler {
 
     @SuppressLint("MissingPermission")
     private fun emit(result: ScanResult) {
-        val name = result.scanRecord?.deviceName ?: return // solo con nombre
+        val name = result.scanRecord?.deviceName ?: return // only named ones
         if (name.isBlank()) return
         val likely = keywords.any { name.lowercase().contains(it) }
         val data = mapOf(

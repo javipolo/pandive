@@ -1,11 +1,11 @@
-/// Enriquecer buceos cruzándolos con otro .ddb (de un compañero): emparejar por
-/// fecha/hora, copiar sitio + notas + buddies y añadir un buddy elegido.
+/// Enrich dives by cross-checking with another .ddb (a buddy's): pair by
+/// date/time, copy site + notes + buddies and add a chosen buddy.
 library;
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-/// Datos copiables de un buceo del .ddb de origen que empareja con uno propio.
+/// Copyable data of a source .ddb dive that pairs with one of ours.
 class DiveMatch {
   final String? place;
   final String? country;
@@ -14,12 +14,12 @@ class DiveMatch {
   const DiveMatch({this.place, this.country, this.lat, this.lon});
 }
 
-/// Empareja los buceos de [her] con [source] (cede al bucle de eventos para que
-/// la UI siga viva). Devuelve los buceos propios con coincidencia y sus datos.
+/// Pairs the dives of [her] with [source] (yields to the event loop so
+/// the UI stays alive). Returns our dives with a match and their data.
 Future<({List<Dive> dives, Map<int, DiveMatch> matches})> computeMatches(
     DivemateDb her, DivemateDb source,
     {Duration tol = const Duration(hours: 1)}) async {
-  // Indexa el origen por día una sola vez (evita re-consultar por cada buceo).
+  // Indexes the source by day once (avoids re-querying for each dive).
   final byDay = <String, List<Dive>>{};
   for (final d in source.listDives()) {
     final dt = d.date;
@@ -50,7 +50,7 @@ Future<({List<Dive> dives, Map<int, DiveMatch> matches})> computeMatches(
   return (dives: dives, matches: matches);
 }
 
-/// Construye los datos copiables desde un buceo del .ddb de origen.
+/// Builds the copyable data from a source .ddb dive.
 DiveMatch _matchFrom(DivemateDb source, Dive best) {
   final site = best.placeId != null ? source.getSite(best.placeId!) : null;
   return DiveMatch(
@@ -61,8 +61,8 @@ DiveMatch _matchFrom(DivemateDb source, Dive best) {
   );
 }
 
-/// Busca en [source] el buceo del mismo día más cercano en hora a [when]
-/// (dentro de [tol]); devuelve sus datos copiables, o null si no hay.
+/// Finds in [source] the dive on the same day closest in time to [when]
+/// (within [tol]); returns its copyable data, or null if none.
 DiveMatch? findSourceMatch(DivemateDb source, DateTime when,
     {Duration tol = const Duration(hours: 1)}) {
   Dive? best;
@@ -82,9 +82,9 @@ DiveMatch? findSourceMatch(DivemateDb source, DateTime when,
   return best == null ? null : _matchFrom(source, best);
 }
 
-/// Aplica los [matches] a los buceos [selected] del logbook [db]: copia SOLO el
-/// sitio de buceo y añade el [buddy] elegido. No toca botellas, notas ni nada
-/// más del buceo. Devuelve el número de buceos actualizados.
+/// Applies the [matches] to the [selected] dives of logbook [db]: copies ONLY the
+/// dive site and adds the chosen [buddy]. Doesn't touch cylinders, notes or anything
+/// else of the dive. Returns the number of dives updated.
 int applyEnrich(DivemateDb db, Map<int, DiveMatch> matches, Set<int> selected,
     String? buddy) {
   var n = 0;

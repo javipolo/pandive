@@ -1,21 +1,21 @@
-/// Decisión pura de la sincronización entre dispositivos (capa 1, ver
-/// docs/sync-plan.md). Nunca fusiona: avanza al lado que cambió o, si
-/// cambiaron los dos, declara divergencia para que decida el usuario.
+/// Pure cross-device sync decision (layer 1, see
+/// docs/sync-plan.md). Never merges: moves forward to the side that changed or, if
+/// both changed, declares divergence so the user decides.
 library;
 
 enum SyncAction {
-  none, // ya sincronizado
-  upload, // solo cambié yo (o no hay fichero en Drive)
-  download, // solo cambió el otro (o soy un dispositivo nuevo y vacío)
-  diverged, // cambiaron ambos: no tocar nada sin preguntar
+  none, // already in sync
+  upload, // only I changed (or there's no file on Drive)
+  download, // only the other changed (or I'm a new, empty device)
+  diverged, // both changed: touch nothing without asking
 }
 
-/// Estado observado en una pasada de sync.
+/// State observed in a sync pass.
 class SyncObservation {
-  final String? baseMd5; // md5 en Drive en la última sync (null = nunca)
-  final String? baseStamp; // sello local en la última sync
-  final String? localStamp; // sello local ahora
-  final bool localEmpty; // la DB local no tiene inmersiones
+  final String? baseMd5; // md5 on Drive at the last sync (null = never)
+  final String? baseStamp; // local stamp at the last sync
+  final String? localStamp; // local stamp now
+  final bool localEmpty; // the local DB has no dives
   final bool remoteExists;
   final String? remoteMd5;
 
@@ -28,17 +28,17 @@ class SyncObservation {
     required this.remoteMd5,
   });
 
-  /// Cualquier escritura local cambia el sello (triggers), incluido
-  /// restaurar un backup (sello distinto aunque sea más viejo).
+  /// Any local write changes the stamp (triggers), including
+  /// restoring a backup (different stamp even if older).
   bool get localChanged => localStamp != baseStamp;
   bool get remoteChanged => remoteExists && remoteMd5 != baseMd5;
 }
 
 SyncAction decideSync(SyncObservation o) {
-  if (!o.remoteExists) return SyncAction.upload; // primer dispositivo
+  if (!o.remoteExists) return SyncAction.upload; // first device
   if (o.baseMd5 == null) {
-    // Dispositivo nuevo en la sync: si está vacío, adopta lo de Drive; si no,
-    // hay dos historias distintas y decide el usuario.
+    // New device in the sync: if empty, adopts Drive's; otherwise
+    // there are two different histories and the user decides.
     return o.localEmpty ? SyncAction.download : SyncAction.diverged;
   }
   final mine = o.localChanged, theirs = o.remoteChanged;

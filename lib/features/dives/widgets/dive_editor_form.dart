@@ -1,5 +1,5 @@
-/// Cuerpo común de alta/edición de inmersión: sitio, compañeros, etiquetas,
-/// tipo de buceo, campos escalares y botellas. Reutilizado por new/edit.
+/// Shared body of dive creation/editing: site, buddies, tags,
+/// dive type, scalar fields and cylinders. Reused by new/edit.
 library;
 
 import 'package:material_ui/material_ui.dart';

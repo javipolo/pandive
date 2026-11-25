@@ -1,6 +1,6 @@
-/// Fila de las listas "elige qué buceos importar": checkbox, sitio y
-/// fecha/duración/profundidad. Verde = nuevo; ámbar = ya existe (con
-/// [duplicateText]; solo se puede marcar si [duplicateSelectable]).
+/// Row of the "choose which dives to import" lists: checkbox, site and
+/// date/duration/depth. Green = new; amber = already exists (with
+/// [duplicateText]; can only be ticked if [duplicateSelectable]).
 library;
 
 import 'package:intl/intl.dart';

@@ -1,5 +1,5 @@
-/// Diálogo "asignar a viaje": elegir un viaje existente o crear uno nuevo y
-/// asignarle las inmersiones seleccionadas. Devuelve true si asignó.
+/// "Assign to trip" dialog: pick an existing trip or create a new one and
+/// assign the selected dives to it. Returns true if it assigned.
 library;
 
 import 'package:material_ui/material_ui.dart';

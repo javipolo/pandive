@@ -1,5 +1,5 @@
-/// Detalle de inmersión con navegación por deslizamiento (anterior/siguiente),
-/// manteniendo la posición de scroll vertical al cambiar de buceo.
+/// Dive detail with swipe navigation (previous/next),
+/// keeping the vertical scroll position when switching dives.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -34,7 +34,7 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
   late final List<Dive> _dives = [...widget.dives];
   late int _index = widget.initialIndex;
   final Map<int, ScrollController> _ctrls = {};
-  double _offset = 0; // scroll vertical compartido entre buceos
+  double _offset = 0; // vertical scroll shared between dives
 
   DivemateDb get db => widget.db;
 
@@ -137,8 +137,8 @@ class _DiveDetailScreenState extends State<DiveDetailScreen> {
   }
 }
 
-/// Exige más desplazamiento horizontal antes de pasar de página, para que el
-/// scroll vertical no cambie de buceo sin querer.
+/// Requires more horizontal drag before turning the page, so that
+/// vertical scrolling doesn't switch dives by accident.
 class _CalmPagePhysics extends PageScrollPhysics {
   const _CalmPagePhysics({super.parent});
 

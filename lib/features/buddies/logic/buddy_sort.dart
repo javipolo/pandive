@@ -1,5 +1,5 @@
-/// Orden de la lista de compañeros: alfabético (por defecto), por nº de buceos
-/// (desc) o por buceo más reciente (desc). La lista llega ya alfabética de la DB.
+/// Buddy list order: alphabetical (default), by dive count
+/// (desc) or by most recent dive (desc). The list arrives alphabetical from the DB.
 library;
 
 import 'package:pandive/core/models/models.dart';
@@ -19,9 +19,9 @@ void sortBuddiesBy(List<Buddy> list, BuddySort by) {
       list.sort((a, b) {
         final x = a.lastDive, y = b.lastDive;
         if (x == null && y == null) return compareFold(a.name, b.name);
-        if (x == null) return 1; // sin buceos al final
+        if (x == null) return 1; // no dives last
         if (y == null) return -1;
-        final c = y.compareTo(x); // más reciente primero
+        final c = y.compareTo(x); // most recent first
         return c != 0 ? c : compareFold(a.name, b.name);
       });
   }

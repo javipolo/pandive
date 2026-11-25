@@ -1,5 +1,5 @@
-/// Escaneo BLE: busca ordenadores de buceo cercanos y los lista.
-/// Fase 2 hito B. La descarga (al tocar un dispositivo) llega en el hito C.
+/// BLE scan: looks for nearby dive computers and lists them.
+/// Phase 2 milestone B. The download (on tapping a device) comes in milestone C.
 library;
 import 'dart:async';
 import 'package:material_ui/material_ui.dart';
@@ -23,7 +23,7 @@ class _ScanScreenState extends State<ScanScreen> {
   String? _error;
   bool _scanning = false;
   bool _permissionOk = false;
-  bool _showAll = false; // mostrar todos los dispositivos BLE, no solo buceo
+  bool _showAll = false; // show all BLE devices, not just diving ones
   bool _btOff = false;
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _ScanScreenState extends State<ScanScreen> {
     return list;
   }
   Future<void> _onTap(ScannedDevice d) async {
-    await _sub?.cancel(); // parar escaneo antes de conectar
+    await _sub?.cancel(); // stop scanning before connecting
     if (mounted) setState(() => _scanning = false);
     if (!mounted) return;
     if (!widget.db.isComputerSaved(d.id)) {

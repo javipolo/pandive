@@ -1,9 +1,9 @@
-/// Notificaciones locales de caducidad de documentos: 30/7/1 días antes y el
-/// mismo día. Reprograma todas desde cero en cada cambio. Solo pide permiso si
-/// hay algún documento con fecha de caducidad (si no, no molesta al usuario).
-/// El payload de cada notificación es el id del documento, para que al pulsarla
-/// la app abra ese documento ([tappedDocId] / [consumeNotificationLaunch]).
-/// Solo Android: en Linux no hay notificaciones programadas (zonedSchedule).
+/// Local document expiry notifications: 30/7/1 days before and on the
+/// day itself. Reschedules all from scratch on each change. Only asks for permission if
+/// some document has an expiry date (otherwise it doesn't bother the user).
+/// The payload of each notification is the document id, so that tapping it
+/// opens that document in the app ([tappedDocId] / [consumeNotificationLaunch]).
+/// Android only: on Linux there are no scheduled notifications (zonedSchedule).
 library;
 
 import 'dart:io';
@@ -17,13 +17,13 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-const _offsets = [30, 7, 1, 0]; // días antes de caducar (0 = el mismo día)
+const _offsets = [30, 7, 1, 0]; // days before expiry (0 = same day)
 
 final _plugin = FlutterLocalNotificationsPlugin();
 bool _inited = false;
 
-/// Id del documento de la última notificación pulsada con la app abierta (o en
-/// segundo plano). Lo escucha HomeScreen para abrir ese documento.
+/// Document id of the last notification tapped with the app open (or in
+/// the background). HomeScreen listens to it to open that document.
 final ValueNotifier<int?> tappedDocId = ValueNotifier<int?>(null);
 
 void _onTap(NotificationResponse r) {
@@ -31,8 +31,8 @@ void _onTap(NotificationResponse r) {
   if (id != null) tappedDocId.value = id;
 }
 
-/// Si la app se abrió (en frío) al pulsar una notificación, devuelve el id del
-/// documento una sola vez; si no, null.
+/// If the app was opened (cold) by tapping a notification, returns the
+/// document id only once; otherwise null.
 Future<int?> consumeNotificationLaunch() async {
   if (!Platform.isAndroid) return null;
   await _init();
@@ -47,7 +47,7 @@ Future<void> _init() async {
   try {
     final info = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(info.identifier));
-  } catch (_) {/* deja UTC por defecto */}
+  } catch (_) {/* keep UTC by default */}
   await _plugin.initialize(
     const InitializationSettings(
         android: AndroidInitializationSettings('ic_stat_panda')),
@@ -56,7 +56,7 @@ Future<void> _init() async {
   _inited = true;
 }
 
-/// Reprograma todas las notificaciones de caducidad a partir del estado actual.
+/// Reschedules all expiry notifications from the current state.
 Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
   if (!Platform.isAndroid) return;
   await _init();
@@ -66,7 +66,7 @@ Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
       .listDocuments()
       .where((d) => d.expires && d.expiryDate != null)
       .toList();
-  if (docs.isEmpty) return; // sin caducidades: no pedir permiso
+  if (docs.isEmpty) return; // no expiries: don't ask for permission
 
   final android = _plugin.resolvePlatformSpecificImplementation<
       AndroidFlutterLocalNotificationsPlugin>();

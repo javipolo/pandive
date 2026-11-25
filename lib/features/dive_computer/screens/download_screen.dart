@@ -1,5 +1,5 @@
-/// Descarga inmersiones, deja elegir cuáles guardar y avanza el fingerprint.
-/// En modo [baseline] solo lee la más reciente para marcarla como importada.
+/// Downloads dives, lets you choose which to save and advances the fingerprint.
+/// In [baseline] mode it only reads the most recent to mark it as imported.
 library;
 import 'dart:async';
 import 'package:material_ui/material_ui.dart';
@@ -20,9 +20,9 @@ class DownloadScreen extends StatefulWidget {
   final DivemateDb db;
   final Settings settings;
   final bool baseline;
-  final bool all; // ignora el fingerprint: baja todas las inmersiones
-  final int maxDives; // 0 = sin límite; >0 = solo las N más recientes (sync)
-  final bool syncMode; // título "Sincronizar y descargar"
+  final bool all; // ignores the fingerprint: downloads all dives
+  final int maxDives; // 0 = no limit; >0 = only the N most recent (sync)
+  final bool syncMode; // title "Sync and download"
   const DownloadScreen({
     super.key,
     required this.device,
@@ -43,8 +43,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   StreamSubscription<double>? _progressSub;
   double _progress = 0;
   bool _saving = false;
-  List<DownloadItem>? _items; // nuevos del aparato + pendientes
-  List<DownloadedDive> _deviceDives = const []; // lo que devolvió el aparato
+  List<DownloadItem>? _items; // new from the device + pending
+  List<DownloadedDive> _deviceDives = const []; // what the device returned
   int _existing = 0;
   @override
   void initState() {
@@ -94,12 +94,12 @@ class _DownloadScreenState extends State<DownloadScreen> {
     );
     if (!mounted) return;
     final t = AppLocalizations.of(context);
-    bumpDataRevision(); // refresca pestañas (sin reabrir DB)
+    bumpDataRevision(); // refreshes tabs (without reopening the DB)
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(t.savedNew(added))));
     Navigator.of(context).popUntil((r) => r.isFirst); // vuelve a inicio
   }
-  // Por defecto: nuevos marcados, pendientes desmarcados.
+  // By default: new ones ticked, pending ones unticked.
   Set<String> get _defaultSel =>
       {for (final it in _items!) if (!it.pending) it.dive.fingerprint};
   @override

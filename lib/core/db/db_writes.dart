@@ -1,9 +1,9 @@
 part of 'divemate_db.dart';
 
-/// Escrituras: edición y alta de inmersiones (respeta convenciones DiveMate).
+/// Writes: editing and creating dives (follows DiveMate conventions).
 extension DivemateDbWrites on DivemateDb {
-  /// Actualiza campos editables de una inmersión. Marca `Updated` con la fecha
-  /// actual. Respeta UUID y Status. Ignora columnas fuera de la allowlist.
+  /// Updates editable fields of a dive. Sets `Updated` to the current
+  /// date. Respects UUID and Status. Ignores columns outside the allowlist.
   void updateDive(int id, Map<String, Object?> fields) {
     final cols = fields.keys.where(_editableColumns.contains).toList();
     if (cols.isEmpty) return;
@@ -12,7 +12,7 @@ extension DivemateDbWrites on DivemateDb {
     _db.execute('UPDATE Logbook SET ${sets.join(', ')} WHERE ID = ?', params);
   }
 
-  /// Marca inmersiones como borradas (Status=2, convención DiveMate).
+  /// Marks dives as deleted (Status=2, DiveMate convention).
   void deleteDives(List<int> ids) {
     final now = _nowStamp();
     for (final id in ids) {
@@ -20,7 +20,7 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
-  /// Restaura inmersiones borradas (Status=2 -> 1). Inverso de deleteDives.
+  /// Restores deleted dives (Status=2 -> 1). Inverse of deleteDives.
   void restoreDives(List<int> ids) {
     final now = _nowStamp();
     for (final id in ids) {
@@ -28,7 +28,7 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
-  /// Fija la fecha/hora de una inmersión (para ajustes en lote).
+  /// Sets the date/time of a dive (for batch adjustments).
   void setDiveDateTime(int id, DateTime dt) {
     String p(int v) => v.toString().padLeft(2, '0');
     updateDive(id, {
@@ -37,9 +37,9 @@ extension DivemateDbWrites on DivemateDb {
     });
   }
 
-  /// Elimina filas asociadas (botellas, gas, extras, tags) de un LogID. Se usa
-  /// al crear una inmersión nueva por si SQLite reutiliza un ID y hereda filas
-  /// huérfanas de un buceo anterior.
+  /// Removes rows associated with a LogID (cylinders, gas, extras, tags). Used
+  /// when creating a new dive in case SQLite reuses an ID and it inherits
+  /// orphan rows from an earlier dive.
   void clearDiveAssoc(int id) {
     _db.execute('DELETE FROM Tank WHERE LogID=?', [id]);
     for (final tbl in ['PandiveDiveTag', 'PandiveGas', 'PandiveSampleExtra']) {
@@ -49,8 +49,8 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
-  /// Borra filas huérfanas: botellas y datos por buceo cuyo LogID/DiveId no
-  /// corresponde a ninguna inmersión. Devuelve cuántas botellas eliminó.
+  /// Deletes orphan rows: cylinders and per-dive data whose LogID/DiveId doesn't
+  /// match any dive. Returns how many cylinders were removed.
   int purgeOrphanData() {
     final n = (_db.select('SELECT COUNT(*) c FROM Tank '
             'WHERE LogID NOT IN (SELECT ID FROM Logbook)').first['c'] as int?) ??
@@ -65,8 +65,8 @@ extension DivemateDbWrites on DivemateDb {
     return n;
   }
 
-  /// Borra inmersiones DEFINITIVAMENTE (fila + datos asociados). Irreversible;
-  /// permite volver a importarlas desde el ordenador/.ddb.
+  /// Deletes dives PERMANENTLY (row + associated data). Irreversible;
+  /// allows importing them again from the computer/.ddb.
   void purgeDives(List<int> ids) {
     for (final id in ids) {
       clearDiveAssoc(id);
@@ -74,9 +74,9 @@ extension DivemateDbWrites on DivemateDb {
     }
   }
 
-  /// Crea una inmersión nueva (alta manual). Devuelve el ID generado. Genera
-  /// Number (si no se pasa), UUID v4, Updated y Status=1, con DiverID del owner.
-  /// Las botellas se añaden aparte con setDiveTanks.
+  /// Creates a new dive (manual entry). Returns the generated ID. Generates
+  /// Number (if not given), UUID v4, Updated and Status=1, with the owner's DiverID.
+  /// Cylinders are added separately with setDiveTanks.
   int createDive({
     required DateTime dateTime,
     int? number,
@@ -113,7 +113,7 @@ extension DivemateDbWrites on DivemateDb {
       ],
     );
     final id = _db.lastInsertRowId;
-    clearDiveAssoc(id); // por si se reutiliza un ID con filas huérfanas
+    clearDiveAssoc(id); // in case an ID with orphan rows is reused
     return id;
   }
 }

@@ -4,7 +4,7 @@ import 'package:pandive/core/gas_plan.dart';
 void main() {
   group('computeGasPlan', () {
     test('single cylinder, fixed reserve', () {
-      // RMV 20, 30 m (4 ata), 40 min => 3200 L. 24 L @ 200 bar, reserva 35.
+      // RMV 20, 30 m (4 ata), 40 min => 3200 L. 24 L @ 200 bar, reserve 35.
       final p = computeGasPlan(
         rmv: 20,
         avgDepthM: 30,
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('mixed sizes with a stage, thirds counts all gas', () {
-      // 2x11.1 reserva + 7 etapa, 200 bar. Gas: 15*40*5 = 3000 L.
+      // 2x11.1 reserve + 7 stage, 200 bar. Gas: 15*40*5 = 3000 L.
       final p = computeGasPlan(
         rmv: 15,
         avgDepthM: 40, // 5 ata
@@ -36,9 +36,9 @@ void main() {
         rule: ReserveRule.thirds,
       )!;
       expect(p.hasStages, isTrue);
-      // totalGas = 29.2*200 = 5840; reserva = 1/3 = 1946.67; en 22.2 L => 87.7 bar
+      // totalGas = 29.2*200 = 5840; reserve = 1/3 = 1946.67; in 22.2 L => 87.7 bar
       expect(p.reserveThresholdBar, closeTo(87.69, 0.1));
-      // salida reserva = (5840-3000)/22.2 = 127.9 bar
+      // reserve exit = (5840-3000)/22.2 = 127.9 bar
       expect(p.endReserveBar, closeTo(127.93, 0.1));
       expect(p.ok, isTrue);
     });
@@ -72,7 +72,7 @@ void main() {
         rule: ReserveRule.bar35,
       )!;
       expect(p.hasStages, isFalse);
-      expect(p.endReserveBar, closeTo(66.67, 0.1)); // igual que 1x24
+      expect(p.endReserveBar, closeTo(66.67, 0.1)); // same as 1x24
     });
 
     test('end pressure clamped to start pressure', () {

@@ -1,4 +1,4 @@
-/// Campo que muestra los compañeros elegidos (chips) y permite editarlos.
+/// Field showing the chosen buddies (chips) and allowing editing them.
 library;
 
 import 'package:material_ui/material_ui.dart';

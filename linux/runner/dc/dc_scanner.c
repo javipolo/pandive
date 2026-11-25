@@ -1,6 +1,6 @@
-// Escaneo BLE con BlueZ para el EventChannel pandive/dc/scan. Emite un mapa
-// {name, id, rssi, likely} por dispositivo visto (como BleScanner.kt).
-// Corre en el hilo principal (contexto GLib por defecto).
+// BLE scan with BlueZ for the pandive/dc/scan EventChannel. Emits a map
+// {name, id, rssi, likely} per device seen (like BleScanner.kt).
+// Runs on the main thread (default GLib context).
 #include "dc_scanner.h"
 
 #include <string.h>
@@ -18,7 +18,7 @@ struct _DcScanner {
     gboolean discovering;
 };
 
-// Emite el dispositivo si tiene nombre y RSSI (=visto en este escaneo).
+// Emits the device if it has a name and RSSI (=seen in this scan).
 static void emit_props(DcScanner *s, GVariant *props) {
     const gchar *name = NULL, *addr = NULL;
     gint16 rssi = 0;
@@ -56,10 +56,10 @@ static void on_added(GDBusConnection *bus, const gchar *sender, const gchar *pat
 static void on_changed(GDBusConnection *bus, const gchar *sender, const gchar *path,
                        const gchar *iface, const gchar *signal, GVariant *params, gpointer ud) {
     (void) bus; (void) sender; (void) iface; (void) signal; (void) params;
-    emit_path(ud, path); // RSSI/nombre actualizados: releer y emitir
+    emit_path(ud, path); // RSSI/name updated: reread and emit
 }
 
-// Dispositivos ya conocidos y vistos recientemente (con RSSI).
+// Devices already known and seen recently (with RSSI).
 static void emit_known(DcScanner *s) {
     g_autoptr(GVariant) res = g_dbus_connection_call_sync(s->bus, BLUEZ, "/",
         "org.freedesktop.DBus.ObjectManager", "GetManagedObjects", NULL,

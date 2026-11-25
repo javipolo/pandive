@@ -1,4 +1,4 @@
-/// Un viaje de buceo: agrupa inmersiones (y opcionalmente compañeros).
+/// A dive trip: groups dives (and optionally buddies).
 library;
 
 class Trip {

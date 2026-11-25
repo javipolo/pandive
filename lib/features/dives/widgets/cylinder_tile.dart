@@ -1,4 +1,4 @@
-/// Tarjeta de una botella en el detalle de inmersión.
+/// Card of a cylinder in the dive detail.
 library;
 
 import 'package:material_ui/material_ui.dart';

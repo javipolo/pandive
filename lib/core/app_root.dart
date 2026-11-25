@@ -1,6 +1,6 @@
-/// AppRoot: decide la pantalla inicial. Si hay una DB válida, la app; si no,
-/// crea una vacía automáticamente (primer arranque) o muestra la pantalla de
-/// carga (al Cambiar base de datos o ante un error).
+/// AppRoot: picks the initial screen. With a valid DB, the app; otherwise it
+/// creates an empty one automatically (first launch) or shows the load
+/// screen (on Change database or after an error).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -28,7 +28,7 @@ class _AppRootState extends State<AppRoot> {
   DivemateDb? _db;
   DbLoadError? _error;
   String? _errorDetail;
-  bool _forceLoad = false; // true = mostrar la pantalla de carga (Cambiar DB)
+  bool _forceLoad = false; // true = show the load screen (Change DB)
 
   @override
   void initState() {
@@ -42,8 +42,8 @@ class _AppRootState extends State<AppRoot> {
     _error = null;
     _errorDetail = null;
     if (path == null) {
-      // Primer arranque sin DB: crear una vacía automáticamente. Si el usuario
-      // eligió "Cambiar base de datos" (_forceLoad), mostrar la pantalla.
+      // First launch without DB: create an empty one automatically. If the user
+      // chose "Change database" (_forceLoad), show the screen.
       if (_forceLoad) {
         setState(() {});
       } else {
@@ -68,7 +68,7 @@ class _AppRootState extends State<AppRoot> {
     setState(() {});
   }
 
-  // Crea un logbook vacío en los documentos de la app y lo abre.
+  // Creates an empty logbook in the app documents and opens it.
   Future<void> _autoCreate() async {
     try {
       final docs = await getApplicationDocumentsDirectory();
@@ -79,13 +79,13 @@ class _AppRootState extends State<AppRoot> {
     } catch (e) {
       _error = DbLoadError.openFailed;
       _errorDetail = '$e';
-      _forceLoad = true; // caer a la pantalla de carga manual
+      _forceLoad = true; // fall back to the manual load screen
       if (mounted) setState(() {});
     }
   }
 
-  // Backup a Drive: copia inmediata al arrancar (silenciosa) y, si el backup
-  // automático está activo, (re)programa la tarea periódica en segundo plano.
+  // Drive backup: immediate copy on startup (silent) and, if automatic
+  // backup is on, (re)schedules the periodic background task.
   void _maybeBackup() {
     DriveBackupService().backupIfNeeded(widget.settings);
     if (widget.settings.autoBackup) {
@@ -93,8 +93,8 @@ class _AppRootState extends State<AppRoot> {
     }
   }
 
-  // Sync entre dispositivos: conectar el controlador a esta DB y sincronizar
-  // (también tras recargar/restaurar: un cambio local se sube).
+  // Cross-device sync: attach the controller to this DB and sync
+  // (also after reload/restore: a local change gets uploaded).
   void _startSync() {
     syncController.attach(
       settings: widget.settings,
@@ -105,8 +105,8 @@ class _AppRootState extends State<AppRoot> {
     Future.microtask(() => syncController.sync(auto: true));
   }
 
-  // Sustituye la DB activa por la versión bajada de Drive (cerrar, copiar,
-  // reabrir). Vuelve a la pantalla principal: las abiertas usan la DB vieja.
+  // Replaces the active DB with the version downloaded from Drive (close, copy,
+  // reopen). Goes back to the main screen: open ones use the old DB.
   Future<void> _replaceFromSync(File src) async {
     final path = widget.settings.dbPath;
     if (path == null) return;
@@ -128,7 +128,7 @@ class _AppRootState extends State<AppRoot> {
   Widget build(BuildContext context) {
     final db = _db;
     if (db == null) {
-      // Mientras se crea la DB automáticamente (sin error ni Cambiar DB).
+      // While the DB is created automatically (no error and no Change DB).
       if (_error == null && !_forceLoad) {
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       }
@@ -144,7 +144,7 @@ class _AppRootState extends State<AppRoot> {
       );
     }
     return HomeScreen(
-      key: ValueKey(db), // nueva DB (reload/restore) -> reconstruye pestañas
+      key: ValueKey(db), // new DB (reload/restore) -> rebuild tabs
       db: db,
       settings: widget.settings,
       onChangeDb: () async {
@@ -157,7 +157,7 @@ class _AppRootState extends State<AppRoot> {
     );
   }
 
-  // Reemplaza la DB activa por el .ddb en [src] (copia a documentos y abre).
+  // Replaces the active DB with the .ddb at [src] (copy to documents and open).
   Future<void> _replaceDb(String src) async {
     final docs = await getApplicationDocumentsDirectory();
     final dest = '${docs.path}/logbook-${DateTime.now().millisecondsSinceEpoch}.ddb';

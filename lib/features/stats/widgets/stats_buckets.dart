@@ -1,11 +1,11 @@
-/// Agrupa fechas de inmersión por año/mes/semana (ISO). Pure y testeable.
+/// Groups dive dates by year/month/week (ISO). Pure and testable.
 library;
 
 enum StatsPeriod { year, month, week }
 
 String _p2(int v) => v.toString().padLeft(2, '0');
 
-/// Número de semana ISO-8601 (y su año ISO) de una fecha.
+/// ISO-8601 week number (and its ISO year) of a date.
 (int isoYear, int week) isoWeek(DateTime date) {
   final d = DateTime.utc(date.year, date.month, date.day);
   final thursday = d.add(Duration(days: 4 - d.weekday)); // lun=1..dom=7
@@ -19,14 +19,14 @@ String periodKey(DateTime d, StatsPeriod p) {
     case StatsPeriod.year:
       return '${d.year}';
     case StatsPeriod.month:
-      return '${_p2(d.year % 100)}-${_p2(d.month)}'; // año corto: 26-01
+      return '${_p2(d.year % 100)}-${_p2(d.month)}'; // short year: 26-01
     case StatsPeriod.week:
       final (y, w) = isoWeek(d);
       return '${_p2(y % 100)}-W${_p2(w)}'; // 26-W05
   }
 }
 
-/// Conteos ordenados por clave ascendente para el periodo [p].
+/// Counts sorted by ascending key for period [p].
 List<(String, int)> bucketByPeriod(List<DateTime> dates, StatsPeriod p) {
   final map = <String, int>{};
   for (final d in dates) {

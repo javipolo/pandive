@@ -1,5 +1,5 @@
-/// Alta/edición de los metadatos de un documento: título, notas y caducidad.
-/// La imagen ya está elegida (alta) o no cambia (edición).
+/// Create/edit a document's metadata: title, notes and expiry.
+/// The image is already chosen (create) or doesn't change (edit).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -15,7 +15,7 @@ import 'package:pandive/l10n/app_localizations.dart';
 class DocumentEditScreen extends StatefulWidget {
   final DivemateDb db;
   final DiveDoc? doc; // null = alta
-  final String? fileName; // requerido en alta
+  final String? fileName; // required on create
   const DocumentEditScreen(
       {super.key, required this.db, this.doc, this.fileName});
 
@@ -69,7 +69,7 @@ class _DocumentEditScreenState extends State<DocumentEditScreen> {
           expires: _expires,
           expiryDate: expiry);
     }
-    syncDocNotifications(widget.db, t); // reprograma avisos de caducidad
+    syncDocNotifications(widget.db, t); // reschedules expiry notifications
     Navigator.of(context).pop(true);
   }
 

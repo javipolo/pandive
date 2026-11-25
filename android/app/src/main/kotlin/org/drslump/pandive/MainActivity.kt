@@ -16,7 +16,7 @@ class MainActivity : FlutterActivity() {
     private val scanChannel = "pandive/dc/scan"
     private val main = Handler(Looper.getMainLooper())
 
-    // Fichero .ddb entrante (abrir con / compartir), pendiente de consumir.
+    // Incoming .ddb file (open with / share), waiting to be consumed.
     private var pendingOpenPath: String? = null
     private var openSink: EventChannel.EventSink? = null
 
@@ -66,7 +66,7 @@ class MainActivity : FlutterActivity() {
         )
     }
 
-    // Descarga en un hilo de trabajo (bloqueante); responde en el hilo principal.
+    // Download on a worker thread (blocking); replies on the main thread.
     private fun handleDownload(
         call: io.flutter.plugin.common.MethodCall,
         result: MethodChannel.Result,
@@ -86,7 +86,7 @@ class MainActivity : FlutterActivity() {
         }.start()
     }
 
-    // Lanza el diálogo del sistema para encender el Bluetooth.
+    // Launches the system dialog to turn Bluetooth on.
     @Suppress("DEPRECATION")
     private fun requestEnableBt() {
         try {
@@ -94,17 +94,17 @@ class MainActivity : FlutterActivity() {
         } catch (_: Exception) {}
     }
 
-    // ¿Está el Bluetooth encendido?
+    // Is Bluetooth on?
     private fun isBluetoothOn(): Boolean {
         val mgr = getSystemService(BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager
         return mgr?.adapter?.isEnabled == true
     }
 
-    // share_plus lanza el selector con startActivityForResult (para el callback de
-    // resultado), lo que impide FLAG_ACTIVITY_NEW_TASK y hace que la app destino
-    // se apile en NUESTRA task (había que salir de ella para volver a Pandive).
-    // Añadimos NEW_TASK al ACTION_CHOOSER y a su intent interno (EXTRA_INTENT) para
-    // que el destino abra en su propia task. No usamos el resultado del share.
+    // share_plus launches the chooser with startActivityForResult (for the result
+    // callback), which prevents FLAG_ACTIVITY_NEW_TASK and makes the target app
+    // stack on OUR task (you had to leave it to get back to Pandive).
+    // We add NEW_TASK to ACTION_CHOOSER and to its inner intent (EXTRA_INTENT) so
+    // the target opens in its own task. We don't use the share result.
     @Suppress("DEPRECATION")
     override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
         if (intent.action == Intent.ACTION_CHOOSER) {
@@ -115,7 +115,7 @@ class MainActivity : FlutterActivity() {
         super.startActivityForResult(intent, requestCode, options)
     }
 
-    // App ya abierta: llega un nuevo .ddb -> avisar a Flutter (o dejar pendiente).
+    // App already open: a new .ddb arrives -> notify Flutter (or keep it pending).
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -124,7 +124,7 @@ class MainActivity : FlutterActivity() {
         if (sink != null) main.post { sink.success(p) } else pendingOpenPath = p
     }
 
-    // Extrae el .ddb de un intent VIEW/SEND y lo copia a un temporal legible.
+    // Extracts the .ddb from a VIEW/SEND intent and copies it to a readable temp file.
     private fun extractDdb(intent: Intent?): String? {
         if (intent == null) return null
         val uri: Uri? = when (intent.action) {

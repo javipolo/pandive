@@ -1,6 +1,6 @@
-/// Resultados del planificador: gas necesario, reserva objetivo y presión de
-/// salida en las botellas de reserva (coloreada), margen y tiempo máximo. Si hay
-/// etapas que se vacían, lo indica (salen a 0 bar).
+/// Planner results: gas needed, target reserve and exit
+/// pressure in the reserve cylinders (coloured), margin and max time. If there
+/// are stages that get emptied, it says so (they end at 0 bar).
 library;
 
 import 'package:material_ui/material_ui.dart';

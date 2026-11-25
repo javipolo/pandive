@@ -1,5 +1,5 @@
-/// Campos escalares de una inmersión (fecha, profundidades, tiempos, etc.).
-/// Sitio, compañeros y botellas se gestionan aparte con selectores.
+/// Scalar fields of a dive (date, depths, times, etc.).
+/// Site, buddies and cylinders are handled separately with pickers.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -10,7 +10,7 @@ import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/star_rating.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Controllers de los campos de texto escalares.
+/// Controllers of the scalar text fields.
 class DiveFormControllers {
   final maxDepth = TextEditingController();
   final avgDepth = TextEditingController();
@@ -45,7 +45,7 @@ class DiveFormControllers {
   }
 }
 
-/// Column (embebible) con los campos escalares.
+/// (Embeddable) Column with the scalar fields.
 class DiveForm extends StatelessWidget {
   final DiveFormControllers c;
   final DateTime when;

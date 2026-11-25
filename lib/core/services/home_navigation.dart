@@ -1,11 +1,11 @@
-/// Peticiones de navegación a la pantalla principal desde pantallas apiladas
-/// encima (p.ej. tras importar: volver a la lista de buceos).
+/// Navigation requests to the main screen from screens stacked
+/// on top (e.g. after importing: go back to the dives list).
 library;
 
 import 'package:flutter/foundation.dart';
 
-/// Sección pedida (índice de la barra inferior); la consume HomeScreen.
+/// Requested section (bottom bar index); consumed by HomeScreen.
 final ValueNotifier<int?> homeSectionRequest = ValueNotifier<int?>(null);
 
-/// Pide mostrar la lista de buceos (sección 0).
+/// Asks to show the dives list (section 0).
 void requestDivesList() => homeSectionRequest.value = 0;

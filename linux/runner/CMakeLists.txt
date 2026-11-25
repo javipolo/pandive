@@ -30,8 +30,8 @@ target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
 
-# Ordenador de buceo: núcleo común (native/) + libdivecomputer estática
-# (linux/ldc/, generada con `make ldc-linux`; headers compartidos con Android).
+# Dive computer: shared core (native/) + static libdivecomputer
+# (linux/ldc/, generated with `make ldc-linux`; headers shared with Android).
 target_include_directories(${BINARY_NAME} PRIVATE
   "${CMAKE_SOURCE_DIR}/../native"
   "${CMAKE_SOURCE_DIR}/../android/app/src/main/cpp/include")

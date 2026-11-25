@@ -1,4 +1,4 @@
-/// Selector de valoración por estrellas (0-5). Tocar la misma estrella la quita.
+/// Star rating picker (0-5). Tapping the same star clears it.
 library;
 
 import 'package:material_ui/material_ui.dart';

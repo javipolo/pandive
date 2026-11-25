@@ -1,5 +1,5 @@
-/// Diálogo de confirmación con una casilla opcional. Devuelve null si se
-/// cancela, o el valor de la casilla si se confirma.
+/// Confirmation dialog with an optional checkbox. Returns null if
+/// cancelled, or the checkbox value if confirmed.
 library;
 
 import 'package:material_ui/material_ui.dart';

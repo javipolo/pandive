@@ -1,4 +1,4 @@
-/// Widgets de la pantalla de escaneo BLE: fila de dispositivo y vista de error.
+/// BLE scan screen widgets: device row and error view.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -29,8 +29,8 @@ class ScannedDeviceTile extends StatelessWidget {
   }
 }
 
-/// Hoja de acciones al tocar un ordenador. Devuelve 'download', 'sync', 'mark'
-/// o null (cancelar).
+/// Action sheet when tapping a computer. Returns 'download', 'sync', 'mark'
+/// or null (cancel).
 Future<String?> showDiveComputerActionSheet(BuildContext context) {
   final t = AppLocalizations.of(context);
   return showModalBottomSheet<String>(
@@ -61,7 +61,7 @@ Future<String?> showDiveComputerActionSheet(BuildContext context) {
   );
 }
 
-/// Pregunta cuántas inmersiones recientes comprobar al sincronizar.
+/// Asks how many recent dives to check when syncing.
 Future<int?> askSyncCount(BuildContext context) {
   final t = AppLocalizations.of(context);
   var n = 5;
@@ -89,8 +89,8 @@ Future<int?> askSyncCount(BuildContext context) {
   );
 }
 
-/// Pregunta si guardar el ordenador recién escaneado (checkbox marcado por
-/// defecto). Devuelve true=guardar, false=no guardar, null=cancelar.
+/// Asks whether to save the newly scanned computer (checkbox ticked by
+/// default). Returns true=save, false=don't save, null=cancel.
 Future<bool?> showSaveComputerDialog(BuildContext context, String name) {
   final t = AppLocalizations.of(context);
   var save = true;
@@ -119,7 +119,7 @@ Future<bool?> showSaveComputerDialog(BuildContext context, String name) {
 class ScanErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
-  final VoidCallback? onEnableBt; // si se pasa, muestra "Activar Bluetooth"
+  final VoidCallback? onEnableBt; // if given, shows "Enable Bluetooth"
   const ScanErrorView(
       {super.key, required this.message, required this.onRetry, this.onEnableBt});
 

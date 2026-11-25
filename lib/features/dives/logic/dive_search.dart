@@ -1,5 +1,5 @@
-/// Coincidencia de búsqueda de inmersiones, insensible a acentos y mayúsculas.
-/// Busca en sitio, país, notas, compañeros (texto) y tipo; o por nº exacto.
+/// Dive search match, accent- and case-insensitive.
+/// Searches site, country, notes, buddies (text) and type; or by exact number.
 library;
 
 import 'package:pandive/core/models/models.dart';

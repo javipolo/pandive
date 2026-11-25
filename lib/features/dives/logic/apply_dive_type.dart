@@ -1,5 +1,5 @@
-/// Al aplicar un tipo de buceo que aporta botellas, descarta las botellas
-/// existentes "vacías" (sin presiones de entrada/salida) y añade las del tipo.
+/// When applying a dive type that brings cylinders, discards the existing
+/// "empty" cylinders (no start/end pressures) and adds the type's.
 library;
 
 import 'package:pandive/core/models/models.dart';
@@ -7,9 +7,9 @@ import 'package:pandive/core/models/models.dart';
 bool tankHasPressure(Cylinder c) =>
     (c.pressureStart ?? 0) > 0 || (c.pressureEnd ?? 0) > 0;
 
-/// Botellas resultantes al elegir un tipo: si el tipo no aporta ninguna, no
-/// toca nada; si aporta, conserva solo las existentes con presiones y añade las
-/// del tipo (las vacías recién creadas se descartan).
+/// Resulting cylinders when picking a type: if the type brings none, it
+/// touches nothing; if it does, keeps only the existing ones with pressures and adds
+/// the type's (the newly created empty ones are discarded).
 List<Cylinder> applyDiveTypeTanks(
     List<Cylinder> existing, List<Cylinder> typeTanks) {
   if (typeTanks.isEmpty) return existing;

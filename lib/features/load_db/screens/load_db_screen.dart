@@ -1,6 +1,6 @@
-/// Pantalla inicial cuando no hay base de datos cargada: permite elegir un
-/// fichero .ddb de DiveMate. Se copia a los documentos de la app para tener
-/// acceso estable (lectura/escritura) después.
+/// Initial screen when no database is loaded: lets you pick a
+/// DiveMate .ddb file. It's copied to the app documents to have
+/// stable (read/write) access afterwards.
 library;
 
 import 'dart:io';
@@ -15,13 +15,13 @@ import 'package:pandive/core/widgets/import_progress.dart';
 import 'package:pandive/features/load_db/widgets/load_db_buttons.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Error al abrir la DB activa, para mostrarlo localizado en la pantalla.
+/// Error opening the active DB, to show it localised on the screen.
 enum DbLoadError { invalid, openFailed }
 
 class LoadDbScreen extends StatefulWidget {
   final Settings settings;
   final DbLoadError? error;
-  final String? errorDetail; // detalle para openFailed
+  final String? errorDetail; // detail for openFailed
   final Future<void> Function(String path) onLoaded;
 
   const LoadDbScreen({
@@ -39,7 +39,7 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
   bool _busy = false;
   String? _localError;
 
-  // Ejecuta [action] con el flag de ocupado y captura errores localizados.
+  // Runs [action] with the busy flag and catches localised errors.
   Future<void> _run(
       Future<void> Function() action, String Function(String) err) async {
     setState(() {
@@ -74,7 +74,7 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
         await widget.onLoaded(dest);
       }, (e) => AppLocalizations.of(context).errorCreate(e));
 
-  // Importa un .ssrf creando un logbook nuevo y volcándolo en él.
+  // Imports a .ssrf creating a new logbook and dumping it into it.
   void _importSsrf() => _run(() async {
         final res = await FilePicker.platform.pickFiles(withData: false);
         final path = res?.files.single.path;

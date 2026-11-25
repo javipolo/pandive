@@ -1,88 +1,88 @@
 part of 'divemate_db.dart';
 
-/// Crea la tabla de sincronización (fingerprints por dispositivo) si falta.
-/// Específica de Pandive; divemate-cli la ignora.
+/// Creates the sync table (fingerprints per device) if missing.
+/// Pandive-specific; divemate-cli ignores it.
 void _ensureSyncTable(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveSync '
       '(DeviceId TEXT PRIMARY KEY, Fingerprint TEXT, Updated TEXT)');
-  // "Mis botellas": presets reutilizables de tamaño + material.
+  // "My cylinders": reusable size + material presets.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveTankPreset '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Litres REAL, '
       'Material INTEGER)');
-  // Etiquetas (tags) reutilizables + enlace por inmersión.
+  // Reusable tags + per-dive link.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveTag '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTag '
       '(DiveId INTEGER, TagId INTEGER, PRIMARY KEY (DiveId, TagId))');
-  // Tags por sitio (Place): derivados a los buceos de ese sitio en tiempo de
-  // lectura (ver effectiveTagsForDive / diveIdsWithTag / listDivesByTag).
+  // Per-site tags (Place): derived onto that site's dives at
+  // read time (see effectiveTagsForDive / diveIdsWithTag / listDivesByTag).
   db.execute('CREATE TABLE IF NOT EXISTS PandiveSiteTag '
       '(PlaceId INTEGER, TagId INTEGER, PRIMARY KEY (PlaceId, TagId))');
-  // Caché de buceos descargados no guardados (reaparecen "una vez más").
+  // Cache of downloaded but unsaved dives (they show up "one more time").
   db.execute('CREATE TABLE IF NOT EXISTS PandivePending '
       '(DeviceId TEXT, Fingerprint TEXT, Json TEXT, Updated TEXT, '
       'PRIMARY KEY (DeviceId, Fingerprint))');
-  // Tipos de buceo + su plantilla de botellas.
+  // Dive types + their cylinder template.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveType '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)');
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTypeTank '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, TypeId INTEGER, Litres REAL, '
       'Material INTEGER, SortOrd INTEGER, Name TEXT)');
-  // Migración: añadir Name si la tabla se creó antes (ignora si ya existe).
+  // Migration: add Name if the table was created earlier (ignore if it exists).
   try {
     db.execute('ALTER TABLE PandiveDiveTypeTank ADD COLUMN Name TEXT');
-  } catch (_) {/* ya existe */}
-  // Columna propia para el SAC/RMV calculado (DiveMate no la tiene; la ignora).
+  } catch (_) {/* already exists */}
+  // Own column for the computed SAC/RMV (DiveMate lacks it; it ignores it).
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveSac REAL');
-  } catch (_) {/* ya existe */}
-  // Temperatura media (del perfil); la mínima va en Watertemp (convención DiveMate).
+  } catch (_) {/* already exists */}
+  // Average temperature (from the profile); the minimum goes in Watertemp (DiveMate convention).
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveAvgTemp REAL');
-  } catch (_) {/* ya existe */}
-  // Fingerprint del ordenador por buceo (para fijar puntos de sync / debug).
+  } catch (_) {/* already exists */}
+  // Computer fingerprint per dive (to pin sync points / debug).
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveFp TEXT');
-  } catch (_) {/* ya existe */}
-  // Ordenadores de buceo guardados (reconexión por MAC sin reescanear).
+  } catch (_) {/* already exists */}
+  // Saved dive computers (reconnect by MAC without rescanning).
   db.execute('CREATE TABLE IF NOT EXISTS PandiveComputer '
       '(Address TEXT PRIMARY KEY, Name TEXT, Vendor TEXT, Product TEXT, '
       'Updated TEXT)');
-  // Índice de gas por muestra (JSON array) para descargas con cambios de gas.
+  // Gas index per sample (JSON array) for downloads with gas switches.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveGas '
       '(DiveId INTEGER PRIMARY KEY, Json TEXT)');
-  // Parámetros extra por muestra (ppo2/cns/presión/rbt) como JSON de arrays.
+  // Extra per-sample parameters (ppo2/cns/pressure/rbt) as JSON arrays.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveSampleExtra '
       '(DiveId INTEGER PRIMARY KEY, Json TEXT)');
-  // Documentación (certificaciones, seguro, etc.): imagen en disco + metadatos.
+  // Documents (certifications, insurance, etc.): image on disk + metadata.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDocument '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT, Notes TEXT, '
       'Expires INTEGER, ExpiryDate TEXT, FileName TEXT, Created TEXT, '
       'Updated TEXT, SortOrd INTEGER)');
-  // Migración: añadir SortOrd si la tabla se creó antes (orden manual).
+  // Migration: add SortOrd if the table was created earlier (manual order).
   try {
     db.execute('ALTER TABLE PandiveDocument ADD COLUMN SortOrd INTEGER');
-  } catch (_) {/* ya existe */}
-  // Viajes: agrupan inmersiones (columna propia en Logbook) + compañeros del viaje.
+  } catch (_) {/* already exists */}
+  // Trips: group dives (own column in Logbook) + trip buddies.
   db.execute('CREATE TABLE IF NOT EXISTS PandiveTrip '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Notes TEXT, Updated TEXT)');
   db.execute('CREATE TABLE IF NOT EXISTS PandiveTripBuddy '
       '(TripId INTEGER, BuddyId INTEGER, PRIMARY KEY (TripId, BuddyId))');
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveTripId INTEGER');
-  } catch (_) {/* ya existe */}
+  } catch (_) {/* already exists */}
 }
 
-/// Importación de inmersiones descargadas del ordenador al formato DiveMate.
+/// Import of dives downloaded from the computer into DiveMate format.
 extension DivemateDbImport on DivemateDb {
-  /// Fingerprint de la última inmersión importada de [deviceId] (o null).
+  /// Fingerprint of the last dive imported from [deviceId] (or null).
   String? fingerprintFor(String deviceId) {
     final r = _db.select(
         'SELECT Fingerprint FROM PandiveSync WHERE DeviceId = ?', [deviceId]);
     return r.isEmpty ? null : r.first['Fingerprint'] as String?;
   }
 
-  /// Guarda el fingerprint de [deviceId] (upsert).
+  /// Stores the fingerprint of [deviceId] (upsert).
   void setFingerprintFor(String deviceId, String fingerprint) {
     _db.execute(
       'INSERT INTO PandiveSync (DeviceId, Fingerprint, Updated) VALUES (?,?,?) '
@@ -92,8 +92,8 @@ extension DivemateDbImport on DivemateDb {
     );
   }
 
-  /// ¿Ya existe una inmersión (no borrada) del owner en esa fecha/hora? (dedupe).
-  /// Ignora las borradas (Status=2) para que un buceo borrado pueda re-descargarse.
+  /// Is there already a (non-deleted) owner dive at that date/time? (dedupe).
+  /// Ignores deleted ones (Status=2) so a deleted dive can be re-downloaded.
   bool hasDiveAt(DateTime dt) {
     final owner = ownerId;
     String p(int v) => v.toString().padLeft(2, '0');
@@ -107,8 +107,8 @@ extension DivemateDbImport on DivemateDb {
     return _db.select(sql, params).isNotEmpty;
   }
 
-  /// Buceos (vivos, del owner) de un día: id, hora, profundidad máx. y
-  /// duración (min). Para deduplicar importaciones sin hora (CSV de SSI).
+  /// Dives (live, owner's) of a day: id, time, max depth and
+  /// duration (min). To dedupe imports without a time (SSI CSV).
   List<({int id, String? time, double? depth, double? minutes})> divesOnDay(
       DateTime day) {
     final owner = ownerId;
@@ -130,8 +130,8 @@ extension DivemateDbImport on DivemateDb {
     ];
   }
 
-  /// Importa una inmersión descargada. Devuelve true si se insertó, false si ya
-  /// existía (dedupe por fecha/hora). Escribe perfil en formato DiveMate.
+  /// Imports a downloaded dive. Returns true if inserted, false if it already
+  /// existed (dedupe by date/time). Writes the profile in DiveMate format.
   bool importDownloaded(DownloadedDive d, {String? computer}) {
     final dt = d.datetime;
     if (dt != null && hasDiveAt(dt)) return false;
@@ -144,13 +144,13 @@ extension DivemateDbImport on DivemateDb {
     final (interval, prof, prof2) = _encodeProfile(d.samples);
     final prof4 = _encodeProfile4(d.samples);
     final o2 = d.gasmixes.isNotEmpty ? d.gasmixes.first.o2 * 100 : null;
-    // Prof. media: la del aparato o, si falta, calculada de las muestras.
+    // Avg depth: the device's or, if missing, computed from the samples.
     var avgDepth = d.avgDepth;
     if (avgDepth == null) {
       final xs = [for (final s in d.samples) if (s.depth > 0) s.depth];
       if (xs.isNotEmpty) avgDepth = xs.reduce((a, b) => a + b) / xs.length;
     }
-    // Temperaturas de las muestras: mínima (Watertemp) y media (PandiveAvgTemp).
+    // Sample temperatures: minimum (Watertemp) and average (PandiveAvgTemp).
     final temps = [for (final s in d.samples) if (s.temp != null) s.temp!];
     final minTemp =
         d.tempMin ?? (temps.isEmpty ? null : temps.reduce((a, b) => a < b ? a : b));
@@ -170,7 +170,7 @@ extension DivemateDbImport on DivemateDb {
       ],
     );
     final id = _db.lastInsertRowId;
-    clearDiveAssoc(id); // evita heredar botellas/gas de un ID reutilizado
+    clearDiveAssoc(id); // avoids inheriting cylinders/gas from a reused ID
     if (d.fingerprint.isNotEmpty) {
       _db.execute('UPDATE Logbook SET PandiveFp=? WHERE ID=?', [d.fingerprint, id]);
     }
@@ -183,7 +183,7 @@ extension DivemateDbImport on DivemateDb {
         [id, i, i, g.o2 * 100, g.he * 100, _uuid(), now],
       );
     }
-    // Gas por muestra (si el ordenador registró cambios de mezcla).
+    // Gas per sample (if the computer logged mix switches).
     if (d.samples.any((s) => s.gasIndex != null)) {
       _db.execute('INSERT OR REPLACE INTO PandiveGas (DiveId, Json) VALUES (?,?)',
           [id, jsonEncode([for (final s in d.samples) s.gasIndex])]);

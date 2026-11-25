@@ -1,5 +1,5 @@
-/// "Dive transfer": elige un ordenador guardado (reconecta por MAC sin
-/// reescanear) o pulsa Buscar para escanear y guardar uno nuevo.
+/// "Dive transfer": pick a saved computer (reconnects by MAC without
+/// rescanning) or tap Search to scan and save a new one.
 library;
 
 import 'package:material_ui/material_ui.dart';

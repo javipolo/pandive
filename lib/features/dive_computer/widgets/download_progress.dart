@@ -1,4 +1,4 @@
-/// Indicador de progreso de descarga: rueda grande + % debajo (legible).
+/// Download progress indicator: large wheel + % below (readable).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -6,9 +6,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DownloadProgress extends StatelessWidget {
-  final double progress; // 0.0–1.0 (0 = indeterminado al principio)
-  /// Si true, no se muestra %: el total de memoria no refleja cuánto falta
-  /// cuando se descargan solo N buceos (sync / marcar importado).
+  final double progress; // 0.0–1.0 (0 = indeterminate at first)
+  /// If true, no % is shown: the memory total doesn't reflect what's left
+  /// when only N dives are downloaded (sync / mark imported).
   final bool indeterminate;
   const DownloadProgress(
       {super.key, required this.progress, this.indeterminate = false});

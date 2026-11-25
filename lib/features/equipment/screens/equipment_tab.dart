@@ -1,4 +1,4 @@
-/// Pestaña "Equipo": hub de configuración de tipos de buceo y de botella.
+/// "Equipment" tab: hub for dive type and cylinder type settings.
 library;
 
 import 'package:material_ui/material_ui.dart';

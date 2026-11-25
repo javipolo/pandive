@@ -1,4 +1,4 @@
-/// Ajustes de la app: idioma y tamaño de letra.
+/// App settings: language and font size.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -41,7 +41,7 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
     if (ok == true && context.mounted) {
-      Navigator.pop(context); // cerrar ajustes
+      Navigator.pop(context); // close settings
       onChangeDb();
     }
   }

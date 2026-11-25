@@ -1,5 +1,5 @@
-// Copiar una imagen PNG al portapapeles del escritorio (Flutter solo copia
-// texto). Canal "pandive/clipboard", método "copyImage" (bytes PNG -> bool).
+// Copy a PNG image to the desktop clipboard (Flutter only copies
+// text). Channel "pandive/clipboard", method "copyImage" (PNG bytes -> bool).
 #ifndef PANDIVE_IMAGE_CLIPBOARD_H_
 #define PANDIVE_IMAGE_CLIPBOARD_H_
 

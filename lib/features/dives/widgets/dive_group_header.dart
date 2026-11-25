@@ -1,5 +1,5 @@
-/// Cabecera de grupo en la lista de inmersiones (año o mes), colapsable y
-/// seleccionable en lote.
+/// Group header in the dive list (year or month), collapsible and
+/// batch-selectable.
 library;
 
 import 'package:material_ui/material_ui.dart';

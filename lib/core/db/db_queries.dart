@@ -1,6 +1,6 @@
 part of 'divemate_db.dart';
 
-/// Lecturas básicas de inmersiones y botellas.
+/// Basic reads of dives and cylinders.
 extension DivemateDbQueries on DivemateDb {
   static const _diveColumns =
       'ID, Number, Divedate, Entrytime, Place, Country, PlaceID, '
@@ -8,8 +8,8 @@ extension DivemateDbQueries on DivemateDb {
       'Rating, Computer, Buddy, Divemaster, Divetype, Comments, Surfint, '
       'ProfileInt, Deco, O2';
 
-  /// Lista de inmersiones del owner, más recientes primero. Excluye borradas
-  /// (Status = 2). [search] filtra por sitio, país, notas, buddy o nº.
+  /// The owner's dives, most recent first. Excludes deleted ones
+  /// (Status = 2). [search] filters by site, country, notes, buddy or number.
   List<Dive> listDives({String? search}) {
     final owner = ownerId;
     final where = StringBuffer('(Status IS NULL OR Status != 2)');
@@ -22,7 +22,7 @@ extension DivemateDbQueries on DivemateDb {
     if (q != null && q.isNotEmpty) {
       where.write(' AND (Place LIKE ? OR Country LIKE ? OR Comments LIKE ? '
           'OR Buddy LIKE ? OR CAST(Number AS TEXT) = ? '
-          // También compañeros enlazados por BuddyIDs (no solo el texto Buddy).
+          // Also buddies linked via BuddyIDs (not just the Buddy text).
           "OR EXISTS (SELECT 1 FROM Buddy B WHERE "
           "(',' || IFNULL(BuddyIDs,'') || ',') LIKE ('%,' || B.ID || ',%') "
           'AND (B.FirstName LIKE ? OR B.LastName LIKE ?)))');
@@ -37,8 +37,8 @@ extension DivemateDbQueries on DivemateDb {
     return rows.map(_diveFromRow).toList();
   }
 
-  /// Inmersiones borradas (Status = 2) del owner, más recientes primero.
-  /// Para la papelera / undelete.
+  /// The owner's deleted dives (Status = 2), most recent first.
+  /// For the trash / undelete.
   List<Dive> listDeletedDives() {
     final owner = ownerId;
     final where = StringBuffer('Status = 2');
@@ -55,7 +55,7 @@ extension DivemateDbQueries on DivemateDb {
     return rows.map(_diveFromRow).toList();
   }
 
-  /// Una inmersión por su ID.
+  /// A dive by its ID.
   Dive? getDive(int id) {
     final rows = _db.select(
       'SELECT $_diveColumns FROM Logbook WHERE ID = ?',
@@ -74,7 +74,7 @@ extension DivemateDbQueries on DivemateDb {
     return (rows.first['c'] as int?) ?? 0;
   }
 
-  /// Siguiente número de inmersión para el owner (max + 1).
+  /// Next dive number for the owner (max + 1).
   int nextDiveNumber() {
     final owner = ownerId;
     final sql = owner != null
@@ -84,7 +84,7 @@ extension DivemateDbQueries on DivemateDb {
     return ((rows.first['m'] as int?) ?? 0) + 1;
   }
 
-  /// Botellas de una inmersión, en orden.
+  /// Cylinders of a dive, in order.
   List<Cylinder> cylinders(int logId) {
     final rows = _db.select(
       'SELECT Tanksize, PresS, PresE, O2, He, Name, Tanktype FROM Tank '

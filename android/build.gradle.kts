@@ -16,10 +16,10 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 subprojects {
-    // Algunos plugins (file_picker, flutter_plugin_android_lifecycle...) compilan
-    // contra un compileSdk antiguo (35) y exigen >= 36. Forzamos 36 en todos los
-    // módulos Android para alinearlos con la app. Registrar antes de que el
-    // subproyecto se evalúe (evaluationDependsOn solo evalúa :app).
+    // Some plugins (file_picker, flutter_plugin_android_lifecycle...) compile
+    // against an old compileSdk (35) and require >= 36. We force 36 on all
+    // Android modules to align them with the app. Register before the
+    // subproject is evaluated (evaluationDependsOn only evaluates :app).
     afterEvaluate {
         extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
             compileSdkVersion(36)

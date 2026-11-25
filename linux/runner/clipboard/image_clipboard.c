@@ -2,8 +2,8 @@
 
 #include <gtk/gtk.h>
 
-// Decodifica el PNG y lo deja en el portapapeles (GTK lo sirve en los
-// formatos de imagen que pida la app que pega).
+// Decodes the PNG and puts it on the clipboard (GTK serves it in the
+// image formats requested by the pasting app).
 static gboolean copy_png(const uint8_t* data, size_t len) {
   g_autoptr(GdkPixbufLoader) loader = gdk_pixbuf_loader_new_with_type("png", NULL);
   if (loader == NULL) return FALSE;
@@ -13,7 +13,7 @@ static gboolean copy_png(const uint8_t* data, size_t len) {
   if (pixbuf == NULL) return FALSE;
   GtkClipboard* cb = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
   gtk_clipboard_set_image(cb, pixbuf);
-  gtk_clipboard_store(cb);  // que siga ahí si se cierra la app (con gestor)
+  gtk_clipboard_store(cb);  // so it stays if the app closes (with a manager)
   return TRUE;
 }
 
@@ -38,7 +38,7 @@ static void method_call_cb(FlMethodChannel* channel, FlMethodCall* call,
 
 void image_clipboard_register_with_registrar(FlPluginRegistrar* registrar) {
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
-  // El canal vive lo que la app: no se libera.
+  // The channel lives as long as the app: not freed.
   FlMethodChannel* channel = fl_method_channel_new(
       fl_plugin_registrar_get_messenger(registrar), "pandive/clipboard",
       FL_METHOD_CODEC(codec));

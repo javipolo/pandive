@@ -1,6 +1,6 @@
-# Pandive — acciones de desarrollo.
-# Flutter no está en el PATH de shells no-interactivos en esta máquina, así que
-# lo resolvemos aquí. Todo es sobreescribible: `make apk FLUTTER=/otro/flutter`.
+# Pandive — development tasks.
+# Flutter is not on the PATH of non-interactive shells on this machine, so
+# we resolve it here. Everything can be overridden: `make apk FLUTTER=/other/flutter`.
 
 FLUTTER ?= $(shell command -v flutter 2>/dev/null || echo $(HOME)/javi/git/flutter/bin/flutter)
 ANDROID_HOME ?= $(HOME)/javi/Android
@@ -10,15 +10,15 @@ export ANDROID_HOME
 export ANDROID_NDK
 export PATH := $(dir $(FLUTTER)):$(ANDROID_HOME)/platform-tools:$(PATH)
 
-# OAuth Web client ID para Google Drive (serverClientId). Se lee de
-# android/gdrive_client_id.txt (no versionado) o de la variable de entorno.
+# OAuth Web client ID for Google Drive (serverClientId). Read from
+# android/gdrive_client_id.txt (not versioned) or from the environment variable.
 GDRIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_client_id.txt 2>/dev/null))
-# OAuth iOS client ID (flutter_appauth, refresh token para backup de fondo).
+# OAuth iOS client ID (flutter_appauth, refresh token for background backup).
 GDRIVE_NATIVE_CLIENT_ID ?= $(strip $(shell cat android/gdrive_native_client_id.txt 2>/dev/null))
 DART_DEFINES := $(if $(GDRIVE_CLIENT_ID),--dart-define=GDRIVE_SERVER_CLIENT_ID=$(GDRIVE_CLIENT_ID),)
 DART_DEFINES += $(if $(GDRIVE_NATIVE_CLIENT_ID),--dart-define=GDRIVE_NATIVE_CLIENT_ID=$(GDRIVE_NATIVE_CLIENT_ID),)
-# App Linux: OAuth client "Desktop app" (mismo proyecto Google Cloud) para el
-# login de Google. linux/gdrive_desktop_client_{id,secret}.txt (no versionados).
+# Linux app: OAuth "Desktop app" client (same Google Cloud project) for the
+# Google login. linux/gdrive_desktop_client_{id,secret}.txt (not versioned).
 GDRIVE_DESKTOP_CLIENT_ID ?= $(strip $(shell cat linux/gdrive_desktop_client_id.txt 2>/dev/null))
 GDRIVE_DESKTOP_CLIENT_SECRET ?= $(strip $(shell cat linux/gdrive_desktop_client_secret.txt 2>/dev/null))
 LINUX_DEFINES := $(if $(GDRIVE_DESKTOP_CLIENT_ID),--dart-define=GDRIVE_DESKTOP_CLIENT_ID=$(GDRIVE_DESKTOP_CLIENT_ID),)
@@ -27,80 +27,80 @@ LINUX_DEFINES += $(if $(GDRIVE_DESKTOP_CLIENT_SECRET),--dart-define=GDRIVE_DESKT
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## Muestra esta ayuda
+help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: deps
-deps: ## Instala dependencias Dart (flutter pub get)
+deps: ## Install Dart dependencies (flutter pub get)
 	$(FLUTTER) pub get
 
 .PHONY: run
-run: ## Compila, instala y lanza en el device conectado
+run: ## Build, install and launch on the connected device
 	$(FLUTTER) run
 
 .PHONY: apk
-apk: ## Genera APK de depuración (sideload)
+apk: ## Build a debug APK (sideload)
 	$(FLUTTER) build apk --debug $(DART_DEFINES)
 
 .PHONY: apk-release
-apk-release: ## Genera APK de release arm64 (sideload)
-	# --no-tree-shake-icons: incluye la fuente de iconos completa. El recorte
-	# producía una OTF que en algunos Android no se parsea y deja todos los
-	# iconos como cuadrados grises (tofu): hamburguesa, barra inferior, FAB...
+apk-release: ## Build an arm64 release APK (sideload)
+	# --no-tree-shake-icons: bundles the full icon font. Tree-shaking
+	# produced an OTF that some Android devices fail to parse, leaving all
+	# icons as grey squares (tofu): hamburger, bottom bar, FAB...
 	$(FLUTTER) build apk --release --target-platform android-arm64 \
 		--no-tree-shake-icons $(DART_DEFINES)
 
 APK := build/app/outputs/flutter-apk/app-debug.apk
 
 .PHONY: install
-install: ## Instala el APK de depuración en el device conectado
+install: ## Install the debug APK on the connected device
 	$(FLUTTER) install --debug
 
 .PHONY: install-apk
-install-apk: ## Instala app-debug.apk con adb (donde esté el móvil)
+install-apk: ## Install app-debug.apk with adb (wherever the phone is)
 	adb install -r $(APK)
 
 .PHONY: apk-path
-apk-path: ## Imprime la ruta absoluta del APK de depuración
+apk-path: ## Print the absolute path of the debug APK
 	@echo "$(CURDIR)/$(APK)"
 
 .PHONY: test
-test: ## Ejecuta los tests (unitarios + contra la DB real si existe)
+test: ## Run the tests (unit + against the real DB if present)
 	$(FLUTTER) test
 
 .PHONY: analyze
-analyze: ## Análisis estático
+analyze: ## Static analysis
 	$(FLUTTER) analyze
 
 .PHONY: fmt
-fmt: ## Formatea el código Dart
+fmt: ## Format the Dart code
 	$(FLUTTER) format lib test
 
 .PHONY: devices
-devices: ## Lista devices/emuladores detectados
+devices: ## List detected devices/emulators
 	$(FLUTTER) devices
 
 .PHONY: clean
-clean: ## Limpia artefactos de build (Flutter + Gradle), conserva los .so nativos
+clean: ## Clean build artifacts (Flutter + Gradle), keeps the native .so files
 	$(FLUTTER) clean
 	@rm -rf .dart_tool build \
 		android/.gradle android/build android/app/build \
 		android/app/.cxx
-	@echo "Limpio (jniLibs nativos conservados; usa 'make distclean' para borrarlos)"
+	@echo "Cleaned (native jniLibs kept; use 'make distclean' to remove them)"
 
 .PHONY: distclean
-distclean: clean ## clean + borra libdivecomputer compilado (.so + headers); fuerza re-cross-compile
+distclean: clean ## clean + remove compiled libdivecomputer (.so + headers); forces a re-cross-compile
 	@rm -rf android/app/src/main/jniLibs \
 		android/app/src/main/cpp/include/libdivecomputer linux/ldc
-	@echo "Artefactos nativos borrados: reconstruye con 'make dc-libs'"
+	@echo "Native artifacts removed: rebuild with 'make dc-libs'"
 
 .PHONY: ldc-android
-ldc-android: ## Cross-compila libdivecomputer para Android (NDK)
+ldc-android: ## Cross-compile libdivecomputer for Android (NDK)
 	./scripts/build-libdivecomputer-android.sh
 
 .PHONY: dc-libs
-dc-libs: ldc-android ## Cross-compila y copia .so + headers al proyecto Android
+dc-libs: ldc-android ## Cross-compile and copy .so + headers into the Android project
 	@for abi in arm64-v8a armeabi-v7a x86_64; do \
 		mkdir -p android/app/src/main/jniLibs/$$abi; \
 		cp build/android/$$abi/install/lib/libdivecomputer.so android/app/src/main/jniLibs/$$abi/; \
@@ -110,23 +110,23 @@ dc-libs: ldc-android ## Cross-compila y copia .so + headers al proyecto Android
 	@echo "libdivecomputer .so + headers copiados a android/app/src/main/"
 
 .PHONY: ldc-linux
-ldc-linux: ## Compila libdivecomputer estática para la app Linux (linux/ldc/)
+ldc-linux: ## Build static libdivecomputer for the Linux app (linux/ldc/)
 	./scripts/build-libdivecomputer-linux.sh
 	@mkdir -p linux/ldc
 	@cp build/linux-ldc/install/lib/libdivecomputer.a linux/ldc/
 	@echo "libdivecomputer.a copiada a linux/ldc/"
 
 .PHONY: linux
-linux: ## Compila la app Linux (release)
+linux: ## Build the Linux app (release)
 	$(FLUTTER) build linux --release $(LINUX_DEFINES)
 
 .PHONY: run-linux
-run-linux: ## Compila y lanza la app Linux (debug) con el client de Google
+run-linux: ## Build and launch the Linux app (debug) with the Google client
 	$(FLUTTER) run -d linux $(LINUX_DEFINES)
 
-# Instalación de la app Linux (el bundle de `make linux`, sin recompilar).
-#   make install-linux                          -> en tu home (~/.local, ~/.local/opt/pandive)
-#   sudo make install-linux PREFIX=/usr/local   -> sistema (/usr/local, /opt/pandive)
+# Linux app install (the `make linux` bundle, without rebuilding).
+#   make install-linux                          -> in your home (~/.local, ~/.local/opt/pandive)
+#   sudo make install-linux PREFIX=/usr/local   -> system-wide (/usr/local, /opt/pandive)
 PREFIX ?= $(HOME)/.local
 APPDIR ?= $(if $(filter $(HOME)/%,$(PREFIX)),$(PREFIX)/opt/pandive,/opt/pandive)
 LINUX_BUNDLE := build/linux/x64/release/bundle
@@ -135,11 +135,11 @@ ICON_SIZES := 16 22 24 32 48 64 128 256 512
 
 .PHONY: check-appdir
 check-appdir:
-	@case "$(APPDIR)" in */pandive) ;; *) echo "APPDIR debe acabar en /pandive: '$(APPDIR)'"; exit 1;; esac
+	@case "$(APPDIR)" in */pandive) ;; *) echo "APPDIR must end in /pandive: '$(APPDIR)'"; exit 1;; esac
 
 .PHONY: install-linux
-install-linux: check-appdir ## Instala la app Linux (PREFIX=~/.local; sudo ... PREFIX=/usr/local)
-	@test -x $(LINUX_BUNDLE)/pandive || { echo "Falta el bundle: ejecuta 'make linux' antes (sin sudo)"; exit 1; }
+install-linux: check-appdir ## Install the Linux app (PREFIX=~/.local; sudo ... PREFIX=/usr/local)
+	@test -x $(LINUX_BUNDLE)/pandive || { echo "Missing bundle: run 'make linux' first (without sudo)"; exit 1; }
 	rm -rf "$(DESTDIR)$(APPDIR)"
 	mkdir -p "$(DESTDIR)$(APPDIR)"
 	cp -r $(LINUX_BUNDLE)/. "$(DESTDIR)$(APPDIR)/"
@@ -153,10 +153,10 @@ install-linux: check-appdir ## Instala la app Linux (PREFIX=~/.local; sudo ... P
 		install -Dm644 /dev/stdin "$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
 	-@gtk-update-icon-cache -q -t -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor" 2>/dev/null
 	-@update-desktop-database -q "$(DESTDIR)$(PREFIX)/share/applications" 2>/dev/null
-	@echo "Pandive instalado en $(APPDIR) (lanzador: $(PREFIX)/bin/pandive)"
+	@echo "Pandive installed in $(APPDIR) (launcher: $(PREFIX)/bin/pandive)"
 
 .PHONY: uninstall-linux
-uninstall-linux: check-appdir ## Desinstala la app Linux (mismo PREFIX que al instalar)
+uninstall-linux: check-appdir ## Uninstall the Linux app (same PREFIX as when installing)
 	rm -rf "$(DESTDIR)$(APPDIR)"
 	rm -f "$(DESTDIR)$(PREFIX)/bin/pandive" \
 		"$(DESTDIR)$(PREFIX)/share/applications/$(APP_ID).desktop"
@@ -165,7 +165,7 @@ uninstall-linux: check-appdir ## Desinstala la app Linux (mismo PREFIX que al in
 	done
 	-@gtk-update-icon-cache -q -t -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor" 2>/dev/null
 	-@update-desktop-database -q "$(DESTDIR)$(PREFIX)/share/applications" 2>/dev/null
-	@echo "Pandive desinstalado (los datos de cada usuario en su home se conservan)"
+	@echo "Pandive uninstalled (each user's data in their home is kept)"
 
 .PHONY: doctor
 doctor: ## flutter doctor

@@ -1,18 +1,18 @@
-/// Inmersión descargada del ordenador (parseada por libdivecomputer, vía JSON).
+/// Dive downloaded from the computer (parsed by libdivecomputer, via JSON).
 library;
 
 class DiveSample {
   final int timeMs;
   final double depth;
   final double? temp;
-  final int? ndl; // min sin deco
-  final int? tts; // min hasta superficie (en deco)
-  final double ceiling; // techo de deco (m), 0 si ninguno
-  final int? gasIndex; // mezcla activa (índice), null si desconocido
+  final int? ndl; // no-deco min
+  final int? tts; // min to surface (in deco)
+  final double ceiling; // deco ceiling (m), 0 if none
+  final int? gasIndex; // active mix (index), null if unknown
   final double? ppo2; // bar
   final double? cns; // %
-  final double? pressure; // presión de botella (bar), AI
-  final int? rbt; // tiempo de fondo restante (min), AI
+  final double? pressure; // cylinder pressure (bar), AI
+  final int? rbt; // remaining bottom time (min), AI
   const DiveSample(this.timeMs, this.depth, this.temp,
       {this.ndl,
       this.tts,
@@ -25,7 +25,7 @@ class DiveSample {
 }
 
 class GasMix {
-  final double o2; // fracción 0-1
+  final double o2; // fraction 0-1
   final double he;
   const GasMix(this.o2, this.he);
 }
@@ -99,7 +99,7 @@ class DownloadedDive {
   }
 }
 
-/// Resultado de una descarga: inmersiones o un error.
+/// Result of a download: dives or an error.
 class DownloadResult {
   final List<DownloadedDive> dives;
   final String? error;

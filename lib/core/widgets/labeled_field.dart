@@ -1,4 +1,4 @@
-/// Campo de texto con etiqueta y borde, reutilizado en los formularios.
+/// Labelled, bordered text field, reused in the forms.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -9,8 +9,8 @@ class LabeledField extends StatelessWidget {
   final String label;
   final int maxLines;
   final bool number;
-  final bool integer; // solo dígitos (sin decimales)
-  final bool signed; // permite negativos (p.ej. coordenadas)
+  final bool integer; // digits only (no decimals)
+  final bool signed; // allows negatives (e.g. coordinates)
 
   const LabeledField({
     super.key,

@@ -1,5 +1,5 @@
-/// Sección del perfil en el detalle: gráfica compacta con botones de compartir
-/// y pantalla completa superpuestos.
+/// Profile section in the detail: compact chart with share and
+/// fullscreen buttons overlaid.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -25,7 +25,7 @@ class ProfileSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final title = dive.place ?? t.dive;
-    // Título para compartir: "DD/MM/YYYY - Sitio".
+    // Title for sharing: "DD/MM/YYYY - Site".
     final locale = Localizations.localeOf(context).languageCode;
     final shareTitle = dive.date != null
         ? '${DateFormat('dd/MM/yyyy', locale).format(dive.date!)} - $title'

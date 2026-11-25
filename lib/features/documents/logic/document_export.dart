@@ -1,6 +1,6 @@
-/// Exportar documentos seleccionados a un PDF y compartirlo. Van varios por
-/// página (fluyen con MultiPage), sin ampliar la imagen: se limita su tamaño a
-/// una resolución máxima para que queden parecidos pero nítidos.
+/// Export selected documents to a PDF and share it. Several per
+/// page (flowing with MultiPage), without enlarging the image: its size is capped at
+/// a maximum resolution so they look alike but sharp.
 library;
 
 import 'dart:io';
@@ -16,8 +16,8 @@ import 'package:pandive/l10n/app_localizations.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
 
-/// Genera el PDF de [docs] con un aviso de "Exportando…" y lo comparte (o lo
-/// guarda, en Linux).
+/// Generates the PDF of [docs] with an "Exporting…" notice and shares it (or
+/// saves it, on Linux).
 Future<void> exportDocumentsPdf(BuildContext context, List<DiveDoc> docs) async {
   if (docs.isEmpty) return;
   final out = await withProgress(
@@ -25,10 +25,10 @@ Future<void> exportDocumentsPdf(BuildContext context, List<DiveDoc> docs) async 
   if (out != null) await shareOrSaveFile(out);
 }
 
-// null si ningún documento tiene imagen.
+// null if no document has an image.
 Future<File?> _buildPdf(List<DiveDoc> docs) async {
   const margin = 24.0;
-  // Tope físico ~ tamaño carnet (8,5 cm ≈ 240 pt) por lado; nunca se amplía.
+  // Physical cap ~ ID card size (8.5 cm ≈ 240 pt) per side; never enlarged.
   const cardMax = 240.0;
 
   final items = <pw.Widget>[];
@@ -67,7 +67,7 @@ Future<File?> _buildPdf(List<DiveDoc> docs) async {
   return out.writeAsBytes(bytes, flush: true);
 }
 
-/// Tamaño en puntos sin ampliar: ~150 dpi, limitado al ancho/alto disponible.
+/// Size in points without enlarging: ~150 dpi, capped to the available width/height.
 PdfPoint _fit(double pxW, double pxH, double maxW, double maxH) {
   const dpi = 150.0;
   var w = pxW * 72 / dpi;

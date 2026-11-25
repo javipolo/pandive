@@ -1,7 +1,7 @@
-// Puente JNI sobre el núcleo común (native/pandive_dc_core.c):
+// JNI bridge over the shared core (native/pandive_dc_core.c):
 //  - nativeSupportedCount / nativeSupportedList / nativeMatchName.
-//  - nativeDownload: el I/O BLE se delega en BleConnection (Kotlin) vía JNI.
-//    Todo ocurre en el hilo de la llamada, así que el JNIEnv vale siempre.
+//  - nativeDownload: BLE I/O is delegated to BleConnection (Kotlin) via JNI.
+//    Everything happens on the calling thread, so the JNIEnv is always valid.
 #include <jni.h>
 #include <stdlib.h>
 #include <string.h>

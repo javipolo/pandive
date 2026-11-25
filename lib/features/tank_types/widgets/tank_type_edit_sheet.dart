@@ -1,4 +1,4 @@
-/// Hoja para crear/editar un tipo de botella: nombre, litros y material.
+/// Sheet to create/edit a cylinder type: name, litres and material.
 library;
 
 import 'package:material_ui/material_ui.dart';

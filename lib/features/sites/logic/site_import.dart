@@ -1,6 +1,6 @@
-/// Plan de importación de sitios desde un JSON: calcula qué sitios añadir y
-/// cuáles modificar (rellenando/pisando con los campos no-null del JSON; los
-/// null no tocan nada). Match por nombre (sin acentos), priorizando país si viene.
+/// Site import plan from a JSON: computes which sites to add and
+/// which to modify (filling/overwriting with the JSON's non-null fields; the
+/// null ones touch nothing). Match by name (accent-insensitive), preferring country if given.
 library;
 
 import 'dart:convert';
@@ -14,15 +14,15 @@ enum SiteImportAction { add, modify }
 class SiteImport {
   final String name;
   final SiteImportAction action;
-  final int? existingId; // sitio a modificar (null si add)
-  final Map<String, Object?> fields; // columnas Place a escribir
+  final int? existingId; // site to modify (null if add)
+  final Map<String, Object?> fields; // Place columns to write
   const SiteImport(
       {required this.name,
       required this.action,
       this.existingId,
       required this.fields});
 
-  /// Etiquetas de los campos que cambian (para mostrar), sin "Place".
+  /// Labels of the fields that change (for display), without "Place".
   List<String> get changedKeys =>
       fields.keys.where((k) => k != 'Place').toList();
 }
@@ -31,7 +31,7 @@ String _norm(String? s) => foldAccents((s ?? '').trim().toLowerCase());
 bool _sameNum(double? a, double? b) =>
     a != null && b != null && (a - b).abs() < 1e-6;
 
-/// Calcula el plan sin tocar la DB. Omite los sitios que no cambian.
+/// Computes the plan without touching the DB. Skips sites that don't change.
 List<SiteImport> planSiteImport(DivemateDb db, String jsonStr) {
   final data = jsonDecode(jsonStr);
   if (data is! List) return const [];
@@ -95,7 +95,7 @@ List<SiteImport> planSiteImport(DivemateDb db, String jsonStr) {
   return out;
 }
 
-/// Aplica los [selected] a la DB. Devuelve cuántos se añadieron/modificaron.
+/// Applies the [selected] ones to the DB. Returns how many were added/modified.
 int applySiteImport(DivemateDb db, Iterable<SiteImport> selected) {
   var n = 0;
   for (final si in selected) {

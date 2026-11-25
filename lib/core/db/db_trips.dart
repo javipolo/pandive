@@ -1,7 +1,7 @@
 part of 'divemate_db.dart';
 
-/// Viajes de buceo: agrupan inmersiones (columna `PandiveTripId`) y guardan los
-/// compañeros del viaje (`PandiveTripBuddy`). Tablas/columna propias de Pandive.
+/// Dive trips: group dives (column `PandiveTripId`) and store the
+/// trip buddies (`PandiveTripBuddy`). Pandive's own tables/column.
 extension DivemateDbTrips on DivemateDb {
   bool get _hasTrips => _db
       .select("SELECT 1 FROM pragma_table_info('Logbook') "

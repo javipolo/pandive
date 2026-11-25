@@ -1,6 +1,6 @@
-/// Compartir un fichero generado (export .ddb, .ssrf, JSON, PDF…). En el
-/// móvil abre la hoja de compartir; en Linux, donde share_plus no comparte
-/// ficheros, abre "Guardar como…" y avisa de dónde quedó.
+/// Share a generated file (export .ddb, .ssrf, JSON, PDF…). On
+/// mobile it opens the share sheet; on Linux, where share_plus can't share
+/// files, it opens "Save as…" and tells where it went.
 library;
 
 import 'dart:io';
@@ -11,11 +11,11 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// ScaffoldMessenger de la app (MaterialApp.scaffoldMessengerKey): avisos
-/// desde lógica sin BuildContext.
+/// The app's ScaffoldMessenger (MaterialApp.scaffoldMessengerKey): messages
+/// from logic without a BuildContext.
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-/// Comparte [file] (móvil) o lo guarda donde elija el usuario (Linux).
+/// Shares [file] (mobile) or saves it where the user chooses (Linux).
 Future<void> shareOrSaveFile(File file, {String? text}) async {
   if (!Platform.isLinux) {
     await SharePlus.instance

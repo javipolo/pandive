@@ -1,32 +1,32 @@
-/// Planificación de gas con lista de botellas (tamaños distintos) y marca por
-/// botella de si mantiene reserva o se vacía (etapa). Presión inicial y regla de
-/// reserva compartidas.
+/// Gas planning with a cylinder list (different sizes) and a per-cylinder
+/// flag for whether it keeps a reserve or is emptied (stage). Initial pressure and rule of
+/// shared reserve.
 ///
-///   gas_necesario(L) = RMV · tiempo · (prof/10 + 1)
-///   gas_total(L)     = Σ(litros · presión_inicial)              (todas)
-///   salida_reserva   = (gas_total − gas_necesario) / Σ litros de reserva
-///   umbral X         = reserva(L) / Σ litros de reserva
+///   needed_gas(L)    = RMV · time · (depth/10 + 1)
+///   total_gas(L)     = Σ(litres · initial_pressure)             (all)
+///   reserve_exit     = (total_gas − needed_gas) / Σ reserve litres
+///   threshold X      = reserve(L) / Σ reserve litres
 ///
-/// La reserva en litros: tercios = 1/3 del gas total; cuartos = 1/2; fija
-/// (35/50/custom) = esos bar en las botellas de reserva. Si ninguna botella está
-/// marcada como reserva, se tratan todas como reserva.
+/// Reserve in litres: thirds = 1/3 of total gas; quarters = 1/2; fixed
+/// (35/50/custom) = those bar in the reserve cylinders. If no cylinder is
+/// marked as reserve, all are treated as reserve.
 library;
 
-/// Regla de reserva (umbral "verde" de presión de salida).
+/// Reserve rule ("green" exit-pressure threshold).
 enum ReserveRule { bar35, bar50, thirds, quarters, custom }
 
 class PlanCylinder {
   final double litres;
-  final bool keepsReserve; // true = mantiene reserva; false = se vacía (etapa)
+  final bool keepsReserve; // true = keeps reserve; false = emptied (stage)
   const PlanCylinder(this.litres, {this.keepsReserve = true});
 }
 
 class GasPlan {
-  final double gasNeededL; // litros en superficie del buceo planeado
-  final double endReserveBar; // presión de salida en las botellas de reserva
-  final double reserveThresholdBar; // umbral X (bar en las de reserva)
-  final double maxTimeMin; // tiempo máx. respetando la reserva
-  final bool hasStages; // hay botellas que se vacían
+  final double gasNeededL; // surface litres of the planned dive
+  final double endReserveBar; // exit pressure in the reserve cylinders
+  final double reserveThresholdBar; // threshold X (bar in the reserve ones)
+  final double maxTimeMin; // max time keeping the reserve
+  final bool hasStages; // there are cylinders that get emptied
 
   const GasPlan({
     required this.gasNeededL,
@@ -71,7 +71,7 @@ GasPlan? computeGasPlan({
       cylinders.fold<double>(0, (s, c) => s + (c.litres > 0 ? c.litres : 0));
   if (totalLitres <= 0) return null;
 
-  // Litros de las botellas de reserva; si no hay ninguna, todas son reserva.
+  // Litres of the reserve cylinders; if there are none, all are reserve.
   var reserveLitres = cylinders.fold<double>(
       0, (s, c) => s + (c.keepsReserve && c.litres > 0 ? c.litres : 0));
   if (reserveLitres <= 0) reserveLitres = totalLitres;
@@ -92,7 +92,7 @@ GasPlan? computeGasPlan({
   }
 
   final thresholdBar = reserveGas / reserveLitres;
-  // La etapa se vacía primero; el gas restante queda en las de reserva.
+  // The stage is emptied first; the remaining gas stays in the reserve ones.
   final endBar =
       ((totalGas - gasNeeded) / reserveLitres).clamp(double.negativeInfinity,
           startBar);

@@ -1,4 +1,4 @@
-/// Control del hueco máx. de fusión: slider + −/+ con el valor siempre visible.
+/// Max merge gap control: slider + −/+ with the value always visible.
 library;
 
 import 'package:material_ui/material_ui.dart';

@@ -1,5 +1,5 @@
-// Pantalla de revisión del CSV de SSI: desmarcar, importar solo lo marcado y
-// volver a la raíz pidiendo la lista de buceos.
+// SSI CSV review screen: untick, import only the ticked ones and
+// go back to the root asking for the dives list.
 import 'dart:ffi';
 import 'dart:io';
 
@@ -59,7 +59,7 @@ void main() {
     await tester.tap(find.textContaining('(2)'));
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pumpAndSettle();
-    expect(find.text('open'), findsOneWidget); // de vuelta en la raíz
+    expect(find.text('open'), findsOneWidget); // back at the root
     expect(homeSectionRequest.value, 0);
     expect(db.listDives().map((d) => d.place).toSet(), {'Uno', 'Tres'});
   });

@@ -1,7 +1,7 @@
-/// Lista de inmersiones con selección en lote y todas las acciones (stats,
-/// fusionar, ajustar hora, exportar, borrar). Controlada: el padre pasa `dives`
-/// y recarga en `onChanged` tras cada mutación. Se usa en la pestaña principal y
-/// en las listas filtradas (por sitio, compañero o etiqueta).
+/// Dive list with batch selection and all actions (stats,
+/// merge, adjust time, export, delete). Controlled: the parent passes `dives`
+/// and reloads in `onChanged` after each mutation. Used in the main tab and
+/// in the filtered lists (by site, buddy or tag).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -25,8 +25,8 @@ class DivesActionList extends StatefulWidget {
   final List<Dive> dives;
   final Set<int> caveIds;
   final bool collapseAll;
-  final int? highlightDiveId; // buceo recién añadido (destacar/desplazar)
-  final VoidCallback onChanged; // el padre recarga su lista
+  final int? highlightDiveId; // newly added dive (highlight/scroll to)
+  final VoidCallback onChanged; // the parent reloads its list
   final ValueChanged<bool>? onSelectionMode;
 
   const DivesActionList({

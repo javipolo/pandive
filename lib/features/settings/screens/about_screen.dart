@@ -1,4 +1,4 @@
-/// Acerca de / contacto: breve descripción y correo para reportar fallos.
+/// About / contact: short description and email to report bugs.
 library;
 
 import 'package:material_ui/material_ui.dart';

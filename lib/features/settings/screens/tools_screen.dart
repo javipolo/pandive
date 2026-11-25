@@ -1,4 +1,4 @@
-/// Herramientas: importar hashtags, exportar logbook y utilidades de debug.
+/// Tools: import hashtags, export logbook and debug utilities.
 library;
 
 import 'dart:io';

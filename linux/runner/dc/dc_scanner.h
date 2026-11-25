@@ -1,4 +1,4 @@
-// EventChannel pandive/dc/scan sobre BlueZ (ver dc_scanner.c).
+// EventChannel pandive/dc/scan over BlueZ (see dc_scanner.c).
 #ifndef PANDIVE_DC_SCANNER_H
 #define PANDIVE_DC_SCANNER_H
 

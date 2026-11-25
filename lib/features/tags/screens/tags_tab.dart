@@ -1,5 +1,5 @@
-/// Pestaña de etiquetas (tags): lista, crear, renombrar, borrar (individual o
-/// en lote), ver buceos.
+/// Tags tab: list, create, rename, delete (single or
+/// in batch), view dives.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -106,7 +106,7 @@ class _TagsTabState extends State<TagsTab> {
           child: shown.isEmpty
               ? Center(child: Text(t.noTags))
               : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
+                  padding: const EdgeInsets.only(bottom: 88), // room for the FAB
                   itemCount: shown.length,
                   separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, i) => _tile(shown[i], t),

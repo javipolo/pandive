@@ -1,4 +1,4 @@
-/// Selección múltiple de etiquetas (tags): elegir existentes o crear nuevas.
+/// Multiple tag selection: pick existing ones or create new ones.
 library;
 
 import 'package:material_ui/material_ui.dart';

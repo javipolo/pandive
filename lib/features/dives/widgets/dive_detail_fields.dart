@@ -1,5 +1,5 @@
-/// Piezas de presentación del detalle de buceo: celda etiqueta/valor compacta,
-/// fila de dos columnas y separador de sección.
+/// Presentation pieces of the dive detail: compact label/value cell,
+/// two-column row and section separator.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -28,7 +28,7 @@ class LabeledValue extends StatelessWidget {
   }
 }
 
-/// Dos columnas alineadas (izquierda | derecha), con proporción configurable.
+/// Two aligned columns (left | right), with configurable ratio.
 Widget twoCol(Widget? a, Widget? b, {int leftFlex = 1, int rightFlex = 1}) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,7 +38,7 @@ Widget twoCol(Widget? a, Widget? b, {int leftFlex = 1, int rightFlex = 1}) => Ro
       ],
     );
 
-/// Tres columnas alineadas (izquierda | centro | derecha).
+/// Three aligned columns (left | centre | right).
 Widget threeCol(Widget? a, Widget? b, Widget? c) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

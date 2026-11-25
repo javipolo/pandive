@@ -1,4 +1,4 @@
-/// Campo que muestra las etiquetas (tags) elegidas y permite editarlas.
+/// Field showing the chosen tags and allowing editing them.
 library;
 
 import 'package:material_ui/material_ui.dart';

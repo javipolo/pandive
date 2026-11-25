@@ -1,4 +1,4 @@
-/// Barra superior de acciones en modo selección (operaciones en lote).
+/// Top action bar in selection mode (batch operations).
 library;
 
 import 'package:material_ui/material_ui.dart';

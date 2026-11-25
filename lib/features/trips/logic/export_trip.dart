@@ -1,7 +1,7 @@
-/// Exporta un viaje como .ddb: sus inmersiones (datos, sitio con coordenadas,
-/// compañeros, botellas, tags, ordenador y, opcionalmente, el perfil), el viaje
-/// en sí y los compañeros del viaje. Lo comparte con nombre
-/// "Año-Nombre del viaje-PanDive.ddb".
+/// Exports a trip as .ddb: its dives (data, site with coordinates,
+/// buddies, cylinders, tags, computer and, optionally, the profile), the trip
+/// itself and the trip buddies. Shares it named
+/// "Year-Trip name-PanDive.ddb".
 library;
 
 import 'dart:io';
@@ -11,8 +11,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 
-/// Genera el .ddb de uno o varios viajes (fichero temporal) para compartirlo
-/// o guardarlo con shareOrSaveFile. null si no hay viajes.
+/// Generates the .ddb of one or several trips (temp file) to share
+/// or save with shareOrSaveFile. null if there are no trips.
 Future<File?> buildTripsDdb(DivemateDb source, List<Trip> trips,
     {bool withProfiles = false}) async {
   if (trips.isEmpty) return null;
@@ -34,7 +34,7 @@ Future<File?> buildTripsDdb(DivemateDb source, List<Trip> trips,
   return f;
 }
 
-/// Nombre base para varios viajes: nombres unidos por "_", o "N-trips" si es largo.
+/// Base name for several trips: names joined with "_", or "N-trips" if long.
 String tripsFileBase(List<Trip> trips) {
   if (trips.length == 1) return tripFileBase(trips.first, const []);
   final names = trips
@@ -45,7 +45,7 @@ String tripsFileBase(List<Trip> trips) {
   return '$base-PanDive';
 }
 
-/// Nombre base del fichero: "Año-Nombre del viaje-PanDive".
+/// Base file name: "Year-Trip name-PanDive".
 String tripFileBase(Trip trip, List<Dive> dives) {
   final year = (trip.lastDate ?? trip.firstDate ?? _firstDate(dives))?.year;
   final safe = trip.name.trim().replaceAll(RegExp(r'[\\/:*?"<>|]'), '').trim();
@@ -56,7 +56,7 @@ String tripFileBase(Trip trip, List<Dive> dives) {
   ].join('-');
 }
 
-/// Construye el .ddb del viaje en un fichero temporal y lo devuelve (sin
+/// Builds the trip's .ddb in a temp file and returns it (without
 /// compartir).
 Future<File> buildTripDdb(DivemateDb source, Trip trip,
     {bool withProfiles = false}) async {
@@ -73,9 +73,9 @@ Future<File> buildTripDdb(DivemateDb source, Trip trip,
   return f;
 }
 
-/// Pobla [out] con el viaje, sus inmersiones y compañeros (con
-/// [withProfiles], también el perfil de cada buceo). Cede frames cada pocas
-/// inmersiones para no congelar la UI. Testeable (sin IO).
+/// Populates [out] with the trip, its dives and buddies (with
+/// [withProfiles], also each dive's profile). Yields frames every few
+/// dives so as not to freeze the UI. Testable (no IO).
 Future<void> writeTripDdb(
   DivemateDb source,
   Trip trip,

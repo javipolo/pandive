@@ -1,4 +1,4 @@
-/// Barrel de modelos de dominio. Importa esto para todos los modelos.
+/// Barrel of domain models. Import this for all models.
 library;
 
 export 'buddy.dart';

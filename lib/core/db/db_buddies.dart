@@ -1,8 +1,8 @@
 part of 'divemate_db.dart';
 
-/// Compañeros de buceo (tabla Buddy). Guardamos el nombre en FirstName.
+/// Dive buddies (Buddy table). We store the name in FirstName.
 extension DivemateDbBuddies on DivemateDb {
-  /// Filtro de inmersiones del owner que referencian a un buddy (por BuddyIDs).
+  /// Filter for the owner's dives that reference a buddy (via BuddyIDs).
   String _buddyDivesWhere() {
     final owner = ownerId;
     final diverFilter = owner != null ? 'AND L.DiverID = $owner' : '';
@@ -10,7 +10,7 @@ extension DivemateDbBuddies on DivemateDb {
         "(',' || IFNULL(L.BuddyIDs,'') || ',') LIKE ('%,' || B.ID || ',%')";
   }
 
-  /// Lista de buddies, alfabética, con nº de inmersiones y fecha del último.
+  /// Buddy list, alphabetical, with dive count and date of the last one.
   List<Buddy> listBuddies() {
     final where = _buddyDivesWhere();
     final rows = _db.select(
@@ -33,10 +33,10 @@ extension DivemateDbBuddies on DivemateDb {
       ..sort((a, b) => compareFold(a.name, b.name));
   }
 
-  /// Rellena `BuddyIDs` de las inmersiones del owner que tienen texto `Buddy`
-  /// pero `BuddyIDs` vacío (dives antiguas de DiveMate, que solo guardaban el
-  /// nombre). El texto puede ser CSV de varios nombres; crea los que falten.
-  /// Devuelve cuántas inmersiones actualizó.
+  /// Fills `BuddyIDs` of the owner's dives that have `Buddy` text
+  /// but empty `BuddyIDs` (old DiveMate dives, which only stored the
+  /// name). The text may be a CSV of several names; creates the missing ones.
+  /// Returns how many dives were updated.
   int backfillBuddyIds() {
     final owner = ownerId;
     final f = owner != null ? 'AND DiverID = $owner' : '';
@@ -56,7 +56,7 @@ extension DivemateDbBuddies on DivemateDb {
     return n;
   }
 
-  /// Borra los buddies sin ninguna inmersión. Devuelve cuántos eliminó.
+  /// Deletes buddies without any dive. Returns how many were removed.
   int purgeUnusedBuddies() {
     final unused = [for (final b in listBuddies()) if (b.diveCount == 0) b.id];
     for (final id in unused) {
@@ -65,7 +65,7 @@ extension DivemateDbBuddies on DivemateDb {
     return unused.length;
   }
 
-  /// Busca un buddy por nombre (case-insensitive) o lo crea. Devuelve su ID.
+  /// Finds a buddy by name (case-insensitive) or creates it. Returns its ID.
   int findOrCreateBuddy(String name) {
     final n = name.trim();
     final found = _db.select(
@@ -89,8 +89,8 @@ extension DivemateDbBuddies on DivemateDb {
     _refreshBuddyNames(id);
   }
 
-  /// Recompone el texto `Logbook.Buddy` de las inmersiones que referencian al
-  /// buddy [id] (por BuddyIDs), para reflejar su nombre actual.
+  /// Rebuilds the `Logbook.Buddy` text of the dives that reference
+  /// buddy [id] (via BuddyIDs), to reflect its current name.
   void _refreshBuddyNames(int id) {
     final rows = _db.select(
       "SELECT ID, BuddyIDs FROM Logbook WHERE "
@@ -117,7 +117,7 @@ extension DivemateDbBuddies on DivemateDb {
 
   void deleteBuddy(int id) => _db.execute('DELETE FROM Buddy WHERE ID=?', [id]);
 
-  /// Compañeros de una inmersión (según Logbook.BuddyIDs).
+  /// Buddies of a dive (per Logbook.BuddyIDs).
   List<Buddy> diveBuddies(int diveId) {
     final rows = _db.select('SELECT BuddyIDs FROM Logbook WHERE ID=?', [diveId]);
     if (rows.isEmpty) return [];
@@ -127,9 +127,9 @@ extension DivemateDbBuddies on DivemateDb {
         .whereType<int>()
         .toList();
     if (ids.isEmpty) return [];
-    // Solo esos compañeros (sin recuentos): listBuddies() recorre el logbook
-    // entero por cada compañero (~150 ms) y esto se llama por buceo al
-    // exportar/importar.
+    // Only those buddies (no counts): listBuddies() walks the whole logbook
+    // for each buddy (~150 ms) and this is called per dive when
+    // exporting/importing.
     final found = _db.select(
       'SELECT ID, FirstName, LastName FROM Buddy '
       'WHERE ID IN (${List.filled(ids.length, '?').join(',')})',
@@ -145,8 +145,8 @@ extension DivemateDbBuddies on DivemateDb {
       ..sort((a, b) => compareFold(a.name, b.name));
   }
 
-  /// Añade [names] como compañeros de la inmersión (crea los que falten) sin
-  /// quitar los existentes. Actualiza BuddyIDs y el texto Buddy.
+  /// Adds [names] as buddies of the dive (creating the missing ones) without
+  /// removing the existing ones. Updates BuddyIDs and the Buddy text.
   void addDiveBuddies(int diveId, List<String> names) {
     final map = {for (final b in diveBuddies(diveId)) b.id: b.name};
     for (final n in names) {

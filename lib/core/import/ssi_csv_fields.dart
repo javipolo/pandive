@@ -1,10 +1,10 @@
-/// Lectura de las celdas del CSV de MySSI: CSV, fechas multi-idioma,
-/// duración, profundidad, la celda de compañeros (personas pegadas + centro +
-/// ordenador) y las listas de etiquetas. Sin acceso a la DB.
+/// Reading the cells of the MySSI CSV: CSV, multi-language dates,
+/// duration, depth, the buddies cell (glued names + centre +
+/// computer) and the tag lists. No DB access.
 library;
 
-/// Parte un CSV (comillas dobles, "" escapadas, saltos de línea dentro de
-/// comillas). Detecta el separador (`,` o `;`) en la primera línea.
+/// Splits a CSV (double quotes, "" escaped, line breaks inside
+/// quotes). Detects the separator (`,` or `;`) on the first line.
 List<List<String>> parseCsv(String text) {
   if (text.startsWith('﻿')) text = text.substring(1);
   final firstLine = text.split('\n').first;
@@ -49,8 +49,8 @@ List<List<String>> parseCsv(String text) {
   return rows;
 }
 
-// Abreviaturas de mes (3 primeras letras, sin acentos) en los idiomas
-// habituales de MySSI.
+// Month abbreviations (first 3 letters, no accents) in MySSI's
+// usual languages.
 const _months = <String, int>{
   'jan': 1, 'janv': 1, 'jän': 1, 'ene': 1, 'gen': 1, 'urt': 1,
   'feb': 2, 'fev': 2, 'fév': 2, 'ots': 2,
@@ -69,7 +69,7 @@ const _months = <String, int>{
 int? _month(String word) {
   final w = word.toLowerCase().replaceAll('.', '');
   if (w.isEmpty) return null;
-  // Francés: "juin" / "juil." comparten "jui".
+  // French: "juin" / "juil." share "jui".
   if (w.startsWith('juin')) return 6;
   if (w.startsWith('juil')) return 7;
   for (final len in [4, 3]) {
@@ -81,8 +81,8 @@ int? _month(String word) {
   return null;
 }
 
-/// Fecha de SSI: "15. Apr 2026", "15 abr. 2026", "15.04.2026",
-/// "2026-04-15", "15/04/2026", con hora opcional "10:30" detrás.
+/// SSI date: "15. Apr 2026", "15 abr. 2026", "15.04.2026",
+/// "2026-04-15", "15/04/2026", with an optional time "10:30" after it.
 ({DateTime date, bool hasTime})? parseSsiDate(String raw) {
   final s = raw.trim();
   final tm = RegExp(r'(\d{1,2}):(\d{2})').firstMatch(s);
@@ -113,7 +113,7 @@ int? _month(String word) {
   return (date: out, hasTime: tm != null);
 }
 
-/// "56 min", "1 h 5 min", "1:05" -> minutos.
+/// "56 min", "1 h 5 min", "1:05" -> minutes.
 double? parseSsiMinutes(String raw) {
   final s = raw.toLowerCase();
   final hm = RegExp(r'(\d+):(\d{2})').firstMatch(s);
@@ -142,22 +142,22 @@ String? _blank(String? s) {
   return v == null || v.isEmpty ? null : v;
 }
 
-// Tramo de espacios con algún tabulador: separa los bloques de una celda
-// (MySSI aplana su HTML así).
+// Run of spaces containing a tab: separates the blocks of a cell
+// (MySSI flattens its HTML like that).
 final _tabRun = RegExp(r' *\t[\t ]*');
 
-/// Trozos de una celda separados por tabuladores ("Buceo\t\tInmersión con
+/// Pieces of a cell separated by tabs ("Buceo\t\tInmersión con
 /// descompresión" -> ["Buceo", "Inmersión con descompresión"]).
 List<String> splitSsiTabs(String cell) =>
     [for (final x in cell.split(_tabRun)) ?_blank(x)];
 
-/// Especialidades separadas por comas -> etiquetas.
+/// Comma-separated specialties -> tags.
 List<String> splitSsiList(String cell) =>
     [for (final x in cell.split(RegExp(r'[,;]'))) ?_blank(x)];
 
-/// Celda "Compañero de buceo / Instructor / Center". MySSI pega los nombres
-/// sin separador ("Javi  PoloDaniel Grau Olalla") y añade, tras tabuladores,
-/// el centro (precedido de <= 8 tabuladores) y el ordenador (9 o más):
+/// "Compañero de buceo / Instructor / Center" cell. MySSI glues the names
+/// without a separator ("Javi  PoloDaniel Grau Olalla") and adds, after tabs,
+/// the centre (preceded by <= 8 tabs) and the computer (9 or more):
 /// "Ana PérezLuis Gil\t\t…  POSIDONIA DIVE  \t\t…\t Puck4".
 ({List<String> people, String? center, String? computer}) parseSsiPeople(
     String cell) {
@@ -177,9 +177,9 @@ List<String> splitSsiList(String cell) =>
   return (people: splitGluedNames(parts.first), center: center, computer: computer);
 }
 
-/// Separa nombres pegados por el cambio minúscula -> Mayúscula, y también
-/// por comas: "Javi  PoloDaniel Grau, Ana" -> [Javi Polo, Daniel Grau, Ana].
-/// (Un apellido tipo "McDonald" se partiría: limitación conocida.)
+/// Splits glued names at the lowercase -> Uppercase change, and also
+/// at commas: "Javi  PoloDaniel Grau, Ana" -> [Javi Polo, Daniel Grau, Ana].
+/// (A surname like "McDonald" would be split: known limitation.)
 List<String> splitGluedNames(String s) => [
       for (final part in splitSsiList(s))
         for (final n in part.split(RegExp(r'(?<=\p{Ll})(?=\p{Lu})', unicode: true)))

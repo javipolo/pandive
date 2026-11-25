@@ -1,5 +1,5 @@
-/// Lista de buceos agrupados por mes con casillas de selección explícitas
-/// (casilla por mes tristate + casilla por buceo). Para "Rellenar desde .ddb".
+/// List of dives grouped by month with explicit selection checkboxes
+/// (tristate checkbox per month + checkbox per dive). For "Fill from .ddb".
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -11,7 +11,7 @@ import 'package:pandive/features/settings/logic/enrich_logbook.dart';
 class FillDiveChecklist extends StatelessWidget {
   final List<Dive> dives;
   final Map<int, DiveMatch> matches;
-  final Set<int> selected; // índices en [dives]
+  final Set<int> selected; // indices into [dives]
   final void Function(int index) onToggle;
   final void Function(List<int> indices) onToggleGroup;
   const FillDiveChecklist({
@@ -29,7 +29,7 @@ class FillDiveChecklist extends StatelessWidget {
     final locale = Localizations.localeOf(context).languageCode;
     final monthFmt = DateFormat('MMMM', locale);
     final dayFmt = DateFormat('dd/MM/yyyy', locale);
-    // Agrupa por año y, dentro, por mes, preservando el orden de [dives].
+    // Groups by year and, within, by month, preserving the order of [dives].
     final yearIdx = <String, List<int>>{};
     final yearMonths = <String, List<String>>{};
     final monthIdx = <String, List<int>>{};

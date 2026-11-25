@@ -1,4 +1,4 @@
-/// Punto de buceo (tabla Place) con nº de inmersiones del owner.
+/// Dive site (Place table) with the owner's dive count.
 library;
 
 class DiveSite {
@@ -13,7 +13,7 @@ class DiveSite {
   final String? difficulty;
   final int? rating;
   final int diveCount;
-  final List<String> tags; // tags asignados al sitio
+  final List<String> tags; // tags assigned to the site
 
   const DiveSite({
     required this.id,

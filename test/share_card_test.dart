@@ -1,5 +1,5 @@
-// Imagen exportada del perfil: el pie de datos cabe (sin overflow) con y sin
-// deco. Con PANDIVE_CARD_PNG=<ruta> guarda la captura para revisarla.
+// Exported profile image: the data footer fits (no overflow) with and without
+// deco. With PANDIVE_CARD_PNG=<path> it saves the capture for review.
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -24,7 +24,7 @@ DiveProfile _profile({bool deco = false}) {
   );
 }
 
-// Carga Roboto (si está en la caché de Flutter) para que la captura se lea.
+// Loads Roboto (if it's in the Flutter cache) so the capture is readable.
 Future<void> _loadFonts() async {
   final home = Platform.environment['HOME'];
   final f = File('$home/javi/git/flutter/bin/cache/artifacts/material_fonts/Roboto-Regular.ttf');
@@ -38,7 +38,7 @@ void main() {
   for (final deco in [false, true]) {
     testWidgets('pie de la imagen ${deco ? 'con' : 'sin'} deco', (tester) async {
       final out = Platform.environment['PANDIVE_CARD_PNG'];
-      if (out != null) await _loadFonts(); // solo para la captura de revisión
+      if (out != null) await _loadFonts(); // only for the review capture
       final profile = _profile(deco: deco);
       final dive = Dive(id: 1, durationMin: 60, maxDepth: 40.2, deco: deco ? 1 : 0);
       final facts = DiveFacts.of(dive, profile);

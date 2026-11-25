@@ -1,4 +1,4 @@
-/// Récords personales del logbook: el buceo que logró cada marca.
+/// Personal logbook records: the dive that set each mark.
 library;
 
 class DiveRecord {
@@ -13,8 +13,8 @@ class PersonalRecords {
   final DiveRecord? deepest; // m
   final DiveRecord? longest; // min
   final DiveRecord? coldest; // °C
-  final DiveRecord? longestDeco; // TTS máx (min)
-  final DiveRecord? longestCeiling; // más tiempo con techo (min)
+  final DiveRecord? longestDeco; // max TTS (min)
+  final DiveRecord? longestCeiling; // longest time under a ceiling (min)
   const PersonalRecords({
     this.deepest,
     this.longest,

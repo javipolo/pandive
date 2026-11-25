@@ -1,5 +1,5 @@
-/// Fila de inmersión estilo DiveMate: número grande a la izquierda (2 líneas),
-/// nombre del sitio arriba y fecha/hora/tiempo/profundidad debajo.
+/// DiveMate-style dive row: big number on the left (2 lines),
+/// site name on top and date/time/duration/depth below.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -43,7 +43,7 @@ class DiveRow extends StatelessWidget {
       if (dive.maxDepth != null) '${NumberFormat('0.0', locale).format(dive.maxDepth)} m',
     ].join('   ');
 
-    // Diurna (sol) vs nocturna (luna) según la hora de entrada (configurable).
+    // Day (sun) vs night (moon) depending on entry time (configurable).
     final hour = dive.date?.hour;
     final night = hour != null && settings.isNight(hour);
 

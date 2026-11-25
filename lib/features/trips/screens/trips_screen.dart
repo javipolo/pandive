@@ -1,4 +1,4 @@
-/// Lista de viajes de buceo: crear, renombrar, borrar y abrir el detalle.
+/// List of dive trips: create, rename, delete and open the detail.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -28,7 +28,7 @@ class TripsScreen extends StatefulWidget {
 
 class _TripsScreenState extends State<TripsScreen> {
   late List<Trip> _trips = widget.db.listTrips();
-  bool _desc = true; // listTrips ya viene por fecha descendente
+  bool _desc = true; // listTrips already comes in descending date order
   bool _select = false;
   final Set<int> _sel = {};
 
@@ -55,7 +55,7 @@ class _TripsScreenState extends State<TripsScreen> {
     _exitSel();
   }
 
-  // Orden actual (listTrips es descendente; para ascendente se invierte).
+  // Current order (listTrips is descending; for ascending it's reversed).
   List<Trip> get _ordered => _desc ? _trips : _trips.reversed.toList();
 
   Future<void> _add() async {
@@ -125,7 +125,7 @@ class _TripsScreenState extends State<TripsScreen> {
     );
   }
 
-  // Filas con cabecera por año (año del viaje = fecha del último buceo).
+  // Rows with a header per year (trip year = date of the last dive).
   List<Widget> _rows(BuildContext context, AppLocalizations t, DateFormat fmt) {
     final cs = Theme.of(context).colorScheme;
     final out = <Widget>[];

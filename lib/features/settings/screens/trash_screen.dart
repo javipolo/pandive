@@ -1,5 +1,5 @@
-/// Papelera: inmersiones borradas (Status=2). Selección múltiple para restaurar
-/// o borrar definitivamente (con confirmación).
+/// Trash: deleted dives (Status=2). Multiple selection to restore
+/// or delete permanently (with confirmation).
 library;
 
 import 'package:material_ui/material_ui.dart';

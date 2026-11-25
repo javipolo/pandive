@@ -18,9 +18,9 @@ static void first_frame_cb(MyApplication* self, FlView* view) {
   gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
 }
 
-// Pone el icono de la ventana en varios tamaños (data/icons/<n>.png junto al
-// ejecutable). Sin esto, gestores como xfwm4 buscan el icono en el tema y,
-// si solo hay uno grande, lo pintan recortado en la barra de título.
+// Sets the window icon in several sizes (data/icons/<n>.png next to the
+// executable). Without this, managers like xfwm4 look for the icon in the theme and,
+// if there's only a large one, paint it cropped in the title bar.
 static void set_window_icon(GtkWindow* window) {
   g_autofree gchar* exe = g_file_read_link("/proc/self/exe", nullptr);
   if (exe == nullptr) return;

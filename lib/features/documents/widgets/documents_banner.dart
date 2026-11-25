@@ -1,4 +1,4 @@
-/// Aviso resumen en la lista de documentos: cuántos caducados / por caducar.
+/// Summary notice in the document list: how many expired / about to expire.
 library;
 
 import 'package:material_ui/material_ui.dart';

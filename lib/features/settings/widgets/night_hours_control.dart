@@ -1,5 +1,5 @@
-/// Franja horaria de inmersión nocturna: dos selectores de hora (desde/hasta)
-/// con el valor siempre visible.
+/// Night dive time window: two time pickers (from/to)
+/// with the value always visible.
 library;
 
 import 'package:material_ui/material_ui.dart';

@@ -1,12 +1,12 @@
-/// Importa el CSV del logbook que exporta la web de SSI (MySSI). La cabecera
-/// va en el idioma del usuario, así que las columnas se leen por posición:
-///   0 nº · 1 lugar · 2 país · 3 fecha[/hora] · 4 actividad · 5 especialidad ·
-///   6 tipo · 7 duración · 8 profundidad · 9 compañeros/instructor/centro
-/// (ver `ssi_csv_fields.dart` para el formato de cada celda).
-/// La hora solo viene si el buceador la rellenó en MySSI. Los duplicados se
-/// detectan por día + profundidad + duración (+ hora si la hay); las
-/// que no traen hora se colocan a las 12:00 (+1 min por cada una que ya
-/// ocupe esa hora), en el orden del nº de SSI.
+/// Imports the logbook CSV exported by the SSI website (MySSI). The header
+/// is in the user's language, so columns are read by position:
+///   0 no. · 1 place · 2 country · 3 date[/time] · 4 activity · 5 specialty ·
+///   6 type · 7 duration · 8 depth · 9 buddies/instructor/centre
+/// (see `ssi_csv_fields.dart` for the format of each cell).
+/// The time is only there if the diver filled it in on MySSI. Duplicates are
+/// detected by day + depth + duration (+ time if present); those
+/// without a time are placed at 12:00 (+1 min for each one that already
+/// takes that time), in SSI number order.
 library;
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -14,17 +14,17 @@ import 'package:pandive/core/import/ssi_csv_fields.dart';
 
 export 'package:pandive/core/import/ssi_csv_fields.dart';
 
-/// Una fila del CSV de SSI ya interpretada.
+/// An already parsed SSI CSV row.
 class SsiDive {
   final int? number;
-  final DateTime date; // con hora solo si [hasTime]
+  final DateTime date; // with time only if [hasTime]
   final bool hasTime;
   final String? site;
   final String? country;
   final double? minutes;
   final double? depth; // metros
   final List<String> buddies;
-  final List<String> tags; // especialidades, centro, actividad/tipo no habitual
+  final List<String> tags; // specialties, centre, unusual activity/type
   final String? computer;
   const SsiDive({
     required this.date,
@@ -40,20 +40,20 @@ class SsiDive {
   });
 }
 
-/// Resultado de una importación: añadidas, ya existentes y filas ilegibles.
+/// Result of an import: added, already existing and unreadable rows.
 typedef SsiImportResult = ({int added, int duplicates, int skipped});
 
-/// Interpreta el CSV. Devuelve las inmersiones legibles y cuántas filas de
-/// datos no se pudieron leer (sin fecha válida). La cabecera se reconoce por
-/// no tener fecha y se ignora.
+/// Parses the CSV. Returns the readable dives and how many data rows
+/// couldn't be read (no valid date). The header is recognised by
+/// having no date and is ignored.
 ({List<SsiDive> dives, int skipped}) parseSsiCsv(String text) {
   final rows = [
     for (final r in parseCsv(text))
       if (parseSsiDate(r.length > 3 ? r[3] : '') != null) r,
   ];
   final all = parseCsv(text).length;
-  // Actividad (col. 4) y tipo (col. 6): el valor que llevan casi todas
-  // ("Buceo", "Inmersión de ocio") no aporta; los demás van como etiqueta.
+  // Activity (col. 4) and type (col. 6): the value almost all rows carry
+  // ("Buceo", "Inmersión de ocio") adds nothing; the rest become tags.
   final usualActivity = _dominant(rows.map((r) => r[4]));
   final usualType = _dominant(rows.map((r) => r.length > 6 ? r[6] : ''));
   final out = <SsiDive>[];
@@ -79,7 +79,7 @@ typedef SsiImportResult = ({int added, int duplicates, int skipped});
       }.toList(),
     ));
   }
-  // Las filas sin fecha válida, salvo la cabecera, no se pudieron leer.
+  // Rows without a valid date, except the header, couldn't be read.
   return (dives: out, skipped: (all - rows.length - 1).clamp(0, all));
 }
 
@@ -88,7 +88,7 @@ String? _clean(String s) {
   return v.isEmpty ? null : v;
 }
 
-// Trozo (separado por tabuladores) presente en más de la mitad de las filas.
+// Piece (tab-separated) present in more than half of the rows.
 String? _dominant(Iterable<String> cells) {
   final count = <String, int>{};
   var n = 0;
@@ -104,16 +104,16 @@ String? _dominant(Iterable<String> cells) {
   return null;
 }
 
-// Márgenes para dar una fila del CSV por "ya existente". Ajustados con un
-// logbook real: los ordenadores de dos buzos difieren 2-3 m y unos minutos, y
-// la hora de MySSI puede ir ~1 h desfasada (zona horaria del ordenador).
+// Tolerances to consider a CSV row "already existing". Tuned with a
+// real logbook: two divers' computers differ by 2-3 m and a few minutes, and
+// the MySSI time can be ~1 h off (the computer's time zone).
 const _maxDepthDiff = 3.0; // m
 const _maxMinutesDiff = 6.0; // min
-const _maxTimeDiff = 90; // min (solo si el CSV trae hora)
+const _maxTimeDiff = 90; // min (only if the CSV has a time)
 
 typedef _Existing = ({int id, String? time, double? depth, double? minutes});
 
-// Parecido de [d] con [e] (0 = idéntico), o null si no puede ser la misma.
+// Similarity of [d] to [e] (0 = identical), or null if it can't be the same one.
 double? _distance(SsiDive d, _Existing e) {
   var score = 0.0;
   if (d.depth != null && e.depth != null) {
@@ -137,19 +137,19 @@ double? _distance(SsiDive d, _Existing e) {
   return score;
 }
 
-/// Importa el CSV de SSI en [db]. Ignora las inmersiones que ya estén: mismo
-/// día, profundidad ±3 m, duración ±6 min y, si hay hora, ±90 min; entre
-/// varias candidatas se empareja con la más parecida.
-/// Una fila del CSV en el plan de importación: [duplicate] si ya hay un
-/// buceo que encaja (no se importa salvo que el usuario la marque).
+/// Imports the SSI CSV into [db]. Ignores dives already present: same
+/// day, depth ±3 m, duration ±6 min and, if there is a time, ±90 min; among
+/// several candidates it pairs with the most similar.
+/// A CSV row in the import plan: [duplicate] if there is already a
+/// matching dive (not imported unless the user ticks it).
 class SsiPlanEntry {
   final SsiDive dive;
   final bool duplicate;
   const SsiPlanEntry(this.dive, {required this.duplicate});
 }
 
-/// Plan sin escribir nada: cada fila del CSV (en orden cronológico) marcada
-/// como nueva o ya existente, y cuántas filas no se pudieron leer.
+/// Plan without writing anything: each CSV row (in chronological order) marked
+/// as new or already existing, and how many rows couldn't be read.
 ({List<SsiPlanEntry> entries, int skipped}) planSsiImport(
     DivemateDb db, String text) {
   final parsed = parseSsiCsv(text);
@@ -157,7 +157,7 @@ class SsiPlanEntry {
       final c = a.date.compareTo(b.date);
       return c != 0 ? c : (a.number ?? 0).compareTo(b.number ?? 0);
     });
-  final used = <int>{}; // buceos existentes ya emparejados con una fila
+  final used = <int>{}; // existing dives already paired with a row
   final entries = <SsiPlanEntry>[];
   for (final d in dives) {
     _Existing? match;
@@ -172,9 +172,9 @@ class SsiPlanEntry {
   return (entries: entries, skipped: parsed.skipped);
 }
 
-/// Importa [dives] por bloques (una transacción cada uno) cediendo el hilo
-/// entre bloques: la UI pinta el progreso y Android no da "no responde".
-/// Devuelve cuántas añadió.
+/// Imports [dives] in chunks (one transaction each) yielding the thread
+/// between chunks: the UI paints progress and Android doesn't show "not responding".
+/// Returns how many were added.
 Future<int> applySsiImport(DivemateDb db, List<SsiDive> dives,
     {void Function(int done, int total)? onProgress}) async {
   const chunk = 25;
@@ -191,8 +191,8 @@ Future<int> applySsiImport(DivemateDb db, List<SsiDive> dives,
 
 bool _insert(DivemateDb db, SsiDive d) {
   var when = d.date;
-  // Sin hora: 12:00, +1 min por cada una que ya ocupe ese minuto. Con hora
-  // real ocupada es la misma inmersión y importExternalDive la rechaza.
+  // No time: 12:00, +1 min for each one already taking that minute. With a real
+  // time taken it's the same dive and importExternalDive rejects it.
   while (!d.hasTime && db.hasDiveAt(when)) {
     when = when.add(const Duration(minutes: 1));
   }
@@ -208,7 +208,7 @@ bool _insert(DivemateDb db, SsiDive d) {
   );
 }
 
-/// Plan + importar las nuevas, sin pantalla (tests y scripts).
+/// Plan + import the new ones, headless (tests and scripts).
 Future<SsiImportResult> importSsiCsv(DivemateDb db, String text) async {
   final plan = planSsiImport(db, text);
   final fresh = [for (final e in plan.entries) if (!e.duplicate) e.dive];

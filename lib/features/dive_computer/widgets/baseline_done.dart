@@ -1,4 +1,4 @@
-/// Confirmación de "marcar como ya importado".
+/// "Mark as already imported" confirmation.
 library;
 
 import 'package:material_ui/material_ui.dart';

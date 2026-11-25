@@ -1,15 +1,15 @@
-# Artefactos de build
+# Build artifacts
 /build/
 
-# libdivecomputer: clon externo (ver README para clonar / futuro submodule)
+# libdivecomputer: external clone (see README to clone / future submodule)
 /vendor/libdivecomputer/
 
-# Datos personales de buceo (no subir a git)
+# Personal dive data (don't commit to git)
 *.ddb
 *.db
 *.sqlite
 
-# Flutter / Dart (cuando exista el proyecto)
+# Flutter / Dart (once the project exists)
 .flutter-plugins
 .flutter-plugins-dependencies
 .dart_tool/
@@ -24,22 +24,22 @@ key.properties
 *.keystore
 *.jks
 
-# OAuth Web client ID de Google Drive (no secreto, pero específico de tu proyecto)
+# Google Drive OAuth Web client ID (not secret, but specific to your project)
 android/gdrive_client_id.txt
 android/gdrive_native_client_id.txt
 linux/gdrive_desktop_client_id.txt
 linux/gdrive_desktop_client_secret.txt
 
-# Varios
+# Misc
 .DS_Store
 
-# El gitignore global del usuario ignora "tags" (ficheros ctags); eso tapa la
-# feature lib/features/tags/. La re-incluimos aquí.
+# The user's global gitignore ignores "tags" (ctags files); that hides the
+# lib/features/tags/ feature. We re-include it here.
 !lib/features/tags/
 !lib/features/tags/**
 
-# l10n generado (se regenera con flutter gen-l10n)
+# generated l10n (regenerated with flutter gen-l10n)
 lib/l10n/app_localizations*.dart
 
-# Material de referencia (screenshots de DiveMate, no parte de la app)
+# Reference material (DiveMate screenshots, not part of the app)
 /reference/

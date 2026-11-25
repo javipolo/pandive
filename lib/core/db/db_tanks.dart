@@ -1,8 +1,8 @@
 part of 'divemate_db.dart';
 
-/// Botellas por inmersión, presets "mis botellas", y listados filtrados.
+/// Cylinders per dive, "my cylinders" presets, and filtered listings.
 extension DivemateDbTanks on DivemateDb {
-  /// Reemplaza las botellas de una inmersión por [tanks] y recalcula el SAC.
+  /// Replaces a dive's cylinders with [tanks] and recomputes the SAC.
   void setDiveTanks(int logId, List<Cylinder> tanks) {
     _db.execute('DELETE FROM Tank WHERE LogID = ?', [logId]);
     final now = _nowStamp();
@@ -20,7 +20,7 @@ extension DivemateDbTanks on DivemateDb {
     recomputeSac(logId);
   }
 
-  /// Índice de gas por muestra (de PandiveGas), o null si no hay datos.
+  /// Gas index per sample (from PandiveGas), or null if there is no data.
   List<int?>? gasPerSample(int diveId) {
     final r = _db.select('SELECT Json FROM PandiveGas WHERE DiveId=?', [diveId]);
     if (r.isEmpty) return null;
@@ -36,27 +36,27 @@ extension DivemateDbTanks on DivemateDb {
     }
   }
 
-  /// SAC/RMV persistido de una inmersión (columna propia), o null.
+  /// Persisted SAC/RMV of a dive (own column), or null.
   double? diveSac(int logId) {
     final r = _db.select('SELECT PandiveSac FROM Logbook WHERE ID=?', [logId]);
     return r.isEmpty ? null : _num(r.first['PandiveSac']);
   }
 
-  /// Calcula el SAC/RMV y lo guarda en la columna propia `Logbook.PandiveSac`.
+  /// Computes the SAC/RMV and stores it in our own column `Logbook.PandiveSac`.
   void recomputeSac(int logId) {
     final d = getDive(logId);
     if (d == null) return;
     final sac = computeSac(cylinders(logId),
         divetimeMin: d.durationMin, avgDepthM: d.avgDepth);
-    // Solo si cambia: un UPDATE que deja el mismo valor (p.ej. NULL -> NULL
-    // cuando faltan datos) también dispara el trigger del sello de escritura,
-    // y al hacerse en cada apertura la sync veía "modificado en ambos lados".
+    // Only if it changes: an UPDATE that leaves the same value (e.g. NULL -> NULL
+    // when data is missing) also fires the write-stamp trigger,
+    // and since it ran on every open, sync saw "modified on both sides".
     _db.execute(
         'UPDATE Logbook SET PandiveSac = ? WHERE ID = ? AND PandiveSac IS NOT ?',
         [sac, logId, sac]);
   }
 
-  /// Rellena `PandiveSac` donde falte y haya botellas con presiones (al abrir).
+  /// Fills `PandiveSac` where missing and there are cylinders with pressures (on open).
   int fillMissingSac() {
     final owner = ownerId;
     final filter = owner != null ? 'AND L.DiverID = $owner' : '';
@@ -72,7 +72,7 @@ extension DivemateDbTanks on DivemateDb {
     return rows.length;
   }
 
-  // --- presets "mis botellas" ---
+  // --- "my cylinders" presets ---
 
   List<TankPreset> listTankPresets() {
     final rows = _db.select(

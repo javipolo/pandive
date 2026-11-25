@@ -1,5 +1,5 @@
-/// Rellena datos de buceos propios con los de un compañero (ya emparejados):
-/// selección estilo lista de buceos + buddy a añadir + confirmación.
+/// Fills our own dives' data with a buddy's (already paired):
+/// dive-list-style selection + buddy to add + confirmation.
 library;
 
 import 'dart:io';
@@ -40,7 +40,7 @@ Future<void> openFillFromDdb(BuildContext context, DivemateDb db,
     }
     final r = await computeMatches(db, source);
     source.close();
-    nav.pop(); // cerrar spinner
+    nav.pop(); // close spinner
     if (r.dives.isEmpty) {
       messenger.showSnackBar(SnackBar(content: Text(t.noMatches)));
       return;
@@ -55,7 +55,7 @@ Future<void> openFillFromDdb(BuildContext context, DivemateDb db,
 }
 class FillFromDdbScreen extends StatefulWidget {
   final DivemateDb db;
-  final List<Dive> dives; // buceos propios con coincidencia
+  final List<Dive> dives; // our dives with a match
   final Map<int, DiveMatch> matches;
   const FillFromDdbScreen(
       {super.key, required this.db, required this.dives, required this.matches});
@@ -64,7 +64,7 @@ class FillFromDdbScreen extends StatefulWidget {
 }
 class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
   final _buddy = TextEditingController();
-  final _selected = <int>{}; // índices en widget.dives
+  final _selected = <int>{}; // indices into widget.dives
   @override
   void dispose() {
     _buddy.dispose();
@@ -100,7 +100,7 @@ class _FillFromDdbScreenState extends State<FillFromDdbScreen> {
     final ids = {for (final i in _selected) widget.dives[i].id};
     final n = applyEnrich(widget.db, widget.matches, ids, _buddy.text);
     if (!mounted) return;
-    bumpDataRevision(); // refresca las pestañas (misma DB abierta)
+    bumpDataRevision(); // refreshes the tabs (same DB open)
     Navigator.of(context).pop();
     messenger.showSnackBar(SnackBar(content: Text(t.fillResult(n))));
   }

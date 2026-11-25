@@ -1,5 +1,5 @@
-/// Lista editable de botellas: cada fila con sus litros y una marca de si
-/// mantiene reserva o se vacía (etapa). Añadir/quitar filas.
+/// Editable cylinder list: each row with its litres and a flag for whether it
+/// keeps a reserve or is emptied (stage). Add/remove rows.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -7,7 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Fila de botella del planificador (litros + marca de reserva).
+/// Planner cylinder row (litres + reserve flag).
 class PlanCyl {
   final TextEditingController litres;
   bool reserve;

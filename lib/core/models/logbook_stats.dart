@@ -1,4 +1,4 @@
-/// Estadísticas agregadas del logbook (del owner).
+/// Aggregate logbook statistics (the owner's).
 library;
 
 class LogbookStats {
@@ -15,13 +15,13 @@ class LogbookStats {
   final double? tempMax;
   final double? tempMin;
   final double? avgWaterTemp;
-  final int? decoDives; // nº buceos con deco
+  final int? decoDives; // number of dives with deco
   final int? maxTts; // min
-  final double? maxCeiling; // m (más profundo = mayor)
-  final double? maxCeilingMinutes; // tiempo con techo del buceo que más tuvo
+  final double? maxCeiling; // m (deeper = larger)
+  final double? maxCeilingMinutes; // ceiling time of the dive that had the most
   final DateTime? firstDive;
   final DateTime? lastDive;
-  final Map<int, int> divesPerYear; // año -> nº inmersiones
+  final Map<int, int> divesPerYear; // year -> dive count
 
   const LogbookStats({
     required this.totalDives,

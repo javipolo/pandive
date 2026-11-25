@@ -1,6 +1,6 @@
-/// Lista de backups en Drive para restaurar (latest primero). Al elegir uno,
-/// confirma, lo descarga, avisa si la DB actual tiene cambios más recientes
-/// (sello de última escritura) y sobrescribe la DB activa; luego recarga.
+/// List of Drive backups to restore (latest first). On choosing one,
+/// it confirms, downloads it, warns if the current DB has newer changes
+/// (last-write stamp) and overwrites the active DB; then reloads.
 library;
 
 import 'dart:io';
@@ -60,12 +60,12 @@ class _RestoreListState extends State<RestoreList> {
         SnackBar(content: Text(ok ? t.restoreDone : t.backupFailed)));
     if (ok) {
       widget.onReloadDb();
-      nav.popUntil((r) => r.isFirst); // volver al inicio con la DB recargada
+      nav.popUntil((r) => r.isFirst); // back to the start with the reloaded DB
     }
   }
 
-  /// Failsafe: si la DB actual tiene escrituras más recientes que el backup,
-  /// avisa con ambas fechas antes de pisarla. true = seguir.
+  /// Failsafe: if the current DB has writes newer than the backup,
+  /// warns with both dates before overwriting it. true = continue.
   Future<bool> _confirmIfOlder(File backup) async {
     final dbPath = widget.settings.dbPath;
     final local = dbPath == null ? null : lastWriteUtcOf(dbPath);

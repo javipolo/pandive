@@ -1,6 +1,6 @@
-/// Señal global de "los datos han cambiado" para refrescar las pestañas sin
-/// cerrar/reabrir la base de datos (reload blando). Lo usan las herramientas
-/// que escriben en la DB ya abierta (enriquecer, tags, papelera…).
+/// Global "data has changed" signal to refresh the tabs without
+/// closing/reopening the database (soft reload). Used by the tools
+/// that write to the already open DB (enrich, tags, trash…).
 library;
 
 import 'package:flutter/foundation.dart';

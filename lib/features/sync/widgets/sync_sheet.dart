@@ -1,6 +1,6 @@
-/// Hoja de la sincronización: estado, última sync, aviso de otro dispositivo
-/// abierto y la acción que toque (sincronizar, actualizar o resolver una
-/// divergencia eligiendo versión).
+/// Sync sheet: status, last sync, notice about another device
+/// open and the relevant action (sync, update or resolve a
+/// divergence by choosing a version).
 library;
 
 import 'package:intl/intl.dart';

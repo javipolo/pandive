@@ -1,4 +1,4 @@
-/// Botón "Guardar" de AppBar con spinner mientras guarda.
+/// AppBar "Save" button with a spinner while saving.
 library;
 
 import 'package:material_ui/material_ui.dart';

@@ -1,4 +1,4 @@
-/// Edición completa de una inmersión: campos, sitio, compañeros, tipo, botellas.
+/// Full dive editing: fields, site, buddies, type, cylinders.
 library;
 
 import 'package:material_ui/material_ui.dart';

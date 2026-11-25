@@ -1,5 +1,5 @@
-// Valida backfillBuddyIds() sobre una COPIA TEMPORAL de la .ddb real del
-// usuario (nunca el original). Se salta si no existe.
+// Validates backfillBuddyIds() on a TEMPORARY COPY of the user's real .ddb
+// (never the original). Skipped if it doesn't exist.
 import 'dart:ffi';
 import 'dart:io';
 
@@ -37,7 +37,7 @@ void main() {
     tmp.deleteSync(recursive: true);
   });
 
-  // Nombre único: no debe existir ya como buddy en la DB real.
+  // Unique name: must not already exist as a buddy in the real DB.
   const name = 'ZZZ Test Backfill Buddy';
   int divesOf(String n) {
     final m = db.listBuddies().where((b) => b.name == n);
@@ -45,16 +45,16 @@ void main() {
   }
 
   test('backfill enlaza un buddy solo-texto y es idempotente', () {
-    // Monta el estado: una inmersión con texto Buddy pero sin BuddyIDs
-    // (como las importadas de DiveMate), autocontenido (no depende del estado
-    // actual de la DB, que puede estar ya enlazada).
+    // Sets up the state: a dive with Buddy text but no BuddyIDs
+    // (like those imported from DiveMate), self-contained (doesn't depend on the
+    // current DB state, which may already be linked).
     final diveId = db.listDives().first.id;
     db.updateDive(diveId, {'Buddy': name, 'BuddyIDs': ''});
-    expect(divesOf(name), 0); // aún sin fila Buddy enlazada
+    expect(divesOf(name), 0); // no linked Buddy row yet
 
     final updated = db.backfillBuddyIds();
     expect(updated, greaterThan(0));
-    expect(divesOf(name), greaterThan(0)); // ya enlazado y cuenta
+    expect(divesOf(name), greaterThan(0)); // now linked and counted
     expect(db.backfillBuddyIds(), 0); // idempotente
   });
 
@@ -97,7 +97,7 @@ void main() {
 
     db.deleteTrip(tripId);
     expect(db.listTrips().any((t) => t.id == tripId), isFalse);
-    // Los buceos siguen existiendo (solo se desasignan).
+    // The dives still exist (they are only unassigned).
     expect(db.listDives().where((d) => dives.contains(d.id)).length, 2);
   });
 
@@ -119,7 +119,7 @@ void main() {
     final mod = plan.firstWhere((p) => p.name == 'ZZZ Plan Exist');
     expect(mod.action, SiteImportAction.modify);
     expect(mod.existingId, ex);
-    // region null no toca; Lon igual no cambia; solo Lat difiere.
+    // null region doesn't touch; same Lon doesn't change; only Lat differs.
     expect(mod.fields.keys.toSet(), {'Lat'});
   });
 
@@ -154,7 +154,7 @@ void main() {
     expect(created.country, 'Spain');
     final after = db.getSite(ex)!;
     expect(after.lat, closeTo(5.5, 1e-4)); // pisado
-    expect(after.region, 'KeepMe'); // null no pisó
+    expect(after.region, 'KeepMe'); // null didn't overwrite
   });
 
   test('sitesToJson: roundtrip no genera cambios', () {
@@ -174,10 +174,10 @@ void main() {
     final id = db.createSite({'Place': 'ZZZ Enrich Site', 'Country': 'X'});
     final again =
         db.findOrCreateSite('ZZZ Enrich Site', country: 'X', lat: 10, lon: 20);
-    expect(again, id); // mismo sitio
+    expect(again, id); // same site
     expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // coords rellenadas
     db.findOrCreateSite('ZZZ Enrich Site', country: 'X', lat: 99, lon: 99);
-    expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // no se pisan
+    expect(db.getSite(id)!.lat, closeTo(10, 1e-4)); // not overwritten
   });
 
   test('purgeUnusedSites borra solo los sitios sin buceos', () {
@@ -196,20 +196,20 @@ void main() {
     final diveId = db.listDives().first.id;
     db.updateDive(diveId, {'PlaceID': site});
 
-    // Sin tag en el sitio: no aparece.
+    // No tag on the site: doesn't show up.
     expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isFalse);
 
-    // Asignar tag al sitio -> aparece en el buceo (efectivo), no en los propios.
+    // Assign a tag to the site -> shows up on the dive (effective), not in its own.
     db.setSiteTags(site, [Tag(id: tagId, name: 'ZZZ sitetag')]);
     expect(db.tagsForSite(site).map((t) => t.id), [tagId]);
-    // listSites expone los tags (para buscar en la lista de sitios).
+    // listSites exposes the tags (to search the site list).
     expect(db.listSites().firstWhere((s) => s.id == site).tags,
         contains('ZZZ sitetag'));
     expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isTrue);
     expect(db.tagsForDive(diveId).any((t) => t.id == tagId), isFalse);
     expect(db.listDivesByTag(tagId).any((d) => d.id == diveId), isTrue);
 
-    // Quitar del sitio -> desaparece al instante (dinámico).
+    // Remove from the site -> disappears instantly (dynamic).
     db.setSiteTags(site, []);
     expect(db.effectiveTagsForDive(diveId).any((t) => t.id == tagId), isFalse);
     expect(db.listDivesByTag(tagId).any((d) => d.id == diveId), isFalse);
@@ -269,7 +269,7 @@ void main() {
     final plan = planDdbImport(db, src);
     expect(plan.where((e) => e.duplicate), isEmpty);
 
-    // Solo los seleccionados (todos menos C).
+    // Only the selected ones (all but C).
     final only = {for (final e in plan) if (e.dive.id != c) e.dive.id};
     final r1 = await importDivesFromDb(db, src, only: only);
     expect(r1.imported, 2);
@@ -278,10 +278,10 @@ void main() {
     expect(r1.newBuddies, 1);
     expect(r1.newSites, 2);
 
-    // Los ya importados aparecen como duplicados y se ignoran.
+    // Already imported ones show up as duplicates and are ignored.
     expect(planDdbImport(db, src).where((e) => e.duplicate).length, 2);
     final r2 = await importDivesFromDb(db, src);
-    expect(r2.imported, 1); // solo C
+    expect(r2.imported, 1); // only C
     expect(r2.duplicates, 2);
     src.close();
 
@@ -347,14 +347,14 @@ void main() {
     expect(withDives.length, greaterThanOrEqualTo(2));
     final keep = withDives[0];
     final gone = withDives[1];
-    final maxExpected = keep.diveCount + gone.diveCount; // tope (sin solape)
+    final maxExpected = keep.diveCount + gone.diveCount; // cap (no overlap)
 
     db.mergeBuddies(keep.id, [gone.id]);
 
     final after = db.listBuddies();
-    expect(after.any((b) => b.id == gone.id), isFalse); // fusionado borrado
+    expect(after.any((b) => b.id == gone.id), isFalse); // merged one deleted
     final keepAfter = after.firstWhere((b) => b.id == keep.id);
-    expect(keepAfter.diveCount, greaterThan(keep.diveCount)); // ganó dives
+    expect(keepAfter.diveCount, greaterThan(keep.diveCount)); // gained dives
     expect(keepAfter.diveCount, lessThanOrEqualTo(maxExpected));
   });
 }

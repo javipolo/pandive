@@ -1,5 +1,5 @@
-/// Fila de un compañero: avatar, nombre, nº de buceos y menú (renombrar/borrar).
-/// Toca para ver sus buceos; en modo selección hace toggle y muestra check.
+/// Buddy row: avatar, name, dive count and menu (rename/delete).
+/// Tap to see their dives; in selection mode it toggles and shows a check.
 library;
 
 import 'package:material_ui/material_ui.dart';

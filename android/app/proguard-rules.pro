@@ -1,18 +1,18 @@
-# Clases cuyos métodos llama el código nativo (C) por nombre vía JNI.
-# R8 no debe renombrarlas ni eliminarlas, o el puente libdivecomputer peta con
+# Classes whose methods the native code (C) calls by name via JNI.
+# R8 must not rename or remove them, or the libdivecomputer bridge breaks with
 # NoSuchMethodError (bleRead/bleWrite/native*).
 -keep class org.drslump.pandive.DiveComputer { *; }
 -keep class org.drslump.pandive.BleConnection { *; }
 
-# Métodos nativos en general.
+# Native methods in general.
 -keepclasseswithmembernames class * {
     native <methods>;
 }
 
-# flutter_local_notifications: persiste las notificaciones programadas con Gson
-# usando TypeToken<List<...>>. R8/minify borra la firma genérica -> al programar
-# en release lanza PlatformException "Missing type parameter" y NO se programa
-# ninguna noti de caducidad. Mantener firma genérica + TypeToken + el plugin.
+# flutter_local_notifications: persists scheduled notifications with Gson
+# using TypeToken<List<...>>. R8/minify strips the generic signature -> scheduling
+# in release throws PlatformException "Missing type parameter" and NO expiry
+# notification gets scheduled. Keep generic signature + TypeToken + the plugin.
 -keep class com.dexterous.** { *; }
 -keep class com.google.gson.** { *; }
 -keepattributes Signature

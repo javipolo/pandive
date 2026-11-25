@@ -1,8 +1,8 @@
-/// Cálculo de consumo (RMV, que en la app llamamos SAC) en l/min.
+/// Consumption calculation (RMV, which the app calls SAC) in l/min.
 ///
-/// SAC = Σ(ΔP_bar · litros) / (tiempo_min · (prof_media_m / 10 + 1))
-/// Suma el gas consumido de todas las botellas (a 1 bar) y lo normaliza por
-/// tiempo y presión ambiente media.
+/// SAC = Σ(ΔP_bar · litres) / (time_min · (avg_depth_m / 10 + 1))
+/// Adds up the gas consumed from all cylinders (at 1 bar) and normalises it by
+/// time and average ambient pressure.
 library;
 
 import 'package:pandive/core/models/models.dart';
@@ -31,8 +31,8 @@ double? computeSac(
   return litresConsumed / (divetimeMin * ata);
 }
 
-/// SAC en bar/min: caída de presión (sumada) normalizada por tiempo y presión
-/// ambiente media. Independiente del tamaño de la botella.
+/// SAC in bar/min: (summed) pressure drop normalised by time and average
+/// ambient pressure. Independent of cylinder size.
 double? computeSacBar(
   List<Cylinder> tanks, {
   required double? divetimeMin,

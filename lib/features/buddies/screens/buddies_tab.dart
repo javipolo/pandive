@@ -1,5 +1,5 @@
-/// Pestaña de compañeros: lista, añadir, renombrar, eliminar (individual o en
-/// lote), ver sus buceos.
+/// Buddies tab: list, add, rename, delete (single or in
+/// batch), see their dives.
 library;
 
 import 'dart:async';
@@ -34,7 +34,7 @@ class BuddiesTab extends StatefulWidget {
 }
 
 class _BuddiesTabState extends State<BuddiesTab> {
-  // Orden y preferencia de sección "antiguos", recordados durante la sesión.
+  // Order and "old ones" section preference, remembered during the session.
   static BuddySort _lastSort = BuddySort.name;
   static bool _lastShowStale = true;
 
@@ -42,9 +42,9 @@ class _BuddiesTabState extends State<BuddiesTab> {
   bool _select = false;
   final Set<int> _sel = {};
   BuddySort _sort = _lastSort;
-  bool _showStale = _lastShowStale; // agrupar los de >2 años en una sección
-  bool _staleOpen = false; // sección "hace >2 años" (colapsada por defecto)
-  int? _highlightId; // buddy recién añadido, para destacar/desplazar
+  bool _showStale = _lastShowStale; // group those >2 years old in a section
+  bool _staleOpen = false; // ">2 years ago" section (collapsed by default)
+  int? _highlightId; // newly added buddy, to highlight/scroll to
   final _hlKey = GlobalKey();
   Timer? _hlTimer;
 
@@ -121,8 +121,8 @@ class _BuddiesTabState extends State<BuddiesTab> {
         : _buddies.where((b) => foldContains(b.name, q)).toList();
     sortBuddiesBy(shown, _sort);
 
-    // Al buscar (o con la sección desactivada): lista plana. Si no: los que no
-    // bucean contigo hace >2 años van a una sección colapsada al final.
+    // When searching (or with the section off): flat list. Otherwise: those who
+    // haven't dived with you for >2 years go to a collapsed section at the end.
     final now = DateTime.now();
     final cutoff = DateTime(now.year - 2, now.month, now.day);
     bool isStale(Buddy b) =>
@@ -168,7 +168,7 @@ class _BuddiesTabState extends State<BuddiesTab> {
           child: shown.isEmpty
               ? Center(child: Text(t.noBuddies))
               : ListView(
-                  padding: const EdgeInsets.only(bottom: 88), // hueco para el FAB
+                  padding: const EdgeInsets.only(bottom: 88), // room for the FAB
                   children: rows,
                 ),
         ),

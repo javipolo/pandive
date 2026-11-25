@@ -1,4 +1,4 @@
-/// Barra de navegación inferior de la pantalla principal (6 pestañas).
+/// Bottom navigation bar of the main screen (6 tabs).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -14,7 +14,7 @@ class HomeNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    // Tags/Equipo/Stats viven en el menú lateral, no aquí.
+    // Tags/Equipment/Stats live in the side menu, not here.
     return NavigationBar(
       selectedIndex: selectedIndex.clamp(0, 2),
       onDestinationSelected: onSelected,

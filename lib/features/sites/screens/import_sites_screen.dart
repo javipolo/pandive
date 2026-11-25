@@ -1,5 +1,5 @@
-/// Previsualización del import de sitios: lista de altas/modificaciones con
-/// checkbox (todo marcado), color por acción; al confirmar aplica los elegidos.
+/// Site import preview: list of additions/modifications with
+/// checkboxes (all ticked), colour per action; on confirm applies the chosen ones.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -25,7 +25,7 @@ class _ImportSitesScreenState extends State<ImportSitesScreen> {
   late final Set<int> _sel = {
     for (var i = 0; i < widget.entries.length; i++) i
   };
-  bool _newToo = true; // false = solo actualizar existentes (oculta las altas)
+  bool _newToo = true; // false = only update existing ones (hides additions)
 
   bool _visible(int i) =>
       _newToo || widget.entries[i].action == SiteImportAction.modify;

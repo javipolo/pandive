@@ -1,4 +1,4 @@
-/// Control de tamaño de letra: slider + botones −/+ (paso 0.1).
+/// Font size control: slider + −/+ buttons (step 0.1).
 library;
 
 import 'package:material_ui/material_ui.dart';

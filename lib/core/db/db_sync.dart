@@ -1,15 +1,15 @@
 part of 'divemate_db.dart';
 
-/// Fingerprint por buceo y utilidad de "punto de sync" (debug/pruebas).
+/// Per-dive fingerprint and "sync point" utility (debug/testing).
 extension DivemateDbSync on DivemateDb {
-  /// Fingerprint del ordenador guardado para un buceo (o null).
+  /// Computer fingerprint stored for a dive (or null).
   String? diveFingerprint(int id) {
     final r = _db.select('SELECT PandiveFp FROM Logbook WHERE ID=?', [id]);
     return r.isEmpty ? null : _str(r.first['PandiveFp']);
   }
 
-  /// Parámetros extra por muestra (ppo2/cns/presión/rbt) de PandiveSampleExtra,
-  /// alineados a [n] muestras (listas de nulls si no hay datos).
+  /// Extra per-sample parameters (ppo2/cns/pressure/rbt) from PandiveSampleExtra,
+  /// aligned to [n] samples (lists of nulls if there is no data).
   ({List<double?> ppo2, List<double?> cns, List<double?> pressure, List<int?> rbt})
       sampleExtra(int id, int n) {
     final res = (
@@ -43,8 +43,8 @@ extension DivemateDbSync on DivemateDb {
     return res;
   }
 
-  /// Guarda parámetros extra por muestra (ppo2/cns/presión/rbt) en
-  /// PandiveSampleExtra, solo si alguna muestra los trae.
+  /// Stores extra per-sample parameters (ppo2/cns/pressure/rbt) in
+  /// PandiveSampleExtra, only if some sample carries them.
   void storeSampleExtra(int id, List<DiveSample> ss) {
     if (!ss.any((s) =>
         s.ppo2 != null || s.cns != null || s.pressure != null || s.rbt != null)) {
@@ -64,8 +64,8 @@ extension DivemateDbSync on DivemateDb {
     );
   }
 
-  /// Fija el punto de sync en [diveId] (su fingerprint, o vacío si no lo tiene)
-  /// y borra (Status=2) todos los buceos del owner posteriores.
+  /// Sets the sync point at [diveId] (its fingerprint, or empty if it has none)
+  /// and deletes (Status=2) all later owner dives.
   void setSyncPoint(int diveId, String deviceId) {
     final d = getDive(diveId);
     if (d?.date == null) return;

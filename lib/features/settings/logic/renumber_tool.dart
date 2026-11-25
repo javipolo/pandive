@@ -1,4 +1,4 @@
-/// Herramienta "Renumerar buceos": vista previa de los cambios y confirmación.
+/// "Renumber dives" tool: preview of the changes and confirmation.
 library;
 
 import 'package:material_ui/material_ui.dart';

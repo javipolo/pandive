@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.22)
 project(pandive_dc C)
 
-# libdivecomputer precompilado (jniLibs/<ABI>/libdivecomputer.so),
-# cross-compilado con scripts/build-libdivecomputer-android.sh.
+# Prebuilt libdivecomputer (jniLibs/<ABI>/libdivecomputer.so),
+# cross-compiled with scripts/build-libdivecomputer-android.sh.
 add_library(divecomputer SHARED IMPORTED)
 set_target_properties(divecomputer PROPERTIES
     IMPORTED_LOCATION
     ${CMAKE_CURRENT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libdivecomputer.so)
 
-# Núcleo común con la app Linux (native/) + adaptador JNI.
+# Core shared with the Linux app (native/) + JNI adapter.
 set(PANDIVE_NATIVE ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../native)
 add_library(pandive_dc SHARED pandive_dc.c ${PANDIVE_NATIVE}/pandive_dc_core.c)
 

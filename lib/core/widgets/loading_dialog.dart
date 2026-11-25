@@ -1,5 +1,5 @@
-/// Diálogo modal simple con spinner y mensaje. El llamante lo cierra con
-/// Navigator.pop cuando termina la operación.
+/// Simple modal dialog with a spinner and a message. The caller closes it with
+/// Navigator.pop when the operation finishes.
 library;
 
 import 'package:material_ui/material_ui.dart';

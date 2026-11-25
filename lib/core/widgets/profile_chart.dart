@@ -1,5 +1,5 @@
-/// Perfil de inmersión: profundidad (azul, superficie arriba) + temperatura
-/// (roja, eje derecho). Al tocar: línea vertical a toda altura + valores.
+/// Dive profile: depth (blue, surface at the top) + temperature
+/// (red, right axis). On touch: full-height vertical line + values.
 library;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -11,8 +11,8 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class ProfileChart extends StatefulWidget {
   final DiveProfile profile;
-  final bool compact; // oculta los títulos de los ejes (gráfica pequeña)
-  final List<GasChange> gasChanges; // marcas de cambio de gas (ampliada)
+  final bool compact; // hides the axis titles (small chart)
+  final List<GasChange> gasChanges; // gas switch marks (enlarged)
   const ProfileChart(
       {super.key,
       required this.profile,
@@ -130,7 +130,7 @@ class _ProfileChartState extends State<ProfileChart> {
             barWidth: 2,
             dotData: const FlDotData(show: false),
           ),
-        // Banda de techo de deco: relleno rojo desde la superficie hasta el techo.
+        // Deco ceiling band: red fill from the surface down to the ceiling.
         if (profile.hasDeco)
           LineChartBarData(
             spots: [

@@ -1,4 +1,4 @@
-/// Gestión de tipos de botella (presets reutilizables): crear, editar, borrar.
+/// Cylinder type management (reusable presets): create, edit, delete.
 library;
 
 import 'package:material_ui/material_ui.dart';

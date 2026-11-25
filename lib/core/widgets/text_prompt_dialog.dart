@@ -1,4 +1,4 @@
-/// Diálogo con un campo de texto. Devuelve el texto (recortado) o null si se
+/// Dialog with a text field. Returns the (trimmed) text or null if
 /// cancela.
 library;
 

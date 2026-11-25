@@ -1,6 +1,6 @@
-/// Lista de inmersiones agrupada por año y, dentro, por mes. Cabeceras
-/// colapsables y seleccionables en lote (año entero o mes). "Colapsar todo"
-/// (barra superior) colapsa los años.
+/// Dive list grouped by year and, within, by month. Collapsible,
+/// batch-selectable headers (whole year or month). "Collapse all"
+/// (top bar) collapses the years.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -23,7 +23,7 @@ class MonthGroupedDives extends StatefulWidget {
   final Set<int> selected;
   final bool selectionMode;
   final bool collapseAll;
-  final int? highlightDiveId; // buceo recién añadido (destacar + desplazar)
+  final int? highlightDiveId; // newly added dive (highlight + scroll to)
   const MonthGroupedDives({
     super.key,
     required this.dives,
@@ -65,7 +65,7 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
     if (old.collapseAll != widget.collapseAll) {
       _collapsed.clear();
       if (widget.collapseAll) {
-        // Colapsar todo = años y meses.
+        // Collapse all = years and months.
         _collapsed
           ..addAll(widget.dives.map(_yKey))
           ..addAll(widget.dives.map(_mKey));
@@ -76,7 +76,7 @@ class _MonthGroupedDivesState extends State<MonthGroupedDives> {
   void _toggle(String k) =>
       setState(() => _collapsed.contains(k) ? _collapsed.remove(k) : _collapsed.add(k));
 
-  // Colapsar un año colapsa también sus meses; expandirlo solo muestra el año.
+  // Collapsing a year also collapses its months; expanding it only shows the year.
   void _toggleYear(String yk, List<String> months) => setState(() {
         if (_collapsed.contains(yk)) {
           _collapsed.remove(yk);

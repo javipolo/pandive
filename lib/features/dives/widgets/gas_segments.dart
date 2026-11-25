@@ -1,5 +1,5 @@
-/// Cambios de gas a lo largo del buceo (para la gráfica ampliada): marca el
-/// minuto del cambio con la etiqueta de la mezcla y un color.
+/// Gas switches along the dive (for the enlarged chart): marks the
+/// minute of the switch with the mix label and a colour.
 library;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -30,7 +30,7 @@ String _label(List<Cylinder> cyls, int idx) {
   return size != null ? '${size.toStringAsFixed(0)}L $gas' : gas;
 }
 
-/// Líneas verticales (fl_chart) para marcar los cambios de gas.
+/// Vertical lines (fl_chart) to mark the gas switches.
 List<VerticalLine> gasVerticalLines(List<GasChange> changes) => [
       for (final gc in changes)
         VerticalLine(
@@ -47,7 +47,7 @@ List<VerticalLine> gasVerticalLines(List<GasChange> changes) => [
         ),
     ];
 
-/// Lista de cambios de gas a partir del índice por muestra. Vacía si no hay.
+/// List of gas switches from the per-sample index. Empty if none.
 List<GasChange> buildGasChanges(
     List<int?>? perSample, List<double> timesMin, List<Cylinder> cyls) {
   if (perSample == null) return const [];

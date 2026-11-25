@@ -1,4 +1,4 @@
-/// Ordenador de buceo guardado (para reconectar sin reescanear, por MAC).
+/// Saved dive computer (to reconnect without rescanning, by MAC).
 library;
 
 class DiveComputerRef {

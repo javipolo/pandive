@@ -1,5 +1,5 @@
-/// Selector de modo de reserva (umbral verde de presión final por botella):
-/// 35 bar, 50 bar, tercios (1/3), cuartos (1/2) o personalizado.
+/// Reserve mode picker (green end-pressure threshold per cylinder):
+/// 35 bar, 50 bar, thirds (1/3), quarters (1/2) or custom.
 library;
 
 import 'package:material_ui/material_ui.dart';

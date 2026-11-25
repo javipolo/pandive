@@ -1,8 +1,8 @@
-/// OAuth de Google para escritorio (Linux), donde no hay flutter_appauth:
-/// flujo "loopback" con PKCE. Abre el navegador del sistema, recoge el código
-/// en un servidor HTTP efímero en 127.0.0.1 y lo canjea por tokens.
-/// Requiere un OAuth client de tipo **Desktop app** (lleva un client secret
-/// que Google no considera confidencial en apps instaladas).
+/// Google OAuth for desktop (Linux), where there is no flutter_appauth:
+/// "loopback" flow with PKCE. Opens the system browser, collects the code
+/// on an ephemeral HTTP server on 127.0.0.1 and exchanges it for tokens.
+/// Requires an OAuth client of type **Desktop app** (it has a client secret
+/// that Google doesn't consider confidential in installed apps).
 library;
 
 import 'dart:async';
@@ -40,8 +40,8 @@ class DesktopOAuth {
   final String clientSecret;
   const DesktopOAuth(this.clientId, this.clientSecret);
 
-  /// Consentimiento interactivo en el navegador. [doneText] se muestra en la
-  /// pestaña al volver. Lanza si se cancela, falla o pasan 5 minutos.
+  /// Interactive consent in the browser. [doneText] is shown in the
+  /// tab on return. Throws if cancelled, failed or after 5 minutes.
   Future<OAuthTokens> authorize(List<String> scopes, {String doneText = ''}) async {
     final verifier = _random(64);
     final challenge = base64Url
@@ -78,13 +78,13 @@ class DesktopOAuth {
     }
   }
 
-  /// Access token nuevo a partir del refresh token (HTTP puro, sin UI).
+  /// New access token from the refresh token (plain HTTP, no UI).
   Future<OAuthTokens> refresh(String refreshToken) => _token({
         'grant_type': 'refresh_token',
         'refresh_token': refreshToken,
       });
 
-  // Espera la redirección de Google (ignora otras peticiones, p.ej. favicon).
+  // Waits for Google's redirect (ignores other requests, e.g. favicon).
   Future<String> _awaitCode(HttpServer server, String state, String doneText) async {
     await for (final req in server) {
       final q = req.uri.queryParameters;

@@ -1,4 +1,4 @@
-// Sync capa 1: tabla de decisión e instantánea consistente con su sello.
+// Sync layer 1: decision table and consistent snapshot with its stamp.
 import 'dart:ffi';
 import 'dart:io';
 
@@ -53,7 +53,7 @@ void main() {
     db.createTrip('Viaje');
     final stamp = db.lastWriteRaw;
     db.snapshotTo('${tmp.path}/snap.ddb');
-    expect(db.lastWriteRaw, stamp); // la instantánea no cuenta como escritura
+    expect(db.lastWriteRaw, stamp); // the snapshot doesn't count as a write
     db.close();
 
     final snap = DivemateDb.open('${tmp.path}/snap.ddb', readOnly: true);

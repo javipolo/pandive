@@ -1,4 +1,4 @@
-/// Alta manual de inmersión: campos, sitio, compañeros, tipo y botellas.
+/// Manual dive entry: fields, site, buddies, type and cylinders.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -77,7 +77,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
     });
   }
 
-  // Con numeración automática, el que le tocará por fecha; si no, max + 1.
+  // With automatic numbering, the one it gets by date; otherwise max + 1.
   int get _number => widget.db.autoNumber
       ? widget.db.numberForNewDive(_when)
       : widget.db.nextDiveNumber();

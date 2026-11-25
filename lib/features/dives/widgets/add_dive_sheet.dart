@@ -1,4 +1,4 @@
-/// Hoja inferior "añadir inmersión": manual o transferir del ordenador.
+/// "Add dive" bottom sheet: manual or transfer from the computer.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -9,9 +9,9 @@ import 'package:pandive/features/dive_computer/screens/computer_pick_screen.dart
 import 'package:pandive/features/dives/screens/new_dive_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Muestra la hoja y navega a la pantalla elegida (alta manual o transferencia).
-/// Devuelve el id del buceo recién creado (alta manual) para poder destacarlo;
-/// null si se canceló o fue transferencia.
+/// Shows the sheet and navigates to the chosen screen (manual entry or transfer).
+/// Returns the id of the newly created dive (manual entry) so it can be highlighted;
+/// null if cancelled or it was a transfer.
 Future<int?> showAddDiveSheet(
     BuildContext context, DivemateDb db, Settings settings) async {
   final t = AppLocalizations.of(context);

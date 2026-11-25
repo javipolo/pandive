@@ -1,5 +1,5 @@
-/// Copiar una imagen PNG al portapapeles. Flutter solo copia texto: en Linux
-/// lo hace el runner nativo (canal `pandive/clipboard`, GTK).
+/// Copy a PNG image to the clipboard. Flutter only copies text: on Linux
+/// the native runner does it (channel `pandive/clipboard`, GTK).
 library;
 
 import 'dart:io';
@@ -8,10 +8,10 @@ import 'package:flutter/services.dart';
 
 const _channel = MethodChannel('pandive/clipboard');
 
-/// ¿Se pueden copiar imágenes en esta plataforma?
+/// Can images be copied on this platform?
 bool get canCopyImages => Platform.isLinux;
 
-/// Copia [png] al portapapeles. Devuelve false si no se pudo.
+/// Copies [png] to the clipboard. Returns false if it couldn't.
 Future<bool> copyPngToClipboard(Uint8List png) async {
   if (!canCopyImages) return false;
   try {

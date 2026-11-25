@@ -1,5 +1,5 @@
-/// Acciones de exportación/importación: DiveMate (.ddb nativo), Subsurface
-/// (.ssrf XML), CSV de SSI y sitios (JSON).
+/// Export/import actions: DiveMate (native .ddb), Subsurface
+/// (.ssrf XML), SSI CSV and sites (JSON).
 library;
 
 import 'dart:io';
@@ -19,8 +19,8 @@ import 'package:pandive/features/settings/screens/import_ssi_screen.dart';
 import 'package:pandive/features/sites/logic/export_sites.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Copia el .ddb activo a un temporal con nombre limpio y lo comparte (igual
-/// que la exportación a Subsurface; snapshot, no comparte el fichero en uso).
+/// Copies the active .ddb to a temp file with a clean name and shares it (like
+/// the Subsurface export; a snapshot, it doesn't share the file in use).
 Future<void> exportDdb(BuildContext context, Settings settings) async {
   final path = settings.dbPath;
   if (path == null) return;
@@ -32,14 +32,14 @@ Future<void> exportDdb(BuildContext context, Settings settings) async {
   await shareOrSaveFile(f);
 }
 
-/// Exporta todos los sitios a JSON (el formato de "Importar sitios").
+/// Exports all sites to JSON (the "Import sites" format).
 Future<void> exportAllSites(BuildContext context, DivemateDb db) async {
   final f = await withProgress(context, AppLocalizations.of(context).exporting,
       () => writeSitesJson(db.listSites()));
   await shareOrSaveFile(f);
 }
 
-/// Genera el XML Subsurface (con barra de progreso) y lo comparte.
+/// Generates the Subsurface XML (with a progress bar) and shares it.
 Future<void> exportSubsurface(BuildContext context, DivemateDb db) async {
   final t = AppLocalizations.of(context);
   final f = await withProgressBar(context, title: t.exporting, (p) async {
@@ -50,8 +50,8 @@ Future<void> exportSubsurface(BuildContext context, DivemateDb db) async {
   await shareOrSaveFile(f);
 }
 
-/// Elige un .ssrf e importa sus inmersiones, mostrando un diálogo de progreso.
-/// Devuelve cuántas añadió, o null si se canceló.
+/// Picks a .ssrf and imports its dives, showing a progress dialog.
+/// Returns how many were added, or null if cancelled.
 Future<int?> importSubsurface(BuildContext context, DivemateDb db) async {
   final res = await FilePicker.platform.pickFiles(withData: false);
   final path = res?.files.single.path;
@@ -61,8 +61,8 @@ Future<int?> importSubsurface(BuildContext context, DivemateDb db) async {
   return importSsrfWithProgress(context, db, xml);
 }
 
-/// Elige el CSV exportado de MySSI, lo analiza (con aviso de "leyendo") y
-/// abre la lista para revisar y desmarcar antes de importar.
+/// Picks the CSV exported from MySSI, parses it (with a "reading" notice) and
+/// opens the list to review and untick before importing.
 Future<void> importSsi(BuildContext context, DivemateDb db) async {
   final res = await FilePicker.platform.pickFiles(withData: false);
   final path = res?.files.single.path;

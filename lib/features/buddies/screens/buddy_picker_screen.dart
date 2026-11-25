@@ -1,6 +1,6 @@
-/// Selección múltiple de compañeros (con crear nuevo). Devuelve `List<Buddy>`.
-/// Búsqueda por nombre, nº de buceos por fila y orden configurable
-/// (alfabético por defecto, por nº de buceos o por buceo más reciente).
+/// Multiple buddy selection (with create new). Returns `List<Buddy>`.
+/// Search by name, dive count per row and configurable order
+/// (alphabetical by default, by dive count or by most recent dive).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -25,7 +25,7 @@ class BuddyPickerScreen extends StatefulWidget {
 }
 
 class _BuddyPickerScreenState extends State<BuddyPickerScreen> {
-  // Recuerda el orden elegido entre aperturas (solo durante la sesión).
+  // Remembers the chosen order between openings (only during the session).
   static BuddySort _lastSort = BuddySort.name;
 
   late List<Buddy> _buddies = widget.db.listBuddies();

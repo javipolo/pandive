@@ -1,6 +1,6 @@
-/// Lista de inmersiones filtradas (por sitio, compañero o etiqueta) con las
-/// mismas acciones que la pestaña principal (stats, fusionar, exportar, borrar)
-/// y búsqueda interna sobre el subconjunto.
+/// Filtered dive list (by site, buddy or tag) with the
+/// same actions as the main tab (stats, merge, export, delete)
+/// and internal search over the subset.
 library;
 
 import 'package:material_ui/material_ui.dart';

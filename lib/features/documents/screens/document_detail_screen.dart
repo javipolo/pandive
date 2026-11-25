@@ -1,5 +1,5 @@
-/// Detalle de un documento: imagen a tamaño grande, notas y estado; editar,
-/// borrar y compartir (como PDF).
+/// Document detail: large image, notes and status; edit,
+/// delete and share (as PDF).
 library;
 
 import 'dart:io';

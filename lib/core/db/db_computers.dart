@@ -1,6 +1,6 @@
 part of 'divemate_db.dart';
 
-/// Ordenadores de buceo guardados (para reconectar por MAC sin reescanear).
+/// Saved dive computers (to reconnect by MAC without rescanning).
 extension DivemateDbComputers on DivemateDb {
   List<DiveComputerRef> listComputers() {
     final rows =

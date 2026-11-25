@@ -1,4 +1,4 @@
-/// Gestión de tipos de buceo: lista, crear, editar, borrar.
+/// Dive type management: list, create, edit, delete.
 library;
 
 import 'package:material_ui/material_ui.dart';

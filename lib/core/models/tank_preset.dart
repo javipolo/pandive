@@ -1,4 +1,4 @@
-/// Preajuste de botella reutilizable ("mis botellas"): litros + material.
+/// Reusable cylinder preset ("my cylinders"): litres + material.
 library;
 
 import 'cylinder.dart';

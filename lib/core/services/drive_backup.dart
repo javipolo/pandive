@@ -1,10 +1,10 @@
-/// Backup/restauración de la DB en Google Drive (carpeta visible "Pandive
-/// Backups", scope drive.file). Auth OAuth nativo con `flutter_appauth` que
-/// persiste un refresh token (en `flutter_secure_storage`), de modo que el
-/// backup en segundo plano puede refrescar el access token sin Activity (headless).
-/// Requiere un OAuth client **de tipo iOS** (da el esquema invertido sin secreto);
-/// ver README. En Linux (sin flutter_appauth) usa [DesktopOAuth] con un client
-/// **Desktop app** del mismo proyecto (así ve los mismos backups). La lógica de operaciones está en el `part`.
+/// DB backup/restore on Google Drive (visible folder "Pandive
+/// Backups", scope drive.file). Native OAuth with `flutter_appauth` that
+/// persists a refresh token (in `flutter_secure_storage`), so the
+/// background backup can refresh the access token without an Activity (headless).
+/// Requires an OAuth client **of type iOS** (gives the reversed scheme without a secret);
+/// see README. On Linux (no flutter_appauth) it uses [DesktopOAuth] with a
+/// **Desktop app** client of the same project (so it sees the same backups). The operations logic is in the `part`.
 library;
 
 import 'dart:convert';
@@ -26,22 +26,22 @@ import 'network.dart';
 part 'drive_backup_ops.dart';
 part 'drive_sync_ops.dart';
 
-/// OAuth client ID **de tipo iOS** del proyecto Google Cloud (sin secreto; da el
-/// esquema invertido `com.googleusercontent.apps.<id>`). Pásalo con
-/// `--dart-define=GDRIVE_NATIVE_CLIENT_ID=...`. No es secreto.
+/// OAuth client ID **of type iOS** of the Google Cloud project (no secret; gives the
+/// reversed scheme `com.googleusercontent.apps.<id>`). Pass it with
+/// `--dart-define=GDRIVE_NATIVE_CLIENT_ID=...`. It is not secret.
 const _clientId = String.fromEnvironment(
   'GDRIVE_NATIVE_CLIENT_ID',
   defaultValue: '',
 );
 
-/// OAuth client **Desktop app** (mismo proyecto Google Cloud) para la app Linux.
-/// Por `--dart-define=GDRIVE_DESKTOP_CLIENT_ID=...` / `..._SECRET=...`.
+/// OAuth **Desktop app** client (same Google Cloud project) for the Linux app.
+/// Via `--dart-define=GDRIVE_DESKTOP_CLIENT_ID=...` / `..._SECRET=...`.
 const _desktopClientId = String.fromEnvironment('GDRIVE_DESKTOP_CLIENT_ID');
 const _desktopClientSecret =
     String.fromEnvironment('GDRIVE_DESKTOP_CLIENT_SECRET');
 
-// Endpoints explícitos de Google (sin discovery: evita el fetch a
-// accounts.google.com/.well-known, frágil en el isolate de background).
+// Explicit Google endpoints (no discovery: avoids fetching
+// accounts.google.com/.well-known, fragile in the background isolate).
 const _serviceConfig = AuthorizationServiceConfiguration(
   authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
   tokenEndpoint: 'https://oauth2.googleapis.com/token',
@@ -50,7 +50,7 @@ const _scopes = [drive.DriveApi.driveFileScope, 'email', 'openid'];
 const _kRefresh = 'drive_refresh_token';
 const _kEmail = 'drive_email';
 
-/// Un backup listado en Drive (para restaurar).
+/// A backup listed on Drive (to restore).
 class BackupEntry {
   final String id;
   final String name;
@@ -73,23 +73,23 @@ class DriveBackupService {
   String? get email => _email;
   bool get connected => _refreshToken != null;
 
-  /// Escritorio: OAuth loopback propio (flutter_appauth es solo móvil).
+  /// Desktop: our own loopback OAuth (flutter_appauth is mobile only).
   static bool get _desktop => Platform.isLinux;
   static const _desktopAuth = DesktopOAuth(_desktopClientId, _desktopClientSecret);
 
-  /// ¿Se compiló con el client ID de esta plataforma? Sin él no hay login.
+  /// Was it built with this platform's client ID? Without it there's no login.
   static bool get configured => _desktop
       ? _desktopClientId.isNotEmpty && _desktopClientSecret.isNotEmpty
       : _clientId.isNotEmpty;
 
-  // scheme invertido a partir del client id -> redirect de AppAuth.
+  // reversed scheme from the client id -> AppAuth redirect.
   String get _scheme =>
       'com.googleusercontent.apps.${_clientId.replaceAll('.apps.googleusercontent.com', '')}';
   String get _redirectUrl => '$_scheme:/oauth2redirect';
 
-  /// Conexión interactiva: consentimiento en el navegador y guarda el refresh
-  /// token. Lanza si falla (para mostrar el error). [browserDoneText]: texto
-  /// de la pestaña del navegador al volver (solo escritorio).
+  /// Interactive connection: consent in the browser and stores the refresh
+  /// token. Throws on failure (to show the error). [browserDoneText]: text
+  /// of the browser tab on return (desktop only).
   Future<void> signIn({String browserDoneText = ''}) async {
     if (_desktop) {
       final r = await _desktopAuth.authorize(_scopes, doneText: browserDoneText);
@@ -129,15 +129,15 @@ class DriveBackupService {
     await _storage.delete(key: _kEmail);
   }
 
-  /// Reconexión silenciosa (sin UI): true si hay refresh token guardado.
-  /// Funciona en el isolate de background (solo lee el storage).
+  /// Silent reconnection (no UI): true if a refresh token is stored.
+  /// Works in the background isolate (only reads the storage).
   Future<bool> signInSilently() async {
     _refreshToken ??= await _storage.read(key: _kRefresh);
     _email ??= await _storage.read(key: _kEmail);
     return _refreshToken != null;
   }
 
-  /// Access token válido (refresca con el refresh token si hace falta). Headless.
+  /// Valid access token (refreshes with the refresh token if needed). Headless.
   Future<String?> _freshAccessToken() async {
     final exp = _accessExp;
     if (_accessToken != null &&
@@ -169,8 +169,8 @@ class DriveBackupService {
     return _accessToken;
   }
 
-  /// Cliente Drive autenticado, o null si no hay sesión. Si [interactive] y no
-  /// hay refresh token, lanza el consentimiento.
+  /// Authenticated Drive client, or null if there's no session. If [interactive] and there's
+  /// no refresh token, starts the consent.
   Future<drive.DriveApi?> _api({bool interactive = false}) async {
     var token = await _freshAccessToken();
     if (token == null && interactive) {
@@ -217,7 +217,7 @@ class DriveBackupService {
   }
 }
 
-/// http.Client que añade el bearer token a cada petición (para googleapis).
+/// http.Client that adds the bearer token to each request (for googleapis).
 class _BearerClient extends http.BaseClient {
   final http.Client _inner = http.Client();
   final String _token;

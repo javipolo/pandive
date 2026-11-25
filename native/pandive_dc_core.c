@@ -1,4 +1,4 @@
-// Núcleo común sobre libdivecomputer (ver pandive_dc_core.h).
+// Shared core over libdivecomputer (see pandive_dc_core.h).
 #include "pandive_dc_core.h"
 
 #include <string.h>
@@ -24,7 +24,7 @@
 #define LOG(...) do { fprintf(stderr, "PandiveDC: " __VA_ARGS__); fputc('\n', stderr); } while (0)
 #endif
 
-// Normaliza a minúsculas alfanuméricas (para comparar nombre/producto BLE).
+// Normalises to lowercase alphanumerics (to compare BLE name/product).
 static void normalize_alnum(const char *s, char *out, size_t cap) {
     size_t j = 0;
     for (size_t i = 0; s[i] && j + 1 < cap; i++) {
@@ -36,7 +36,7 @@ static void normalize_alnum(const char *s, char *out, size_t cap) {
 }
 
 // ---------------------------------------------------------------------------
-// Buffer de texto dinámico (para construir el JSON)
+// Dynamic text buffer (to build the JSON)
 // ---------------------------------------------------------------------------
 
 typedef struct { char *p; size_t len, cap; } strbuf_t;
@@ -95,14 +95,14 @@ char *pdc_supported_list(void) {
     return sb.p ? sb.p : strdup("");
 }
 
-// Primer descriptor de libdivecomputer que reconoce el nombre BLE
-// (dc_descriptor_filter). Así se soportan todos sus ordenadores sin lista propia.
+// First libdivecomputer descriptor that recognises the BLE name
+// (dc_descriptor_filter). That way all its computers are supported without our own list.
 char *pdc_match_name(const char *name) {
     char out[256];
     out[0] = '\0';
     char nname[160];
     normalize_alnum(name ? name : "", nname, sizeof(nname));
-    int best = -1; // -1 nada, 0 match de marca, >0 longitud del prefijo de producto
+    int best = -1; // -1 nothing, 0 brand match, >0 product prefix length
     dc_iterator_t *it = NULL;
     if (name && dc_descriptor_iterator(&it) == DC_STATUS_SUCCESS) {
         dc_descriptor_t *desc = NULL;
@@ -110,8 +110,8 @@ char *pdc_match_name(const char *name) {
             if (dc_descriptor_filter(desc, DC_TRANSPORT_BLE, name)) {
                 const char *v = dc_descriptor_get_vendor(desc);
                 const char *p = dc_descriptor_get_product(desc);
-                // El filtro casa a nivel de marca; desambiguar por el nombre:
-                // preferir el descriptor cuyo producto sea prefijo del nombre.
+                // The filter matches at brand level; disambiguate by name:
+                // prefer the descriptor whose product is a prefix of the name.
                 char np[160];
                 normalize_alnum(p ? p : "", np, sizeof(np));
                 size_t nl = strlen(np);
@@ -130,7 +130,7 @@ char *pdc_match_name(const char *name) {
 }
 
 // ---------------------------------------------------------------------------
-// I/O personalizado: delega en pdc_io_t (paquetes) con un búfer local.
+// Custom I/O: delegates to pdc_io_t (packets) with a local buffer.
 // ---------------------------------------------------------------------------
 
 typedef struct {
@@ -156,7 +156,7 @@ static dc_status_t io_configure(void *ud, unsigned int baudrate,
         dc_flowcontrol_t flowcontrol) {
     (void) ud; (void) baudrate; (void) databits; (void) parity;
     (void) stopbits; (void) flowcontrol;
-    return DC_STATUS_SUCCESS; // no aplica a BLE; no-op para drivers que lo piden
+    return DC_STATUS_SUCCESS; // doesn't apply to BLE; no-op for drivers that ask for it
 }
 
 static dc_status_t io_purge(void *ud, dc_direction_t direction) {
@@ -169,7 +169,7 @@ static dc_status_t io_purge(void *ud, dc_direction_t direction) {
 static dc_status_t io_read(void *ud, void *data, size_t size, size_t *actual) {
     ble_io_t *b = ud;
     if (b->bufpos >= b->buflen) {
-        // sin datos en el búfer local: pedir un paquete al BLE
+        // no data in the local buffer: ask BLE for a packet
         int to = b->timeout > 0 ? b->timeout : 3000;
         int n = b->io->read_packet(b->io->ud, b->buf, sizeof(b->buf), to);
         if (n < 0) { *actual = 0; return DC_STATUS_IO; }
@@ -192,7 +192,7 @@ static dc_status_t io_write(void *ud, const void *data, size_t size, size_t *act
 }
 
 // ---------------------------------------------------------------------------
-// Parseo de muestras del perfil
+// Profile sample parsing
 // ---------------------------------------------------------------------------
 
 typedef struct {
@@ -202,10 +202,10 @@ typedef struct {
     int havePpo2, haveCns, havePres, haveRbt;
     unsigned int timeMs;
     double depth, temp, ceiling, ppo2, cns, pressure;
-    int ndlMin, ttsMin, gas, rbt; // gas se arrastra; -1 = desconocido
+    int ndlMin, ttsMin, gas, rbt; // gas carries over; -1 = unknown
 } sample_ctx_t;
 
-// Muestra: [t, depth, temp, ndl, tts, ceiling, gas, ppo2, cns, pressure, rbt]
+// Sample: [t, depth, temp, ndl, tts, ceiling, gas, ppo2, cns, pressure, rbt]
 static void _n(sample_ctx_t *c, int have, double v) {
     if (have) sb_fmt(c->sb, "%.2f,", v); else sb_puts(c->sb, "null,");
 }
@@ -243,7 +243,7 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
     } else if (type == DC_SAMPLE_PPO2) {
         c->ppo2 = value->ppo2.value; c->havePpo2 = 1;
     } else if (type == DC_SAMPLE_CNS) {
-        c->cns = value->cns * 100.0; c->haveCns = 1; // fracción -> %
+        c->cns = value->cns * 100.0; c->haveCns = 1; // fraction -> %
     } else if (type == DC_SAMPLE_PRESSURE) {
         c->pressure = value->pressure.value; c->havePres = 1;
     } else if (type == DC_SAMPLE_RBT) {
@@ -254,7 +254,7 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
             c->ceiling = value->deco.depth;
             c->ttsMin = (int) ((value->deco.tts + 30) / 60);
             c->ndlMin = 0;
-        } else { // NDL (y safety/deep stop: sin techo obligatorio)
+        } else { // NDL (and safety/deep stop: no mandatory ceiling)
             c->ceiling = 0;
             c->ndlMin = (int) ((value->deco.time + 30) / 60);
             c->ttsMin = 0;
@@ -265,7 +265,7 @@ static void sample_cb(dc_sample_type_t type, const dc_sample_value_t *value, voi
 }
 
 // ---------------------------------------------------------------------------
-// Callback por inmersión: parsea y añade al JSON
+// Per-dive callback: parses and appends to the JSON
 // ---------------------------------------------------------------------------
 
 typedef struct {
@@ -277,7 +277,7 @@ static int dive_cb(const unsigned char *data, unsigned int size,
     dive_ctx_t *dc = ud;
     dc_parser_t *parser = NULL;
     if (dc_parser_new(&parser, dc->device, data, size) != DC_STATUS_SUCCESS)
-        return 1; // continuar con las demás
+        return 1; // continue with the rest
 
     if (dc->count++) sb_puts(dc->sb, ",");
     sb_puts(dc->sb, "{");
@@ -325,16 +325,16 @@ static int dive_cb(const unsigned char *data, unsigned int size,
     sb_puts(dc->sb, "]}");
 
     dc_parser_destroy(parser);
-    // Progreso por buceo cuando hay límite (count/maxDives): el % por memoria
-    // no sirve si solo bajamos N buceos.
+    // Per-dive progress when there's a limit (count/maxDives): the memory-based %
+    // is useless if we only fetch N dives.
     if (dc->maxDives > 0 && dc->io->progress)
         dc->io->progress(dc->io->ud, dc->count, dc->maxDives);
-    // maxDives > 0: parar tras N (p.ej. 1 para "marcar como ya importado").
+    // maxDives > 0: stop after N (e.g. 1 for "mark as already imported").
     if (dc->maxDives > 0 && dc->count >= dc->maxDives) return 0;
     return 1;
 }
 
-// Progreso: DC_EVENT_PROGRESS -> io->progress(cur, max)
+// Progress: DC_EVENT_PROGRESS -> io->progress(cur, max)
 static void event_cb(dc_device_t *device, dc_event_type_t event,
                      const void *data, void *ud) {
     (void) device;
@@ -345,7 +345,7 @@ static void event_cb(dc_device_t *device, dc_event_type_t event,
 }
 
 // ---------------------------------------------------------------------------
-// Descarga principal
+// Main download
 // ---------------------------------------------------------------------------
 
 static dc_descriptor_t *find_descriptor(const char *vendor, const char *product) {
@@ -364,7 +364,7 @@ static dc_descriptor_t *find_descriptor(const char *vendor, const char *product)
     return found;
 }
 
-// Decodifica una cadena hex ("a1b2...") a bytes. Devuelve la longitud en bytes.
+// Decodes a hex string ("a1b2...") to bytes. Returns the length in bytes.
 static unsigned int hex_decode(const char *hex, unsigned char *out, unsigned int max) {
     unsigned int n = 0;
     for (; hex[0] && hex[1] && n < max; hex += 2, n++) {
@@ -416,15 +416,15 @@ char *pdc_download(const char *vendor, const char *product,
         dc_iostream_close(iostream); dc_context_free(ctx); dc_descriptor_free(desc); goto done;
     }
 
-    // Fingerprint: solo descargar inmersiones más nuevas que esta.
+    // Fingerprint: only download dives newer than this one.
     if (fingerprint_hex && fingerprint_hex[0]) {
         unsigned char fp[64];
         unsigned int fplen = hex_decode(fingerprint_hex, fp, sizeof(fp));
         if (fplen) dc_device_set_fingerprint(device, fp, fplen);
     }
 
-    // Con límite, el progreso se emite por buceo (count/N) desde dive_cb; sin
-    // límite usamos el progreso por memoria (DC_EVENT_PROGRESS).
+    // With a limit, progress is emitted per dive (count/N) from dive_cb; without
+    // a limit we use memory-based progress (DC_EVENT_PROGRESS).
     if (io->progress && max_dives == 0)
         dc_device_set_events(device, DC_EVENT_PROGRESS, event_cb, io);
 
@@ -436,7 +436,7 @@ char *pdc_download(const char *vendor, const char *product,
     if (rc != DC_STATUS_SUCCESS)
         sb_fmt(&out, ",\"error\":\"Incomplete download (%d)\"", rc);
     sb_fmt(&out, ",\"count\":%d}", dctx.count);
-    LOG("Descargadas %d inmersiones (rc=%d)", dctx.count, rc);
+    LOG("Downloaded %d dives (rc=%d)", dctx.count, rc);
 
     dc_device_close(device);
     dc_iostream_close(iostream);

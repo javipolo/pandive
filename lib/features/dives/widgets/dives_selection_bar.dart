@@ -1,4 +1,4 @@
-/// Barra de selección de inmersiones: estadísticas, fusionar y borrar.
+/// Dive selection bar: statistics, merge and delete.
 library;
 
 import 'package:material_ui/material_ui.dart';

@@ -1,5 +1,5 @@
-/// Tarjeta de récords personales: buceo más profundo, más largo y más frío
-/// (tocar abre ese buceo) + próximo hito por nº de inmersiones.
+/// Personal records card: deepest, longest and coldest dive
+/// (tapping opens that dive) + next milestone by dive count.
 library;
 
 import 'package:material_ui/material_ui.dart';

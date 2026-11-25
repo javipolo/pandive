@@ -1,4 +1,4 @@
-/// Barras horizontales etiqueta/valor (inmersiones por periodo).
+/// Horizontal label/value bars (dives per period).
 library;
 
 import 'package:material_ui/material_ui.dart';

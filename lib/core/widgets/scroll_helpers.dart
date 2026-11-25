@@ -1,5 +1,5 @@
-/// Tras el siguiente frame, desplaza la lista para que el widget de [key] quede
-/// visible (p.ej. el elemento recién añadido).
+/// After the next frame, scrolls the list so the widget of [key] becomes
+/// visible (e.g. the newly added item).
 library;
 
 import 'package:material_ui/material_ui.dart';

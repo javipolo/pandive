@@ -7,7 +7,7 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Firma release desde android/key.properties (no versionado). Si falta, cae a debug.
+// Release signing from android/key.properties (not versioned). If missing, falls back to debug.
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 val hasReleaseKeystore = keystorePropertiesFile.exists()
@@ -17,13 +17,13 @@ if (hasReleaseKeystore) {
 
 android {
     namespace = "org.drslump.pandive"
-    compileSdk = 36 // file_picker y otros plugins requieren >= 36
+    compileSdk = 36 // file_picker and other plugins require >= 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        // Requerido por flutter_local_notifications (APIs java.time en minSdk<26).
+        // Required by flutter_local_notifications (java.time APIs on minSdk<26).
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -32,7 +32,7 @@ android {
         applicationId = "org.drslump.pandive"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 24 // Android 7.0; BLE estable para la descarga del dive computer
+        minSdk = 24 // Android 7.0; stable BLE for the dive computer download
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -42,13 +42,13 @@ android {
         versionName = flutter.versionName
 
         ndk {
-            // ABIs para los que tenemos libdivecomputer precompilado.
+            // ABIs we have prebuilt libdivecomputer for.
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
 
-        // Esquema de redirect de AppAuth (flutter_appauth): esquema invertido del
-        // OAuth client iOS, derivado del id en android/gdrive_native_client_id.txt
-        // (no versionado). Debe ir en minúsculas.
+        // AppAuth redirect scheme (flutter_appauth): reversed scheme of the
+        // iOS OAuth client, derived from the id in android/gdrive_native_client_id.txt
+        // (not versioned). Must be lowercase.
         val nativeClientIdFile = rootProject.file("gdrive_native_client_id.txt")
         val nativeClientId =
             if (nativeClientIdFile.exists()) nativeClientIdFile.readText().trim() else ""
@@ -59,7 +59,7 @@ android {
             else "com.googleusercontent.apps.pandive-placeholder"
     }
 
-    // Wrapper JNI sobre libdivecomputer (src/main/cpp).
+    // JNI wrapper over libdivecomputer (src/main/cpp).
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
@@ -67,7 +67,7 @@ android {
         }
     }
 
-    // lintVital casca en release (bug del parser de javadoc en una dependencia);
+    // lintVital breaks in release (javadoc parser bug in a dependency);
     // no necesitamos el lint de release.
     lint {
         checkReleaseBuilds = false
@@ -87,13 +87,13 @@ android {
 
     buildTypes {
         release {
-            // Firma release propia (android/key.properties); si falta, debug.
+            // Our own release signing (android/key.properties); if missing, debug.
             signingConfig = if (hasReleaseKeystore)
                 signingConfigs.getByName("release")
             else
                 signingConfigs.getByName("debug")
-            // R8 con nuestras reglas keep: conserva los métodos que llama el
-            // nativo por JNI (BleConnection.bleRead/bleWrite, DiveComputer.*).
+            // R8 with our keep rules: keeps the methods the native side
+            // calls via JNI (BleConnection.bleRead/bleWrite, DiveComputer.*).
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(

@@ -1,5 +1,5 @@
-/// Preferencias de la app: escala de texto (accesibilidad, presbicia) y ruta
-/// de la base de datos activa. Persistido con shared_preferences.
+/// App preferences: text scale (accessibility, presbyopia) and path
+/// of the active database. Persisted with shared_preferences.
 library;
 
 import 'dart:math';
@@ -26,7 +26,7 @@ class Settings extends ChangeNotifier {
   static const _kBackupWifi = 'backup_wifi_only';
   static const _kSyncWifi = 'sync_wifi_only';
 
-  /// Por defecto grande (uso sin gafas). Configurable de 1.0 a 2.2.
+  /// Large by default (use without glasses). Configurable from 1.0 to 2.2.
   static const double defaultTextScale = 1.4;
   static const double minTextScale = 1.0;
   static const double maxTextScale = 2.2;
@@ -59,13 +59,13 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Idioma de la app: null = seguir el del sistema; si no, 'es' / 'en'.
+  /// App language: null = follow the system's; otherwise 'es' / 'en'.
   Locale? get locale {
     final code = _prefs.getString(_kLocale);
     return code == null ? null : Locale(code);
   }
 
-  /// Máximo intervalo en superficie (min) para poder fusionar inmersiones.
+  /// Maximum surface interval (min) to be able to merge dives.
   int get mergeGapMinutes => _prefs.getInt(_kMergeGap) ?? 15;
 
   Future<void> setMergeGapMinutes(int minutes) async {
@@ -73,7 +73,7 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Tema: claro / oscuro / seguir el sistema (por defecto).
+  /// Theme: light / dark / follow the system (default).
   ThemeMode get themeMode => switch (_prefs.getString(_kTheme)) {
         'light' => ThemeMode.light,
         'dark' => ThemeMode.dark,
@@ -85,7 +85,7 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Franja horaria de inmersión nocturna (por defecto 18:00 → 07:00).
+  /// Night dive time window (default 18:00 → 07:00).
   int get nightStartHour => _prefs.getInt(_kNightStart) ?? 18;
   int get nightEndHour => _prefs.getInt(_kNightEnd) ?? 7;
 
@@ -99,28 +99,28 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// ¿Es nocturna una inmersión que entra al agua a esta [hour]? Maneja la
-  /// franja que cruza medianoche (p.ej. 18 → 7).
+  /// Is a dive entering the water at this [hour] a night dive? Handles the
+  /// window crossing midnight (e.g. 18 → 7).
   bool isNight(int hour) {
     final s = nightStartHour, e = nightEndHour;
     return s <= e ? (hour >= s && hour < e) : (hour >= s || hour < e);
   }
 
-  /// Backup diario automático a Drive activado.
+  /// Daily automatic backup to Drive enabled.
   bool get autoBackup => _prefs.getBool(_kBackupAuto) ?? false;
   Future<void> setAutoBackup(bool v) async {
     await _prefs.setBool(_kBackupAuto, v);
     notifyListeners();
   }
 
-  /// Backups automáticos solo con WiFi (los manuales siempre).
+  /// Automatic backups only on WiFi (manual ones always).
   bool get backupWifiOnly => _prefs.getBool(_kBackupWifi) ?? true;
   Future<void> setBackupWifiOnly(bool v) async {
     await _prefs.setBool(_kBackupWifi, v);
     notifyListeners();
   }
 
-  /// Con datos móviles, la sync no hace nada sola (solo el botón manual).
+  /// On mobile data, sync does nothing by itself (only the manual button).
   bool get syncWifiOnly => _prefs.getBool(_kSyncWifi) ?? true;
   Future<void> setSyncWifiOnly(bool v) async {
     await _prefs.setBool(_kSyncWifi, v);
@@ -136,18 +136,18 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Sincronización entre dispositivos vía Drive (capa 1, ver sync_logic).
+  /// Cross-device sync via Drive (layer 1, see sync_logic).
   bool get syncEnabled => _prefs.getBool(_kSyncOn) ?? false;
   Future<void> setSyncEnabled(bool v) async {
     await _prefs.setBool(_kSyncOn, v);
     notifyListeners();
   }
 
-  /// Relee del disco (otro isolate, p.ej. WorkManager, pudo cambiarlas).
+  /// Rereads from disk (another isolate, e.g. WorkManager, may have changed them).
   Future<void> reload() => _prefs.reload();
 
-  /// Base de la última sync: md5 del fichero en Drive y sello local
-  /// (lastWriteUtc en bruto) en ese momento. Sin notificar (estado interno).
+  /// Base of the last sync: md5 of the file on Drive and local stamp
+  /// (raw lastWriteUtc) at that moment. Without notifying (internal state).
   String? get syncBaseMd5 => _prefs.getString(_kSyncMd5);
   String? get syncBaseStamp => _prefs.getString(_kSyncStamp);
   Future<void> setSyncBase(String? md5, String? stamp) async {
@@ -157,11 +157,11 @@ class Settings extends ChangeNotifier {
         : _prefs.setString(_kSyncStamp, stamp));
   }
 
-  /// Firma (nombres+tamaños) de documents/ en la última subida del zip.
+  /// Signature (names+sizes) of documents/ at the last zip upload.
   String? get syncDocsSig => _prefs.getString(_kSyncDocs);
   Future<void> setSyncDocsSig(String sig) => _prefs.setString(_kSyncDocs, sig);
 
-  /// Id estable de este dispositivo (presencia en Drive).
+  /// Stable id of this device (presence on Drive).
   String get deviceId {
     var id = _prefs.getString(_kDeviceId);
     if (id == null) {

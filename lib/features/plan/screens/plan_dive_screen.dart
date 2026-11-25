@@ -1,6 +1,6 @@
-/// Planificador de gas interactivo: precarga las medias (RMV, prof, tiempo) de
-/// una selección y recalcula al cambiar cualquier valor o la lista de botellas.
-/// Lógica en `core/gas_plan.dart`.
+/// Interactive gas planner: preloads the averages (RMV, depth, time) of
+/// a selection and recomputes when any value or the cylinder list changes.
+/// Logic in `core/gas_plan.dart`.
 library;
 
 import 'package:material_ui/material_ui.dart';

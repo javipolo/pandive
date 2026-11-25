@@ -1,7 +1,7 @@
-/// Revisar antes de importar el CSV de SSI: lista de inmersiones con
-/// checkbox. Verde = nueva (marcada); ámbar = parece que ya está (desmarcada,
-/// pero se puede marcar: el emparejamiento es aproximado). Al importar va a
-/// la lista de buceos ya refrescada.
+/// Review before importing the SSI CSV: list of dives with
+/// checkboxes. Green = new (ticked); amber = seems already present (unticked,
+/// but can be ticked: the pairing is approximate). Importing goes to
+/// the refreshed dives list.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -25,7 +25,7 @@ class ImportSsiScreen extends StatefulWidget {
 
 class _ImportSsiScreenState extends State<ImportSsiScreen> {
   List<SsiPlanEntry> get _entries => widget.entries;
-  // Índices marcados (las filas no tienen id propio).
+  // Ticked indices (rows have no id of their own).
   late final Set<int> _sel = {
     for (var i = 0; i < _entries.length; i++)
       if (!_entries[i].duplicate) i

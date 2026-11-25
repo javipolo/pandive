@@ -1,6 +1,6 @@
-/// Hoja modal para añadir/editar una botella: nombre (izquierda, deco…), litros,
-/// material y, salvo en modo [template], presiones y gas. En plantillas de tipo
-/// de buceo no se piden presiones (antes del buceo no se conocen).
+/// Modal sheet to add/edit a cylinder: name (left, deco…), litres,
+/// material and, except in [template] mode, pressures and gas. In dive type
+/// templates pressures aren't asked for (they aren't known before the dive).
 library;
 
 import 'package:material_ui/material_ui.dart';

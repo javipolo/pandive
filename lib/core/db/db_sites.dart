@@ -1,7 +1,7 @@
 part of 'divemate_db.dart';
 
-/// Puntos de buceo (tabla Place). Campos usados: nombre, país, stretch of
-/// water (WaterName), región, lat/lon, dificultad, valoración.
+/// Dive sites (Place table). Fields used: name, country, stretch of
+/// water (WaterName), region, lat/lon, difficulty, rating.
 extension DivemateDbSites on DivemateDb {
   static const _siteCols =
       'ID, Place, Country, WaterName, Region, Lat, Lon, Difficulty, Rating, MaxDepth';
@@ -34,7 +34,7 @@ extension DivemateDbSites on DivemateDb {
     final sets = [for (final c in cols) '$c = ?', 'Updated = ?'];
     final params = <Object?>[for (final c in cols) fields[c], _nowStamp(), id];
     _db.execute('UPDATE Place SET ${sets.join(', ')} WHERE ID=?', params);
-    // Propaga nombre/país a las inmersiones ya registradas de este sitio.
+    // Propagates name/country to the dives already logged at this site.
     if (fields.containsKey('Place') || fields.containsKey('Country')) {
       _db.execute(
         'UPDATE Logbook SET Place=?, Country=?, Updated=? WHERE PlaceID=?',
@@ -45,7 +45,7 @@ extension DivemateDbSites on DivemateDb {
 
   void deleteSite(int id) => _db.execute('DELETE FROM Place WHERE ID=?', [id]);
 
-  /// Borra los sitios sin ninguna inmersión (del owner). Devuelve cuántos.
+  /// Deletes sites without any (owner) dive. Returns how many.
   int purgeUnusedSites() {
     final unused = [for (final s in listSites()) if (s.diveCount == 0) s.id];
     for (final id in unused) {
@@ -67,9 +67,9 @@ extension DivemateDbSites on DivemateDb {
     return _db.lastInsertRowId;
   }
 
-  /// Busca un sitio por nombre (+país opcional) o lo crea. Devuelve su ID. Si
-  /// existe pero no tiene coordenadas y se pasan [lat]/[lon], las rellena (no
-  /// sobrescribe las que ya tenga).
+  /// Finds a site by name (+optional country) or creates it. Returns its ID. If
+  /// it exists without coordinates and [lat]/[lon] are given, fills them in (doesn't
+  /// overwrite existing ones).
   int findOrCreateSite(String name, {String? country, double? lat, double? lon}) {
     final rows = _db.select(
       'SELECT ID, Lat, Lon FROM Place WHERE Place = ? COLLATE NOCASE '

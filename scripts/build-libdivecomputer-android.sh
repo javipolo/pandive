@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 #
-# Cross-compila libdivecomputer para Android usando el NDK.
-# Produce libdivecomputer.so por ABI en build/android/<abi>/install/lib/.
+# Cross-compiles libdivecomputer for Android using the NDK.
+# Produces libdivecomputer.so per ABI in build/android/<abi>/install/lib/.
 #
-# Requisitos:
-#   - Android NDK instalado. Exporta ANDROID_NDK apuntando a el, p.ej:
+# Requirements:
+#   - Android NDK installed. Export ANDROID_NDK pointing to it, e.g.:
 #       export ANDROID_NDK=$HOME/Android/ndk/27.2.12479018
-#   - autotools (autoconf/automake/libtool), clang host no necesario.
+#   - autotools (autoconf/automake/libtool), host clang not needed.
 #
-# Uso:
+# Usage:
 #   ./scripts/build-libdivecomputer-android.sh
 #
 set -euo pipefail
 
 : "${ANDROID_NDK:?Exporta ANDROID_NDK con la ruta al NDK (p.ej. \$HOME/Android/ndk/27.2.12479018)}"
 
-API=24                       # minSdk 24 (Android 7.0); BLE estable
+API=24                       # minSdk 24 (Android 7.0); stable BLE
 HOST_TAG=linux-x86_64
-ABIS=(arm64-v8a armeabi-v7a x86_64)   # x86_64 solo util para emulador (sin BLE)
+ABIS=(arm64-v8a armeabi-v7a x86_64)   # x86_64 only useful for the emulator (no BLE)
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/vendor/libdivecomputer"
@@ -26,15 +26,15 @@ TOOLCHAIN="$ANDROID_NDK/toolchains/llvm/prebuilt/$HOST_TAG"
 
 [ -d "$TOOLCHAIN" ] || { echo "No existe toolchain NDK: $TOOLCHAIN"; exit 1; }
 
-# triple del compilador clang vs triple --host de configure (difieren en 32-bit arm)
+# clang compiler triple vs configure --host triple (they differ on 32-bit arm)
 declare -A CC_TRIPLE=( [arm64-v8a]=aarch64-linux-android [armeabi-v7a]=armv7a-linux-androideabi [x86_64]=x86_64-linux-android )
 declare -A CONF_HOST=( [arm64-v8a]=aarch64-linux-android [armeabi-v7a]=arm-linux-androideabi   [x86_64]=x86_64-linux-android )
 
-# generar ./configure si falta (clon de git)
+# generate ./configure if missing (git clone)
 [ -x "$SRC/configure" ] || ( cd "$SRC" && autoreconf --install )
 
-# limpiar config previa en el arbol de fuentes (p.ej. de un build nativo),
-# que haria fallar los builds out-of-tree con "source directory already configured"
+# clean previous config in the source tree (e.g. from a native build),
+# which would make out-of-tree builds fail with "source directory already configured"
 [ -f "$SRC/Makefile" ] && ( cd "$SRC" && make distclean >/dev/null 2>&1 || true )
 
 for ABI in "${ABIS[@]}"; do
@@ -60,9 +60,9 @@ for ABI in "${ABIS[@]}"; do
 
   make -C "$BUILDDIR" -j"$(nproc)"
   make -C "$BUILDDIR" install
-  echo "--- $ABI listo:"; ls -la "$PREFIX/lib/"*.so* 2>/dev/null || true
+  echo "--- $ABI done:"; ls -la "$PREFIX/lib/"*.so* 2>/dev/null || true
 done
 
 echo
-echo "OK. Librerias en $OUT/<abi>/install/lib/"
-echo "Headers en $OUT/arm64-v8a/install/include/libdivecomputer/"
+echo "OK. Libraries in $OUT/<abi>/install/lib/"
+echo "Headers in $OUT/arm64-v8a/install/include/libdivecomputer/"

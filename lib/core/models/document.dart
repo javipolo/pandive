@@ -1,5 +1,5 @@
-/// Documento del buzo (certificación, seguro, etc.): una imagen en disco más
-/// metadatos (título, notas, caducidad). Fila de `PandiveDocument`.
+/// Diver document (certification, insurance, etc.): an image on disk plus
+/// metadata (title, notes, expiry). Row of `PandiveDocument`.
 library;
 
 enum DocStatus { none, valid, soon, expired }
@@ -9,8 +9,8 @@ class DiveDoc {
   final String title;
   final String? notes;
   final bool expires;
-  final DateTime? expiryDate; // solo fecha (sin hora)
-  final String fileName; // relativo dentro de la carpeta documents/
+  final DateTime? expiryDate; // date only (no time)
+  final String fileName; // relative inside the documents/ folder
   final DateTime? created;
   final DateTime? updated;
 
@@ -25,7 +25,7 @@ class DiveDoc {
     this.updated,
   });
 
-  /// Estado respecto a [now]: vigente / próximo (≤30 días) / caducado.
+  /// Status relative to [now]: valid / due soon (≤30 days) / expired.
   DocStatus status(DateTime now) {
     if (!expires || expiryDate == null) return DocStatus.none;
     final today = DateTime(now.year, now.month, now.day);

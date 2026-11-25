@@ -1,4 +1,4 @@
-/// Etiqueta de inmersión (reutilizable, tipo buddies).
+/// Dive tag (reusable, like buddies).
 library;
 
 class Tag {

@@ -1,5 +1,5 @@
-/// Pestaña de sitios de buceo: lista agrupada por país + crear/editar, con
-/// selección múltiple para exportar (JSON) o borrar.
+/// Dive sites tab: list grouped by country + create/edit, with
+/// multiple selection to export (JSON) or delete.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -54,7 +54,7 @@ class _SitesTabState extends State<SitesTab> {
         if (_sel.isEmpty) _select = false;
       });
 
-  // "Todos" = los que se ven con la búsqueda actual.
+  // "All" = those visible with the current search.
   List<DiveSite> get _visible => filterSites(_sites, widget.query);
 
   bool get _allSelected {
@@ -117,7 +117,7 @@ class _SitesTabState extends State<SitesTab> {
       builder: (_) => SiteInfoScreen(
           db: widget.db, sites: _sites, initialIndex: idx < 0 ? 0 : idx),
     ));
-    if (mounted) _reload(); // editar/borrar dentro pudo cambiar cosas
+    if (mounted) _reload(); // editing/deleting inside may have changed things
   }
 
   @override

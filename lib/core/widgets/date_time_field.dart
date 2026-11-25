@@ -1,4 +1,4 @@
-/// Selector de fecha+hora como ListTile; gestiona sus propios diálogos.
+/// Date+time picker as a ListTile; handles its own dialogs.
 library;
 
 import 'package:material_ui/material_ui.dart';

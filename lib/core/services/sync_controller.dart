@@ -1,6 +1,6 @@
-/// Sincronización entre dispositivos vía Drive (capa 1): estado observable
-/// para la UI y disparadores (abrir/volver a la app, tras editar, cada ~2 min
-/// y al salir). Decide con [decideSync]; nunca fusiona ni pisa en silencio.
+/// Cross-device sync via Drive (layer 1): observable state
+/// for the UI and triggers (open/return to the app, after editing, every ~2 min
+/// and on exit). Decides with [decideSync]; never merges or overwrites silently.
 library;
 
 import 'dart:async';
@@ -18,10 +18,10 @@ import 'sync_logic.dart';
 
 enum SyncStatus {
   off, synced, syncing, pendingRemote, diverged, offline,
-  manual, // datos móviles con "solo WiFi": no se sincroniza solo
+  manual, // mobile data with "WiFi only": doesn't sync by itself
 }
 
-/// Instancia única (la conecta AppRoot con [SyncController.attach]).
+/// Single instance (attached by AppRoot with [SyncController.attach]).
 final syncController = SyncController();
 
 class SyncController extends ChangeNotifier with WidgetsBindingObserver {
@@ -37,21 +37,21 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _timer;
   int _ticks = 0;
   String? _lastSeenStamp;
-  int _quietTicks = 0; // ticks seguidos con el mismo sello local
+  int _quietTicks = 0; // consecutive ticks with the same local stamp
   bool _running = false;
   DateTime _lastPresence = DateTime(0);
 
   SyncStatus status = SyncStatus.off;
   DateTime? lastSync;
   String? lastError;
-  DevicePresence? otherActive; // otro dispositivo abierto hace < 5 min
+  DevicePresence? otherActive; // another device open < 5 min ago
 
   bool get enabled =>
       (_s?.syncEnabled ?? false) && DriveBackupService.configured;
 
-  /// [db]: DB abierta ahora; [replace]: cierra la DB, la sustituye por el
-  /// fichero dado y la reabre; [canAutoReplace]: si se puede sustituir sin
-  /// molestar (ninguna pantalla abierta encima de la principal).
+  /// [db]: currently open DB; [replace]: closes the DB, replaces it with the
+  /// given file and reopens it; [canAutoReplace]: whether it can be replaced without
+  /// disturbing (no screen open on top of the main one).
   void attach({
     required Settings settings,
     required DivemateDb? Function() db,
@@ -71,7 +71,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> setEnabled(bool v) async {
     await _s?.setSyncEnabled(v);
     if (v) {
-      await sync(force: true); // acción del usuario: puede bajar ya
+      await sync(force: true); // user action: may download right away
     } else {
       _set(SyncStatus.off);
     }
@@ -79,15 +79,15 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // En escritorio "resumed" llega con cada cambio de foco: no repetir si se
-    // acaba de sincronizar.
+    // On desktop "resumed" arrives on every focus change: don't repeat if we
+    // just synced.
     final recent = lastSync != null &&
         DateTime.now().difference(lastSync!) < const Duration(seconds: 30);
     if (state == AppLifecycleState.resumed && !recent) sync(auto: true);
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
-      sync(allowDownload: false, auto: true); // subir lo pendiente al irnos
-      // Android congela la app en segundo plano a los pocos segundos: si la
-      // subida no termina, la hace WorkManager en cuanto haya red.
+      sync(allowDownload: false, auto: true); // upload what's pending as we leave
+      // Android freezes the app in the background after a few seconds: if the
+      // upload doesn't finish, WorkManager does it as soon as there's network.
       final stamp = _db?.call()?.lastWriteRaw;
       if (enabled && stamp != _s!.syncBaseStamp) {
         enqueueSyncUpload(wifiOnly: _s!.syncWifiOnly);
@@ -95,14 +95,14 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  // Sube tras ~2 min sin escrituras (debounce) y mira Drive cada ~2 min.
+  // Uploads after ~2 min without writes (debounce) and checks Drive every ~2 min.
   void _onTick() {
     if (!enabled || _running || status == SyncStatus.diverged) return;
     _ticks++;
     final stamp = _db?.call()?.lastWriteRaw;
     _quietTicks = stamp == _lastSeenStamp ? _quietTicks + 1 : 0;
-    // Subir tras 6 ticks (~2 min) sin escribir: agrupa una sesión de edición
-    // (con pausas para buscar información) en una sola subida.
+    // Upload after 6 ticks (~2 min) without writing: groups an editing session
+    // (with pauses to look things up) into a single upload.
     if (stamp != _s!.syncBaseStamp && _quietTicks >= 6) {
       sync(allowDownload: false, auto: true);
     } else if (_ticks % 6 == 0) {
@@ -111,16 +111,16 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     _lastSeenStamp = stamp;
   }
 
-  /// Una pasada. Si hay que bajar y [allowDownload] (o [force]) lo permite y
-  /// no molesta, sustituye la DB local; si no, queda pendiente. [auto]: la
-  /// lanza un disparador (no el usuario); con "solo WiFi" y datos móviles no
-  /// hace nada (ni comprobar) y marca la sync como manual.
+  /// One pass. If it needs to download and [allowDownload] (or [force]) allows it and
+  /// it doesn't disturb, replaces the local DB; otherwise it stays pending. [auto]:
+  /// launched by a trigger (not the user); with "WiFi only" and mobile data it
+  /// does nothing (not even check) and marks sync as manual.
   Future<void> sync(
       {bool allowDownload = true, bool force = false, bool auto = false}) async {
     if (!enabled) return _set(SyncStatus.off);
     if (_running) return;
     if (auto && _s!.syncWifiOnly && !await onUnmeteredNetwork()) {
-      // conservar avisos importantes ya conocidos
+      // keep important warnings already known
       if (status != SyncStatus.diverged && status != SyncStatus.pendingRemote) {
         _set(SyncStatus.manual);
       }
@@ -129,7 +129,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     _running = true;
     _set(SyncStatus.syncing);
     try {
-      await _s!.reload(); // la base puede haberla movido el worker
+      await _s!.reload(); // the worker may have moved the base
       await _syncOnce(allowDownload, force);
     } catch (e) {
       lastError = '$e';
@@ -172,8 +172,8 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  /// Divergencia: quedarse con esta versión ([keepLocal]) o con la de Drive.
-  /// La descartada se guarda como backup con timestamp.
+  /// Divergence: keep this version ([keepLocal]) or Drive's.
+  /// The discarded one is saved as a timestamped backup.
   Future<void> resolve({required bool keepLocal}) async {
     if (_running) return;
     _running = true;
@@ -210,7 +210,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     await tmp.writeAsBytes(bytes, flush: true);
     await _replace!(tmp);
     await _svc.syncDocumentsDown();
-    // El sello base es el de la DB ya reabierta (por si abrir escribe algo).
+    // The base stamp is that of the reopened DB (in case opening writes something).
     await _s!.setSyncBase(remote.md5, _db?.call()?.lastWriteRaw);
     await _saveBaseCopy(bytes);
   }
@@ -229,7 +229,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
         : null;
   }
 
-  /// Nombre legible de este dispositivo para la presencia.
+  /// Readable name of this device for presence.
   static String get deviceName => Platform.isAndroid
       ? 'Android'
       : '${Platform.operatingSystem} (${Platform.localHostname})';
@@ -248,10 +248,10 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
 }
 
 // ---------------------------------------------------------------------------
-// Compartido con el worker de segundo plano
+// Shared with the background worker
 // ---------------------------------------------------------------------------
 
-// Instantánea consistente + su sello (leídos en el mismo instante).
+// Consistent snapshot + its stamp (read at the same instant).
 Future<(List<int>, String?)> _snapshot(DivemateDb db) async {
   final f = File('${Directory.systemTemp.path}/pandive-snap-'
       '${DateTime.now().microsecondsSinceEpoch}.ddb');
@@ -272,21 +272,21 @@ Future<void> _uploadSnapshot(DriveBackupService svc, Settings s, DivemateDb db,
   await svc.syncDocumentsUp(s);
 }
 
-// Copia de la versión base (la necesitará la fusión de tres vías, capa 2).
+// Copy of the base version (the three-way merge, layer 2, will need it).
 Future<void> _saveBaseCopy(List<int> bytes) async {
   final dir = await getApplicationSupportDirectory();
   await File('${dir.path}/sync-base.ddb').writeAsBytes(bytes, flush: true);
 }
 
-/// Subida desde WorkManager (app congelada o cerrada): abre la DB en solo
-/// lectura y sube solo si el único cambio es local. Nunca baja ni resuelve
-/// divergencias (eso necesita la UI).
+/// Upload from WorkManager (app frozen or closed): opens the DB read-only
+/// and uploads only if the only change is local. Never downloads or resolves
+/// divergences (that needs the UI).
 Future<void> syncUploadInBackground(Settings s) async {
   final path = s.dbPath;
   if (!s.syncEnabled || path == null) return;
   final svc = DriveBackupService();
   final remote = await svc.remoteSync();
-  if (remote == null) throw StateError('no network'); // WorkManager reintenta
+  if (remote == null) throw StateError('no network'); // WorkManager retries
   final db = DivemateDb.open(path, readOnly: true);
   try {
     final action = decideSync(SyncObservation(

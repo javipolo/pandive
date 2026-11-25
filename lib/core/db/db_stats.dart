@@ -1,8 +1,8 @@
 part of 'divemate_db.dart';
 
-/// Agregados: sitios de buceo y estadísticas.
+/// Aggregates: dive sites and statistics.
 extension DivemateDbStats on DivemateDb {
-  /// Puntos de buceo con nº de inmersiones del owner, más visitados primero.
+  /// Dive sites with the owner's dive count, most visited first.
   List<DiveSite> listSites() {
     final owner = ownerId;
     final diveFilter = StringBuffer('(L.Status IS NULL OR L.Status != 2)');
@@ -11,7 +11,7 @@ extension DivemateDbStats on DivemateDb {
       diveFilter.write(' AND L.DiverID = ?');
       params.add(owner);
     }
-    // PandiveSiteTag solo existe en bases propias (no en .ddb read-only externas).
+    // PandiveSiteTag only exists in our own DBs (not in external read-only .ddb files).
     final tagsCol = _hasTable('PandiveSiteTag')
         ? "(SELECT GROUP_CONCAT(T.Name, char(10)) FROM PandiveSiteTag S "
             'JOIN PandiveTag T ON T.Id = S.TagId WHERE S.PlaceId = P.ID)'
@@ -44,8 +44,8 @@ extension DivemateDbStats on DivemateDb {
         .toList();
   }
 
-  /// Estadísticas agregadas del owner. Si [ids] no es null, solo esas
-  /// inmersiones (para las stats de una selección); misma plantilla y cálculos.
+  /// The owner's aggregate statistics. If [ids] is not null, only those
+  /// dives (for the stats of a selection); same template and calculations.
   LogbookStats computeStats({Iterable<int>? ids}) {
     final owner = ownerId;
     final filter = StringBuffer('(Status IS NULL OR Status != 2)');
@@ -58,9 +58,9 @@ extension DivemateDbStats on DivemateDb {
       final list = ids.toList();
       filter.write(' AND ID IN (${list.isEmpty ? '-1' : list.join(',')})');
     }
-    // Solo lecturas de temperatura plausibles (p.ej. -300 = "sin lectura").
+    // Only plausible temperature readings (e.g. -300 = "no reading").
     const tempOk = 'Watertemp > -50 AND Watertemp < 60';
-    // PandiveSac es columna propia; puede faltar (p.ej. DB abierta solo lectura).
+    // PandiveSac is our own column; it may be missing (e.g. DB opened read-only).
     final hasSac = _db
         .select("SELECT 1 FROM pragma_table_info('Logbook') "
             "WHERE name='PandiveSac'")
@@ -97,12 +97,12 @@ extension DivemateDbStats on DivemateDb {
       if (y != null) perYear[y] = (r['c'] as int?) ?? 0;
     }
 
-    // Deco: cuenta por columna; TTS/ceiling máx. decodificando Profile4 solo de
-    // los buceos con deco (barato frente a decodificar todo el logbook).
+    // Deco: count by column; max TTS/ceiling by decoding Profile4 only for
+    // dives with deco (cheap compared to decoding the whole logbook).
     int decoDives = 0;
     int maxTts = 0;
     double maxCeiling = 0;
-    int maxCeilSecs = 0; // más tiempo con techo (segundos) de un solo buceo
+    int maxCeilSecs = 0; // longest time under a ceiling (seconds) in a single dive
     for (final r
         in _db.select('SELECT ID FROM Logbook WHERE $filter AND Deco = 1', params)) {
       decoDives++;
@@ -121,7 +121,7 @@ extension DivemateDbStats on DivemateDb {
       }
     }
 
-    // Buddies distintos referenciados por las inmersiones del filtro.
+    // Distinct buddies referenced by the filtered dives.
     final buddyIds = <int>{};
     for (final r in _db.select(
         'SELECT BuddyIDs FROM Logbook WHERE $filter', params)) {
@@ -155,7 +155,7 @@ extension DivemateDbStats on DivemateDb {
     );
   }
 
-  /// Récords personales del owner: el buceo más profundo, más largo y más frío.
+  /// The owner's personal records: deepest, longest and coldest dive.
   PersonalRecords personalRecords() {
     final owner = ownerId;
     final f = owner != null ? 'AND DiverID = $owner' : '';
@@ -172,7 +172,7 @@ extension DivemateDbStats on DivemateDb {
           _parseDate(_str(r['Divedate']), _str(r['Entrytime'])), _str(r['Place']));
     }
 
-    // Récords de deco: recorrer buceos con deco y decodificar el perfil.
+    // Deco records: walk dives with deco and decode the profile.
     int? ttsId, ceilId;
     int bestTts = 0, bestCeilSecs = 0;
     for (final r in _db.select(

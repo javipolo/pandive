@@ -1,4 +1,4 @@
-// Sello UTC de última escritura (triggers) y la regla de aviso al restaurar.
+// UTC last-write stamp (triggers) and the restore warning rule.
 import 'dart:ffi';
 import 'dart:io';
 
@@ -32,17 +32,17 @@ void main() {
     expect(db.lastWriteUtc!.isAfter(afterInsert), isTrue);
     db.close();
 
-    // Leído desde otro proceso/conexión (como al comparar con un backup).
+    // Read from another process/connection (like when comparing with a backup).
     expect(lastWriteUtcOf(path), isNotNull);
   });
 
   test('restoreWouldLoseData', () {
     final old = DateTime.utc(2026, 1, 1);
     final recent = DateTime.utc(2026, 6, 1);
-    expect(restoreWouldLoseData(recent, old), isTrue); // local más nuevo
-    expect(restoreWouldLoseData(old, recent), isFalse); // backup más nuevo
-    expect(restoreWouldLoseData(old, old), isFalse); // el mismo estado
-    expect(restoreWouldLoseData(recent, null), isTrue); // backup sin sello
-    expect(restoreWouldLoseData(null, old), isFalse); // local sin sello
+    expect(restoreWouldLoseData(recent, old), isTrue); // local newer
+    expect(restoreWouldLoseData(old, recent), isFalse); // backup newer
+    expect(restoreWouldLoseData(old, old), isFalse); // the same state
+    expect(restoreWouldLoseData(recent, null), isTrue); // backup without stamp
+    expect(restoreWouldLoseData(null, old), isFalse); // local without stamp
   });
 }

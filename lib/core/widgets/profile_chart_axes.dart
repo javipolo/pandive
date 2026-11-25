@@ -1,4 +1,4 @@
-/// Ejes y tooltip del gráfico de perfil (funciones auxiliares de ProfileChart).
+/// Axes and tooltip of the profile chart (ProfileChart helper functions).
 library;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -15,7 +15,7 @@ double niceStep(double range, int target) {
   return 100;
 }
 
-// Etiquetas con sufijo de unidad (sin título de eje): "-5m", "15°C", "15min".
+// Labels with a unit suffix (no axis title): "-5m", "15°C", "15min".
 AxisTitles depthAxis(BuildContext c, double step) => AxisTitles(
       sideTitles: SideTitles(
         showTitles: true,

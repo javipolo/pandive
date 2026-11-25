@@ -1,5 +1,5 @@
-/// Copia de seguridad en Google Drive: conectar cuenta, backup manual, toggle
-/// de backup diario automático y acceso a la restauración.
+/// Google Drive backup: connect account, manual backup, toggle
+/// for daily automatic backup and access to restore.
 library;
 
 import 'dart:io';
@@ -27,7 +27,7 @@ class _BackupScreenState extends State<BackupScreen> {
   final _svc = DriveBackupService();
   bool _busy = false;
 
-  bool _connecting = true; // reconectando en silencio al abrir
+  bool _connecting = true; // silently reconnecting on open
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _BackupScreenState extends State<BackupScreen> {
         messenger.showSnackBar(SnackBar(content: Text(t.driveNotConfigured)));
       } else {
         await _svc.signIn(browserDoneText: t.oauthBrowserDone);
-        // Al conectar, activar el backup automático por defecto.
+        // On connect, enable automatic backup by default.
         if (_svc.connected) {
           await widget.settings.setAutoBackup(true);
           await registerAutoBackup(wifiOnly: widget.settings.backupWifiOnly);
@@ -72,7 +72,7 @@ class _BackupScreenState extends State<BackupScreen> {
     if (mounted) setState(() => _busy = false);
   }
 
-  // Cambia la restricción de red de la tarea periódica (si está activa).
+  // Changes the network constraint of the periodic task (if active).
   Future<void> _toggleBackupWifi(bool v) async {
     await widget.settings.setBackupWifiOnly(v);
     if (widget.settings.autoBackup) await registerAutoBackup(wifiOnly: v);
@@ -110,7 +110,7 @@ class _BackupScreenState extends State<BackupScreen> {
                   ),
           ),
           const Divider(),
-          // WorkManager solo existe en Android: en escritorio, solo un aviso.
+          // WorkManager only exists on Android: on desktop, just a notice.
           if (Platform.isAndroid)
             SwitchListTile(
               title: Text(t.autoBackupDaily),

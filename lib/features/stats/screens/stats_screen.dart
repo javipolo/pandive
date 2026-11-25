@@ -1,4 +1,4 @@
-/// Pestaña de estadísticas agregadas del logbook.
+/// Aggregate logbook statistics tab.
 library;
 
 import 'package:material_ui/material_ui.dart';

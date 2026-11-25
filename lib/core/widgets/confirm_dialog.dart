@@ -1,4 +1,4 @@
-/// Diálogo de confirmación reutilizable (Sí/No). Devuelve true si se confirma.
+/// Reusable confirmation dialog (Yes/No). Returns true if confirmed.
 library;
 
 import 'package:material_ui/material_ui.dart';

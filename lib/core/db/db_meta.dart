@@ -1,14 +1,14 @@
 part of 'divemate_db.dart';
 
-// Sello de "última escritura" (UTC) de la base de datos, para avisar al
-// restaurar un backup más viejo que los datos actuales. Lo mantienen triggers
-// de SQLite en cada tabla, así cuenta cualquier escritura (la app, imports, o
-// divemate-cli) sin tocar las ~100 sentencias de escritura. Tabla propia
-// PandiveMeta (clave/valor): DiveMate la ignora.
+// Database "last write" stamp (UTC), to warn when restoring a backup
+// older than the current data. Maintained by SQLite triggers on each
+// table, so any write counts (the app, imports, or divemate-cli) without
+// touching the ~100 write statements. Own table PandiveMeta
+// (key/value): DiveMate ignores it.
 
 const _kLastWrite = 'lastWriteUtc';
 
-/// Crea PandiveMeta y un trigger INSERT/UPDATE/DELETE por tabla (idempotente).
+/// Creates PandiveMeta and one INSERT/UPDATE/DELETE trigger per table (idempotent).
 void _ensureLastWriteTriggers(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveMeta '
       '(Key TEXT PRIMARY KEY, Value TEXT)');
@@ -26,7 +26,7 @@ void _ensureLastWriteTriggers(Database db) {
 }
 
 extension DivemateDbMeta on DivemateDb {
-  /// Sello tal cual está guardado (para comparar por igualdad en la sync).
+  /// Stamp exactly as stored (for equality comparison in sync).
   String? get lastWriteRaw {
     if (!_hasTable('PandiveMeta')) return null;
     final r = _db.select(
@@ -34,33 +34,33 @@ extension DivemateDbMeta on DivemateDb {
     return r.isEmpty ? null : r.first['Value'] as String?;
   }
 
-  /// Copia consistente de la DB abierta en [path] (VACUUM INTO, atómico).
+  /// Consistent copy of the open DB at [path] (VACUUM INTO, atomic).
   void snapshotTo(String path) => _db.execute('VACUUM INTO ?', [path]);
 
-  /// Momento (UTC) de la última escritura, o null si la DB es anterior a esto
-  /// o no tiene la tabla (p.ej. un .ddb de DiveMate).
+  /// Time (UTC) of the last write, or null if the DB predates this
+  /// or lacks the table (e.g. a DiveMate .ddb).
   DateTime? get lastWriteUtc => DateTime.tryParse(lastWriteRaw ?? '');
 
-  /// Valor guardado en PandiveMeta (null si no existe o no hay tabla).
+  /// Value stored in PandiveMeta (null if missing or no table).
   String? _metaGet(String key) {
     if (!_hasTable('PandiveMeta')) return null;
     final r = _db.select('SELECT Value FROM PandiveMeta WHERE Key = ?', [key]);
     return r.isEmpty ? null : r.first['Value'] as String?;
   }
 
-  /// Guarda un valor en PandiveMeta. No mueve el sello (PandiveMeta no tiene
-  /// trigger): si es un cambio del usuario, llama también a [_touchLastWrite].
+  /// Stores a value in PandiveMeta. Doesn't move the stamp (PandiveMeta has no
+  /// trigger): if it's a user change, also call [_touchLastWrite].
   void _metaSet(String key, String value) => _db.execute(
       'INSERT OR REPLACE INTO PandiveMeta (Key, Value) VALUES (?, ?)',
       [key, value]);
 
-  /// Marca "escrito ahora" a mano (para cambios que solo tocan PandiveMeta).
+  /// Marks "written now" by hand (for changes that only touch PandiveMeta).
   void _touchLastWrite() => _db.execute(
       'INSERT OR REPLACE INTO PandiveMeta (Key, Value) VALUES '
       "(?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))", [_kLastWrite]);
 }
 
-/// [DivemateDb.lastWriteUtc] de un fichero (abre en solo lectura).
+/// [DivemateDb.lastWriteUtc] of a file (opens read-only).
 DateTime? lastWriteUtcOf(String path) {
   try {
     final db = DivemateDb.open(path, readOnly: true);

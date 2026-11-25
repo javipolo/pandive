@@ -1,7 +1,7 @@
 part of 'divemate_db.dart';
 
-/// Esquema DiveMate para crear una base de datos vacía nueva (compatible con
-/// divemate-cli). Replica las tablas del formato .ddb original.
+/// DiveMate schema to create a new empty database (compatible with
+/// divemate-cli). Replicates the tables of the original .ddb format.
 const _schemaSql = <String>[
   'CREATE TABLE Logbook (ID INTEGER PRIMARY KEY, Number INTEGER, Divedate TEXT, '
       'Entrytime TEXT, Country TEXT, Place TEXT, PlaceID INTEGER, Divetime REAL, '
@@ -55,7 +55,7 @@ const _schemaSql = <String>[
   'CREATE TABLE DBInfo (PrgName TEXT, DBVersion TEXT, UUID TEXT, Updated TEXT)',
 ];
 
-/// Crea el esquema y una fila de buceador (owner) con ID 1.
+/// Creates the schema and a diver (owner) row with ID 1.
 void _createSchema(Database db) {
   for (final sql in _schemaSql) {
     db.execute(sql);

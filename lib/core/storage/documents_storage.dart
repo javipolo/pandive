@@ -1,6 +1,6 @@
-/// Almacenamiento en disco de las imágenes de documentos (carpeta `documents/`
-/// dentro del directorio de la app). La DB solo guarda el nombre de fichero.
-/// Vive en `core/` porque lo usan tanto la UI como el backup de Drive.
+/// On-disk storage of document images (`documents/` folder
+/// inside the app directory). The DB only stores the file name.
+/// Lives in `core/` because both the UI and the Drive backup use it.
 library;
 
 import 'dart:io';
@@ -14,7 +14,7 @@ Future<Directory> documentsDir() async {
   return dir;
 }
 
-/// Guarda [bytes] como JPG con nombre único y devuelve el nombre relativo.
+/// Saves [bytes] as a JPG with a unique name and returns the relative name.
 Future<String> saveDocImage(List<int> bytes) async {
   final dir = await documentsDir();
   final name = '${DateTime.now().millisecondsSinceEpoch}.jpg';

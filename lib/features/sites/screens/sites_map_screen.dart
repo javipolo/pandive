@@ -1,5 +1,5 @@
-/// Visor de todos los sitios de buceo con coordenadas sobre un mapa de satélite.
-/// Tocar un marcador muestra el nombre y permite ver sus inmersiones.
+/// Viewer of all dive sites with coordinates on a satellite map.
+/// Tapping a marker shows the name and lets you see its dives.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -15,14 +15,14 @@ import 'package:pandive/l10n/app_localizations.dart';
 
 class SitesMapScreen extends StatelessWidget {
   final DivemateDb db;
-  /// Solo para abrir los buceos de un sitio desde su marcador; si es null, el
-  /// marcador solo muestra el nombre.
+  /// Only to open a site's dives from its marker; if null, the
+  /// marker only shows the name.
   final Settings? settings;
-  /// Si se pasa, muestra solo estos sitios (p.ej. los de un viaje); si no, todos.
+  /// If given, shows only these sites (e.g. a trip's); otherwise all.
   final List<DiveSite>? sites;
   final String? title;
-  /// Une los sitios con una línea en el orden dado y numera los marcadores
-  /// (recorrido del viaje).
+  /// Joins the sites with a line in the given order and numbers the markers
+  /// (trip route).
   final bool connect;
   const SitesMapScreen(
       {super.key,
@@ -138,7 +138,7 @@ class SitesMapScreen extends StatelessWidget {
     );
   }
 
-  // Km recorridos sumando las distancias entre puntos consecutivos.
+  // Km travelled, adding up the distances between consecutive points.
   String _km(List<LatLng> pts) {
     const d = Distance();
     var m = 0.0;

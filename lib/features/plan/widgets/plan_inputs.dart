@@ -1,5 +1,5 @@
-/// Campos de entrada del planificador: tipo de buceo (precarga botellas), RMV,
-/// profundidad y tiempo medios, lista de botellas, presión inicial y reserva.
+/// Planner input fields: dive type (preloads cylinders), RMV,
+/// average depth and time, cylinder list, initial pressure and reserve.
 library;
 
 import 'package:material_ui/material_ui.dart';

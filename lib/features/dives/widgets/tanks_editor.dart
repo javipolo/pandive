@@ -1,4 +1,4 @@
-/// Editor de botellas de una inmersión + muestra el SAC calculado.
+/// Cylinder editor of a dive + shows the computed SAC.
 library;
 
 import 'package:material_ui/material_ui.dart';

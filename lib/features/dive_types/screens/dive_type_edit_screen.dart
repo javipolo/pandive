@@ -1,5 +1,5 @@
-/// Crear/editar un tipo de buceo: nombre + plantilla de botellas (litros+material)
-/// que se añadirán automáticamente al elegir el tipo en un buceo.
+/// Create/edit a dive type: name + cylinder template (litres+material)
+/// added automatically when the type is picked on a dive.
 library;
 
 import 'package:material_ui/material_ui.dart';

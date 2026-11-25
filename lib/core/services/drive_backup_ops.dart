@@ -1,6 +1,6 @@
 part of 'drive_backup.dart';
 
-/// Operaciones de backup/restauración sobre [DriveBackupService].
+/// Backup/restore operations on [DriveBackupService].
 extension DriveBackupOps on DriveBackupService {
   Future<drive.File?> _findInFolder(
       drive.DriveApi api, String folderId, String name) async {
@@ -46,8 +46,8 @@ extension DriveBackupOps on DriveBackupService {
     }
   }
 
-  /// Sube la DB como latest + copia con timestamp y poda a 10. Guarda estado.
-  /// También sube las imágenes de documentos como un zip (solo "latest").
+  /// Uploads the DB as latest + timestamped copy and prunes to 10. Stores state.
+  /// Also uploads the document images as a zip ("latest" only).
   Future<bool> backupNow(Settings s, {bool interactive = true}) async {
     final path = s.dbPath;
     if (path == null) return false;
@@ -65,8 +65,8 @@ extension DriveBackupOps on DriveBackupService {
     return true;
   }
 
-  /// Comprime las imágenes de `documents/` y las sube como [documentsBackupName]
-  /// (reemplazando). Si no hay imágenes, no hace nada.
+  /// Compresses the images in `documents/` and uploads them as [documentsBackupName]
+  /// (replacing). If there are no images, does nothing.
   Future<void> _backupDocuments(drive.DriveApi api, String folder) async {
     final dir = await documentsDir();
     final archive = Archive();
@@ -81,7 +81,7 @@ extension DriveBackupOps on DriveBackupService {
     await _upload(api, folder, documentsBackupName, zip, replace: true);
   }
 
-  /// Descarga y descomprime [documentsBackupName] en `documents/` (si existe).
+  /// Downloads and unpacks [documentsBackupName] into `documents/` (if it exists).
   Future<void> _restoreDocuments(drive.DriveApi api, String folder) async {
     final existing = await _findInFolder(api, folder, documentsBackupName);
     if (existing == null) return;
@@ -99,22 +99,22 @@ extension DriveBackupOps on DriveBackupService {
     }
   }
 
-  /// Como [backupNow] pero solo si la DB cambió desde el último backup. Sin gate
-  /// de tiempo (la cadencia la controla WorkManager). Auth silenciosa. Devuelve
-  /// true si subió algo.
+  /// Like [backupNow] but only if the DB changed since the last backup. No time
+  /// gate (WorkManager controls the cadence). Silent auth. Returns
+  /// true if it uploaded something.
   Future<bool> backupIfChanged(Settings s) async {
     if (!await signInSilently()) return false;
     final hash = await dbHash(s.dbPath);
     if (hash == null) return false;
     final now = DateTime.now().millisecondsSinceEpoch;
     if (hash == s.backupLastHash) {
-      await s.setBackupState(hash, now); // sin cambios: solo refresca la fecha
+      await s.setBackupState(hash, now); // no changes: only refreshes the date
       return false;
     }
     return backupNow(s, interactive: false);
   }
 
-  /// Backup automático diario: solo si hay cuenta, pasaron >24 h y la DB cambió.
+  /// Daily automatic backup: only if there's an account, >24 h passed and the DB changed.
   Future<void> backupIfNeeded(Settings s) async {
     if (!s.autoBackup) return;
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -126,7 +126,7 @@ extension DriveBackupOps on DriveBackupService {
     final hash = await dbHash(s.dbPath);
     if (hash == null) return;
     if (hash == s.backupLastHash) {
-      await s.setBackupState(hash, now); // sin cambios: solo refresca la fecha
+      await s.setBackupState(hash, now); // no changes: only refreshes the date
       return;
     }
     await backupNow(s, interactive: false);
@@ -145,7 +145,7 @@ extension DriveBackupOps on DriveBackupService {
     for (final f in res.files ?? const <drive.File>[]) {
       final name = f.name ?? '';
       final latest = name == latestBackupName;
-      // latest.ddb antiguo (sin comprimir): se lista como una copia más.
+      // old latest.ddb (uncompressed): listed as one more copy.
       if (latest || name == legacyLatestBackupName || isTimestampedBackup(name)) {
         out.add(BackupEntry(f.id!, name, f.modifiedTime, latest));
       }
@@ -158,8 +158,8 @@ extension DriveBackupOps on DriveBackupService {
     return out;
   }
 
-  /// Descarga el backup [fileId] a un temporal, para revisarlo (sello de
-  /// última escritura) antes de aplicarlo con [applyRestore]. Null si falla.
+  /// Downloads backup [fileId] to a temp file, to review it (last-write
+  /// stamp) before applying it with [applyRestore]. Null on failure.
   Future<File?> downloadBackup(String fileId) async {
     final api = await _api(interactive: true);
     if (api == null) return null;
@@ -175,8 +175,8 @@ extension DriveBackupOps on DriveBackupService {
     return f;
   }
 
-  /// Sustituye la DB activa por [file] (de [downloadBackup]) y restaura los
-  /// documentos. Borra el temporal.
+  /// Replaces the active DB with [file] (from [downloadBackup]) and restores the
+  /// documents. Deletes the temp file.
   Future<bool> applyRestore(File file, Settings s) async {
     final path = s.dbPath;
     final api = await _api(interactive: true);

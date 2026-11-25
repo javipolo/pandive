@@ -1,6 +1,6 @@
-// Plugin Linux del ordenador de buceo (ver dc_plugin.h). La descarga es
-// bloqueante y corre en un hilo propio; progreso y resultado vuelven al hilo
-// principal (la API de Flutter no es thread-safe).
+// Linux dive computer plugin (see dc_plugin.h). The download is
+// blocking and runs on its own thread; progress and result go back to the
+// main thread (the Flutter API isn't thread-safe).
 #include "dc_plugin.h"
 
 #include <stdlib.h>
@@ -42,7 +42,7 @@ static FlMethodErrorResponse *progress_cancel(FlEventChannel *c, FlValue *a, gpo
 }
 
 // ---------------------------------------------------------------------------
-// Descarga (hilo de trabajo)
+// Download (worker thread)
 // ---------------------------------------------------------------------------
 
 typedef struct {
@@ -160,7 +160,7 @@ static void on_method(FlMethodChannel *ch, FlMethodCall *call, gpointer ud) {
 void dc_plugin_register_with_registrar(FlPluginRegistrar *registrar) {
     FlBinaryMessenger *messenger = fl_plugin_registrar_get_messenger(registrar);
     g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
-    // Los canales viven lo que la app: no se liberan.
+    // The channels live as long as the app: not freed.
     FlMethodChannel *mc = fl_method_channel_new(messenger, "pandive/dc", FL_METHOD_CODEC(codec));
     fl_method_channel_set_method_call_handler(mc, on_method, NULL, NULL);
     progress_channel =

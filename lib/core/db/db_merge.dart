@@ -1,16 +1,16 @@
 part of 'divemate_db.dart';
 
-/// Se lanza si el intervalo en superficie entre dos inmersiones supera el máximo.
+/// Thrown if the surface interval between two dives exceeds the maximum.
 class MergeTooFarException implements Exception {
   final int gapMinutes;
   MergeTooFarException(this.gapMinutes);
 }
 
 extension DivemateDbMerge on DivemateDb {
-  /// Fusiona [ids] en una sola (la más antigua conserva nº/fecha/sitio). Suma
-  /// los tiempos, prof. máx = la mayor, perfil concatenado (con el hueco en
-  /// superficie), compañeros/tags/botellas = unión. Las demás se borran.
-  /// Lanza [MergeTooFarException] si algún hueco supera [maxGapMin].
+  /// Merges [ids] into one (the oldest keeps number/date/site). Adds up
+  /// the times, max depth = the largest, concatenated profile (with the surface
+  /// gap), buddies/tags/cylinders = union. The others are deleted.
+  /// Throws [MergeTooFarException] if any gap exceeds [maxGapMin].
   int mergeDives(List<int> ids, {required int maxGapMin}) {
     final dives = ids.map(getDive).whereType<Dive>().toList()
       ..sort((a, b) =>
@@ -34,7 +34,7 @@ extension DivemateDbMerge on DivemateDb {
         : 10;
     final start0 = first.date;
 
-    // Perfil continuo: rellena con superficie (0 m) los huecos entre partes.
+    // Continuous profile: fills the gaps between parts with surface (0 m).
     final depths = <double>[];
     final temps = <double?>[];
     for (final d in dives) {
@@ -79,7 +79,7 @@ extension DivemateDbMerge on DivemateDb {
         _nowStamp(), first.id],
     );
 
-    // Unión de compañeros, tags y botellas.
+    // Union of buddies, tags and cylinders.
     final buddies = <int, Buddy>{};
     final tags = <int, Tag>{};
     final tanks = <Cylinder>[];

@@ -1,6 +1,6 @@
-/// Fila de un sitio de buceo: avatar, nombre, región · nº buceos, y opcional
-/// icono "ojo" para ver su info. Toca para ver sus buceos; en modo selección
-/// hace toggle y muestra check.
+/// Dive site row: avatar, name, region · dive count, and an optional
+/// "eye" icon to see its info. Tap to see its dives; in selection mode
+/// it toggles and shows a check.
 library;
 
 import 'package:material_ui/material_ui.dart';
