@@ -127,8 +127,22 @@ extension DivemateDbBuddies on DivemateDb {
         .whereType<int>()
         .toList();
     if (ids.isEmpty) return [];
-    final all = listBuddies();
-    return [for (final b in all) if (ids.contains(b.id)) b];
+    // Solo esos compañeros (sin recuentos): listBuddies() recorre el logbook
+    // entero por cada compañero (~150 ms) y esto se llama por buceo al
+    // exportar/importar.
+    final found = _db.select(
+      'SELECT ID, FirstName, LastName FROM Buddy '
+      'WHERE ID IN (${List.filled(ids.length, '?').join(',')})',
+      ids,
+    );
+    String nameOf(Row r) {
+      final n = [_str(r['FirstName']), _str(r['LastName'])]
+          .whereType<String>()
+          .join(' ');
+      return n.isEmpty ? '—' : n;
+    }
+    return [for (final r in found) Buddy(id: r['ID'] as int, name: nameOf(r))]
+      ..sort((a, b) => compareFold(a.name, b.name));
   }
 
   /// Añade [names] como compañeros de la inmersión (crea los que falten) sin
