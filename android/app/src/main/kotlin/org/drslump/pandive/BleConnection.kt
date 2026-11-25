@@ -79,6 +79,7 @@ class BleConnection(private val context: Context, private val address: String) {
     @Volatile private var setupStarted = false // evita doble descubrimiento
     // Emparejamiento LE en curso (OSTC): connect() espera más (diálogo de PIN).
     @Volatile private var bonding = false
+    private var bondTried = false
     private var bondReceiver: BroadcastReceiver? = null
 
     private val callback = object : BluetoothGattCallback() {
@@ -112,16 +113,9 @@ class BleConnection(private val context: Context, private val address: String) {
             setupStarted = true
             if (selectHwTelit(g)) {
                 creditMode = true
-                // El Telit solo acepta el CCCD con el enlace LE cifrado (y lo
-                // rechaza con 0xC0, que Android no trata como "falta
-                // autenticación", así que no empareja solo). Sin bond,
-                // emparejar ahora: con el enlace LE abierto, createBond()
-                // empareja por LE (por BR/EDR, como Ajustes, no serviría).
-                if (g.device.bondState == BluetoothDevice.BOND_NONE) {
-                    bondThenStart(g)
-                } else {
-                    startTelit(g)
-                }
+                // Sin emparejar: el OSTC no lo exige (si rechaza el CCCD,
+                // onDescriptorWrite empareja y reintenta).
+                startTelit(g)
                 return
             }
             if (!selectCharacteristics(g)) {
@@ -148,12 +142,15 @@ class BleConnection(private val context: Context, private val address: String) {
         ) {
             if (d.uuid != CCCD) return
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                if (creditMode && g.device.bondState == BluetoothDevice.BOND_BONDED) {
-                    // Bond solo de Bluetooth clásico (emparejado desde Ajustes):
-                    // el enlace LE sigue sin cifrar.
-                    fail("El OSTC rechaza la conexión ($status). Olvida el " +
-                        "dispositivo en Ajustes > Bluetooth y vuelve a " +
-                        "intentarlo: Pandive lo emparejará por BLE.")
+                // Red de seguridad (OSTC con firmware que exija cifrado): el
+                // Telit responde con un código propio que Android no trata como
+                // "falta autenticación", así que no empareja solo. Emparejar
+                // con el enlace LE abierto (createBond() va por LE) y reintentar.
+                if (creditMode && !bondTried &&
+                        g.device.bondState == BluetoothDevice.BOND_NONE) {
+                    Log.i(TAG, "CCCD rechazado ($status); emparejando y reintentando")
+                    bondTried = true
+                    bondThenStart(g)
                 } else {
                     fail("No se pudieron activar notificaciones ($status)")
                 }
@@ -245,7 +242,7 @@ class BleConnection(private val context: Context, private val address: String) {
         writeCccd(g, credTx!!, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
     }
 
-    // Empareja por LE (el OSTC puede mostrar un PIN; Android abre su diálogo)
+    // Empareja por LE (Android abre su diálogo de confirmación)
     // y, al quedar emparejado, sigue con la secuencia Telit.
     @SuppressLint("MissingPermission")
     private fun bondThenStart(g: BluetoothGatt) {
