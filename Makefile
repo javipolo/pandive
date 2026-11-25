@@ -51,18 +51,19 @@ apk-release: ## Build an arm64 release APK (sideload)
 	$(FLUTTER) build apk --release --target-platform android-arm64 \
 		--no-tree-shake-icons $(DART_DEFINES)
 
-APK := build/app/outputs/flutter-apk/app-debug.apk
+APK := build/app/outputs/flutter-apk/app-release.apk
 
+# --user 0: install only for the phone's owner (not in a work profile or a
+# Secure Folder / second space). Without other profiles it's the default anyway.
 .PHONY: install
-install: ## Install the debug APK on the connected device
-	$(FLUTTER) install --debug
+install: ## Install the release APK on the connected device (owner user)
+	adb install -r --user 0 $(APK)
 
 .PHONY: install-apk
-install-apk: ## Install app-debug.apk with adb (wherever the phone is)
-	adb install -r $(APK)
+install-apk: install ## Alias of install
 
 .PHONY: apk-path
-apk-path: ## Print the absolute path of the debug APK
+apk-path: ## Print the absolute path of the release APK
 	@echo "$(CURDIR)/$(APK)"
 
 .PHONY: test
