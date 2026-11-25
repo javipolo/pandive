@@ -1,5 +1,8 @@
-/// Exports a minimal .ddb with only the selected dives (date/time + site).
-/// Meant for another diver to use "Fill from a buddy's logbook".
+/// Exports a .ddb with only the selected dives: full data (depths, duration,
+/// temperatures, notes, buddies, computer, cylinders, tags, site with
+/// coordinates) and, optionally, the profile. Works both for a buddy to
+/// import them as their own ("Import dives") and for "Fill from a buddy's
+/// logbook" (which only looks at date/time and site).
 library;
 
 import 'dart:io';
@@ -7,30 +10,30 @@ import 'dart:io';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:pandive/core/export/ddb_dive_copy.dart';
 import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/progress_dialog.dart';
-import 'package:pandive/core/widgets/text_prompt_dialog.dart';
+import 'package:pandive/features/dives/widgets/export_selection_dialog.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-/// Asks for a name, creates a temp .ddb with [dives] (date/time and place only)
-/// and shares it. The file is named `name - PanDive.ddb`.
+/// Asks for a name (and whether to include profiles), creates a temp .ddb
+/// with [dives] and shares it. The file is named `name - PanDive.ddb`.
 Future<void> exportSelectionDdb(
     BuildContext context, DivemateDb source, List<Dive> dives) async {
-  final name =
-      await showTextPrompt(context, title: AppLocalizations.of(context).exportName);
-  if (name == null) return;
-  if (!context.mounted) return;
-  final f = await withProgress(context, AppLocalizations.of(context).exporting,
-      () => _writeSelection(source, dives, name));
+  final opts = await showExportSelectionDialog(context);
+  if (opts == null || !context.mounted) return;
+  final f = await withProgress(
+      context,
+      AppLocalizations.of(context).exporting,
+      () => _buildSelection(source, dives, opts.name,
+          withProfiles: opts.profiles));
   await shareOrSaveFile(f);
 }
 
-// Writes [dives] to a temp .ddb "<name> - PanDive.ddb". In chunks
-// within a transaction, yielding the thread between chunks (don't freeze the UI).
-Future<File> _writeSelection(
-    DivemateDb source, List<Dive> dives, String name) async {
+Future<File> _buildSelection(DivemateDb source, List<Dive> dives, String name,
+    {required bool withProfiles}) async {
   final dir = await getTemporaryDirectory();
   final safe = name.trim().replaceAll(RegExp(r'[\\/:*?"<>|]'), '').trim();
   final base = safe.isEmpty ? 'PanDive' : '$safe - PanDive';
@@ -38,36 +41,25 @@ Future<File> _writeSelection(
   if (f.existsSync()) f.deleteSync();
   final out = DivemateDb.createEmpty(f.path);
   try {
-    for (var i = 0; i < dives.length; i += 50) {
-      final part = dives.sublist(i, (i + 50).clamp(0, dives.length));
-      out.inTransaction(() {
-        for (final d in part) {
-          _copyDive(source, out, d);
-        }
-      });
-      await Future<void>.delayed(Duration.zero);
-    }
+    await writeSelectionDdb(source, out, dives, withProfiles: withProfiles);
   } finally {
     out.close();
   }
   return f;
 }
 
-void _copyDive(DivemateDb source, DivemateDb out, Dive d) {
-  final dt = d.date;
-  if (dt == null) return;
-  final site = d.placeId != null ? source.getSite(d.placeId!) : null;
-  final name = site?.name ?? d.place;
-  int? placeId;
-  if (name != null && name.trim().isNotEmpty) {
-    placeId = out.findOrCreateSite(name,
-        country: site?.country ?? d.country, lat: site?.lat, lon: site?.lon);
+/// Writes [dives] from [source] into [out]. In chunks within a transaction,
+/// yielding the thread between chunks (don't freeze the UI). Testable (no IO).
+Future<void> writeSelectionDdb(
+    DivemateDb source, DivemateDb out, List<Dive> dives,
+    {bool withProfiles = false}) async {
+  for (var i = 0; i < dives.length; i += 50) {
+    final part = dives.sublist(i, (i + 50).clamp(0, dives.length));
+    out.inTransaction(() {
+      for (final d in part) {
+        copyDiveToDdb(source, out, d, withProfile: withProfiles);
+      }
+    });
+    await Future<void>.delayed(Duration.zero);
   }
-  out.createDive(
-    dateTime: dt,
-    number: d.number,
-    place: name,
-    country: site?.country ?? d.country,
-    placeId: placeId,
-  );
 }

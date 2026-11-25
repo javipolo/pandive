@@ -60,6 +60,7 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/sac.dart` -> cálculo de SAC/RMV (l/min)
 - `lib/core/gas_plan.dart` -> planificación de gas: gas necesario, presión final, tiempo máx. (lógica pura)
 - `lib/core/export/subsurface_export.dart` -> genera el XML Subsurface (.ssrf)
+- `lib/core/export/ddb_dive_copy.dart` -> copyDiveToDdb: copia un buceo completo (datos, sitio, compañeros, ordenador, botellas, tags, perfil opcional) a un .ddb exportado; lo usan export de viajes y de selección
 - `lib/core/import/subsurface_import.dart` -> importa el XML Subsurface (.ssrf) al logbook
 - `lib/core/import/ssi_csv_import.dart` -> importa el CSV del logbook de SSI (columnas por posición; etiquetas; dedupe por día+prof.+duración+hora con la candidata más parecida)
 - `lib/core/import/ssi_csv_fields.dart` -> lectura de celdas del CSV de SSI: CSV, fechas multi-idioma, duración, profundidad, compañeros pegados + centro + ordenador
@@ -166,6 +167,8 @@ con `screens/` y, si hace falta, `widgets/`).
 - `lib/core/widgets/save_action.dart` -> botón Guardar de AppBar
 - `lib/core/db/db_tags.dart` -> etiquetas (tags): enlace por inmersión + por sitio (PandiveSiteTag); tags efectivos = propios ∪ sitio (effectiveTagsForDive); diveIdsWithTag/listDivesByTag unen por sitio
 - `lib/features/dives/widgets/dives_action_list.dart` -> lista de buceos con selección en lote + acciones (stats/fusionar/exportar/borrar); usada por el tab y las listas filtradas
+- `lib/features/dives/logic/export_selection.dart` -> exporta los buceos seleccionados a un .ddb completo (perfiles opcionales) y lo comparte; vale para "Importar buceos" y para "Rellenar"
+- `lib/features/dives/widgets/export_selection_dialog.dart` -> diálogo: nombre del cuaderno + checkbox "exportar también perfiles"
 - `lib/features/dives/widgets/dive_detail_body.dart` -> cuerpo del detalle por secciones (nº/fecha, sitio, perfil+métricas, gases, deco, botellas)
 - `lib/features/dives/widgets/profile_section.dart` -> sección perfil: gráfica compacta + botones compartir / pantalla completa
 - `lib/features/dives/logic/share_profile.dart` -> imagen PNG del perfil (ProfileShareCard: título, gráfica y pie con duración/temp. mín./profundidades/deco; igual en todas las plataformas): compartir (móvil) o copiar al portapapeles (Linux)

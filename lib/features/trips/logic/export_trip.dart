@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/export/ddb_dive_copy.dart';
 import 'package:pandive/core/models/models.dart';
 
 /// Generates the .ddb of one or several trips (temp file) to share
@@ -91,39 +92,9 @@ Future<void> writeTripDdb(
   var i = 0;
   for (final d in dives) {
     if (i++ % 10 == 9) await Future<void>.delayed(Duration.zero);
-    final dt = d.date;
-    if (dt == null) continue;
-    final site = d.placeId != null ? source.getSite(d.placeId!) : null;
-    final place = site?.name ?? d.place;
-    int? placeId;
-    if (place != null && place.trim().isNotEmpty) {
-      placeId = out.findOrCreateSite(
-        place,
-        country: site?.country ?? d.country,
-        lat: site?.lat,
-        lon: site?.lon,
-      );
-    }
-    final names = [for (final b in source.diveBuddies(d.id)) b.name];
-    final ids = [for (final n in names) out.findOrCreateBuddy(n)];
-    final newId = out.createDive(
-      dateTime: dt,
-      number: d.number,
-      place: place,
-      country: site?.country ?? d.country,
-      placeId: placeId,
-      maxDepth: d.maxDepth,
-      avgDepth: d.avgDepth,
-      durationMin: d.durationMin,
-      waterTemp: d.waterTemp,
-      airTemp: d.airTemp,
-      weight: d.weight,
-      rating: d.rating ?? 0,
-      comments: d.comments,
-      buddy: names.isEmpty ? null : names.join(', '),
-      buddyIds: ids.isEmpty ? null : ids.join(','),
-    );
-    out.copyDiveDetailsFrom(newId, source, d.id, withProfile: withProfiles);
+    final newId =
+        copyDiveToDdb(source, out, d, withProfile: withProfiles);
+    if (newId == null) continue;
     out.assignDivesToTrip(outTrip, [newId]);
   }
 }
