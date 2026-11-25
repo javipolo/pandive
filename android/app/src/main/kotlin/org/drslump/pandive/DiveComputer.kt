@@ -48,7 +48,7 @@ object DiveComputer {
         val conn = BleConnection(context.applicationContext, address)
         try {
             if (!conn.connect(20000)) {
-                val msg = (conn.error() ?: "no se pudo conectar")
+                val msg = (conn.error() ?: "could not connect")
                     .replace("\\", " ").replace("\"", "'")
                 return "{\"error\":\"$msg\"}"
             }

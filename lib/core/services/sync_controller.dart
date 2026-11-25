@@ -204,7 +204,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _download(RemoteSync remote) async {
     final bytes = await _svc.downloadSync(remote);
-    if (bytes == null) throw StateError('descarga vacía');
+    if (bytes == null) throw StateError('empty download');
     final tmp = File('${Directory.systemTemp.path}/pandive-sync-'
         '${DateTime.now().microsecondsSinceEpoch}.ddb');
     await tmp.writeAsBytes(bytes, flush: true);
@@ -266,7 +266,7 @@ Future<void> _uploadSnapshot(DriveBackupService svc, Settings s, DivemateDb db,
     RemoteSync remote) async {
   final (bytes, stamp) = await _snapshot(db);
   final md5 = await svc.uploadSync(bytes, remote);
-  if (md5 == null) throw StateError('upload sin md5');
+  if (md5 == null) throw StateError('upload without md5');
   await s.setSyncBase(md5, stamp);
   await _saveBaseCopy(bytes);
   await svc.syncDocumentsUp(s);
@@ -286,7 +286,7 @@ Future<void> syncUploadInBackground(Settings s) async {
   if (!s.syncEnabled || path == null) return;
   final svc = DriveBackupService();
   final remote = await svc.remoteSync();
-  if (remote == null) throw StateError('sin red'); // WorkManager reintenta
+  if (remote == null) throw StateError('no network'); // WorkManager reintenta
   final db = DivemateDb.open(path, readOnly: true);
   try {
     final action = decideSync(SyncObservation(

@@ -92,7 +92,7 @@ static gpointer download_thread(gpointer ud) {
     g_autofree gchar *err = NULL;
     BleConn *c = ble_conn_open(d->address, 20000, &err);
     if (!c) {
-        d->json = error_json(err ? err : "no se pudo conectar");
+        d->json = error_json(err ? err : "could not connect");
     } else {
         pdc_io_t io = { io_read, io_write, io_progress, c };
         char *json = pdc_download(d->vendor, d->product, d->fingerprint, d->max_dives, &io);

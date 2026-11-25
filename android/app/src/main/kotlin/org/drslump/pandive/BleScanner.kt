@@ -42,7 +42,7 @@ class BleScanner(private val context: Context) : EventChannel.StreamHandler {
         }
 
         override fun onScanFailed(errorCode: Int) {
-            main.post { sink?.error("scan_failed", "Escaneo BLE falló ($errorCode)", null) }
+            main.post { sink?.error("scan_failed", "BLE scan failed ($errorCode)", null) }
         }
     }
 
@@ -66,12 +66,12 @@ class BleScanner(private val context: Context) : EventChannel.StreamHandler {
         val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val adapter = manager?.adapter
         if (adapter == null || !adapter.isEnabled) {
-            events?.error("bt_off", "Bluetooth desactivado", null)
+            events?.error("bt_off", "Bluetooth is off", null)
             return
         }
         val scanner = adapter.bluetoothLeScanner
         if (scanner == null) {
-            events?.error("no_scanner", "No hay escáner BLE disponible", null)
+            events?.error("no_scanner", "No BLE scanner available", null)
             return
         }
         val settings = ScanSettings.Builder()
@@ -81,7 +81,7 @@ class BleScanner(private val context: Context) : EventChannel.StreamHandler {
             scanner.startScan(null, settings, callback)
             scanning = true
         } catch (e: SecurityException) {
-            events?.error("perm", "Falta permiso de Bluetooth: ${e.message}", null)
+            events?.error("perm", "Missing Bluetooth permission: ${e.message}", null)
         }
     }
 

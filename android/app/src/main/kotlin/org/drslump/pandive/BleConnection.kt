@@ -93,7 +93,7 @@ class BleConnection(private val context: Context, private val address: String) {
                 if (!g.requestMtu(247)) g.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (!ready) {
-                    connectError = "Desconectado (status $status)"
+                    connectError = "Disconnected (status $status)"
                     connectLatch.countDown()
                 }
             }
@@ -106,7 +106,7 @@ class BleConnection(private val context: Context, private val address: String) {
 
         override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                fail("Fallo al descubrir servicios ($status)")
+                fail("Service discovery failed ($status)")
                 return
             }
             if (setupStarted) return // el stack puede descubrir dos veces
@@ -119,7 +119,7 @@ class BleConnection(private val context: Context, private val address: String) {
                 return
             }
             if (!selectCharacteristics(g)) {
-                fail("No se encontró característica de lectura/escritura")
+                fail("No read/write characteristic found")
                 return
             }
             enableNotifications(g)
@@ -152,7 +152,7 @@ class BleConnection(private val context: Context, private val address: String) {
                     bondTried = true
                     bondThenStart(g)
                 } else {
-                    fail("No se pudieron activar notificaciones ($status)")
+                    fail("Could not enable notifications ($status)")
                 }
                 return
             }
@@ -179,7 +179,7 @@ class BleConnection(private val context: Context, private val address: String) {
                 // Créditos: no es la escritura de datos que espera bleWrite.
                 if (!ready) {
                     if (status != BluetoothGatt.GATT_SUCCESS) {
-                        fail("No se pudo enviar el crédito inicial ($status)")
+                        fail("Could not send the initial credit ($status)")
                         return
                     }
                     ready = true
@@ -261,7 +261,7 @@ class BleConnection(private val context: Context, private val address: String) {
                     BluetoothDevice.BOND_NONE -> {
                         unregisterBond()
                         bonding = false
-                        fail("No se pudo emparejar con el ordenador de buceo")
+                        fail("Could not pair with the dive computer")
                     }
                 }
             }
@@ -273,7 +273,7 @@ class BleConnection(private val context: Context, private val address: String) {
         if (!g.device.createBond()) {
             unregisterBond()
             bonding = false
-            fail("No se pudo iniciar el emparejamiento")
+            fail("Could not start pairing")
         }
     }
 
@@ -299,7 +299,7 @@ class BleConnection(private val context: Context, private val address: String) {
         g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray
     ) {
         g.setCharacteristicNotification(c, true)
-        val cccd = c.getDescriptor(CCCD) ?: return fail("sin descriptor CCCD")
+        val cccd = c.getDescriptor(CCCD) ?: return fail("no CCCD descriptor")
         @Suppress("DEPRECATION")
         run { cccd.value = value; g.writeDescriptor(cccd) }
     }
@@ -318,9 +318,9 @@ class BleConnection(private val context: Context, private val address: String) {
 
     @SuppressLint("MissingPermission")
     private fun enableNotifications(g: BluetoothGatt) {
-        val n = notifyChar ?: return fail("sin característica notify")
+        val n = notifyChar ?: return fail("no notify characteristic")
         g.setCharacteristicNotification(n, true)
-        val cccd = n.getDescriptor(CCCD) ?: return fail("sin descriptor CCCD")
+        val cccd = n.getDescriptor(CCCD) ?: return fail("no CCCD descriptor")
         val value = if (n.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0)
             BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
         else BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
@@ -345,7 +345,7 @@ class BleConnection(private val context: Context, private val address: String) {
         if (!ok && bonding) ok = connectLatch.await(60000, TimeUnit.MILLISECONDS)
         if (!ok) {
             connectError =
-                if (scanned == null) "No se encontró el dispositivo" else "Timeout de conexión"
+                if (scanned == null) "Device not found" else "Connection timed out"
             return false
         }
         return ready

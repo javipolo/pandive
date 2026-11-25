@@ -102,9 +102,9 @@ static FlMethodErrorResponse *on_listen(FlEventChannel *ch, FlValue *args, gpoin
     gboolean powered = FALSE;
     s->adapter = bluez_adapter_path(s->bus, &powered);
     if (!s->adapter)
-        return fl_method_error_response_new("no_scanner", "No hay adaptador Bluetooth", NULL);
+        return fl_method_error_response_new("no_scanner", "No Bluetooth adapter", NULL);
     if (!powered)
-        return fl_method_error_response_new("bt_off", "Bluetooth desactivado", NULL);
+        return fl_method_error_response_new("bt_off", "Bluetooth is off", NULL);
 
     s->sub_added = g_dbus_connection_signal_subscribe(s->bus, BLUEZ,
         "org.freedesktop.DBus.ObjectManager", "InterfacesAdded", "/", NULL,

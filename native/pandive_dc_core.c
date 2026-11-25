@@ -381,14 +381,14 @@ char *pdc_download(const char *vendor, const char *product,
 
     dc_descriptor_t *desc = find_descriptor(vendor, product);
     if (!desc) {
-        sb_fmt(&out, "{\"error\":\"Modelo no soportado: %s %s\"}", vendor, product);
+        sb_fmt(&out, "{\"error\":\"Unsupported model: %s %s\"}", vendor, product);
         goto done;
     }
     LOG("open %s %s model=0x%x", vendor, product, dc_descriptor_get_model(desc));
 
     dc_context_t *ctx = NULL;
     if (dc_context_new(&ctx) != DC_STATUS_SUCCESS) {
-        sb_puts(&out, "{\"error\":\"No se pudo crear el contexto\"}");
+        sb_puts(&out, "{\"error\":\"Could not create the context\"}");
         dc_descriptor_free(desc); goto done;
     }
 
@@ -405,14 +405,14 @@ char *pdc_download(const char *vendor, const char *product,
 
     dc_iostream_t *iostream = NULL;
     if (dc_custom_open(&iostream, ctx, DC_TRANSPORT_BLE, &cbs, &bio) != DC_STATUS_SUCCESS) {
-        sb_puts(&out, "{\"error\":\"No se pudo abrir el stream BLE\"}");
+        sb_puts(&out, "{\"error\":\"Could not open the BLE stream\"}");
         dc_context_free(ctx); dc_descriptor_free(desc); goto done;
     }
 
     dc_device_t *device = NULL;
     dc_status_t rc = dc_device_open(&device, ctx, desc, iostream);
     if (rc != DC_STATUS_SUCCESS) {
-        sb_fmt(&out, "{\"error\":\"No se pudo abrir el dispositivo (%d)\"}", rc);
+        sb_fmt(&out, "{\"error\":\"Could not open the device (%d)\"}", rc);
         dc_iostream_close(iostream); dc_context_free(ctx); dc_descriptor_free(desc); goto done;
     }
 
@@ -434,7 +434,7 @@ char *pdc_download(const char *vendor, const char *product,
     rc = dc_device_foreach(device, dive_cb, &dctx);
     sb_puts(&out, "]");
     if (rc != DC_STATUS_SUCCESS)
-        sb_fmt(&out, ",\"error\":\"Descarga incompleta (%d)\"", rc);
+        sb_fmt(&out, ",\"error\":\"Incomplete download (%d)\"", rc);
     sb_fmt(&out, ",\"count\":%d}", dctx.count);
     LOG("Descargadas %d inmersiones (rc=%d)", dctx.count, rc);
 
@@ -444,5 +444,5 @@ char *pdc_download(const char *vendor, const char *product,
     dc_descriptor_free(desc);
 
 done:
-    return out.p ? out.p : strdup("{\"error\":\"sin memoria\"}");
+    return out.p ? out.p : strdup("{\"error\":\"out of memory\"}");
 }

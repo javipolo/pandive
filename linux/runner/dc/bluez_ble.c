@@ -346,7 +346,7 @@ static gboolean start_notify(BleConn *c, const gchar *path, gchar **error) {
             r = call(c, path, IFACE_CHAR, "StartNotify", NULL, 10000, &err);
         }
     }
-    if (!r) *error = g_strdup_printf("No se pudieron activar notificaciones: %s", err->message);
+    if (!r) *error = g_strdup_printf("Could not enable notifications: %s", err->message);
     return r != NULL;
 }
 
@@ -368,7 +368,7 @@ static gboolean do_connect(BleConn *c, int timeout_ms, gchar **error) {
                                      timeout_ms, &err);
         if (r || (err && strstr(err->message, "AlreadyConnected"))) return TRUE;
         g_warning("PandiveBLE: Connect (intento %d): %s", attempt + 1, err->message);
-        if (attempt == 1) *error = g_strdup_printf("No se pudo conectar: %s", err->message);
+        if (attempt == 1) *error = g_strdup_printf("Could not connect: %s", err->message);
         g_usleep(1000 * 1000);
     }
     return FALSE;
@@ -386,17 +386,17 @@ BleConn *ble_conn_open(const gchar *address, int timeout_ms, gchar **error) {
     g_autoptr(GError) err = NULL;
     c->bus = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &err);
     if (!c->bus) {
-        *error = g_strdup_printf("Sin acceso a D-Bus: %s", err->message);
+        *error = g_strdup_printf("No D-Bus access: %s", err->message);
         goto fail;
     }
     c->dev_path = discover_device(c->bus, address, 15000);
-    if (!c->dev_path) { *error = g_strdup("No se encontró el dispositivo"); goto fail; }
+    if (!c->dev_path) { *error = g_strdup("Device not found"); goto fail; }
     if (!do_connect(c, timeout_ms, error)) goto fail;
-    if (!wait_resolved(c, 15000)) { *error = g_strdup("Timeout descubriendo servicios"); goto fail; }
+    if (!wait_resolved(c, 15000)) { *error = g_strdup("Timed out discovering services"); goto fail; }
 
     list_gatt(c, services, chars);
     if (!select_chars(c, services, chars)) {
-        *error = g_strdup("No se encontró característica de lectura/escritura");
+        *error = g_strdup("No read/write characteristic found");
         goto fail;
     }
 

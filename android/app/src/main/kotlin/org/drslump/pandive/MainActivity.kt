@@ -80,7 +80,7 @@ class MainActivity : FlutterActivity() {
             val json = try {
                 DiveComputer.download(this, vendor, product, address, fingerprint, maxDives)
             } catch (e: Exception) {
-                "{\"error\":\"${(e.message ?: "fallo").replace("\"", "'")}\"}"
+                "{\"error\":\"${(e.message ?: "failed").replace("\"", "'")}\"}"
             }
             main.post { result.success(json) }
         }.start()

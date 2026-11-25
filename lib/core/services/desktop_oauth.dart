@@ -63,7 +63,7 @@ class DesktopOAuth {
         'prompt': 'consent',
       });
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        throw StateError('No se pudo abrir el navegador');
+        throw StateError('Could not open the browser');
       }
       final code = await _awaitCode(server, state, doneText)
           .timeout(const Duration(minutes: 5));
@@ -99,10 +99,10 @@ class DesktopOAuth {
           '<h2>Pandive</h2><p>${htmlEscape.convert(doneText)}</p></body>');
       await req.response.close();
       if (q['error'] != null) throw StateError('OAuth: ${q['error']}');
-      if (q['state'] != state) throw StateError('OAuth: state no coincide');
+      if (q['state'] != state) throw StateError('OAuth: state mismatch');
       return q['code']!;
     }
-    throw StateError('OAuth: servidor cerrado');
+    throw StateError('OAuth: server closed');
   }
 
   Future<OAuthTokens> _token(Map<String, String> params) async {
