@@ -13,7 +13,10 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
 import java.util.UUID
 import java.util.concurrent.ArrayBlockingQueue
@@ -74,6 +77,9 @@ class BleConnection(private val context: Context, private val address: String) {
     @Volatile private var connectError: String? = null
     @Volatile private var ready = false
     @Volatile private var setupStarted = false // evita doble descubrimiento
+    // Emparejamiento LE en curso (OSTC): connect() espera más (diálogo de PIN).
+    @Volatile private var bonding = false
+    private var bondReceiver: BroadcastReceiver? = null
 
     private val callback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
@@ -106,8 +112,16 @@ class BleConnection(private val context: Context, private val address: String) {
             setupStarted = true
             if (selectHwTelit(g)) {
                 creditMode = true
-                // Paso 1: activar indicaciones en créditos TX (secuencia en onDescriptorWrite).
-                writeCccd(g, credTx!!, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
+                // El Telit solo acepta el CCCD con el enlace LE cifrado (y lo
+                // rechaza con 0xC0, que Android no trata como "falta
+                // autenticación", así que no empareja solo). Sin bond,
+                // emparejar ahora: con el enlace LE abierto, createBond()
+                // empareja por LE (por BR/EDR, como Ajustes, no serviría).
+                if (g.device.bondState == BluetoothDevice.BOND_NONE) {
+                    bondThenStart(g)
+                } else {
+                    startTelit(g)
+                }
                 return
             }
             if (!selectCharacteristics(g)) {
@@ -134,7 +148,15 @@ class BleConnection(private val context: Context, private val address: String) {
         ) {
             if (d.uuid != CCCD) return
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                fail("No se pudieron activar notificaciones ($status)")
+                if (creditMode && g.device.bondState == BluetoothDevice.BOND_BONDED) {
+                    // Bond solo de Bluetooth clásico (emparejado desde Ajustes):
+                    // el enlace LE sigue sin cifrar.
+                    fail("El OSTC rechaza la conexión ($status). Olvida el " +
+                        "dispositivo en Ajustes > Bluetooth y vuelve a " +
+                        "intentarlo: Pandive lo emparejará por BLE.")
+                } else {
+                    fail("No se pudieron activar notificaciones ($status)")
+                }
                 return
             }
             if (!creditMode) {
@@ -206,6 +228,51 @@ class BleConnection(private val context: Context, private val address: String) {
         return false
     }
 
+    // Paso 1 Telit: indicaciones en créditos TX (la secuencia sigue en onDescriptorWrite).
+    private fun startTelit(g: BluetoothGatt) {
+        writeCccd(g, credTx!!, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
+    }
+
+    // Empareja por LE (el OSTC puede mostrar un PIN; Android abre su diálogo)
+    // y, al quedar emparejado, sigue con la secuencia Telit.
+    @SuppressLint("MissingPermission")
+    private fun bondThenStart(g: BluetoothGatt) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                @Suppress("DEPRECATION")
+                val dev = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                if (dev?.address?.equals(address, ignoreCase = true) != true) return
+                when (intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)) {
+                    BluetoothDevice.BOND_BONDED -> {
+                        Log.i(TAG, "Emparejado por LE")
+                        unregisterBond()
+                        bonding = false
+                        startTelit(g)
+                    }
+                    BluetoothDevice.BOND_NONE -> {
+                        unregisterBond()
+                        bonding = false
+                        fail("No se pudo emparejar con el ordenador de buceo")
+                    }
+                }
+            }
+        }
+        bondReceiver = receiver
+        context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
+        bonding = true
+        Log.i(TAG, "Sin emparejar; createBond() sobre el enlace LE")
+        if (!g.device.createBond()) {
+            unregisterBond()
+            bonding = false
+            fail("No se pudo iniciar el emparejamiento")
+        }
+    }
+
+    private fun unregisterBond() {
+        bondReceiver?.let { try { context.unregisterReceiver(it) } catch (_: Exception) {} }
+        bondReceiver = null
+    }
+
     // Detecta el servicio Telit/HW (OSTC) y sus 4 características por UUID.
     private fun selectHwTelit(g: BluetoothGatt): Boolean {
         val s = g.getService(HW_TELIT_SERVICE) ?: return false
@@ -264,7 +331,9 @@ class BleConnection(private val context: Context, private val address: String) {
         val scanned = scanFor(adapter, 15000)
         val device = scanned ?: adapter.getRemoteDevice(address)
         gatt = device.connectGatt(context, false, callback, BluetoothDevice.TRANSPORT_LE)
-        val ok = connectLatch.await(timeoutMs, TimeUnit.MILLISECONDS)
+        var ok = connectLatch.await(timeoutMs, TimeUnit.MILLISECONDS)
+        // Emparejando (el usuario puede estar tecleando el PIN): margen extra.
+        if (!ok && bonding) ok = connectLatch.await(60000, TimeUnit.MILLISECONDS)
         if (!ok) {
             connectError =
                 if (scanned == null) "No se encontró el dispositivo" else "Timeout de conexión"
@@ -325,6 +394,7 @@ class BleConnection(private val context: Context, private val address: String) {
 
     @SuppressLint("MissingPermission")
     fun close() {
+        unregisterBond()
         try { gatt?.disconnect(); gatt?.close() } catch (_: Exception) {}
         gatt = null
     }
