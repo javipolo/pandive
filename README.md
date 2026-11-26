@@ -72,6 +72,25 @@ bluetoothctl
 > cancelled", your default browser (e.g. Brave) is losing the login redirect:
 > use Chrome for that one step.
 
+## Command line: pandive-cli
+
+[pandive-cli](https://github.com/javipolo/pandive-cli) (`pandive-cli`, or the
+short alias `pdive`) queries a Pandive or DiveMate `.ddb` logbook from the
+terminal: list and filter dives and extract statistics without writing SQL.
+It also comes as a small Python library.
+
+```console
+$ pdive list tank=24 period='last year'
+```
+
+Its query language supports `and` / `or` / `not`, parentheses, numeric and
+date comparisons, `sort` and `limit`. For example, the ten most air-efficient
+daytime dives of last year that were either caves or deeper than 30 m:
+
+```console
+$ pdive list '(tag=cave or depth>30) and not night and period="last year"' sort sac asc limit 10
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome. To build Pandive or hack on it, see
