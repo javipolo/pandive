@@ -77,7 +77,8 @@ not behind `origin`, with `gh` logged in. It:
 
 1. Takes the latest `vX.Y.Z` tag and bumps it.
 2. Writes `release/changelog-X.Y.Z.txt` from the commit subjects since the
-   previous tag, grouped into features (`feat:`), fixes (`fix:`) and other.
+   previous tag, grouped into features (`feat:`), fixes (`fix:`) and other. `chore:`
+   commits are left out (they don't change the app).
 3. Commits it (`chore: release vX.Y.Z`) and creates the annotated tag.
 4. Builds the APK from the tagged commit (so `versionName` is exactly
    `X.Y.Z`) into `release/PanDive-Android-vX.Y.Z.apk`. If the build fails,

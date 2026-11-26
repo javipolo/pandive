@@ -45,9 +45,10 @@ git rev-parse -q --verify "refs/tags/$TAG" >/dev/null && die "tag $TAG already e
 
 # --- Changelog ---------------------------------------------------------------
 RANGE="${PREV_TAG:+$PREV_TAG..}HEAD"
-# Subjects without merges or previous release commits, oldest first.
+# Subjects without merges or chores (release commits included: they don't
+# change the app), oldest first.
 mapfile -t SUBJECTS < <(git log --no-merges --reverse --format='%s' "$RANGE" \
-  | grep -v '^chore: release v' || true)
+  | grep -Ev '^chore(\(.*\))?!?:' || true)
 [[ ${#SUBJECTS[@]} -gt 0 ]] || die "no changes since ${PREV_TAG:-the beginning}"
 
 section() {  # section <title> <regex of conventional prefixes>
