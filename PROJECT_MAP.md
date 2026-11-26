@@ -50,7 +50,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/db/db_buddies_merge.dart` -> mergeBuddies: merges several buddies into one (reassigns BuddyIDs, deletes the rest)
 - `lib/core/db/db_trips.dart` -> trips: create/rename/delete, assign dives (PandiveTripId), trip buddies
 - `lib/core/db/db_sites.dart` -> sites (Place): get/create/update, find-or-create
-- `lib/core/db/db_tanks.dart` -> cylinders per dive, "my cylinders" presets, dives per site/buddy
+- `lib/core/db/db_tanks.dart` -> cylinders per dive, "my cylinders" presets, dives per site/buddy, purge of blank cylinders (purgeBlankTanks)
 - `lib/core/db/db_merge.dart` -> merge dives (concatenated profile, union of data)
 - `lib/core/db/db_pending.dart` -> cache of downloaded-but-unsaved dives (they reappear once)
 - `lib/core/db/db_dive_types.dart` -> dive types + cylinder template + tags (PandiveDiveTypeTag)
@@ -125,11 +125,12 @@ with `screens/` and, if needed, `widgets/`).
 
 ### settings
 - `lib/features/settings/screens/settings_screen.dart` -> settings: language, theme, text size, numbering, merge gap, night, DB
-- `lib/features/settings/screens/tools_screen.dart` -> tools: renumber dives, import hashtags, export DDB/Subsurface, import SSI CSV, trash, debug sync (from drawer)
+- `lib/features/settings/screens/tools_screen.dart` -> tools: renumber dives, import hashtags, export DDB/Subsurface, import SSI CSV, Cleanup section, trash, debug sync (from drawer)
 - `lib/features/settings/screens/about_screen.dart` -> about / contact: description + report email (mailto, from drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> fills own dives by matching against a buddy's .ddb (site/notes/buddies)
 - `lib/features/settings/logic/import_dives.dart` -> plan (new/duplicate by date/time) + copy of selected dives from another .ddb (profile/site/buddies/tags/cylinders) with summary (DdbImportResult)
 - `lib/features/settings/logic/enrich_logbook.dart` -> matches by date/time and copies data between logbooks
+- `lib/features/settings/logic/cleanup_tools.dart` -> "Cleanup" tools (unused buddies/sites, orphan and blank cylinders): confirm, purge, report count
 - `lib/features/settings/logic/renumber_tool.dart` -> "Renumber dives" tool: preview of changes + confirmation
 - `lib/features/settings/logic/link_buddies_tool.dart` -> tool: fills BuddyIDs of old dives (Buddy text without IDs) so they count
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previews a .ddb read-only; "Import options" FAB with menu (fill / import dives / replace DB)

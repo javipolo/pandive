@@ -20,6 +20,37 @@ extension DivemateDbTanks on DivemateDb {
     recomputeSac(logId);
   }
 
+  /// Deletes blank cylinders: no size, no pressures and no mix other than air
+  /// (unset O2 or 21 %, no helium), but only when the dive keeps another
+  /// cylinder that does carry data. Mix-only cylinders (what computer imports
+  /// write) hold the dive's gas and are kept. So is any cylinder at or before
+  /// the highest per-sample gas index, since removing it would shift the
+  /// indices. Returns how many cylinders were removed.
+  int purgeBlankTanks() {
+    final byDive = <int, List<Row>>{};
+    for (final r in _db.select('SELECT ID, LogID, Tanksize, PresS, PresE, O2, He '
+        'FROM Tank WHERE LogID IS NOT NULL ORDER BY LogID, SortOrd, TankID')) {
+      byDive.putIfAbsent(r['LogID'] as int, () => []).add(r);
+    }
+    final doomed = <int>[];
+    byDive.forEach((logId, tanks) {
+      final blank = [for (final t in tanks) _isBlankTank(t)];
+      if (!blank.contains(false)) return; // nothing better to keep
+      final gas = gasPerSample(logId) ?? const <int?>[];
+      final maxIdx = gas.whereType<int>().fold(-1, max);
+      for (var i = maxIdx + 1; i < tanks.length; i++) {
+        if (blank[i]) doomed.add(tanks[i]['ID'] as int);
+      }
+    });
+    if (doomed.isEmpty) return 0;
+    inTransaction(() {
+      for (final id in doomed) {
+        _db.execute('DELETE FROM Tank WHERE ID = ?', [id]);
+      }
+    });
+    return doomed.length;
+  }
+
   /// Gas index per sample (from PandiveGas), or null if there is no data.
   List<int?>? gasPerSample(int diveId) {
     final r = _db.select('SELECT Json FROM PandiveGas WHERE DiveId=?', [diveId]);
@@ -139,4 +170,15 @@ extension DivemateDbTanks on DivemateDb {
     );
     return rows.map(_diveFromRow).toList();
   }
+}
+
+/// A cylinder row that says nothing: no size, no pressures, air or unset mix.
+bool _isBlankTank(Row t) {
+  bool unset(Object? v) => v == null || (v is num && v == 0);
+  final o2 = t['O2'];
+  return unset(t['Tanksize']) &&
+      unset(t['PresS']) &&
+      unset(t['PresE']) &&
+      (unset(o2) || (o2 is num && o2 == 21)) &&
+      unset(t['He']);
 }

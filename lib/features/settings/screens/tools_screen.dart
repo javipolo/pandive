@@ -1,4 +1,4 @@
-/// Tools: import hashtags, export logbook and debug utilities.
+/// Tools: import/export, tags, cleanup and debug utilities.
 library;
 
 import 'dart:io';
@@ -8,12 +8,12 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/data_revision.dart';
-import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
+import 'package:pandive/features/settings/logic/cleanup_tools.dart';
 import 'package:pandive/features/settings/logic/link_buddies_tool.dart';
 import 'package:pandive/features/settings/logic/renumber_tool.dart';
 import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
@@ -37,39 +37,6 @@ class ToolsScreen extends StatelessWidget {
     bumpDataRevision();
     messenger.showSnackBar(
         SnackBar(content: Text(t.importHashtagsResult(n))));
-  }
-  Future<void> _purgeBuddies(BuildContext context) async {
-    final t = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    if (!await confirmDialog(context, t.purgeBuddiesConfirm,
-        confirmLabel: t.delete)) {
-      return;
-    }
-    final n = db.purgeUnusedBuddies();
-    bumpDataRevision();
-    messenger.showSnackBar(SnackBar(content: Text(t.purgeBuddiesResult(n))));
-  }
-  Future<void> _purgeSites(BuildContext context) async {
-    final t = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    if (!await confirmDialog(context, t.purgeSitesConfirm,
-        confirmLabel: t.delete)) {
-      return;
-    }
-    final n = db.purgeUnusedSites();
-    bumpDataRevision();
-    messenger.showSnackBar(SnackBar(content: Text(t.purgeSitesResult(n))));
-  }
-  Future<void> _purgeOrphanTanks(BuildContext context) async {
-    final t = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    if (!await confirmDialog(context, t.purgeOrphanTanksConfirm,
-        confirmLabel: t.delete)) {
-      return;
-    }
-    final n = db.purgeOrphanData();
-    bumpDataRevision();
-    messenger.showSnackBar(SnackBar(content: Text(t.purgeOrphanTanksResult(n))));
   }
   Future<void> _tagsToHashtags(BuildContext context) async {
     final t = AppLocalizations.of(context);
@@ -184,26 +151,18 @@ class ToolsScreen extends StatelessWidget {
             onTap: () => runLinkBuddies(context, db),
           ),
           ListTile(
-            leading: const Icon(Icons.person_remove_outlined),
-            title: Text(t.purgeBuddies),
-            onTap: () => _purgeBuddies(context),
-          ),
-          ListTile(
-            leading: const Icon(Icons.wrong_location_outlined),
-            title: Text(t.purgeSites),
-            onTap: () => _purgeSites(context),
-          ),
-          ListTile(
-            leading: const Icon(Icons.cleaning_services_outlined),
-            title: Text(t.purgeOrphanTanks),
-            onTap: () => _purgeOrphanTanks(context),
-          ),
-          ListTile(
             leading: const Icon(Icons.delete_outline),
             title: Text(t.trash),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => TrashScreen(db: db))),
           ),
+          _header(context, t.sectionCleanup),
+          for (final tool in cleanupTools)
+            ListTile(
+              leading: Icon(tool.icon),
+              title: Text(tool.title(t)),
+              onTap: () => runCleanupTool(context, db, tool),
+            ),
           _header(context, t.sectionDebug),
           ListTile(
             leading: const Icon(Icons.bug_report_outlined),

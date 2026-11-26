@@ -49,6 +49,14 @@
       "count": {}
     }
   },
+  "purgeBlankTanks": "Delete tanks with no data",
+  "purgeBlankTanksConfirm": "Delete tanks with no size, pressures or mix on dives that have another tank with data?",
+  "purgeBlankTanksResult": "{count} tanks with no data deleted",
+  "@purgeBlankTanksResult": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "sortByDives": "Sort by dives",
   "sortByName": "Sort by name",
   "sortRecent": "Sort by most recent",
@@ -121,6 +129,7 @@
       "count": {}
     }
   },
+  "sectionCleanup": "Cleanup",
   "sectionOther": "Others",
   "sectionDebug": "DEBUG",
   "debugSyncPoint": "Reset sync point to a dive",
