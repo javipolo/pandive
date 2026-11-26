@@ -74,7 +74,7 @@ APK := build/app/outputs/flutter-apk/app-release.apk
 # or BUMP=patch), write and commit release/changelog-<version>.txt, tag, build
 # the APK from the tagged commit, push and create the GitHub release with it.
 # DRY_RUN=1 only prints the next version and the changelog.
-BUMP ?= minor
+BUMP ?= patch
 
 .PHONY: release
 release: require-android ## Cut a release: bump tag (BUMP=major|minor|patch), changelog, APK, push, GitHub release

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/import/ssi_csv_import.dart';
+import 'package:pandive/core/models/models.dart';
 import 'package:sqlite3/open.dart';
 
 const _header = '"inmersión #","Lugar de buceo","País","Fecha / Tiempo",'
@@ -207,6 +208,35 @@ void main() {
       expect(done, [1]);
       expect(db.listDives().map((d) => d.place), contains('C'));
       expect(db.listDives().map((d) => d.place), isNot(contains('B')));
+    });
+
+    test('completar: rellena lo vacío, suma compañeros/tags y mantiene el resto',
+        () async {
+      final id = db.createDive(dateTime: DateTime(2026, 4, 15, 10, 12));
+      db.updateDive(id, {'Depth': 22.4, 'Divetime': 55.0, 'Buddy': 'Luis',
+          'BuddyIDs': '${db.findOrCreateBuddy('Luis')}'});
+      db.setDiveTanks(id, [const Cylinder(size: 15, pressureStart: 200, o2: 32)]);
+      final csv = _header +
+          _row(1, 'El Fitó', '15. Apr 2026 10:10', '56 min', '21 m',
+              'Ana Pérez') +
+          _row(2, 'B', '16. Apr 2026 10:00', '40 min', '12 m');
+      final plan = planSsiImport(db, csv);
+      expect(plan.entries.first.matchId, id);
+
+      final r = await applySsiChanges(db,
+          insert: [plan.entries[1].dive], fill: [plan.entries.first]);
+      expect((r.added, r.filled), (1, 1));
+      final d = db.listDives().firstWhere((d) => d.id == id);
+      expect(d.place, 'El Fitó');
+      expect(d.maxDepth, 22.4); // kept: the computer's value wins
+      expect(db.diveBuddies(id).map((b) => b.name).toSet(), {'Luis', 'Ana Pérez'});
+      expect(db.tagsForDive(id).map((t) => t.name),
+          contains('Inmersión desde embarcación'));
+      expect(db.cylinders(id).single.size, 15);
+      expect(db.listDives(), hasLength(2));
+
+      // A second pass has nothing left to fill.
+      expect((await applySsiChanges(db, fill: [plan.entries.first])).filled, 0);
     });
   });
 }

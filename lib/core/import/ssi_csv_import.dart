@@ -137,15 +137,15 @@ double? _distance(SsiDive d, _Existing e) {
   return score;
 }
 
-/// Imports the SSI CSV into [db]. Ignores dives already present: same
-/// day, depth ±3 m, duration ±6 min and, if there is a time, ±90 min; among
-/// several candidates it pairs with the most similar.
-/// A CSV row in the import plan: [duplicate] if there is already a
-/// matching dive (not imported unless the user ticks it).
+/// A CSV row in the import plan. [matchId] is the existing dive it pairs
+/// with (same day, depth ±3 m, duration ±6 min and, if there is a time,
+/// ±90 min; the most similar among several): then it is a [duplicate], not
+/// imported unless the user ticks it, or used to fill that dive in.
 class SsiPlanEntry {
   final SsiDive dive;
-  final bool duplicate;
-  const SsiPlanEntry(this.dive, {required this.duplicate});
+  final int? matchId;
+  const SsiPlanEntry(this.dive, {this.matchId});
+  bool get duplicate => matchId != null;
 }
 
 /// Plan without writing anything: each CSV row (in chronological order) marked
@@ -167,7 +167,7 @@ class SsiPlanEntry {
       if (x != null && (best == null || x < best)) (match, best) = (e, x);
     }
     if (match != null) used.add(match.id);
-    entries.add(SsiPlanEntry(d, duplicate: match != null));
+    entries.add(SsiPlanEntry(d, matchId: match?.id));
   }
   return (entries: entries, skipped: parsed.skipped);
 }
@@ -176,17 +176,47 @@ class SsiPlanEntry {
 /// between chunks: the UI paints progress and Android doesn't show "not responding".
 /// Returns how many were added.
 Future<int> applySsiImport(DivemateDb db, List<SsiDive> dives,
-    {void Function(int done, int total)? onProgress}) async {
+        {void Function(int done, int total)? onProgress}) async =>
+    (await applySsiChanges(db, insert: dives, onProgress: onProgress)).added;
+
+/// Inserts [insert] as new dives and fills the existing dives of [fill]
+/// (entries with a [SsiPlanEntry.matchId]) with their CSV data, keeping what
+/// they already have (see `fillDiveFromImport`). Chunked like
+/// [applySsiImport]. Returns how many were added and how many changed.
+Future<({int added, int filled})> applySsiChanges(DivemateDb db,
+    {List<SsiDive> insert = const [],
+    List<SsiPlanEntry> fill = const [],
+    void Function(int done, int total)? onProgress}) async {
   const chunk = 25;
-  var added = 0;
-  for (var i = 0; i < dives.length; i += chunk) {
-    final part = dives.sublist(i, (i + chunk).clamp(0, dives.length));
+  final total = insert.length + fill.length;
+  var added = 0, filled = 0;
+  for (var i = 0; i < fill.length; i += chunk) {
+    final part = fill.sublist(i, (i + chunk).clamp(0, fill.length));
+    filled += db.inTransaction(() => part.where((e) => _fill(db, e)).length);
+    onProgress?.call(i + part.length, total);
+    await Future<void>.delayed(Duration.zero);
+  }
+  for (var i = 0; i < insert.length; i += chunk) {
+    final part = insert.sublist(i, (i + chunk).clamp(0, insert.length));
     added += db.inTransaction(() => part.where((d) => _insert(db, d)).length);
-    onProgress?.call(i + part.length, dives.length);
+    onProgress?.call(fill.length + i + part.length, total);
     await Future<void>.delayed(Duration.zero);
   }
   if (added > 0) db.autoRenumber();
-  return added;
+  return (added: added, filled: filled);
+}
+
+bool _fill(DivemateDb db, SsiPlanEntry e) {
+  final d = e.dive;
+  return e.matchId != null &&
+      db.fillDiveFromImport(e.matchId!,
+          placeName: d.site,
+          country: d.country,
+          maxDepth: d.depth,
+          durationMin: d.minutes,
+          computer: d.computer,
+          buddies: d.buddies,
+          tagNames: d.tags);
 }
 
 bool _insert(DivemateDb db, SsiDive d) {

@@ -32,8 +32,7 @@ void main() {
       for (final (i, site) in ['Uno', 'Dos', 'Tres'].indexed)
         SsiPlanEntry(
             SsiDive(date: DateTime(2026, 4, 10 + i, 10), site: site,
-                hasTime: true, minutes: 40, depth: 12),
-            duplicate: false),
+                hasTime: true, minutes: 40, depth: 12)),
     ];
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -62,5 +61,33 @@ void main() {
     expect(find.text('open'), findsOneWidget); // back at the root
     expect(homeSectionRequest.value, 0);
     expect(db.listDives().map((d) => d.place).toSet(), {'Uno', 'Tres'});
+  });
+
+  testWidgets('completar existentes: la amarilla completa en vez de duplicar',
+      (tester) async {
+    final id = db.createDive(dateTime: DateTime(2026, 4, 10, 10));
+    final entries = [
+      SsiPlanEntry(
+          SsiDive(date: DateTime(2026, 4, 10, 10), site: 'Medas',
+              hasTime: true, minutes: 40, depth: 12),
+          matchId: id),
+      SsiPlanEntry(SsiDive(date: DateTime(2026, 4, 11, 10), site: 'Nueva',
+          hasTime: true, minutes: 40, depth: 12)),
+    ];
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: ImportSsiScreen(db: db, entries: entries),
+    ));
+    expect(find.textContaining('(1)'), findsOneWidget);
+    await tester.tap(find.byType(Switch));
+    await tester.pump();
+    expect(find.textContaining('(2)'), findsOneWidget);
+
+    await tester.tap(find.textContaining('(2)'));
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    await tester.pumpAndSettle();
+    expect(db.listDives(), hasLength(2));
+    expect(db.listDives().map((d) => d.place).toSet(), {'Medas', 'Nueva'});
   });
 }

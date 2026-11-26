@@ -1,7 +1,9 @@
 /// Review before importing the SSI CSV: list of dives with
 /// checkboxes. Green = new (ticked); amber = seems already present (unticked,
-/// but can be ticked: the pairing is approximate). Importing goes to
-/// the refreshed dives list.
+/// but can be ticked: the pairing is approximate). With "fill in existing"
+/// the ticked amber rows complete the dive they pair with instead of adding a
+/// new one (only empty fields, plus buddies and tags; profile, cylinders and
+/// the rest stay). Importing goes to the refreshed dives list.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -31,6 +33,15 @@ class _ImportSsiScreenState extends State<ImportSsiScreen> {
       if (!_entries[i].duplicate) i
   };
 
+  bool _fill = false;
+
+  void _setFill(bool v) => setState(() {
+        _fill = v;
+        for (var i = 0; i < _entries.length; i++) {
+          if (_entries[i].duplicate) v ? _sel.add(i) : _sel.remove(i);
+        }
+      });
+
   void _toggleAll() => setState(() {
         if (_sel.length == _entries.length) {
           _sel.clear();
@@ -43,16 +54,23 @@ class _ImportSsiScreenState extends State<ImportSsiScreen> {
     final t = AppLocalizations.of(context);
     final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final dives = [
+    final picked = [
       for (var i = 0; i < _entries.length; i++)
-        if (_sel.contains(i)) _entries[i].dive
+        if (_sel.contains(i)) _entries[i]
     ];
-    final added = await withProgressBar(
-        context, (p) => applySsiImport(widget.db, dives, onProgress: p));
+    final r = await withProgressBar(
+        context,
+        (p) => applySsiChanges(widget.db,
+            insert: [for (final e in picked) if (!_fill || !e.duplicate) e.dive],
+            fill: [for (final e in picked) if (_fill && e.duplicate) e],
+            onProgress: p));
     bumpDataRevision();
     requestDivesList();
     nav.popUntil((r) => r.isFirst);
-    messenger.showSnackBar(SnackBar(content: Text(t.importSsiDone(added))));
+    messenger.showSnackBar(SnackBar(
+        content: Text(_fill
+            ? t.importSsiDoneFilled(r.added, r.filled)
+            : t.importSsiDone(r.added))));
   }
 
   @override
@@ -77,9 +95,19 @@ class _ImportSsiScreenState extends State<ImportSsiScreen> {
           : Column(children: [
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Text(t.importSsiHeader(_entries.length - dups, dups),
+                child: Text(
+                    _fill
+                        ? t.importSsiHeaderFill(_entries.length - dups, dups)
+                        : t.importSsiHeader(_entries.length - dups, dups),
                     style: Theme.of(context).textTheme.bodyMedium),
               ),
+              if (dups > 0)
+                SwitchListTile(
+                  value: _fill,
+                  onChanged: _setFill,
+                  title: Text(t.importSsiFillExisting),
+                  subtitle: Text(t.importSsiFillExistingHint),
+                ),
               Expanded(
                 child: ListView.builder(
                   itemCount: _entries.length,
@@ -91,7 +119,8 @@ class _ImportSsiScreenState extends State<ImportSsiScreen> {
                       minutes: d.minutes,
                       depth: d.depth,
                       duplicate: _entries[i].duplicate,
-                      duplicateText: t.importSsiDuplicate,
+                      duplicateText:
+                          _fill ? t.importSsiWillFill : t.importSsiDuplicate,
                       duplicateSelectable: true,
                       selected: _sel.contains(i),
                       onChanged: (v) =>

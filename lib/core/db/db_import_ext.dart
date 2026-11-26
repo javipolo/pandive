@@ -75,6 +75,70 @@ extension DivemateDbImportExt on DivemateDb {
     return true;
   }
 
+  /// Fills an existing dive with the data of an imported one (e.g. the SSI
+  /// CSV) without touching what it already has: site, country, depth,
+  /// duration and computer only if empty; buddies and tags are added to the
+  /// existing ones. Profile, cylinders and everything else are kept.
+  /// Returns true if anything changed.
+  bool fillDiveFromImport(
+    int id, {
+    String? placeName,
+    String? country,
+    double? maxDepth,
+    double? durationMin,
+    String? computer,
+    List<String> buddies = const [],
+    List<String> tagNames = const [],
+  }) {
+    final rows = _db.select(
+      'SELECT Place, PlaceID, Country, Depth, Divetime, Computer '
+      'FROM Logbook WHERE ID=?',
+      [id],
+    );
+    if (rows.isEmpty) return false;
+    final r = rows.first;
+    bool blank(Object? v) => v == null || (v is String && v.trim().isEmpty);
+    bool zero(Object? v) => v == null || (v is num && v <= 0);
+    final place = placeName?.trim();
+    final fields = <String, Object?>{};
+    if (place != null &&
+        place.isNotEmpty &&
+        blank(r['Place']) &&
+        r['PlaceID'] == null) {
+      fields['Place'] = place;
+      fields['PlaceID'] = findOrCreateSite(place, country: country);
+    }
+    if (!blank(country) && blank(r['Country'])) fields['Country'] = country;
+    if (maxDepth != null && zero(r['Depth'])) fields['Depth'] = maxDepth;
+    if (durationMin != null && zero(r['Divetime'])) {
+      fields['Divetime'] = durationMin;
+    }
+    var changed = fields.isNotEmpty;
+    if (changed) updateDive(id, fields);
+    if (!blank(computer) && blank(r['Computer'])) {
+      _db.execute(
+        'UPDATE Logbook SET Computer=?, Updated=? WHERE ID=?',
+        [computer, _nowStamp(), id],
+      );
+      changed = true;
+    }
+    final have = {for (final b in diveBuddies(id)) b.name.toLowerCase()};
+    final newBuddies = [
+      for (final n in buddies)
+        if (n.trim().isNotEmpty && !have.contains(n.trim().toLowerCase()))
+          n.trim(),
+    ];
+    if (newBuddies.isNotEmpty) {
+      addDiveBuddies(id, newBuddies);
+      changed = true;
+    }
+    for (final n in tagNames) {
+      if (n.trim().isEmpty) continue;
+      if (addTagToDives(findOrCreateTag(n.trim()), [id]) > 0) changed = true;
+    }
+    return changed;
+  }
+
   /// Logbook columns with the profile and computer data (copied as is
   /// between .ddb files; only those present on both sides).
   static const _profileCols = [

@@ -65,7 +65,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/export/subsurface_export.dart` -> generates the Subsurface XML (.ssrf)
 - `lib/core/export/ddb_dive_copy.dart` -> copyDiveToDdb: copies a full dive (data, site, port, buddies, computer, cylinders, tags, optional profile) to an exported .ddb; used by trip and selection export. copyPortToDdb
 - `lib/core/import/subsurface_import.dart` -> imports the Subsurface XML (.ssrf) into the logbook
-- `lib/core/import/ssi_csv_import.dart` -> imports the SSI logbook CSV (columns by position; tags; dedupe by day+depth+duration+time with the closest candidate)
+- `lib/core/import/ssi_csv_import.dart` -> imports the SSI logbook CSV (columns by position; tags; dedupe by day+depth+duration+time with the closest candidate; can fill matched dives instead of adding them)
 - `lib/core/import/ssi_csv_fields.dart` -> SSI CSV cell parsing: CSV, multi-language dates, duration, depth, glued buddies + center + computer
 - `lib/core/widgets/import_progress.dart` -> progress-bar dialog for long imports (withProgressBar; importSsrfWithProgress)
 - `lib/core/db/db_import_ext.dart` -> inserts an external dive (profile, cylinders, site, buddies, tags) + copyDiveDetailsFrom (copies computer/cylinders/tags/profile between .ddb files)
@@ -139,7 +139,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/settings/logic/link_buddies_tool.dart` -> tool: fills BuddyIDs of old dives (Buddy text without IDs) so they count
 - `lib/features/settings/screens/preview_ddb_screen.dart` -> previews a .ddb read-only; "Import options" FAB with menu (fill / import dives / replace DB)
 - `lib/features/settings/screens/import_ddb_dives_screen.dart` -> pick dives from the .ddb to import (green new / amber already exists, skipped) + summary dialog
-- `lib/features/settings/screens/import_ssi_screen.dart` -> review the SSI CSV before importing (green new / amber seems to exist, tickable), imports with a bar and goes back to the dive list
+- `lib/features/settings/screens/import_ssi_screen.dart` -> review the SSI CSV before importing (green new / amber seems to exist, tickable; "fill in existing" switch completes the matched dives), imports with a bar and goes back to the dive list
 - `lib/features/settings/widgets/import_dive_tile.dart` -> checkbox row for the import lists (ddb and SSI)
 - `lib/features/settings/screens/trash_screen.dart` -> trash: lists deleted dives (Status=2) and restores them (undelete)
 - `lib/features/settings/screens/debug_sync_screen.dart` -> debug: set sync point and delete later dives

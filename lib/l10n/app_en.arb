@@ -789,6 +789,23 @@
   },
   "importSsiHeader": "{newCount} new · {dupCount} seem to be in your logbook already (unticked: tick them if they aren't)",
   "importSsiDuplicate": "Seems to be in your logbook already",
+  "importSsiFillExisting": "Fill in the dives you already have",
+  "importSsiFillExistingHint": "Ticked amber rows add the missing site, depth, duration, buddies and tags from SSI to the existing dive. Its profile, cylinders and everything else stay as they are.",
+  "importSsiWillFill": "Already in your logbook: the missing data will be filled in",
+  "importSsiHeaderFill": "{newCount} new · {dupCount} already in your logbook will be filled in",
+  "importSsiDoneFilled": "{added} dives imported · {filled} completed",
+  "@importSsiHeaderFill": {
+    "placeholders": {
+      "newCount": {},
+      "dupCount": {}
+    }
+  },
+  "@importSsiDoneFilled": {
+    "placeholders": {
+      "added": {},
+      "filled": {}
+    }
+  },
   "importSsiDone": "{count} dives imported",
   "readingFile": "Reading the file…",
   "@importSsiHeader": {

@@ -63,6 +63,9 @@ SSI lets you export your digital logbook from its website as a CSV file.
    (ticked) and in amber the ones that seem to be in your logbook already
    (unticked; tick them if they aren't, matching is approximate). Untick
    anything you don't want.
+   If some dives are already there, the **Fill in the dives you already
+   have** switch ticks the amber ones and, instead of adding them again,
+   completes the existing dive with the CSV data (see below).
 4. **Import**: a bar shows progress and when it finishes you're back on the
    dive list, with the new dives.
 
@@ -120,6 +123,22 @@ computers differ by 2–3 m and a few minutes, and the MySSI time can be ~1 h
 off from the computer's (time zone). This way dives you already downloaded
 from the computer aren't duplicated, and re-importing the same CSV adds
 nothing.
+
+### Filling in dives you already have
+
+Typical case: you downloaded the dives from the computer (profile,
+cylinders, exact depth and time) but the site, buddies and center are only
+on MySSI. With **Fill in the dives you already have** on, each ticked amber
+row completes the dive it was matched with:
+
+- **site** (and country), **depth**, **duration** and **computer**: only if
+  the dive has none;
+- **buddies** and **tags** (specialty, center…): added to the ones it
+  already has.
+
+Nothing else changes: the profile, cylinders, date and time, depth and
+duration it already had, comments and everything else stay as they are.
+Green rows are still added as new dives.
 
 ### Time of dives with no time
 
