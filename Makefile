@@ -25,6 +25,18 @@ GDRIVE_DESKTOP_CLIENT_SECRET ?= $(strip $(shell cat linux/gdrive_desktop_client_
 LINUX_DEFINES := $(if $(GDRIVE_DESKTOP_CLIENT_ID),--dart-define=GDRIVE_DESKTOP_CLIENT_ID=$(GDRIVE_DESKTOP_CLIENT_ID),)
 LINUX_DEFINES += $(if $(GDRIVE_DESKTOP_CLIENT_SECRET),--dart-define=GDRIVE_DESKTOP_CLIENT_SECRET=$(GDRIVE_DESKTOP_CLIENT_SECRET),)
 
+# Versioning: the git tag is the source of truth (pubspec's version is a
+# placeholder). versionName = `git describe` without the leading "v"
+# (1.1.0 on a tagged commit, 1.1.0-3-gabc1234[-dirty] on a dev build);
+# versionCode = commit count, so it always grows and Android accepts updates.
+GIT_DESCRIBE := $(shell git describe --tags --always --dirty 2>/dev/null)
+BUILD_NAME := $(patsubst v%,%,$(GIT_DESCRIBE))
+BUILD_NUMBER := $(shell git rev-list --count HEAD 2>/dev/null)
+VERSION_FLAGS := $(if $(BUILD_NAME),--build-name=$(BUILD_NAME),) \
+	$(if $(BUILD_NUMBER),--build-number=$(BUILD_NUMBER),)
+RELEASE_TAG := $(shell git describe --tags --exact-match 2>/dev/null)
+RELEASES_DIR := releases
+
 .DEFAULT_GOAL := help
 
 .PHONY: help
@@ -42,7 +54,7 @@ require-android:
 
 .PHONY: run
 run: require-android ## Build (release), install and launch on the connected device
-	$(FLUTTER) run --release $(DART_DEFINES)
+	$(FLUTTER) run --release $(VERSION_FLAGS) $(DART_DEFINES)
 
 .PHONY: apk
 apk: require-android ## Build an arm64 release APK (sideload)
@@ -50,12 +62,27 @@ apk: require-android ## Build an arm64 release APK (sideload)
 	# produced an OTF that some Android devices fail to parse, leaving all
 	# icons as grey squares (tofu): hamburger, bottom bar, FAB...
 	$(FLUTTER) build apk --release --target-platform android-arm64 \
-		--no-tree-shake-icons $(DART_DEFINES)
+		--no-tree-shake-icons $(VERSION_FLAGS) $(DART_DEFINES)
 
 .PHONY: apk-release
 apk-release: apk ## Alias of apk
 
 APK := build/app/outputs/flutter-apk/app-release.apk
+
+# Release flow: commit, `git tag vX.Y.Z`, `make release`. Refuses to build
+# from a dirty tree or from a commit without an exact tag.
+.PHONY: release
+release: require-android ## Build the APK of the tagged HEAD into releases/PanDive-Android-<tag>.apk
+	@git diff --quiet HEAD || { echo "Uncommitted changes: commit or stash them first"; exit 1; }
+	@test -n "$(RELEASE_TAG)" || { echo "HEAD has no tag: run 'git tag vX.Y.Z' first"; exit 1; }
+	$(MAKE) apk
+	@mkdir -p $(RELEASES_DIR)
+	cp $(APK) $(RELEASES_DIR)/PanDive-Android-$(RELEASE_TAG).apk
+	@echo "Release $(RELEASE_TAG) (versionCode $(BUILD_NUMBER)): $(RELEASES_DIR)/PanDive-Android-$(RELEASE_TAG).apk"
+
+.PHONY: version
+version: ## Print the versionName / versionCode a build would get
+	@echo "versionName=$(BUILD_NAME) versionCode=$(BUILD_NUMBER)"
 
 # --user 0: install only for the phone's owner (not in a work profile or a
 # Secure Folder / second space). Without other profiles it's the default anyway.
@@ -123,11 +150,11 @@ ldc-linux: ## Build static libdivecomputer for the Linux app (linux/ldc/)
 
 .PHONY: linux
 linux: ## Build the Linux app (release)
-	$(FLUTTER) build linux --release $(LINUX_DEFINES)
+	$(FLUTTER) build linux --release $(VERSION_FLAGS) $(LINUX_DEFINES)
 
 .PHONY: run-linux
 run-linux: ## Build (release) and launch the Linux app with the Google client
-	$(FLUTTER) run --release -d linux $(LINUX_DEFINES)
+	$(FLUTTER) run --release -d linux $(VERSION_FLAGS) $(LINUX_DEFINES)
 
 # Linux app install (the `make linux` bundle, without rebuilding).
 #   make install-linux                          -> in your home (~/.local, ~/.local/opt/pandive)

@@ -54,6 +54,23 @@ make help           # all targets
 Google OAuth client IDs. `make install-linux` installs the Linux build into
 `~/.local` (or `sudo make install-linux PREFIX=/usr/local` system-wide).
 
+### Releases
+
+The git tag is the version. `make apk` / `make run` / `make linux` pass
+`--build-name` (`git describe` without the `v`: `1.1.0`, or
+`1.1.0-3-gabc1234-dirty` for a dev build) and `--build-number` (commit
+count, so Android's `versionCode` always grows). The `version:` in
+`pubspec.yaml` is only a placeholder.
+
+```bash
+git tag v1.1.0
+make release        # -> releases/PanDive-Android-v1.1.0.apk (gitignored)
+make version        # what versionName / versionCode a build would get
+```
+
+`make release` refuses a dirty tree or an untagged HEAD. Upload the APK
+to a GitHub release, e.g. `gh release create v1.1.0 releases/PanDive-Android-v1.1.0.apk`.
+
 ### Release signing
 
 Release APKs are signed with `android/key.properties` (not versioned); without
