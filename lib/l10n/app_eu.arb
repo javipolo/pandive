@@ -448,5 +448,22 @@
   "bulkTagRemoved": "\"{tag}\" kenduta: {count, plural, =1{urpekaritza 1} other{{count} urpekaritza}}",
   "bulkTagStillInherited": "{count, plural, =1{1ek oraindik badu} other{{count}k oraindik badute}} gunearen edo urpekaritza motaren bidez",
   "bulkTagOnDives": "{count, plural, =1{Hautatutako urpekaritza 1ean} other{Hautatutako {count} urpekaritzatan}}",
-  "bulkNoOwnTags": "Hautatutako urpekaritzek ez dute etiketa propiorik (gunearenak edo urpekaritza motarenak han kentzen dira)"
+  "bulkNoOwnTags": "Hautatutako urpekaritzek ez dute etiketa propiorik (gunearenak edo urpekaritza motarenak han kentzen dira)",
+  "port": "Portua",
+  "ports": "Portuak",
+  "selectPort": "Aukeratu portua",
+  "selectPortOptional": "Portua (aukerakoa)",
+  "newPort": "Portu berria",
+  "editPort": "Editatu portua",
+  "portName": "Portuaren izena",
+  "portNameRequired": "Portuak izen bat behar du",
+  "noPorts": "Ez dago porturik oraindik",
+  "portNoLocation": "kokapenik gabe",
+  "portUses": "{count, plural, =0{Erabili gabe} =1{Behin erabilia} other{{count} aldiz erabilia}}",
+  "deletePortConfirm": "\"{name}\" portua ezabatu? {count, plural, =0{Ez da erabiltzen.} =1{Urpekaritza edo bidaia 1etik kentzen da.} other{{count} urpekaritza edo bidaiatatik kentzen da.}}",
+  "departurePort": "Irteera portua",
+  "arrivalPort": "Iritsiera portua",
+  "departurePortNone": "Irteera portua (bat ere ez: lehorreko bidaia)",
+  "arrivalPortNone": "Iritsiera portua (bat ere ez)",
+  "arrivalSameAsDeparture": "Iritsiera portua irteerakoa bera da"
 }

@@ -14,6 +14,7 @@ import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
 import 'package:pandive/features/dives/widgets/dive_editor_form.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
 import 'package:pandive/features/dives/widgets/dive_type_picker_field.dart';
+import 'package:pandive/features/ports/widgets/port_picker_field.dart';
 import 'package:pandive/features/sites/screens/site_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -30,6 +31,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
   DateTime _when = DateTime.now();
   int _rating = 0;
   DiveSite? _site;
+  Port? _port;
   List<Buddy> _buddies = [];
   List<Tag> _tags = [];
   List<Cylinder> _tanks = [];
@@ -54,6 +56,10 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
     if (s != null) setState(() => _site = s);
   }
 
+  Future<void> _pickPort() async {
+    final p = await pickPort(context, widget.db, selectedId: _port?.id);
+    if (p != null) setState(() => _port = p);
+  }
   Future<void> _pickBuddies() async {
     final r = await Navigator.of(context).push<List<Buddy>>(MaterialPageRoute(
         builder: (_) => BuddyPickerScreen(
@@ -103,6 +109,7 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
         comments: _s(_c.comments),
       );
       if (_typeName != null) widget.db.updateDive(id, {'Divetype': _typeName});
+      widget.db.setDivePort(id, _port?.id);
       widget.db.setDiveTanks(id, _tanks);
       widget.db.setDiveTags(id, _tags);
       if (mounted) await renumberAfterSave(context, widget.db, id);
@@ -135,6 +142,9 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
         site: _site,
         onPickSite: _pickSite,
         onClearSite: () => setState(() => _site = null),
+        port: _port,
+        onPickPort: _pickPort,
+        onClearPort: () => setState(() => _port = null),
         buddies: _buddies,
         onPickBuddies: _pickBuddies,
         tags: _tags,

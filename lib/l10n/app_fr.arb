@@ -448,5 +448,22 @@
   "bulkTagRemoved": "« {tag} » retirée de {count, plural, =1{1 plongée} other{{count} plongées}}",
   "bulkTagStillInherited": "{count, plural, =1{1 l'a encore} other{{count} l'ont encore}} via le site ou le type de plongée",
   "bulkTagOnDives": "{count, plural, =1{Sur 1 plongée sélectionnée} other{Sur {count} plongées sélectionnées}}",
-  "bulkNoOwnTags": "Les plongées sélectionnées n'ont pas d'étiquettes propres (celles du site ou du type de plongée se retirent là-bas)"
+  "bulkNoOwnTags": "Les plongées sélectionnées n'ont pas d'étiquettes propres (celles du site ou du type de plongée se retirent là-bas)",
+  "port": "Port",
+  "ports": "Ports",
+  "selectPort": "Choisir un port",
+  "selectPortOptional": "Port (facultatif)",
+  "newPort": "Nouveau port",
+  "editPort": "Modifier le port",
+  "portName": "Nom du port",
+  "portNameRequired": "Le port doit avoir un nom",
+  "noPorts": "Aucun port pour l'instant",
+  "portNoLocation": "sans position",
+  "portUses": "{count, plural, =0{Inutilisé} =1{Utilisé 1 fois} other{Utilisé {count} fois}}",
+  "deletePortConfirm": "Supprimer le port « {name} » ? {count, plural, =0{Il n'est pas utilisé.} =1{Il est retiré d'1 plongée ou voyage.} other{Il est retiré de {count} plongées ou voyages.}}",
+  "departurePort": "Port de départ",
+  "arrivalPort": "Port d'arrivée",
+  "departurePortNone": "Port de départ (aucun : voyage depuis la côte)",
+  "arrivalPortNone": "Port d'arrivée (aucun)",
+  "arrivalSameAsDeparture": "Le port d'arrivée est le même que celui de départ"
 }

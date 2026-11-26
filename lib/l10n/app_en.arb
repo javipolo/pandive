@@ -883,5 +883,39 @@
       }
     }
   },
-  "bulkNoOwnTags": "The selected dives have no tags of their own (tags from the site or dive type are removed there)"
+  "bulkNoOwnTags": "The selected dives have no tags of their own (tags from the site or dive type are removed there)",
+  "port": "Port",
+  "ports": "Ports",
+  "selectPort": "Select port",
+  "selectPortOptional": "Port (optional)",
+  "newPort": "New port",
+  "editPort": "Edit port",
+  "portName": "Port name",
+  "portNameRequired": "The port needs a name",
+  "noPorts": "No ports yet",
+  "portNoLocation": "no location",
+  "portUses": "{count, plural, =0{Unused} =1{Used once} other{Used {count} times}}",
+  "@portUses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deletePortConfirm": "Delete port \"{name}\"? {count, plural, =0{It is not used.} =1{It is removed from 1 dive or trip.} other{It is removed from {count} dives or trips.}}",
+  "@deletePortConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "departurePort": "Departure port",
+  "arrivalPort": "Arrival port",
+  "departurePortNone": "Departure port (none: shore trip)",
+  "arrivalPortNone": "Arrival port (none)",
+  "arrivalSameAsDeparture": "Arrival port is the same as departure"
 }

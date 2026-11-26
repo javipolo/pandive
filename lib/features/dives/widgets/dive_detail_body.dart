@@ -1,4 +1,4 @@
-/// Body of a dive's detail: compact sections (no./date, site,
+/// Body of a dive's detail: compact sections (no./date, site + port,
 /// buddy, profile + metrics, gases, deco, cylinders, computer).
 library;
 
@@ -30,6 +30,7 @@ class DiveDetailBody extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).languageCode;
     final site = dive.placeId != null ? db.getSite(dive.placeId!) : null;
+    final port = db.portForDive(dive.id);
     final profile = db.diveProfile(dive.id);
     final cyls = db.cylinders(dive.id);
     final buddies = db.diveBuddies(dive.id).map((b) => b.name).join(', ');
@@ -69,6 +70,7 @@ class DiveDetailBody extends StatelessWidget {
         LabeledValue(t.fieldSite, dive.place ?? site?.name),
         twoCol(LabeledValue(t.fieldCountry, dive.country ?? site?.country),
             LabeledValue(t.fieldRegion, site?.region)),
+        if (port != null) LabeledValue(t.port, port.name),
         sectionLine(),
         LabeledValue(t.fieldBuddy, buddies),
         sectionLine(),

@@ -75,6 +75,19 @@ void _ensureSyncTable(Database db) {
   try {
     db.execute('ALTER TABLE Logbook ADD COLUMN PandiveTripId INTEGER');
   } catch (_) {/* already exists */}
+  // Ports (name + GPS): trip departure/arrival and, optionally, per dive.
+  db.execute('CREATE TABLE IF NOT EXISTS PandivePort '
+      '(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Lat REAL, Lon REAL, '
+      'Updated TEXT)');
+  for (final (table, col) in const [
+    ('PandiveTrip', 'DeparturePortId'),
+    ('PandiveTrip', 'ArrivalPortId'),
+    ('Logbook', 'PandivePortId'),
+  ]) {
+    try {
+      db.execute('ALTER TABLE $table ADD COLUMN $col INTEGER');
+    } catch (_) {/* already exists */}
+  }
 }
 
 /// Import of dives downloaded from the computer into DiveMate format.

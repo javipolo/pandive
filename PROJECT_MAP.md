@@ -49,6 +49,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/db/db_buddies.dart` -> buddies (Buddy): list, create/rename/delete, dives per buddy, backfillBuddyIds (links old Buddy text)
 - `lib/core/db/db_buddies_merge.dart` -> mergeBuddies: merges several buddies into one (reassigns BuddyIDs, deletes the rest)
 - `lib/core/db/db_trips.dart` -> trips: create/rename/delete, assign dives (PandiveTripId), trip buddies
+- `lib/core/db/db_ports.dart` -> ports (PandivePort: name + GPS): CRUD with usage count, findOrCreatePort, trip departure/arrival (PandiveTrip.DeparturePortId/ArrivalPortId; same port = arrival equals departure), per-dive port (Logbook.PandivePortId), portsForDives
 - `lib/core/db/db_sites.dart` -> sites (Place): get/create/update, find-or-create
 - `lib/core/db/db_tanks.dart` -> cylinders per dive, "my cylinders" presets, dives per site/buddy, purge of blank cylinders (purgeBlankTanks)
 - `lib/core/db/db_bulk.dart` -> batch edits on a selection: setDivesType, addTagToDives/removeTagFromDives (own link), ownTagCounts (caller wraps in inTransaction)
@@ -62,7 +63,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/sac.dart` -> SAC/RMV calculation (l/min)
 - `lib/core/gas_plan.dart` -> gas planning: gas needed, end pressure, max time (pure logic)
 - `lib/core/export/subsurface_export.dart` -> generates the Subsurface XML (.ssrf)
-- `lib/core/export/ddb_dive_copy.dart` -> copyDiveToDdb: copies a full dive (data, site, buddies, computer, cylinders, tags, optional profile) to an exported .ddb; used by trip and selection export
+- `lib/core/export/ddb_dive_copy.dart` -> copyDiveToDdb: copies a full dive (data, site, port, buddies, computer, cylinders, tags, optional profile) to an exported .ddb; used by trip and selection export. copyPortToDdb
 - `lib/core/import/subsurface_import.dart` -> imports the Subsurface XML (.ssrf) into the logbook
 - `lib/core/import/ssi_csv_import.dart` -> imports the SSI logbook CSV (columns by position; tags; dedupe by day+depth+duration+time with the closest candidate)
 - `lib/core/import/ssi_csv_fields.dart` -> SSI CSV cell parsing: CSV, multi-language dates, duration, depth, glued buddies + center + computer
@@ -83,6 +84,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/models/downloaded_dive.dart` -> dive downloaded from the computer (+ samples/gases, JSON parse)
 - `lib/core/models/logbook_stats.dart` -> aggregate stats
 - `lib/core/models/personal_records.dart` -> personal records (deepest/longest/coldest dive)
+- `lib/core/models/port.dart` -> port (name, optional lat/lon, usage count)
 - `lib/core/models/trip.dart` -> trip (name, dive/buddy count, date range)
 
 ### Core · shared widgets
@@ -171,7 +173,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/dives/widgets/choice_sheet.dart` -> showChoiceSheet: generic titled bottom-sheet list of options (batch pickers)
 - `lib/features/dives/logic/bulk_edit.dart` -> batch actions on the selection: set/clear dive type (+ type cylinders like the editor), add tag (existing/new), remove own tag (reports those still inheriting it)
 - `lib/features/dives/logic/adjust_time.dart` -> batch time adjustment: new time of the first dive, same offset to all
-- `lib/features/dives/widgets/dive_editor_form.dart` -> shared body for new/edit (site/buddies/tags/type/fields/cylinders)
+- `lib/features/dives/widgets/dive_editor_form.dart` -> shared body for new/edit (site/port/buddies/tags/type/fields/cylinders)
 - `lib/features/dives/widgets/dive_type_picker_field.dart` -> field + picker sheet for dive type
 - `lib/features/dives/widgets/gas_segments.dart` -> gas switches (color/label) for the enlarged chart
 - `lib/features/dives/widgets/tags_picker_field.dart` -> chosen tags field (chips; inherited site/type tags shown tinted, read-only)
@@ -200,6 +202,12 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/plan/widgets/plan_reserve_field.dart` -> reserve selector (35/50 bar, thirds 1/3, quarters 1/2, custom)
 - `lib/features/plan/widgets/plan_cylinders_field.dart` -> editable cylinder list (litres + reserve/empties flag); PlanCyl
 
+### ports
+- `lib/features/ports/screens/port_picker_screen.dart` -> port list: pick, new (picked straight away), edit, delete (unlinks); usage count
+- `lib/features/ports/screens/port_edit_screen.dart` -> create/edit port: name + lat/lon + pick on map
+- `lib/features/ports/widgets/port_picker_field.dart` -> chosen-port field (boat icon, clear) + pickPort; used by the dive editor and trip detail
+- `lib/features/ports/widgets/port_marker.dart` -> portMarker: boat-in-blue-circle map marker, tap shows name + role
+
 ### documents
 - `lib/features/documents/screens/documents_screen.dart` -> list with expiry status + add + multi-export to PDF
 - `lib/features/documents/screens/document_detail_screen.dart` -> view large image, edit, delete, share (PDF)
@@ -213,9 +221,10 @@ with `screens/` and, if needed, `widgets/`).
 
 ### trips
 - `lib/features/trips/screens/trips_screen.dart` -> trip list (create/rename/delete)
-- `lib/features/trips/screens/trip_detail_screen.dart` -> detail: buddies (edit/from dives) + view dives
+- `lib/features/trips/screens/trip_detail_screen.dart` -> detail: view dives, map (sites numbered + ports as boats, route departure → sites → arrival), ports, buddies (edit/from dives)
+- `lib/features/trips/widgets/trip_ports_section.dart` -> optional departure/arrival port + "same as departure" checkbox (saves on change)
 - `lib/features/trips/logic/assign_trip_action.dart` -> dialog to assign the selection to a trip (pick/create)
-- `lib/features/trips/logic/export_trip.dart` -> exports/shares trips as .ddb (trip+dives+buddies+cylinders+tags, optional profiles; name Year-Name-PanDive)
+- `lib/features/trips/logic/export_trip.dart` -> exports/shares trips as .ddb (trip+ports+dives+buddies+cylinders+tags, optional profiles; name Year-Name-PanDive)
 - `lib/features/trips/widgets/export_trips_dialog.dart` -> confirmation: trip list + "also export profiles" checkbox (off)
 
 ### sites
@@ -223,10 +232,11 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/sites/screens/import_sites_screen.dart` -> JSON import preview (update-only/+new mode, per-row checkbox, add/modify color, confirms count)
 - `lib/features/sites/logic/site_import.dart` -> JSON import plan (add/modify, null doesn't overwrite) + applySiteImport
 - `lib/features/sites/logic/export_sites.dart` -> exports sites to JSON and shares (sitesToJson/writeSitesJson, JSON generated in another isolate; shared or saved with shareOrSaveFile)
+- `lib/features/sites/screens/site_picker_screen.dart` -> pick a site for a dive (grouped list) or create a new one
 - `lib/features/sites/screens/site_info_screen.dart` -> site info (fields, tags, edit/delete, swipe between sites)
 - `lib/features/sites/screens/site_edit_screen.dart` -> add/edit site (fields + GPS location + tags)
 - `lib/features/sites/screens/map_picker_screen.dart` -> pick a location on the map (tap + my GPS)
-- `lib/features/sites/screens/sites_map_screen.dart` -> viewer of all sites with coords (markers -> view dives)
+- `lib/features/sites/screens/sites_map_screen.dart` -> viewer of all sites with coords (markers -> view dives); for a trip also its ports (boat markers, unnumbered) and the dives' ports
 - `lib/features/sites/widgets/sites_grouped_list.dart` -> list grouped by country (collapse/search by name/country/region/tags/sort by dives); filterSites = the search filter, also used by "select all"
 - `lib/features/sites/widgets/site_tile.dart` -> site row (avatar, region · dive count, tag chips, info eye)
 

@@ -1,4 +1,4 @@
-/// Full dive editing: fields, site, buddies, type, cylinders.
+/// Full dive editing: fields, site, port, buddies, type, cylinders.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -14,6 +14,7 @@ import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
 import 'package:pandive/features/dives/widgets/dive_editor_form.dart';
 import 'package:pandive/features/dives/widgets/dive_form.dart';
 import 'package:pandive/features/dives/widgets/dive_type_picker_field.dart';
+import 'package:pandive/features/ports/widgets/port_picker_field.dart';
 import 'package:pandive/features/sites/screens/site_picker_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -32,6 +33,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
   late int _rating = widget.dive.rating ?? 0;
   late String? _typeName = widget.dive.diveType;
   DiveSite? _site;
+  Port? _port;
   List<Buddy> _buddies = [];
   List<Tag> _tags = [];
   List<Cylinder> _tanks = [];
@@ -42,6 +44,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
     super.initState();
     final pid = widget.dive.placeId;
     _site = pid != null ? widget.db.getSite(pid) : null;
+    _port = widget.db.portForDive(widget.dive.id);
     _buddies = widget.db.diveBuddies(widget.dive.id);
     _tags = widget.db.tagsForDive(widget.dive.id);
     _tanks = widget.db.cylinders(widget.dive.id);
@@ -59,6 +62,10 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
     final s = await Navigator.of(context).push<DiveSite>(
         MaterialPageRoute(builder: (_) => SitePickerScreen(db: widget.db)));
     if (s != null) setState(() => _site = s);
+  }
+  Future<void> _pickPort() async {
+    final p = await pickPort(context, widget.db, selectedId: _port?.id);
+    if (p != null) setState(() => _port = p);
   }
   Future<void> _pickBuddies() async {
     final r = await Navigator.of(context).push<List<Buddy>>(MaterialPageRoute(
@@ -103,6 +110,7 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
         'Buddy': _buddies.isEmpty ? null : _buddies.map((b) => b.name).join(', '),
         'BuddyIDs': _buddies.isEmpty ? null : _buddies.map((b) => b.id).join(','),
       });
+      widget.db.setDivePort(widget.dive.id, _port?.id);
       widget.db.setDiveTanks(widget.dive.id, _tanks);
       widget.db.setDiveTags(widget.dive.id, _tags);
       if (mounted) await renumberAfterSave(context, widget.db, widget.dive.id);
@@ -136,6 +144,9 @@ class _EditDiveScreenState extends State<EditDiveScreen> {
         site: _site,
         onPickSite: _pickSite,
         onClearSite: () => setState(() => _site = null),
+        port: _port,
+        onPickPort: _pickPort,
+        onClearPort: () => setState(() => _port = null),
         buddies: _buddies,
         onPickBuddies: _pickBuddies,
         tags: _tags,

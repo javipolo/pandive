@@ -448,5 +448,22 @@
   "bulkTagRemoved": "\"{tag}\" treta de {count, plural, =1{1 immersió} other{{count} immersions}}",
   "bulkTagStillInherited": "{count, plural, =1{1 encara la té} other{{count} encara la tenen}} pel lloc o el tipus d'immersió",
   "bulkTagOnDives": "{count, plural, =1{En 1 immersió seleccionada} other{En {count} immersions seleccionades}}",
-  "bulkNoOwnTags": "Les immersions seleccionades no tenen etiquetes pròpies (les del lloc o del tipus d'immersió es treuen allà)"
+  "bulkNoOwnTags": "Les immersions seleccionades no tenen etiquetes pròpies (les del lloc o del tipus d'immersió es treuen allà)",
+  "port": "Port",
+  "ports": "Ports",
+  "selectPort": "Tria un port",
+  "selectPortOptional": "Port (opcional)",
+  "newPort": "Port nou",
+  "editPort": "Edita el port",
+  "portName": "Nom del port",
+  "portNameRequired": "El port necessita un nom",
+  "noPorts": "Encara no hi ha ports",
+  "portNoLocation": "sense ubicació",
+  "portUses": "{count, plural, =0{Sense ús} =1{Usat 1 vegada} other{Usat {count} vegades}}",
+  "deletePortConfirm": "Vols esborrar el port \"{name}\"? {count, plural, =0{No s'utilitza.} =1{Es treu d'1 immersió o viatge.} other{Es treu de {count} immersions o viatges.}}",
+  "departurePort": "Port de sortida",
+  "arrivalPort": "Port d'arribada",
+  "departurePortNone": "Port de sortida (cap: viatge des de terra)",
+  "arrivalPortNone": "Port d'arribada (cap)",
+  "arrivalSameAsDeparture": "El port d'arribada és el mateix que el de sortida"
 }

@@ -24,6 +24,7 @@ part 'db_helpers.dart';
 part 'db_buddies.dart';
 part 'db_buddies_merge.dart';
 part 'db_trips.dart';
+part 'db_ports.dart';
 part 'db_sites.dart';
 part 'db_tanks.dart';
 part 'db_tags.dart';

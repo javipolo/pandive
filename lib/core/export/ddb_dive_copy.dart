@@ -1,6 +1,6 @@
 /// Copies one dive from a .ddb into another .ddb being exported: data, site
-/// with coordinates, buddies, computer, cylinders, tags and, optionally, the
-/// profile. Shared by the trip export and the dive-selection export.
+/// with coordinates, port, buddies, computer, cylinders, tags and,
+/// optionally, the profile. Shared by the trip export and the dive-selection export.
 library;
 
 import 'package:pandive/core/db/divemate_db.dart';
@@ -43,5 +43,10 @@ int? copyDiveToDdb(DivemateDb source, DivemateDb out, Dive d,
     buddyIds: ids.isEmpty ? null : ids.join(','),
   );
   out.copyDiveDetailsFrom(newId, source, d.id, withProfile: withProfile);
+  out.setDivePort(newId, copyPortToDdb(out, source.portForDive(d.id)));
   return newId;
 }
+
+/// The same port (by name, with its position) in [out]; null for null.
+int? copyPortToDdb(DivemateDb out, Port? p) =>
+    p == null ? null : out.findOrCreatePort(p.name, lat: p.lat, lon: p.lon);

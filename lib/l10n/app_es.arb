@@ -448,5 +448,22 @@
   "bulkTagRemoved": "\"{tag}\" quitado de {count, plural, =1{1 buceo} other{{count} buceos}}",
   "bulkTagStillInherited": "{count, plural, =1{1 lo sigue teniendo} other{{count} lo siguen teniendo}} por el sitio o el tipo de buceo",
   "bulkTagOnDives": "{count, plural, =1{En 1 buceo seleccionado} other{En {count} buceos seleccionados}}",
-  "bulkNoOwnTags": "Los buceos seleccionados no tienen tags propios (los del sitio o el tipo de buceo se quitan allí)"
+  "bulkNoOwnTags": "Los buceos seleccionados no tienen tags propios (los del sitio o el tipo de buceo se quitan allí)",
+  "port": "Puerto",
+  "ports": "Puertos",
+  "selectPort": "Elegir puerto",
+  "selectPortOptional": "Puerto (opcional)",
+  "newPort": "Nuevo puerto",
+  "editPort": "Editar puerto",
+  "portName": "Nombre del puerto",
+  "portNameRequired": "El puerto necesita un nombre",
+  "noPorts": "Aún no hay puertos",
+  "portNoLocation": "sin ubicación",
+  "portUses": "{count, plural, =0{Sin usar} =1{Usado 1 vez} other{Usado {count} veces}}",
+  "deletePortConfirm": "¿Borrar el puerto \"{name}\"? {count, plural, =0{No se usa.} =1{Se quita de 1 buceo o viaje.} other{Se quita de {count} buceos o viajes.}}",
+  "departurePort": "Puerto de salida",
+  "arrivalPort": "Puerto de llegada",
+  "departurePortNone": "Puerto de salida (ninguno: viaje desde tierra)",
+  "arrivalPortNone": "Puerto de llegada (ninguno)",
+  "arrivalSameAsDeparture": "El puerto de llegada es el mismo que el de salida"
 }

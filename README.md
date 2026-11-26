@@ -14,8 +14,9 @@ an existing DiveMate logbook as is: no conversion needed.
   Shearwater Peregrine/Perdix, Mares Puck 4 and Heinrichs Weikamp OSTC).
 - **Full dive detail**: depth and temperature profile, gases, deco, cylinders
   and SAC.
-- **Organize**: dive sites (with map), buddies, tags, trips, dive types and
-  cylinder presets, search and filters. Batch edits on a selection of dives
+- **Organize**: dive sites (with map), buddies, tags, trips (with optional
+  departure/arrival port, shown on the trip map), ports (also per dive),
+  dive types and cylinder presets, search and filters. Batch edits on a selection of dives
   (long-press): merge, adjust time, assign a trip, set or clear the dive
   type, add or remove a tag.
 - **Statistics** and personal records, overall or for any selection of dives.

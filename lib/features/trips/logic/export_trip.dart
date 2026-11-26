@@ -85,6 +85,10 @@ Future<void> writeTripDdb(
   bool withProfiles = false,
 }) async {
   final outTrip = out.createTrip(trip.name);
+  final ports = source.tripPorts(trip.id);
+  out.setTripPorts(outTrip,
+      departureId: copyPortToDdb(out, ports.departure),
+      arrivalId: copyPortToDdb(out, ports.arrival));
   out.setTripBuddies(outTrip, [
     for (final b in source.tripBuddies(trip.id)) out.findOrCreateBuddy(b.name),
   ]);

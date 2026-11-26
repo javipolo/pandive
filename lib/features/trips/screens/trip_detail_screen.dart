@@ -1,4 +1,5 @@
-/// Trip detail: buddies (editable) and access to its dives.
+/// Trip detail: access to its dives and map, ports (departure/arrival) and
+/// buddies (editable).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -13,6 +14,7 @@ import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
 import 'package:pandive/features/sites/screens/sites_map_screen.dart';
 import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:pandive/features/trips/widgets/export_trips_dialog.dart';
+import 'package:pandive/features/trips/widgets/trip_ports_section.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class TripDetailScreen extends StatefulWidget {
@@ -67,7 +69,11 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
         if (db2 == null) return -1;
         return da.compareTo(db2);
       });
-    if (sites.isEmpty) {
+    final ports = widget.db.tripPorts(widget.trip.id);
+    final divePorts = widget.db.portsForDives([for (final d in dives) d.id]);
+    final anyPort = [ports.departure, ports.arrival, ...divePorts]
+        .any((p) => p != null && p.hasCoords);
+    if (sites.isEmpty && !anyPort) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(t.noLocatedSites)));
       return;
@@ -78,7 +84,10 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
           settings: widget.settings,
           sites: sites,
           title: widget.trip.name,
-          connect: true),
+          connect: true,
+          departure: ports.departure,
+          arrival: ports.arrival,
+          ports: divePorts),
     ));
   }
 
@@ -138,6 +147,8 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: _openMap,
           ),
+          const Divider(),
+          TripPortsSection(db: widget.db, tripId: widget.trip.id),
           const Divider(),
           Row(
             children: [

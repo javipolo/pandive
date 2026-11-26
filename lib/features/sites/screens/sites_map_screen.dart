@@ -1,5 +1,7 @@
 /// Viewer of all dive sites with coordinates on a satellite map.
-/// Tapping a marker shows the name and lets you see its dives.
+/// Tapping a marker shows the name and lets you see its dives. For a trip,
+/// also its ports (boat markers, not numbered): the route starts at the
+/// departure port and ends at the arrival port.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -11,26 +13,40 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/site_map.dart';
 import 'package:pandive/features/dives/screens/filtered_dives_screen.dart';
+import 'package:pandive/features/ports/widgets/port_marker.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class SitesMapScreen extends StatelessWidget {
   final DivemateDb db;
+
   /// Only to open a site's dives from its marker; if null, the
   /// marker only shows the name.
   final Settings? settings;
+
   /// If given, shows only these sites (e.g. a trip's); otherwise all.
   final List<DiveSite>? sites;
   final String? title;
+
   /// Joins the sites with a line in the given order and numbers the markers
   /// (trip route).
   final bool connect;
-  const SitesMapScreen(
-      {super.key,
-      required this.db,
-      this.settings,
-      this.sites,
-      this.title,
-      this.connect = false});
+
+  /// Trip ports (shown with a boat; the route goes from [departure] to
+  /// [arrival]) and other ports to show without joining (e.g. the dives').
+  final Port? departure;
+  final Port? arrival;
+  final List<Port> ports;
+  const SitesMapScreen({
+    super.key,
+    required this.db,
+    this.settings,
+    this.sites,
+    this.title,
+    this.connect = false,
+    this.departure,
+    this.arrival,
+    this.ports = const [],
+  });
 
   void _open(BuildContext context, DiveSite s) {
     final t = AppLocalizations.of(context);
@@ -51,14 +67,16 @@ class SitesMapScreen extends StatelessWidget {
                 title: Text(t.divesWith(s.name ?? t.site)),
                 onTap: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => FilteredDivesScreen(
-                      db: db,
-                      settings: settings!,
-                      title: s.name ?? t.site,
-                      loader: () => db.listDivesBySite(s.id),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => FilteredDivesScreen(
+                        db: db,
+                        settings: settings!,
+                        title: s.name ?? t.site,
+                        loader: () => db.listDivesBySite(s.id),
+                      ),
                     ),
-                  ));
+                  );
                 },
               ),
           ],
@@ -68,55 +86,85 @@ class SitesMapScreen extends StatelessWidget {
   }
 
   Widget _numbered(BuildContext context, int n) => Container(
-        decoration: BoxDecoration(
-          color: Colors.red,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-        ),
-        alignment: Alignment.center,
-        child: Text('$n',
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 13)),
-      );
+    decoration: BoxDecoration(
+      color: Colors.red,
+      shape: BoxShape.circle,
+      border: Border.all(color: Colors.white, width: 2),
+    ),
+    alignment: Alignment.center,
+    child: Text(
+      '$n',
+      style: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 13,
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final located =
-        (sites ?? db.listSites()).where((s) => s.hasCoords).toList();
+    final located = (sites ?? db.listSites())
+        .where((s) => s.hasCoords)
+        .toList();
     final points = [for (final s in located) LatLng(s.lat!, s.lon!)];
+    LatLng? at(Port? p) =>
+        (p != null && p.hasCoords) ? LatLng(p.lat!, p.lon!) : null;
+    final dep = at(departure), arr = at(arrival);
+    final route = [?dep, ...points, ?arr];
+    // Each port once, with its role (a trip port wins over a dive's).
+    final roles = <int, (Port, String)>{
+      for (final p in ports) p.id: (p, t.port),
+      if (arrival != null) arrival!.id: (arrival!, t.arrivalPort),
+      if (departure != null)
+        departure!.id: (
+          departure!,
+          departure!.id == arrival?.id
+              ? '${t.departurePort} · ${t.arrivalPort}'
+              : t.departurePort,
+        ),
+    };
+    final portMarkers = [
+      for (final (p, role) in roles.values)
+        if (p.hasCoords) portMarker(context, p, role),
+    ];
+    final all = [...points, for (final m in portMarkers) m.point];
     return Scaffold(
       appBar: AppBar(title: Text(title ?? t.mapTitle)),
-      body: located.isEmpty
+      body: all.isEmpty
           ? Center(child: Text(t.noLocatedSites))
           : Stack(
               children: [
                 SiteMap(
-                  center: points.first,
+                  center: all.first,
                   zoom: 8,
-                  fitBounds: points,
-                  route: connect ? points : null,
+                  fitBounds: all,
+                  route: connect ? route : null,
                   markers: [
+                    ...portMarkers,
                     for (var i = 0; i < located.length; i++)
                       Marker(
                         point: points[i],
                         width: connect ? 30 : 40,
                         height: connect ? 30 : 40,
-                        alignment:
-                            connect ? Alignment.center : Alignment.topCenter,
+                        alignment: connect
+                            ? Alignment.center
+                            : Alignment.topCenter,
                         child: GestureDetector(
                           onTap: () => _open(context, located[i]),
                           child: connect
                               ? _numbered(context, i + 1)
-                              : const Icon(Icons.location_on,
-                                  color: Colors.red, size: 40),
+                              : const Icon(
+                                  Icons.location_on,
+                                  color: Colors.red,
+                                  size: 40,
+                                ),
                         ),
                       ),
                   ],
                 ),
-                if (connect && points.length >= 2)
+                if (connect && route.length >= 2)
                   Positioned(
                     top: 8,
                     left: 0,
@@ -125,10 +173,13 @@ class SitesMapScreen extends StatelessWidget {
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          child: Text(t.tripDistance(_km(points)),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold)),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          child: Text(
+                            t.tripDistance(_km(route)),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),

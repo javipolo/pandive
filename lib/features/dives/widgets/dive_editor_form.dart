@@ -1,4 +1,4 @@
-/// Shared body of dive creation/editing: site, buddies, tags,
+/// Shared body of dive creation/editing: site, port, buddies, tags,
 /// dive type, scalar fields and cylinders. Reused by new/edit.
 library;
 
@@ -11,6 +11,8 @@ import 'package:pandive/features/dives/widgets/dive_type_picker_field.dart';
 import 'package:pandive/features/dives/widgets/site_picker_field.dart';
 import 'package:pandive/features/dives/widgets/tags_picker_field.dart';
 import 'package:pandive/features/dives/widgets/tanks_editor.dart';
+import 'package:pandive/features/ports/widgets/port_picker_field.dart';
+import 'package:pandive/l10n/app_localizations.dart';
 
 class DiveEditorForm extends StatelessWidget {
   final DiveFormControllers c;
@@ -21,6 +23,9 @@ class DiveEditorForm extends StatelessWidget {
   final DiveSite? site;
   final VoidCallback onPickSite;
   final VoidCallback onClearSite;
+  final Port? port; // the boat's departure port (optional)
+  final VoidCallback onPickPort;
+  final VoidCallback onClearPort;
   final List<Buddy> buddies;
   final VoidCallback onPickBuddies;
   final List<Tag> tags;
@@ -44,6 +49,9 @@ class DiveEditorForm extends StatelessWidget {
     required this.site,
     required this.onPickSite,
     required this.onClearSite,
+    required this.port,
+    required this.onPickPort,
+    required this.onClearPort,
     required this.buddies,
     required this.onPickBuddies,
     required this.tags,
@@ -60,11 +68,18 @@ class DiveEditorForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return ListView(
       padding: EdgeInsets.fromLTRB(
           16, 16, 16, 16 + MediaQuery.of(context).viewInsets.bottom),
       children: [
         SitePickerField(site: site, onTap: onPickSite, onClear: onClearSite),
+        PortPickerField(
+            port: port,
+            placeholder: t.selectPortOptional,
+            label: t.port,
+            onTap: onPickPort,
+            onClear: onClearPort),
         BuddiesPickerField(buddies: buddies, onTap: onPickBuddies),
         TagsPickerField(
             tags: tags, inherited: inheritedTags, onTap: onPickTags),
