@@ -26,7 +26,7 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
   `lib/`, actualiza `PROJECT_MAP.md` en el mismo turno.
 - **Control de comandos**: NO ejecutes `flutter build` ni lances emuladores
   automáticamente, EXCEPTO el build obligatorio tras cada commit (`make
-  apk-release`, ver Workflow). Fuera de ese caso, solo `flutter analyze` (o
+  apk`, ver Workflow). Fuera de ese caso, solo `flutter analyze` (o
   `make analyze`) tras un cambio grande para verificar.
 - **Operaciones largas: feedback siempre y sin bloquear**. Toda acción que
   pueda tardar (importar, exportar, leer/escribir ficheros, red, procesar
@@ -68,14 +68,14 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 - Commit messages: short imperative subject (`feat:`, `fix:`, `docs:`, `chore:`),
   body only if it adds something. End with the Co-Authored-By trailer the harness
   specifies.
-- **Build after every commit.** Right after committing, run `make apk-release`
+- **Build after every commit.** Right after committing, run `make apk`
   (arm64 release APK for sideload) so the user finds it ready. This overrides the
   "no `flutter build`" rule below, but only for the post-commit build.
 
 ## Commands (see `Makefile`)
 
-- `make apk` — debug APK (sideload)        `make run` — build+install+run on device
-- `make install` — install last APK        `make test` — unit + real-DB tests
+- `make apk` — release APK (sideload)      `make run` — build+install+run on device
+- `make install` — install release APK     `make test` — unit + real-DB tests
 - `make analyze` — static analysis         `make ldc-android` — cross-compile libdivecomputer
 - `make help` — list all targets
 
