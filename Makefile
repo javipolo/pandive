@@ -37,8 +37,6 @@ GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)$(if $(shell git st
 VERSION_FLAGS := $(if $(BUILD_NAME),--build-name=$(BUILD_NAME) --dart-define=PANDIVE_VERSION=$(BUILD_NAME),) \
 	$(if $(BUILD_NUMBER),--build-number=$(BUILD_NUMBER),) \
 	$(if $(GIT_COMMIT),--dart-define=PANDIVE_COMMIT=$(GIT_COMMIT),)
-RELEASE_TAG := $(shell git describe --tags --exact-match 2>/dev/null)
-RELEASES_DIR := releases
 
 .DEFAULT_GOAL := help
 
@@ -72,16 +70,23 @@ apk-release: apk ## Alias of apk
 
 APK := build/app/outputs/flutter-apk/app-release.apk
 
-# Release flow: commit, `git tag vX.Y.Z`, `make release`. Refuses to build
-# from a dirty tree or from a commit without an exact tag.
+# Release flow (scripts/release.sh): bump the tag (minor by default; BUMP=major
+# or BUMP=patch), write and commit release/changelog-<version>.txt, tag, build
+# the APK from the tagged commit, push and create the GitHub release with it.
+# DRY_RUN=1 only prints the next version and the changelog.
+BUMP ?= minor
+
 .PHONY: release
-release: require-android ## Build the APK of the tagged HEAD into releases/PanDive-Android-<tag>.apk
-	@git diff --quiet HEAD || { echo "Uncommitted changes: commit or stash them first"; exit 1; }
-	@test -n "$(RELEASE_TAG)" || { echo "HEAD has no tag: run 'git tag vX.Y.Z' first"; exit 1; }
-	$(MAKE) apk
-	@mkdir -p $(RELEASES_DIR)
-	cp $(APK) $(RELEASES_DIR)/PanDive-Android-$(RELEASE_TAG).apk
-	@echo "Release $(RELEASE_TAG) (versionCode $(BUILD_NUMBER)): $(RELEASES_DIR)/PanDive-Android-$(RELEASE_TAG).apk"
+release: require-android ## Cut a release: bump tag (BUMP=major|minor|patch), changelog, APK, push, GitHub release
+	./scripts/release.sh $(BUMP)
+
+.PHONY: release-major
+release-major: ## make release BUMP=major
+	$(MAKE) release BUMP=major
+
+.PHONY: release-patch
+release-patch: ## make release BUMP=patch
+	$(MAKE) release BUMP=patch
 
 .PHONY: version
 version: ## Print the versionName / versionCode a build would get

@@ -65,13 +65,27 @@ are also passed as `--dart-define` (`PANDIVE_VERSION`, `PANDIVE_COMMIT`) and
 shown in About; a plain `flutter run` shows "dev".
 
 ```bash
-git tag v1.1.0
-make release        # -> releases/PanDive-Android-v1.1.0.apk (gitignored)
-make version        # what versionName / versionCode a build would get
+make release                 # v1.1.0 -> v1.2.0 (minor bump, the default)
+make release BUMP=patch      # v1.1.0 -> v1.1.1  (or: make release-patch)
+make release BUMP=major      # v1.1.0 -> v2.0.0  (or: make release-major)
+DRY_RUN=1 make release       # only print the next version and the changelog
+make version                 # what versionName / versionCode a build would get
 ```
 
-`make release` refuses a dirty tree or an untagged HEAD. Upload the APK
-to a GitHub release, e.g. `gh release create v1.1.0 releases/PanDive-Android-v1.1.0.apk`.
+`make release` (`scripts/release.sh`) must run on a clean `main` that is
+not behind `origin`, with `gh` logged in. It:
+
+1. Takes the latest `vX.Y.Z` tag and bumps it.
+2. Writes `release/changelog-X.Y.Z.txt` from the commit subjects since the
+   previous tag, grouped into features (`feat:`), fixes (`fix:`) and other.
+3. Commits it (`chore: release vX.Y.Z`) and creates the annotated tag.
+4. Builds the APK from the tagged commit (so `versionName` is exactly
+   `X.Y.Z`) into `release/PanDive-Android-vX.Y.Z.apk`. If the build fails,
+   the commit and tag are undone locally and nothing is pushed.
+5. Pushes `main` and the tag atomically.
+6. Runs `gh release create` with the changelog as notes and the APK attached.
+
+APKs in `release/` are gitignored; the changelogs are versioned.
 
 ### Release signing
 

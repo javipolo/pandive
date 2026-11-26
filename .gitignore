@@ -1,5 +1,5 @@
-# Releases
-/releases/
+# Releases: APKs are ignored, changelogs are versioned
+/release/*.apk
 
 # Build artifacts
 /build/
