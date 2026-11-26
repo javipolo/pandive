@@ -167,7 +167,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/dives/widgets/dive_group_header.dart` -> group header (year/month) collapsible/selectable
 - `lib/features/dives/widgets/dive_row.dart` -> DiveMate-style dive row (big number + 2 lines)
 - `lib/features/dives/widgets/add_dive_sheet.dart` -> "add" sheet: manual entry or transfer
-- `lib/features/dives/widgets/dives_selection_bar.dart` -> selection bar: icons (select all/stats/merge/trip/delete) + overflow menu (dive type/add tag/remove tag/adjust time/export)
+- `lib/features/dives/widgets/dives_selection_bar.dart` -> selection bar: icons (select all/stats) + overflow menu (dive type/add tag/remove tag/adjust time/trip/merge/export/delete)
 - `lib/features/dives/widgets/choice_sheet.dart` -> showChoiceSheet: generic titled bottom-sheet list of options (batch pickers)
 - `lib/features/dives/logic/bulk_edit.dart` -> batch actions on the selection: set/clear dive type (+ type cylinders like the editor), add tag (existing/new), remove own tag (reports those still inheriting it)
 - `lib/features/dives/logic/adjust_time.dart` -> batch time adjustment: new time of the first dive, same offset to all

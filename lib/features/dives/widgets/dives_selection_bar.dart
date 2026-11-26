@@ -1,6 +1,5 @@
-/// Dive selection bar: the frequent actions as icons (select all, stats,
-/// merge, trip, delete) and the rest in an overflow menu (adjust time,
-/// export, dive type, add/remove tag).
+/// Dive selection bar: select all and stats as icons, everything else in an
+/// overflow menu (dive type, tags, time, trip, merge, export, delete).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -8,7 +7,16 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/widgets/selection_bar.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
-enum _More { adjustTime, export, diveType, addTag, removeTag }
+enum _More {
+  diveType,
+  addTag,
+  removeTag,
+  adjustTime,
+  assignTrip,
+  merge,
+  export,
+  delete,
+}
 
 class DivesSelectionBar extends StatelessWidget {
   final int count;
@@ -43,20 +51,26 @@ class DivesSelectionBar extends StatelessWidget {
   });
 
   void _onMore(_More m) => switch (m) {
-        _More.adjustTime => onAdjustTime(),
-        _More.export => onExport(),
         _More.diveType => onDiveType(),
         _More.addTag => onAddTag(),
         _More.removeTag => onRemoveTag(),
+        _More.adjustTime => onAdjustTime(),
+        _More.assignTrip => onAssignTrip(),
+        _More.merge => onMerge?.call(),
+        _More.export => onExport(),
+        _More.delete => onDelete(),
       };
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    PopupMenuItem<_More> item(_More v, IconData icon, String label) =>
+    PopupMenuItem<_More> item(_More v, IconData icon, String label,
+            {bool enabled = true}) =>
         PopupMenuItem(
           value: v,
+          enabled: enabled,
           child: ListTile(
+              enabled: enabled,
               leading: Icon(icon),
               title: Text(label),
               contentPadding: EdgeInsets.zero),
@@ -70,16 +84,6 @@ class DivesSelectionBar extends StatelessWidget {
           tooltip: t.navStats,
           icon: const Icon(Icons.bar_chart),
           onPressed: onStats),
-      IconButton(
-          tooltip: t.merge, icon: const Icon(Icons.merge), onPressed: onMerge),
-      IconButton(
-          tooltip: t.assignToTrip,
-          icon: const Icon(Icons.luggage),
-          onPressed: onAssignTrip),
-      IconButton(
-          tooltip: t.delete,
-          icon: const Icon(Icons.delete_outline),
-          onPressed: onDelete),
       PopupMenuButton<_More>(
         onSelected: _onMore,
         itemBuilder: (_) => [
@@ -87,7 +91,11 @@ class DivesSelectionBar extends StatelessWidget {
           item(_More.addTag, Icons.label_outline, t.bulkAddTag),
           item(_More.removeTag, Icons.label_off_outlined, t.bulkRemoveTag),
           item(_More.adjustTime, Icons.schedule, t.adjustTime),
+          item(_More.assignTrip, Icons.luggage, t.assignToTrip),
+          item(_More.merge, Icons.merge, t.merge, enabled: onMerge != null),
           item(_More.export, Icons.share, t.exportSelection),
+          const PopupMenuDivider(),
+          item(_More.delete, Icons.delete_outline, t.delete),
         ],
       ),
     ]);
