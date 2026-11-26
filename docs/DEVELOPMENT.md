@@ -35,8 +35,8 @@ flutter config --android-sdk "$ANDROID_HOME"
 flutter doctor
 ```
 
-The Makefile looks for `flutter` on the `PATH`; override with
-`make … FLUTTER=/path/to/flutter ANDROID_HOME=/path/to/sdk`.
+The Makefile expects `flutter` on the `PATH` and `ANDROID_HOME` exported
+(pointing to the Android SDK; only needed for the Android targets).
 
 ## Building
 

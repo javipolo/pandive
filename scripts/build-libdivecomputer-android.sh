@@ -5,7 +5,8 @@
 #
 # Requirements:
 #   - Android NDK installed. Export ANDROID_NDK pointing to it, e.g.:
-#       export ANDROID_NDK=$HOME/Android/ndk/27.2.12479018
+#       export ANDROID_NDK=$ANDROID_HOME/ndk/27.2.12479018
+#     (`make ldc-android` sets it from ANDROID_HOME.)
 #   - autotools (autoconf/automake/libtool), host clang not needed.
 #
 # Usage:
@@ -13,7 +14,7 @@
 #
 set -euo pipefail
 
-: "${ANDROID_NDK:?Exporta ANDROID_NDK con la ruta al NDK (p.ej. \$HOME/Android/ndk/27.2.12479018)}"
+: "${ANDROID_NDK:?Export ANDROID_NDK with the path to the NDK (e.g. \$ANDROID_HOME/ndk/27.2.12479018)}"
 
 API=24                       # minSdk 24 (Android 7.0); stable BLE
 HOST_TAG=linux-x86_64

@@ -1,14 +1,15 @@
 # Pandive — development tasks.
-# Flutter is not on the PATH of non-interactive shells on this machine, so
-# we resolve it here. Everything can be overridden: `make apk FLUTTER=/other/flutter`.
+# Prerequisites: `flutter` on the PATH and ANDROID_HOME pointing to the Android
+# SDK (only for the Android targets). See docs/DEVELOPMENT.md.
 
-FLUTTER ?= $(shell command -v flutter 2>/dev/null || echo $(HOME)/javi/git/flutter/bin/flutter)
-ANDROID_HOME ?= $(HOME)/javi/Android
-ANDROID_NDK ?= $(ANDROID_HOME)/ndk/27.2.12479018
-
-export ANDROID_HOME
+FLUTTER ?= flutter
+NDK_VERSION := 27.2.12479018
+ANDROID_NDK ?= $(ANDROID_HOME)/ndk/$(NDK_VERSION)
 export ANDROID_NDK
-export PATH := $(dir $(FLUTTER)):$(ANDROID_HOME)/platform-tools:$(PATH)
+
+ifdef ANDROID_HOME
+export PATH := $(ANDROID_HOME)/platform-tools:$(PATH)
+endif
 
 # OAuth Web client ID for Google Drive (serverClientId). Read from
 # android/gdrive_client_id.txt (not versioned) or from the environment variable.
@@ -35,12 +36,16 @@ help: ## Show this help
 deps: ## Install Dart dependencies (flutter pub get)
 	$(FLUTTER) pub get
 
+.PHONY: require-android
+require-android:
+	@test -n "$(ANDROID_HOME)" || { echo "ANDROID_HOME is not set: export it with the path to the Android SDK"; exit 1; }
+
 .PHONY: run
-run: ## Build (release), install and launch on the connected device
+run: require-android ## Build (release), install and launch on the connected device
 	$(FLUTTER) run --release $(DART_DEFINES)
 
 .PHONY: apk
-apk: ## Build an arm64 release APK (sideload)
+apk: require-android ## Build an arm64 release APK (sideload)
 	# --no-tree-shake-icons: bundles the full icon font. Tree-shaking
 	# produced an OTF that some Android devices fail to parse, leaving all
 	# icons as grey squares (tofu): hamburger, bottom bar, FAB...
@@ -55,7 +60,7 @@ APK := build/app/outputs/flutter-apk/app-release.apk
 # --user 0: install only for the phone's owner (not in a work profile or a
 # Secure Folder / second space). Without other profiles it's the default anyway.
 .PHONY: install
-install: ## Install the release APK on the connected device (owner user)
+install: require-android ## Install the release APK on the connected device (owner user)
 	adb install -r --user 0 $(APK)
 
 .PHONY: install-apk
@@ -96,7 +101,7 @@ distclean: clean ## clean + remove compiled libdivecomputer (.so + headers); for
 	@echo "Native artifacts removed: rebuild with 'make dc-libs'"
 
 .PHONY: ldc-android
-ldc-android: ## Cross-compile libdivecomputer for Android (NDK)
+ldc-android: require-android ## Cross-compile libdivecomputer for Android (NDK)
 	./scripts/build-libdivecomputer-android.sh
 
 .PHONY: dc-libs
@@ -107,14 +112,14 @@ dc-libs: ldc-android ## Cross-compile and copy .so + headers into the Android pr
 	done
 	@rm -rf android/app/src/main/cpp/include/libdivecomputer
 	@cp -r build/android/arm64-v8a/install/include/libdivecomputer android/app/src/main/cpp/include/
-	@echo "libdivecomputer .so + headers copiados a android/app/src/main/"
+	@echo "libdivecomputer .so + headers copied to android/app/src/main/"
 
 .PHONY: ldc-linux
 ldc-linux: ## Build static libdivecomputer for the Linux app (linux/ldc/)
 	./scripts/build-libdivecomputer-linux.sh
 	@mkdir -p linux/ldc
 	@cp build/linux-ldc/install/lib/libdivecomputer.a linux/ldc/
-	@echo "libdivecomputer.a copiada a linux/ldc/"
+	@echo "libdivecomputer.a copied to linux/ldc/"
 
 .PHONY: linux
 linux: ## Build the Linux app (release)

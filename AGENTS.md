@@ -79,9 +79,8 @@ DiveMate logbooks open as is and other tools that read them keep working.
 - `make analyze` — static analysis         `make ldc-android` — cross-compile libdivecomputer
 - `make help` — list all targets
 
-The Makefile finds `flutter` on the `PATH` (override with `FLUTTER=…`,
-`ANDROID_HOME=…`). Gradle needs **JDK 17**. Setup details in
-`docs/DEVELOPMENT.md`.
+Prerequisites: `flutter` on the `PATH` and `ANDROID_HOME` exported (Android
+targets). Gradle needs **JDK 17**. Setup details in `docs/DEVELOPMENT.md`.
 
 ## Layout
 
