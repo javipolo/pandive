@@ -176,7 +176,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/dives/widgets/profile_section.dart` -> profile section: compact chart + share / full-screen buttons
 - `lib/features/dives/logic/share_profile.dart` -> PNG image of the profile (ProfileShareCard: title, chart and footer with duration/min temp/depths/deco; same on all platforms): share (mobile) or copy to clipboard (Linux)
 - `lib/features/dives/logic/dive_facts.dart` -> DiveFacts: duration, max/avg depth, min temp, deco (TTS/max ceiling, time with ceiling) from the record + profile; used by the detail and the exported image
-- `lib/features/dives/logic/apply_dive_type.dart` -> apply type: drops empty cylinders (no pressures) and adds the type's
+- `lib/features/dives/logic/apply_dive_type.dart` -> apply type: drops empty cylinders (no pressures) and adds the type's not already filled (same size+material)
 - `lib/features/dives/logic/renumber_after_save.dart` -> after create/edit: renumbers (automatic) or offers to renumber if the dive is out of order
 - `lib/features/dives/logic/dive_search.dart` -> accent-insensitive dive search filter (foldContains)
 - `lib/features/dives/widgets/dive_detail_fields.dart` -> label/value cell, 2/3-column rows, section separator
