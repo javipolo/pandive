@@ -169,7 +169,8 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/dives/widgets/dive_editor_form.dart` -> shared body for new/edit (site/buddies/tags/type/fields/cylinders)
 - `lib/features/dives/widgets/dive_type_picker_field.dart` -> field + picker sheet for dive type
 - `lib/features/dives/widgets/gas_segments.dart` -> gas switches (color/label) for the enlarged chart
-- `lib/features/dives/widgets/tags_picker_field.dart` -> chosen tags field (chips)
+- `lib/features/dives/widgets/tags_picker_field.dart` -> chosen tags field (chips; inherited site/type tags shown tinted, read-only)
+- `lib/features/dives/widgets/tag_chips.dart` -> TagChips: manual tags plain + inherited (site/dive type) tinted with source icon; detail and editor
 - `lib/features/dives/widgets/dives_action_list.dart` -> dive list with batch selection + actions (stats/merge/export/delete); used by the tab and filtered lists
 - `lib/features/dives/logic/export_selection.dart` -> exports the selected dives to a full .ddb (optional profiles) and shares it; works for "Import dives" and "Fill"
 - `lib/features/dives/widgets/export_selection_dialog.dart` -> dialog: logbook name + "also export profiles" checkbox

@@ -138,6 +138,8 @@ class _NewDiveScreenState extends State<NewDiveScreen> {
         buddies: _buddies,
         onPickBuddies: _pickBuddies,
         tags: _tags,
+        inheritedTags:
+            widget.db.inheritedTags(placeId: _site?.id, diveType: _typeName),
         onPickTags: _pickTags,
         diveTypeName: _typeName,
         onPickType: _pickType,

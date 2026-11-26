@@ -252,6 +252,8 @@
   "sacLabel": "SAC",
   "tags": "Etiquetes",
   "selectTags": "Selecciona les etiquetes",
+  "tagFromSite": "Del lloc d'immersió",
+  "tagFromDiveType": "Del tipus d'immersió",
   "newTag": "Etiqueta nova",
   "noTags": "Encara no hi ha etiquetes",
   "share": "Comparteix",

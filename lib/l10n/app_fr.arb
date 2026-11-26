@@ -252,6 +252,8 @@
   "sacLabel": "SAC",
   "tags": "Tags",
   "selectTags": "Sélectionner des tags",
+  "tagFromSite": "Du site de plongée",
+  "tagFromDiveType": "Du type de plongée",
   "newTag": "Nouveau tag",
   "noTags": "Aucun tag pour l'instant",
   "share": "Partager",

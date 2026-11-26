@@ -252,6 +252,8 @@
   "sacLabel": "SAC",
   "tags": "Etiquetas",
   "selectTags": "Seleccionar etiquetas",
+  "tagFromSite": "Del sitio de buceo",
+  "tagFromDiveType": "Del tipo de buceo",
   "newTag": "Nueva etiqueta",
   "noTags": "Aún no hay etiquetas",
   "share": "Compartir",

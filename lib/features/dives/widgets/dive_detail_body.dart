@@ -12,6 +12,7 @@ import 'package:pandive/features/dives/logic/dive_facts.dart';
 import 'package:pandive/features/dives/widgets/cylinder_tile.dart';
 import 'package:pandive/features/dives/widgets/dive_detail_fields.dart';
 import 'package:pandive/features/dives/widgets/profile_section.dart';
+import 'package:pandive/features/dives/widgets/tag_chips.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class DiveDetailBody extends StatelessWidget {
@@ -32,7 +33,9 @@ class DiveDetailBody extends StatelessWidget {
     final profile = db.diveProfile(dive.id);
     final cyls = db.cylinders(dive.id);
     final buddies = db.diveBuddies(dive.id).map((b) => b.name).join(', ');
-    final tags = db.effectiveTagsForDive(dive.id);
+    final tags = db.tagsForDive(dive.id);
+    final inherited =
+        db.inheritedTags(placeId: dive.placeId, diveType: dive.diveType);
 
     final facts = DiveFacts.of(dive, profile);
     final avg = facts.avgDepth;
@@ -108,11 +111,9 @@ class DiveDetailBody extends StatelessWidget {
         ...cyls.map((c) => CylinderTile(cylinder: c)),
         sectionLine(),
         LabeledValue(t.statComputer, dive.computer),
-        if (tags.isNotEmpty) ...[
+        if (tags.isNotEmpty || inherited.isNotEmpty) ...[
           const SizedBox(height: 12),
-          Wrap(spacing: 6, runSpacing: 4, children: [
-            for (final tag in tags) Chip(label: Text(tag.name)),
-          ]),
+          TagChips(own: tags, inherited: inherited),
         ],
         if (dive.comments != null) ...[
           sectionLine(),

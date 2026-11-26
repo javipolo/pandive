@@ -24,6 +24,7 @@ class DiveEditorForm extends StatelessWidget {
   final List<Buddy> buddies;
   final VoidCallback onPickBuddies;
   final List<Tag> tags;
+  final List<InheritedTag> inheritedTags; // from site / dive type (read-only)
   final VoidCallback onPickTags;
   final String? diveTypeName;
   final VoidCallback onPickType;
@@ -46,6 +47,7 @@ class DiveEditorForm extends StatelessWidget {
     required this.buddies,
     required this.onPickBuddies,
     required this.tags,
+    this.inheritedTags = const [],
     required this.onPickTags,
     required this.diveTypeName,
     required this.onPickType,
@@ -64,7 +66,8 @@ class DiveEditorForm extends StatelessWidget {
       children: [
         SitePickerField(site: site, onTap: onPickSite, onClear: onClearSite),
         BuddiesPickerField(buddies: buddies, onTap: onPickBuddies),
-        TagsPickerField(tags: tags, onTap: onPickTags),
+        TagsPickerField(
+            tags: tags, inherited: inheritedTags, onTap: onPickTags),
         DiveTypePickerField(
             typeName: diveTypeName, onTap: onPickType, onClear: onClearType),
         DiveForm(

@@ -415,6 +415,8 @@
   "sacLabel": "SAC",
   "tags": "Tags",
   "selectTags": "Select tags",
+  "tagFromSite": "From the dive site",
+  "tagFromDiveType": "From the dive type",
   "newTag": "New tag",
   "noTags": "No tags yet",
   "share": "Share",

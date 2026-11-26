@@ -252,6 +252,8 @@
   "sacLabel": "SAC",
   "tags": "Etiketak",
   "selectTags": "Hautatu etiketak",
+  "tagFromSite": "Urpekaritza-gunetik",
+  "tagFromDiveType": "Urpekaritza motatik",
   "newTag": "Etiketa berria",
   "noTags": "Etiketarik ez oraindik",
   "share": "Partekatu",
