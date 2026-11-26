@@ -15,7 +15,9 @@ an existing DiveMate logbook as is: no conversion needed.
 - **Full dive detail**: depth and temperature profile, gases, deco, cylinders
   and SAC.
 - **Organize**: dive sites (with map), buddies, tags, trips, dive types and
-  cylinder presets, search and filters.
+  cylinder presets, search and filters. Batch edits on a selection of dives
+  (long-press): merge, adjust time, assign a trip, set or clear the dive
+  type, add or remove a tag.
 - **Statistics** and personal records, overall or for any selection of dives.
 - **Gas planner** for a quick "how much gas do I need" check.
 - **Documents**: keep your certification cards and insurance with expiry

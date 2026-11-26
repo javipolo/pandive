@@ -436,13 +436,17 @@
   "aboutVersion": "Version {version}",
   "@aboutVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "aboutCommit": "Commit {commit}",
   "@aboutCommit": {
     "placeholders": {
-      "commit": {"type": "String"}
+      "commit": {
+        "type": "String"
+      }
     }
   },
   "contactEmail": "Send email",
@@ -805,5 +809,79 @@
     "placeholders": {
       "path": {}
     }
-  }
+  },
+  "apply": "Apply",
+  "bulkDiveType": "Set dive type",
+  "bulkNoDiveType": "No dive type",
+  "bulkAddTag": "Add tag",
+  "bulkRemoveTag": "Remove tag",
+  "bulkDiveTypeTanksConfirm": "Set \"{type}\" on {count, plural, =1{1 dive} other{{count} dives}}? Its cylinders are added where missing (empty cylinders are replaced, as in the editor).",
+  "@bulkDiveTypeTanksConfirm": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkDiveTypeSet": "\"{type}\" set on {count, plural, =1{1 dive} other{{count} dives}}",
+  "@bulkDiveTypeSet": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkDiveTypeCleared": "Dive type removed from {count, plural, =1{1 dive} other{{count} dives}}",
+  "@bulkDiveTypeCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkTagAdded": "\"{tag}\" added to {count, plural, =1{1 dive} other{{count} dives}}",
+  "@bulkTagAdded": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkTagRemoved": "\"{tag}\" removed from {count, plural, =1{1 dive} other{{count} dives}}",
+  "@bulkTagRemoved": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkTagStillInherited": "{count, plural, =1{1 still has it} other{{count} still have it}} from the site or dive type",
+  "@bulkTagStillInherited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkTagOnDives": "{count, plural, =1{On 1 selected dive} other{On {count} selected dives}}",
+  "@bulkTagOnDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkNoOwnTags": "The selected dives have no tags of their own (tags from the site or dive type are removed there)"
 }

@@ -1,7 +1,7 @@
 /// Dive list with batch selection and all actions (stats,
-/// merge, adjust time, export, delete). Controlled: the parent passes `dives`
-/// and reloads in `onChanged` after each mutation. Used in the main tab and
-/// in the filtered lists (by site, buddy or tag).
+/// merge, adjust time, export, trip, dive type, tags, delete). Controlled:
+/// the parent passes `dives` and reloads in `onChanged` after each mutation.
+/// Used in the main tab and in the filtered lists (by site, buddy or tag).
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -11,6 +11,7 @@ import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/confirm_dialog.dart';
 import 'package:pandive/features/dives/logic/adjust_time.dart';
+import 'package:pandive/features/dives/logic/bulk_edit.dart';
 import 'package:pandive/features/dives/logic/export_selection.dart';
 import 'package:pandive/features/dives/screens/dive_detail_screen.dart';
 import 'package:pandive/features/dives/widgets/dives_selection_bar.dart';
@@ -143,9 +144,21 @@ class _DivesActionListState extends State<DivesActionList> {
     _exitSel();
   }
 
+  List<int> get _pickedIds => [for (final d in _picked) d.id];
+
   Future<void> _assignTripSel() async {
-    if (await runAssignToTrip(
-        context, widget.db, [for (final d in _picked) d.id])) {
+    if (await runAssignToTrip(context, widget.db, _pickedIds)) {
+      _exitSel();
+      widget.onChanged();
+    }
+  }
+
+  /// Batch edits (dive type, tags). The selection is index-based and the
+  /// reload may drop dives from a filtered list (e.g. removing the tag it
+  /// filters by), so it's cleared like after the other mutations.
+  Future<void> _bulk(
+      Future<bool> Function(BuildContext, DivemateDb, List<int>) run) async {
+    if (await run(context, widget.db, _pickedIds)) {
       _exitSel();
       widget.onChanged();
     }
@@ -164,6 +177,9 @@ class _DivesActionListState extends State<DivesActionList> {
             onAdjustTime: _adjustTimeSel,
             onExport: _exportSel,
             onAssignTrip: _assignTripSel,
+            onDiveType: () => _bulk(runBulkDiveType),
+            onAddTag: () => _bulk(runBulkAddTag),
+            onRemoveTag: () => _bulk(runBulkRemoveTag),
             onDelete: _deleteSel,
             onSelectAll: _toggleSelectAll,
             allSelected: _allSelected),

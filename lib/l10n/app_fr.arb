@@ -435,5 +435,18 @@
   "readingFile": "Lecture du fichier…",
   "exporting": "Exportation…",
   "saveAs": "Enregistrer sous",
-  "savedTo": "Enregistré dans {path}"
+  "savedTo": "Enregistré dans {path}",
+  "apply": "Appliquer",
+  "bulkDiveType": "Définir le type de plongée",
+  "bulkNoDiveType": "Aucun type de plongée",
+  "bulkAddTag": "Ajouter une étiquette",
+  "bulkRemoveTag": "Retirer une étiquette",
+  "bulkDiveTypeTanksConfirm": "Appliquer « {type} » à {count, plural, =1{1 plongée} other{{count} plongées}} ? Ses blocs sont ajoutés là où ils manquent (les blocs vides sont remplacés, comme dans l'éditeur).",
+  "bulkDiveTypeSet": "« {type} » appliqué à {count, plural, =1{1 plongée} other{{count} plongées}}",
+  "bulkDiveTypeCleared": "Type de plongée retiré de {count, plural, =1{1 plongée} other{{count} plongées}}",
+  "bulkTagAdded": "« {tag} » ajoutée à {count, plural, =1{1 plongée} other{{count} plongées}}",
+  "bulkTagRemoved": "« {tag} » retirée de {count, plural, =1{1 plongée} other{{count} plongées}}",
+  "bulkTagStillInherited": "{count, plural, =1{1 l'a encore} other{{count} l'ont encore}} via le site ou le type de plongée",
+  "bulkTagOnDives": "{count, plural, =1{Sur 1 plongée sélectionnée} other{Sur {count} plongées sélectionnées}}",
+  "bulkNoOwnTags": "Les plongées sélectionnées n'ont pas d'étiquettes propres (celles du site ou du type de plongée se retirent là-bas)"
 }

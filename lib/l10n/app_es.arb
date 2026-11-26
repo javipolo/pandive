@@ -435,5 +435,18 @@
   "readingFile": "Leyendo el fichero…",
   "exporting": "Exportando…",
   "saveAs": "Guardar como",
-  "savedTo": "Guardado en {path}"
+  "savedTo": "Guardado en {path}",
+  "apply": "Aplicar",
+  "bulkDiveType": "Asignar tipo de buceo",
+  "bulkNoDiveType": "Sin tipo de buceo",
+  "bulkAddTag": "Añadir tag",
+  "bulkRemoveTag": "Quitar tag",
+  "bulkDiveTypeTanksConfirm": "¿Asignar \"{type}\" a {count, plural, =1{1 buceo} other{{count} buceos}}? Se añaden sus botellas donde falten (las botellas vacías se sustituyen, como en el editor).",
+  "bulkDiveTypeSet": "\"{type}\" asignado a {count, plural, =1{1 buceo} other{{count} buceos}}",
+  "bulkDiveTypeCleared": "Tipo de buceo quitado de {count, plural, =1{1 buceo} other{{count} buceos}}",
+  "bulkTagAdded": "\"{tag}\" añadido a {count, plural, =1{1 buceo} other{{count} buceos}}",
+  "bulkTagRemoved": "\"{tag}\" quitado de {count, plural, =1{1 buceo} other{{count} buceos}}",
+  "bulkTagStillInherited": "{count, plural, =1{1 lo sigue teniendo} other{{count} lo siguen teniendo}} por el sitio o el tipo de buceo",
+  "bulkTagOnDives": "{count, plural, =1{En 1 buceo seleccionado} other{En {count} buceos seleccionados}}",
+  "bulkNoOwnTags": "Los buceos seleccionados no tienen tags propios (los del sitio o el tipo de buceo se quitan allí)"
 }

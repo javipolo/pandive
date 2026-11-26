@@ -435,5 +435,18 @@
   "readingFile": "Llegint el fitxer…",
   "exporting": "Exportant…",
   "saveAs": "Desa com a",
-  "savedTo": "Desat a {path}"
+  "savedTo": "Desat a {path}",
+  "apply": "Aplica",
+  "bulkDiveType": "Assigna tipus d'immersió",
+  "bulkNoDiveType": "Sense tipus d'immersió",
+  "bulkAddTag": "Afegeix etiqueta",
+  "bulkRemoveTag": "Treu etiqueta",
+  "bulkDiveTypeTanksConfirm": "Vols assignar \"{type}\" a {count, plural, =1{1 immersió} other{{count} immersions}}? S'hi afegeixen les seves ampolles on faltin (les ampolles buides se substitueixen, com a l'editor).",
+  "bulkDiveTypeSet": "\"{type}\" assignat a {count, plural, =1{1 immersió} other{{count} immersions}}",
+  "bulkDiveTypeCleared": "Tipus d'immersió tret de {count, plural, =1{1 immersió} other{{count} immersions}}",
+  "bulkTagAdded": "\"{tag}\" afegida a {count, plural, =1{1 immersió} other{{count} immersions}}",
+  "bulkTagRemoved": "\"{tag}\" treta de {count, plural, =1{1 immersió} other{{count} immersions}}",
+  "bulkTagStillInherited": "{count, plural, =1{1 encara la té} other{{count} encara la tenen}} pel lloc o el tipus d'immersió",
+  "bulkTagOnDives": "{count, plural, =1{En 1 immersió seleccionada} other{En {count} immersions seleccionades}}",
+  "bulkNoOwnTags": "Les immersions seleccionades no tenen etiquetes pròpies (les del lloc o del tipus d'immersió es treuen allà)"
 }

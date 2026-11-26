@@ -435,5 +435,18 @@
   "readingFile": "Fitxategia irakurtzen…",
   "exporting": "Esportatzen…",
   "saveAs": "Gorde honela",
-  "savedTo": "Hemen gorde da: {path}"
+  "savedTo": "Hemen gorde da: {path}",
+  "apply": "Aplikatu",
+  "bulkDiveType": "Esleitu urpekaritza mota",
+  "bulkNoDiveType": "Urpekaritza motarik gabe",
+  "bulkAddTag": "Gehitu etiketa",
+  "bulkRemoveTag": "Kendu etiketa",
+  "bulkDiveTypeTanksConfirm": "\"{type}\" esleitu {count, plural, =1{urpekaritza 1i} other{{count} urpekaritzari}}? Bere botilak falta diren lekuan gehitzen dira (botila hutsak ordezkatzen dira, editorean bezala).",
+  "bulkDiveTypeSet": "\"{type}\" esleituta: {count, plural, =1{urpekaritza 1} other{{count} urpekaritza}}",
+  "bulkDiveTypeCleared": "Urpekaritza mota kenduta: {count, plural, =1{urpekaritza 1} other{{count} urpekaritza}}",
+  "bulkTagAdded": "\"{tag}\" gehituta: {count, plural, =1{urpekaritza 1} other{{count} urpekaritza}}",
+  "bulkTagRemoved": "\"{tag}\" kenduta: {count, plural, =1{urpekaritza 1} other{{count} urpekaritza}}",
+  "bulkTagStillInherited": "{count, plural, =1{1ek oraindik badu} other{{count}k oraindik badute}} gunearen edo urpekaritza motaren bidez",
+  "bulkTagOnDives": "{count, plural, =1{Hautatutako urpekaritza 1ean} other{Hautatutako {count} urpekaritzatan}}",
+  "bulkNoOwnTags": "Hautatutako urpekaritzek ez dute etiketa propiorik (gunearenak edo urpekaritza motarenak han kentzen dira)"
 }

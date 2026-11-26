@@ -27,6 +27,7 @@ part 'db_trips.dart';
 part 'db_sites.dart';
 part 'db_tanks.dart';
 part 'db_tags.dart';
+part 'db_bulk.dart';
 part 'db_merge.dart';
 part 'db_pending.dart';
 part 'db_dive_types.dart';

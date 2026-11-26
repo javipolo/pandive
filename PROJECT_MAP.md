@@ -51,6 +51,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/db/db_trips.dart` -> trips: create/rename/delete, assign dives (PandiveTripId), trip buddies
 - `lib/core/db/db_sites.dart` -> sites (Place): get/create/update, find-or-create
 - `lib/core/db/db_tanks.dart` -> cylinders per dive, "my cylinders" presets, dives per site/buddy, purge of blank cylinders (purgeBlankTanks)
+- `lib/core/db/db_bulk.dart` -> batch edits on a selection: setDivesType, addTagToDives/removeTagFromDives (own link), ownTagCounts (caller wraps in inTransaction)
 - `lib/core/db/db_merge.dart` -> merge dives (concatenated profile, union of data)
 - `lib/core/db/db_pending.dart` -> cache of downloaded-but-unsaved dives (they reappear once)
 - `lib/core/db/db_dive_types.dart` -> dive types + cylinder template + tags (PandiveDiveTypeTag)
@@ -166,13 +167,16 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/dives/widgets/dive_group_header.dart` -> group header (year/month) collapsible/selectable
 - `lib/features/dives/widgets/dive_row.dart` -> DiveMate-style dive row (big number + 2 lines)
 - `lib/features/dives/widgets/add_dive_sheet.dart` -> "add" sheet: manual entry or transfer
-- `lib/features/dives/widgets/dives_selection_bar.dart` -> selection bar (stats/merge/delete)
+- `lib/features/dives/widgets/dives_selection_bar.dart` -> selection bar: icons (select all/stats/merge/trip/delete) + overflow menu (dive type/add tag/remove tag/adjust time/export)
+- `lib/features/dives/widgets/choice_sheet.dart` -> showChoiceSheet: generic titled bottom-sheet list of options (batch pickers)
+- `lib/features/dives/logic/bulk_edit.dart` -> batch actions on the selection: set/clear dive type (+ type cylinders like the editor), add tag (existing/new), remove own tag (reports those still inheriting it)
+- `lib/features/dives/logic/adjust_time.dart` -> batch time adjustment: new time of the first dive, same offset to all
 - `lib/features/dives/widgets/dive_editor_form.dart` -> shared body for new/edit (site/buddies/tags/type/fields/cylinders)
 - `lib/features/dives/widgets/dive_type_picker_field.dart` -> field + picker sheet for dive type
 - `lib/features/dives/widgets/gas_segments.dart` -> gas switches (color/label) for the enlarged chart
 - `lib/features/dives/widgets/tags_picker_field.dart` -> chosen tags field (chips; inherited site/type tags shown tinted, read-only)
 - `lib/features/dives/widgets/tag_chips.dart` -> TagChips: manual tags plain + inherited (site/dive type) tinted with source icon; detail and editor
-- `lib/features/dives/widgets/dives_action_list.dart` -> dive list with batch selection + actions (stats/merge/export/delete); used by the tab and filtered lists
+- `lib/features/dives/widgets/dives_action_list.dart` -> dive list with batch selection + actions (stats/merge/time/export/trip/dive type/tags/delete); used by the tab and filtered lists
 - `lib/features/dives/logic/export_selection.dart` -> exports the selected dives to a full .ddb (optional profiles) and shares it; works for "Import dives" and "Fill"
 - `lib/features/dives/widgets/export_selection_dialog.dart` -> dialog: logbook name + "also export profiles" checkbox
 - `lib/features/dives/widgets/dive_detail_body.dart` -> detail body by sections (number/date, site, profile+metrics, gases, deco, cylinders)
