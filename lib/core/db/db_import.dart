@@ -28,6 +28,10 @@ void _ensureSyncTable(Database db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTypeTank '
       '(Id INTEGER PRIMARY KEY AUTOINCREMENT, TypeId INTEGER, Litres REAL, '
       'Material INTEGER, SortOrd INTEGER, Name TEXT)');
+  // Per-type tags: derived onto the dives of that type (Logbook.Divetype =
+  // type name) at read time, like the site tags.
+  db.execute('CREATE TABLE IF NOT EXISTS PandiveDiveTypeTag '
+      '(TypeId INTEGER, TagId INTEGER, PRIMARY KEY (TypeId, TagId))');
   // Migration: add Name if the table was created earlier (ignore if it exists).
   try {
     db.execute('ALTER TABLE PandiveDiveTypeTank ADD COLUMN Name TEXT');

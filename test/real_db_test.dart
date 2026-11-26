@@ -427,6 +427,46 @@ void main() {
     }
   });
 
+  test('tipos de buceo: tags heredados por sus buceos (dinámicos)', () {
+    final tmp = File(
+        '${Directory.systemTemp.path}/pandive_dtt_${DateTime.now().microsecondsSinceEpoch}.ddb');
+    addTearDown(() => tmp.existsSync() ? tmp.deleteSync() : null);
+    final w = DivemateDb.createEmpty(tmp.path);
+    try {
+      final tagId = w.findOrCreateTag('cave');
+      final own = Tag(id: w.findOrCreateTag('fun'), name: 'fun');
+      final tag = Tag(id: tagId, name: 'cave');
+      final typeId = w.addDiveType('Sidemount', const [], tags: [tag]);
+      expect(w.listDiveTypes().single.tags.map((t) => t.id), [tagId]);
+      final diveId = w.createDive(dateTime: DateTime(2024, 1, 1, 10));
+      w.updateDive(diveId, {'Divetype': 'sidemount'}); // case-insensitive
+      w.setDiveTags(diveId, [own]);
+
+      expect(w.effectiveTagsForDive(diveId).map((t) => t.name),
+          ['cave', 'fun']);
+      expect(w.tagsForDive(diveId).map((t) => t.name), ['fun']);
+      expect(w.listDivesByTag(tagId).map((d) => d.id), [diveId]);
+      expect(w.diveIdsWithTag('CAVE'), {diveId});
+      final inh = w.inheritedTags(diveType: 'Sidemount');
+      expect(inh.single.tag.id, tagId);
+      expect(inh.single.source, TagSource.diveType);
+
+      // Removing it from the type drops it from the dive.
+      w.updateDiveType(typeId, 'Sidemount', const []);
+      expect(w.effectiveTagsForDive(diveId).map((t) => t.name), ['fun']);
+      expect(w.listDivesByTag(tagId), isEmpty);
+
+      // deleteTag / deleteDiveType clean the link.
+      w.updateDiveType(typeId, 'Sidemount', const [], tags: [tag]);
+      w.deleteTag(tagId);
+      expect(w.tagsForDiveType(typeId), isEmpty);
+      w.deleteDiveType(typeId);
+      expect(w.listDiveTypes(), isEmpty);
+    } finally {
+      w.close();
+    }
+  });
+
   test('tipos de buceo: CRUD + plantilla de botellas', () {
     final tmp = File(
         '${Directory.systemTemp.path}/pandive_dt_${DateTime.now().microsecondsSinceEpoch}.ddb');

@@ -53,7 +53,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/db/db_tanks.dart` -> cylinders per dive, "my cylinders" presets, dives per site/buddy
 - `lib/core/db/db_merge.dart` -> merge dives (concatenated profile, union of data)
 - `lib/core/db/db_pending.dart` -> cache of downloaded-but-unsaved dives (they reappear once)
-- `lib/core/db/db_dive_types.dart` -> dive types + cylinder template
+- `lib/core/db/db_dive_types.dart` -> dive types + cylinder template + tags (PandiveDiveTypeTag)
 - `lib/core/db/db_computers.dart` -> saved dive computers (by MAC)
 - `lib/core/db/db_meta.dart` -> UTC last-write stamp (PandiveMeta + per-table triggers); lastWriteUtc / lastWriteUtcOf(path); key/value in PandiveMeta
 - `lib/core/db/db_numbering.dart` -> automatic numbering (consecutive, chronological, from a first number; config in PandiveMeta): renumberPlan/renumberDives/autoRenumber, isOutOfOrder, numberForNewDive
@@ -76,7 +76,8 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/models/cylinder.dart` -> cylinder/mix (+ gas label)
 - `lib/core/models/dive_site.dart` -> dive site with dive count
 - `lib/core/models/dive_computer_ref.dart` -> saved dive computer (MAC+name+model)
-- `lib/core/models/dive_type.dart` -> dive type (name + cylinder template)
+- `lib/core/models/dive_type.dart` -> dive type (name + cylinder template + inherited tags)
+- `lib/core/models/tag.dart` -> tag + InheritedTag/TagSource (tag a dive gets from its site or dive type)
 - `lib/core/models/document.dart` -> diver document (image + expiry); DiveDoc + DocStatus
 - `lib/core/models/downloaded_dive.dart` -> dive downloaded from the computer (+ samples/gases, JSON parse)
 - `lib/core/models/logbook_stats.dart` -> aggregate stats
@@ -112,7 +113,7 @@ with `screens/` and, if needed, `widgets/`).
 
 ### tags
 - `lib/features/tags/screens/tags_tab.dart` -> tag list (create/rename/delete, view dives)
-- `lib/core/db/db_tags.dart` -> tags: per-dive link + per-site link (PandiveSiteTag); effective tags = own ∪ site (effectiveTagsForDive); diveIdsWithTag/listDivesByTag include site tags
+- `lib/core/db/db_tags.dart` -> tags: per-dive link + per-site link (PandiveSiteTag) + per-dive-type link (PandiveDiveTypeTag, matched by Logbook.Divetype name); effective tags = own ∪ site ∪ type (effectiveTagsForDive); inheritedTags(placeId, diveType) with source; diveIdsWithTag/listDivesByTag include inherited
 
 ### sync (between devices)
 - `lib/features/sync/widgets/sync_indicator.dart` -> status icon in the top bar (+ syncStatusText)
@@ -244,8 +245,8 @@ with `screens/` and, if needed, `widgets/`).
 
 ### equipment (dive / cylinder types)
 - `lib/features/equipment/screens/equipment_tab.dart` -> hub: dive types + cylinder types
-- `lib/features/dive_types/screens/dive_types_screen.dart` -> dive type list
-- `lib/features/dive_types/screens/dive_type_edit_screen.dart` -> create/edit type (name + cylinders)
+- `lib/features/dive_types/screens/dive_types_screen.dart` -> dive type list (cylinders · #tags summary)
+- `lib/features/dive_types/screens/dive_type_edit_screen.dart` -> create/edit type (name + tags + cylinders)
 - `lib/features/tank_types/screens/tank_types_screen.dart` -> cylinder type management (presets)
 - `lib/features/tank_types/widgets/tank_type_edit_sheet.dart` -> create/edit cylinder type sheet
 

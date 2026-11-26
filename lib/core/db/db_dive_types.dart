@@ -9,6 +9,7 @@ extension DivemateDbDiveTypes on DivemateDb {
               id: r['Id'] as int,
               name: _str(r['Name']) ?? '',
               tanks: diveTypeTanks(r['Id'] as int),
+              tags: tagsForDiveType(r['Id'] as int),
             ))
         .toList()
       ..sort((a, b) => compareFold(a.name, b.name));
@@ -30,19 +31,38 @@ extension DivemateDbDiveTypes on DivemateDb {
         .toList();
   }
 
-  int addDiveType(String name, List<Cylinder> tanks) {
+  /// Tags of a type (inherited by the dives of that type).
+  List<Tag> tagsForDiveType(int typeId) {
+    if (!_hasTable('PandiveDiveTypeTag')) return const [];
+    final rows = _db.select(
+      'SELECT T.Id, T.Name FROM PandiveTag T '
+      'JOIN PandiveDiveTypeTag D ON D.TagId = T.Id WHERE D.TypeId = ? '
+      'ORDER BY T.Name COLLATE NOCASE',
+      [typeId],
+    );
+    return rows
+        .map((r) => Tag(id: r['Id'] as int, name: _str(r['Name']) ?? ''))
+        .toList();
+  }
+
+  int addDiveType(String name, List<Cylinder> tanks,
+      {List<Tag> tags = const []}) {
     _db.execute('INSERT INTO PandiveDiveType (Name) VALUES (?)', [name.trim()]);
     final id = _db.lastInsertRowId;
     _setDiveTypeTanks(id, tanks);
+    _setDiveTypeTags(id, tags);
     return id;
   }
 
-  void updateDiveType(int id, String name, List<Cylinder> tanks) {
+  void updateDiveType(int id, String name, List<Cylinder> tanks,
+      {List<Tag> tags = const []}) {
     _db.execute('UPDATE PandiveDiveType SET Name=? WHERE Id=?', [name.trim(), id]);
     _setDiveTypeTanks(id, tanks);
+    _setDiveTypeTags(id, tags);
   }
 
   void deleteDiveType(int id) {
+    _db.execute('DELETE FROM PandiveDiveTypeTag WHERE TypeId=?', [id]);
     _db.execute('DELETE FROM PandiveDiveTypeTank WHERE TypeId=?', [id]);
     _db.execute('DELETE FROM PandiveDiveType WHERE Id=?', [id]);
   }
@@ -55,6 +75,16 @@ extension DivemateDbDiveTypes on DivemateDb {
         'Name) VALUES (?,?,?,?,?)',
         [typeId, tanks[i].size, _materialToInt(tanks[i].material), i,
           tanks[i].name],
+      );
+    }
+  }
+
+  void _setDiveTypeTags(int typeId, List<Tag> tags) {
+    _db.execute('DELETE FROM PandiveDiveTypeTag WHERE TypeId=?', [typeId]);
+    for (final t in tags) {
+      _db.execute(
+        'INSERT OR IGNORE INTO PandiveDiveTypeTag (TypeId, TagId) VALUES (?,?)',
+        [typeId, t.id],
       );
     }
   }

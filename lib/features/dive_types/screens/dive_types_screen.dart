@@ -27,8 +27,13 @@ class _DiveTypesScreenState extends State<DiveTypesScreen> {
     if (ok == true) _reload();
   }
 
-  String _summary(DiveType d) =>
-      d.tanks.map((c) => '${c.size?.toStringAsFixed(1) ?? '—'} L').join(' + ');
+  String _summary(DiveType d) => [
+        if (d.tanks.isNotEmpty)
+          d.tanks
+              .map((c) => '${c.size?.toStringAsFixed(1) ?? '—'} L')
+              .join(' + '),
+        for (final tag in d.tags) '#${tag.name}',
+      ].join(' · ');
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +54,9 @@ class _DiveTypesScreenState extends State<DiveTypesScreen> {
                 return ListTile(
                   leading: const Icon(Icons.scuba_diving),
                   title: Text(d.name),
-                  subtitle: d.tanks.isEmpty ? null : Text(_summary(d)),
+                  subtitle: d.tanks.isEmpty && d.tags.isEmpty
+                      ? null
+                      : Text(_summary(d)),
                   onTap: () => _edit(type: d),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline),

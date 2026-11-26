@@ -1,5 +1,6 @@
 /// Create/edit a dive type: name + cylinder template (litres+material)
-/// added automatically when the type is picked on a dive.
+/// added automatically when the type is picked on a dive + tags that the
+/// dives of this type inherit.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -8,6 +9,8 @@ import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/widgets/labeled_field.dart';
 import 'package:pandive/core/widgets/save_action.dart';
+import 'package:pandive/features/dives/screens/tag_picker_screen.dart';
+import 'package:pandive/features/dives/widgets/tags_picker_field.dart';
 import 'package:pandive/features/dives/widgets/tank_edit_sheet.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -23,6 +26,7 @@ class DiveTypeEditScreen extends StatefulWidget {
 class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
   late final _name = TextEditingController(text: widget.type?.name ?? '');
   late final List<Cylinder> _tanks = [...?widget.type?.tanks];
+  late List<Tag> _tags = [...?widget.type?.tags];
   late final _presets = widget.db.listTankPresets();
 
   @override
@@ -36,13 +40,20 @@ class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
     if (c != null) setState(() => _tanks.add(c));
   }
 
+  Future<void> _pickTags() async {
+    final r = await Navigator.of(context).push<List<Tag>>(MaterialPageRoute(
+        builder: (_) => TagPickerScreen(
+            db: widget.db, selectedIds: [for (final t in _tags) t.id])));
+    if (r != null) setState(() => _tags = r);
+  }
+
   void _save() {
     final name = _name.text.trim();
     if (name.isEmpty) return;
     if (widget.type == null) {
-      widget.db.addDiveType(name, _tanks);
+      widget.db.addDiveType(name, _tanks, tags: _tags);
     } else {
-      widget.db.updateDiveType(widget.type!.id, name, _tanks);
+      widget.db.updateDiveType(widget.type!.id, name, _tanks, tags: _tags);
     }
     Navigator.of(context).pop(true);
   }
@@ -60,6 +71,8 @@ class _DiveTypeEditScreenState extends State<DiveTypeEditScreen> {
             16, 16, 16, 16 + MediaQuery.of(context).viewInsets.bottom),
         children: [
           LabeledField(controller: _name, label: t.name),
+          const SizedBox(height: 8),
+          TagsPickerField(tags: _tags, onTap: _pickTags),
           const SizedBox(height: 16),
           Text(t.tanks, style: Theme.of(context).textTheme.titleMedium),
           for (var i = 0; i < _tanks.length; i++)

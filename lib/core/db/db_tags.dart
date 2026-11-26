@@ -1,6 +1,7 @@
 part of 'divemate_db.dart';
 
-/// Reusable tags and their per-dive link.
+/// Reusable tags and their per-dive link; sites and dive types also carry
+/// tags that their dives inherit on read.
 extension DivemateDbTags on DivemateDb {
   List<Tag> listTags() {
     final rows = _db.select('SELECT Id, Name FROM PandiveTag');
@@ -19,22 +20,34 @@ extension DivemateDbTags on DivemateDb {
     return _db.lastInsertRowId;
   }
 
-  /// IDs of dives that have a tag by name (case-insensitive), either
-  /// the dive's own or inherited from its site's (Place) tag.
+  /// IDs of dives that have a tag by name (case-insensitive): the dive's own,
+  /// or inherited from its site's (Place) or its dive type's tags.
   Set<int> diveIdsWithTag(String name) {
-    final bySite = _hasTable('PandiveSiteTag')
-        ? 'OR L.PlaceID IN (SELECT S.PlaceId FROM PandiveSiteTag S '
-            'JOIN PandiveTag T ON T.Id = S.TagId WHERE T.Name = ? COLLATE NOCASE)'
-        : '';
-    final params = bySite.isEmpty ? [name] : [name, name];
+    const byName = 'SELECT Id FROM PandiveTag WHERE Name = ?1 COLLATE NOCASE';
     final rows = _db.select(
       'SELECT L.ID FROM Logbook L WHERE '
-      'L.ID IN (SELECT D.DiveId FROM PandiveDiveTag D '
-      '         JOIN PandiveTag T ON T.Id = D.TagId WHERE T.Name = ? COLLATE NOCASE) '
-      '$bySite',
-      params,
+      'L.ID IN (SELECT DiveId FROM PandiveDiveTag WHERE TagId IN ($byName)) '
+      '${_inheritedTagClause('IN ($byName)')}',
+      [name],
     );
     return {for (final r in rows) r['ID'] as int};
+  }
+
+  /// `OR …` matching Logbook `L` rows that inherit a tag whose id satisfies
+  /// [tagCond] (e.g. `= ?1`) from their site or their dive type. Empty for
+  /// external .ddb files without our tables.
+  String _inheritedTagClause(String tagCond) {
+    final b = StringBuffer();
+    if (_hasTable('PandiveSiteTag')) {
+      b.write('OR L.PlaceID IN (SELECT PlaceId FROM PandiveSiteTag '
+          'WHERE TagId $tagCond) ');
+    }
+    if (_hasTable('PandiveDiveTypeTag')) {
+      b.write('OR L.Divetype COLLATE NOCASE IN (SELECT DT.Name FROM PandiveDiveType DT '
+          'JOIN PandiveDiveTypeTag X ON X.TypeId = DT.Id '
+          'WHERE X.TagId $tagCond) ');
+    }
+    return b.toString();
   }
 
   /// The dive's own tags (only the PandiveDiveTag link). This is what the editor
@@ -51,22 +64,50 @@ extension DivemateDbTags on DivemateDb {
         .toList();
   }
 
-  /// Effective tags of the dive: own + those of the site (Place) it belongs to.
-  /// Derived on read (dynamic): show/count, don't persist.
+  /// Effective tags of the dive: own + those of its site (Place) + those of
+  /// its dive type. Derived on read (dynamic): show/count, don't persist.
   List<Tag> effectiveTagsForDive(int diveId) {
-    if (!_hasTable('PandiveSiteTag')) return tagsForDive(diveId);
-    final rows = _db.select(
-      'SELECT T.Id, T.Name FROM PandiveTag T WHERE T.Id IN ('
-      '  SELECT TagId FROM PandiveDiveTag WHERE DiveId = ?1 '
-      '  UNION '
-      '  SELECT TagId FROM PandiveSiteTag WHERE PlaceId = '
-      '    (SELECT PlaceID FROM Logbook WHERE ID = ?1)'
-      ') ORDER BY T.Name COLLATE NOCASE',
-      [diveId],
-    );
-    return rows
-        .map((r) => Tag(id: r['Id'] as int, name: _str(r['Name']) ?? ''))
-        .toList();
+    final own = tagsForDive(diveId);
+    final r = _db.select(
+        'SELECT PlaceID, Divetype FROM Logbook WHERE ID = ?', [diveId]);
+    if (r.isEmpty) return own;
+    final inherited = inheritedTags(
+        placeId: r.first['PlaceID'] as int?,
+        diveType: _str(r.first['Divetype']));
+    final ids = {for (final t in own) t.id};
+    return [
+      ...own,
+      for (final i in inherited)
+        if (ids.add(i.tag.id)) i.tag,
+    ]..sort((a, b) => compareFold(a.name, b.name));
+  }
+
+  /// Tags a dive with that site and dive type (by name) inherits, with their
+  /// source; a tag that comes from both appears once (as site). Takes the
+  /// values instead of a dive id so the editor can show them live.
+  List<InheritedTag> inheritedTags({int? placeId, String? diveType}) {
+    final out = <InheritedTag>[];
+    final seen = <int>{};
+    if (placeId != null && _hasTable('PandiveSiteTag')) {
+      for (final t in tagsForSite(placeId)) {
+        if (seen.add(t.id)) out.add(InheritedTag(t, TagSource.site));
+      }
+    }
+    final type = diveType?.trim();
+    if (type != null && type.isNotEmpty && _hasTable('PandiveDiveTypeTag')) {
+      final rows = _db.select(
+        'SELECT T.Id, T.Name FROM PandiveTag T '
+        'JOIN PandiveDiveTypeTag X ON X.TagId = T.Id '
+        'JOIN PandiveDiveType DT ON DT.Id = X.TypeId '
+        'WHERE DT.Name = ? COLLATE NOCASE ORDER BY T.Name COLLATE NOCASE',
+        [type],
+      );
+      for (final r in rows) {
+        final t = Tag(id: r['Id'] as int, name: _str(r['Name']) ?? '');
+        if (seen.add(t.id)) out.add(InheritedTag(t, TagSource.diveType));
+      }
+    }
+    return out;
   }
 
   /// Tags assigned to a site (Place).
@@ -161,19 +202,20 @@ extension DivemateDbTags on DivemateDb {
   void deleteTag(int id) {
     _db.execute('DELETE FROM PandiveDiveTag WHERE TagId=?', [id]);
     _db.execute('DELETE FROM PandiveSiteTag WHERE TagId=?', [id]);
+    if (_hasTable('PandiveDiveTypeTag')) {
+      _db.execute('DELETE FROM PandiveDiveTypeTag WHERE TagId=?', [id]);
+    }
     _db.execute('DELETE FROM PandiveTag WHERE Id=?', [id]);
   }
 
-  /// Dives with a tag (the dive's own or inherited from its site's tag).
+  /// Dives with a tag (the dive's own or inherited from its site or type).
   List<Dive> listDivesByTag(int tagId) {
     final owner = ownerId;
     final diver = owner != null ? 'AND L.DiverID = $owner' : '';
-    final bySite = _hasTable('PandiveSiteTag')
-        ? 'OR L.PlaceID IN (SELECT PlaceId FROM PandiveSiteTag WHERE TagId = ?1)'
-        : '';
     final rows = _db.select(
       'SELECT ${DivemateDbQueries._diveColumns} FROM Logbook L '
-      'WHERE (L.ID IN (SELECT DiveId FROM PandiveDiveTag WHERE TagId = ?1) $bySite) '
+      'WHERE (L.ID IN (SELECT DiveId FROM PandiveDiveTag WHERE TagId = ?1) '
+      '${_inheritedTagClause('= ?1')}) '
       'AND (L.Status IS NULL OR L.Status != 2) $diver '
       'ORDER BY L.Divedate DESC, L.Entrytime DESC',
       [tagId],
