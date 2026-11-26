@@ -465,5 +465,6 @@
   "arrivalPort": "Port d'arribada",
   "departurePortNone": "Port de sortida (cap: viatge des de terra)",
   "arrivalPortNone": "Port d'arribada (cap)",
-  "arrivalSameAsDeparture": "El port d'arribada és el mateix que el de sortida"
+  "arrivalSameAsDeparture": "El port d'arribada és el mateix que el de sortida",
+  "unreadableFile": "No s'ha pogut llegir el fitxer: {error}"
 }

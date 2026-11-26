@@ -1,25 +1,22 @@
 /// Tools: import/export, tags, cleanup and debug utilities.
 library;
 
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/services/data_revision.dart';
-import 'package:pandive/core/widgets/progress_dialog.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/option_dialog.dart';
 import 'package:pandive/features/settings/screens/debug_sync_screen.dart';
 import 'package:pandive/features/settings/screens/fill_from_ddb_screen.dart';
 import 'package:pandive/features/settings/logic/cleanup_tools.dart';
+import 'package:pandive/features/settings/logic/import_from_file.dart';
 import 'package:pandive/features/settings/logic/link_buddies_tool.dart';
 import 'package:pandive/features/settings/logic/renumber_tool.dart';
 import 'package:pandive/features/plan/screens/plan_dive_screen.dart';
 import 'package:pandive/features/settings/screens/trash_screen.dart';
-import 'package:pandive/features/sites/logic/site_import.dart';
-import 'package:pandive/features/sites/screens/import_sites_screen.dart';
 import 'package:pandive/features/settings/widgets/export_tools.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -59,24 +56,10 @@ class ToolsScreen extends StatelessWidget {
         SnackBar(content: Text(t.importSubsurfaceResult(n))));
   }
   Future<void> _importSites(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final nav = Navigator.of(context);
-    final t = AppLocalizations.of(context);
     final res = await FilePicker.platform.pickFiles(withData: false);
     final path = res?.files.single.path;
-    if (path == null) return;
-    if (!context.mounted) return;
-    final plan = await withProgress(context, t.working,
-        () async => planSiteImport(db, await File(path).readAsString()));
-    if (plan.isEmpty) {
-      messenger.showSnackBar(SnackBar(content: Text(t.nothingToImport)));
-      return;
-    }
-    final n = await nav.push<int>(MaterialPageRoute(
-        builder: (_) => ImportSitesScreen(db: db, entries: plan)));
-    if (n != null && n > 0) {
-      messenger.showSnackBar(SnackBar(content: Text(t.importResult(n))));
-    }
+    if (path == null || !context.mounted) return;
+    await importSitesFile(context, db, path);
   }
 
   @override

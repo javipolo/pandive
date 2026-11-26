@@ -465,5 +465,6 @@
   "arrivalPort": "Puerto de llegada",
   "departurePortNone": "Puerto de salida (ninguno: viaje desde tierra)",
   "arrivalPortNone": "Puerto de llegada (ninguno)",
-  "arrivalSameAsDeparture": "El puerto de llegada es el mismo que el de salida"
+  "arrivalSameAsDeparture": "El puerto de llegada es el mismo que el de salida",
+  "unreadableFile": "No se pudo leer el archivo: {error}"
 }

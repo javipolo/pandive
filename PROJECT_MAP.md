@@ -15,7 +15,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/text/relative_date.dart` -> "human" date: "Today 17:12" / "Yesterday 21:23" / full date (backup list)
 - `lib/core/services/home_navigation.dart` -> section requests to HomeScreen (requestDivesList: back to the dive list after importing)
 - `lib/core/services/share_file.dart` -> shareOrSaveFile: share (mobile) or "Save as…" (Linux) a generated file + appMessengerKey (snackbars without context)
-- `lib/core/services/opened_file.dart` -> incoming .ddb file (open with / share): consume + stream
+- `lib/core/services/opened_file.dart` -> incoming file (open with / share; .ddb, SSI CSV, sites JSON, .ssrf): consume + stream
 - `lib/core/services/data_revision.dart` -> global signal for soft tab refresh (without reopening the DB)
 - `lib/core/theme/app_theme.dart` -> Material 3 theme (dive blue)
 - `lib/core/settings/settings.dart` -> preferences: text scale, DB path, language, theme, night hours, merge gap
@@ -132,6 +132,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/features/settings/screens/about_screen.dart` -> about / contact: description + report email (mailto, from drawer)
 - `lib/features/settings/screens/fill_from_ddb_screen.dart` -> fills own dives by matching against a buddy's .ddb (site/notes/buddies)
 - `lib/features/settings/logic/import_dives.dart` -> plan (new/duplicate by date/time) + copy of selected dives from another .ddb (profile/site/buddies/tags/cylinders) with summary (DdbImportResult)
+- `lib/features/settings/logic/import_from_file.dart` -> imports from a path (SSI CSV / sites JSON / .ssrf), detectIncomingKind (by content) + openIncomingFile: routes a shared/opened file to its import or the .ddb preview
 - `lib/features/settings/logic/enrich_logbook.dart` -> matches by date/time and copies data between logbooks
 - `lib/features/settings/logic/cleanup_tools.dart` -> "Cleanup" tools (unused buddies/sites, orphan and blank cylinders): confirm, purge, report count
 - `lib/features/settings/logic/renumber_tool.dart` -> "Renumber dives" tool: preview of changes + confirmation

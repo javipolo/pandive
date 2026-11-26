@@ -11,6 +11,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
 import 'package:pandive/features/documents/screens/documents_screen.dart';
 import 'package:pandive/features/documents/screens/document_detail_screen.dart';
+import 'package:pandive/features/settings/logic/import_from_file.dart';
 import 'package:pandive/features/settings/screens/preview_ddb_screen.dart';
 import 'package:pandive/features/home/widgets/home_drawer.dart';
 import 'package:pandive/features/home/widgets/home_app_bar.dart';
@@ -95,12 +96,18 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => DocumentDetailScreen(
             db: widget.db, doc: doc, imagePath: '${dir.path}/${doc.fileName}')));
   }
-  void _onOpened(String path) => Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => PreviewDdbScreen(
-          path: path,
-          settings: widget.settings,
-          db: widget.db,
-          onReplace: widget.onReplaceDb)));
+  // File shared/opened with PanDive: a .ddb opens its preview; SSI CSV, sites
+  // JSON and .ssrf go to their import.
+  void _onOpened(String path) => openIncomingFile(
+      context,
+      widget.db,
+      path,
+      (p) => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => PreviewDdbScreen(
+              path: p,
+              settings: widget.settings,
+              db: widget.db,
+              onReplace: widget.onReplaceDb))));
   @override
   void dispose() {
     tappedDocId.removeListener(_onTappedDoc);

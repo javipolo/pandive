@@ -917,5 +917,13 @@
   "arrivalPort": "Arrival port",
   "departurePortNone": "Departure port (none: shore trip)",
   "arrivalPortNone": "Arrival port (none)",
-  "arrivalSameAsDeparture": "Arrival port is the same as departure"
+  "arrivalSameAsDeparture": "Arrival port is the same as departure",
+  "unreadableFile": "Couldn't read the file: {error}",
+  "@unreadableFile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -9,6 +9,18 @@ In every case:
 - **Numbering fixes itself** if automatic numbering is on (Settings → Dive
   numbering): imported dives land in their chronological place.
 
+## Files received on WhatsApp, email, etc. (Android)
+
+You don't need to find the file in the file picker. In WhatsApp (or the mail
+app, Drive, a file manager…) tap the document and choose **Open with →
+PanDive**, or use **Share → PanDive**. PanDive recognises the file by its
+content and opens the right import: a `.ddb` opens its preview, the SSI CSV
+its review list, the sites JSON its preview and a Subsurface `.ssrf` is
+imported straight away.
+
+(Documents received on WhatsApp are not saved to the gallery: they live in
+WhatsApp's own folder, which is why the file picker doesn't show them.)
+
 ## Summary
 
 | Source | Where | Profile | Time | Site | Buddies | Duplicates by |

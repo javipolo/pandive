@@ -58,7 +58,8 @@
                 <data android:pathPattern=".*\\..*\\..*\\.ddb"/>
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.ddb"/>
             </intent-filter>
-            <!-- Open a .ddb by MIME type (content without a usable path). -->
+            <!-- Open a .ddb, SSI CSV, sites JSON or .ssrf by MIME type (content
+                 without a usable path, e.g. a document tapped in WhatsApp). -->
             <intent-filter android:label="PanDive">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -67,12 +68,27 @@
                 <data android:mimeType="application/octet-stream"/>
                 <data android:mimeType="application/x-sqlite3"/>
                 <data android:mimeType="application/vnd.sqlite3"/>
+                <data android:mimeType="text/csv"/>
+                <data android:mimeType="text/comma-separated-values"/>
+                <data android:mimeType="application/csv"/>
+                <data android:mimeType="application/json"/>
+                <data android:mimeType="text/xml"/>
+                <data android:mimeType="application/xml"/>
             </intent-filter>
-            <!-- Share a .ddb with PanDive. -->
-            <intent-filter>
+            <!-- Share a .ddb, SSI CSV, sites JSON or .ssrf with PanDive. -->
+            <intent-filter android:label="PanDive">
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="application/octet-stream"/>
+                <data android:mimeType="application/x-sqlite3"/>
+                <data android:mimeType="application/vnd.sqlite3"/>
+                <data android:mimeType="text/csv"/>
+                <data android:mimeType="text/comma-separated-values"/>
+                <data android:mimeType="application/csv"/>
+                <data android:mimeType="application/json"/>
+                <data android:mimeType="text/xml"/>
+                <data android:mimeType="application/xml"/>
+                <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
         <!-- flutter_local_notifications: reschedules notifications after reboot. -->

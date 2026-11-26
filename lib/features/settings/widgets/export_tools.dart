@@ -11,11 +11,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/export/subsurface_export.dart';
-import 'package:pandive/core/import/ssi_csv_import.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/import_progress.dart';
+import 'package:pandive/features/settings/logic/import_from_file.dart';
 import 'package:pandive/core/widgets/progress_dialog.dart';
-import 'package:pandive/features/settings/screens/import_ssi_screen.dart';
 import 'package:pandive/features/sites/logic/export_sites.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -55,10 +54,8 @@ Future<void> exportSubsurface(BuildContext context, DivemateDb db) async {
 Future<int?> importSubsurface(BuildContext context, DivemateDb db) async {
   final res = await FilePicker.platform.pickFiles(withData: false);
   final path = res?.files.single.path;
-  if (path == null) return null;
-  final xml = await File(path).readAsString();
-  if (!context.mounted) return null;
-  return importSsrfWithProgress(context, db, xml);
+  if (path == null || !context.mounted) return null;
+  return importSubsurfaceFile(context, db, path);
 }
 
 /// Picks the CSV exported from MySSI, parses it (with a "reading" notice) and
@@ -67,10 +64,5 @@ Future<void> importSsi(BuildContext context, DivemateDb db) async {
   final res = await FilePicker.platform.pickFiles(withData: false);
   final path = res?.files.single.path;
   if (path == null || !context.mounted) return;
-  final t = AppLocalizations.of(context);
-  final plan = await withProgress(context, t.readingFile,
-      () async => planSsiImport(db, await File(path).readAsString()));
-  if (!context.mounted) return;
-  await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => ImportSsiScreen(db: db, entries: plan.entries)));
+  await importSsiFile(context, db, path);
 }

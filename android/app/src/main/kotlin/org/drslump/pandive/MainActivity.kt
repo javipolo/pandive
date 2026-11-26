@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.OpenableColumns
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -16,7 +17,8 @@ class MainActivity : FlutterActivity() {
     private val scanChannel = "pandive/dc/scan"
     private val main = Handler(Looper.getMainLooper())
 
-    // Incoming .ddb file (open with / share), waiting to be consumed.
+    // Incoming file (.ddb, SSI CSV, sites JSON, .ssrf; open with / share),
+    // waiting to be consumed. Dart detects the kind from the content.
     private var pendingOpenPath: String? = null
     private var openSink: EventChannel.EventSink? = null
 
@@ -24,7 +26,7 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         val messenger = flutterEngine.dartExecutor.binaryMessenger
 
-        pendingOpenPath = extractDdb(intent)
+        pendingOpenPath = extractFile(intent)
 
         MethodChannel(messenger, methodChannel)
             .setMethodCallHandler { call, result ->
@@ -115,17 +117,18 @@ class MainActivity : FlutterActivity() {
         super.startActivityForResult(intent, requestCode, options)
     }
 
-    // App already open: a new .ddb arrives -> notify Flutter (or keep it pending).
+    // App already open: a new file arrives -> notify Flutter (or keep it pending).
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val p = extractDdb(intent) ?: return
+        val p = extractFile(intent) ?: return
         val sink = openSink
         if (sink != null) main.post { sink.success(p) } else pendingOpenPath = p
     }
 
-    // Extracts the .ddb from a VIEW/SEND intent and copies it to a readable temp file.
-    private fun extractDdb(intent: Intent?): String? {
+    // Extracts the file from a VIEW/SEND intent and copies it to a readable temp
+    // file that keeps the original name (and so its extension) when known.
+    private fun extractFile(intent: Intent?): String? {
         if (intent == null) return null
         val uri: Uri? = when (intent.action) {
             Intent.ACTION_VIEW -> intent.data
@@ -135,7 +138,9 @@ class MainActivity : FlutterActivity() {
         }
         if (uri == null) return null
         return try {
-            val dest = File(cacheDir, "opened-${System.currentTimeMillis()}.ddb")
+            val name = displayName(uri)?.replace(Regex("[^A-Za-z0-9._-]"), "_")
+                ?: "file"
+            val dest = File(cacheDir, "opened-${System.currentTimeMillis()}-$name")
             contentResolver.openInputStream(uri)!!.use { input ->
                 dest.outputStream().use { input.copyTo(it) }
             }
@@ -143,5 +148,13 @@ class MainActivity : FlutterActivity() {
         } catch (_: Exception) {
             null
         }
+    }
+
+    private fun displayName(uri: Uri): String? = try {
+        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            ?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
+            ?: uri.lastPathSegment
+    } catch (_: Exception) {
+        uri.lastPathSegment
     }
 }

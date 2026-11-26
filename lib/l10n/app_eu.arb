@@ -465,5 +465,6 @@
   "arrivalPort": "Iritsiera portua",
   "departurePortNone": "Irteera portua (bat ere ez: lehorreko bidaia)",
   "arrivalPortNone": "Iritsiera portua (bat ere ez)",
-  "arrivalSameAsDeparture": "Iritsiera portua irteerakoa bera da"
+  "arrivalSameAsDeparture": "Iritsiera portua irteerakoa bera da",
+  "unreadableFile": "Ezin izan da fitxategia irakurri: {error}"
 }
