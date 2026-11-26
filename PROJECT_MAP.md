@@ -29,7 +29,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/services/image_clipboard.dart` -> copy PNG to the clipboard (Linux: native channel `pandive/clipboard`, GTK)
 - `lib/core/services/sync_controller.dart` -> global SyncController (syncController): state, triggers (open/resume, after editing, ~2 min, exit), upload/download/resolve divergence; syncUploadInBackground for the worker
 - `lib/core/services/backup_worker.dart` -> WorkManager: periodic background backup (~12h, WiFi) if the DB changed + fallback sync upload on exit (enqueueSyncUpload)
-- `lib/core/services/backup_util.dart` -> pure helpers: names (.ddb.gz, compat with old .ddb), maybeGunzip, prune to 10, restoreWouldLoseData
+- `lib/core/services/backup_util.dart` -> pure helpers: names (PanDive-….ddb.gz; old latest/pandive-/.ddb names still listed and pruned), maybeGunzip, prune to 10, restoreWouldLoseData
 - `lib/core/storage/documents_storage.dart` -> documents/ folder on disk (save/delete/path); used by UI and backup
 - `lib/core/services/doc_notifications.dart` -> local expiry notifications (30/7/1/0 days); permission only if there are docs with expiry; payload=docId, tapping opens the document (tappedDocId / consumeNotificationLaunch)
 

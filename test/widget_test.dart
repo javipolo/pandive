@@ -15,11 +15,25 @@ void main() {
 
   test('backupFileName da nombre con timestamp', () {
     expect(backupFileName(DateTime(2026, 3, 4, 9, 5, 7)),
-        'pandive-20260304-090507.ddb.gz');
-    expect(isTimestampedBackup('pandive-20260304-090507.ddb.gz'), isTrue);
-    expect(isTimestampedBackup('pandive-20260304-090507.ddb'), isTrue); // antiguo
+        'PanDive-20260304-090507.ddb.gz');
+    expect(isTimestampedBackup('PanDive-20260304-090507.ddb.gz'), isTrue);
+    expect(isTimestampedBackup('pandive-20260304-090507.ddb.gz'), isTrue); // old
+    expect(isTimestampedBackup('pandive-20260304-090507.ddb'), isTrue); // old
+    expect(isTimestampedBackup(latestBackupName), isFalse);
     expect(isTimestampedBackup('latest.ddb.gz'), isFalse);
     expect(isTimestampedBackup('sync-logbook.ddb.gz'), isFalse);
+    expect(isTimestampedBackup(documentsBackupName), isFalse);
+  });
+
+  test('backup names: PanDive prefix; old latest files are pruned', () {
+    expect(latestBackupName, 'PanDive-latest.ddb.gz');
+    expect(documentsBackupName, 'PanDive-documents-latest.zip');
+    expect(isPrunableBackup('PanDive-20260304-090507.ddb.gz'), isTrue);
+    expect(isPrunableBackup('latest.ddb.gz'), isTrue);
+    expect(isPrunableBackup('latest.ddb'), isTrue);
+    expect(isPrunableBackup(latestBackupName), isFalse);
+    expect(isPrunableBackup(documentsBackupName), isFalse);
+    expect(isPrunableBackup('sync-logbook.ddb.gz'), isFalse);
   });
 
   test('maybeGunzip: gzip se descomprime, .ddb antiguo tal cual', () {

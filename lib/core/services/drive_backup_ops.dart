@@ -38,7 +38,7 @@ extension DriveBackupOps on DriveBackupService {
     );
     final items = <(String, DateTime)>[
       for (final f in res.files ?? const <drive.File>[])
-        if (isTimestampedBackup(f.name ?? ''))
+        if (isPrunableBackup(f.name ?? ''))
           (f.id!, f.modifiedTime ?? DateTime(0)),
     ];
     for (final id in idsToPrune(items)) {
@@ -79,11 +79,16 @@ extension DriveBackupOps on DriveBackupService {
     if (archive.isEmpty) return;
     final zip = ZipEncoder().encode(archive);
     await _upload(api, folder, documentsBackupName, zip, replace: true);
+    // The old-named zip would go stale: drop it once the new one is up.
+    final legacy = await _findInFolder(api, folder, legacyDocumentsBackupName);
+    if (legacy != null) await api.files.delete(legacy.id!);
   }
 
-  /// Downloads and unpacks [documentsBackupName] into `documents/` (if it exists).
+  /// Downloads and unpacks [documentsBackupName] (or the old-named zip) into
+  /// `documents/`, if it exists.
   Future<void> _restoreDocuments(drive.DriveApi api, String folder) async {
-    final existing = await _findInFolder(api, folder, documentsBackupName);
+    final existing = await _findInFolder(api, folder, documentsBackupName) ??
+        await _findInFolder(api, folder, legacyDocumentsBackupName);
     if (existing == null) return;
     final media = await api.files.get(existing.id!,
         downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
@@ -145,8 +150,8 @@ extension DriveBackupOps on DriveBackupService {
     for (final f in res.files ?? const <drive.File>[]) {
       final name = f.name ?? '';
       final latest = name == latestBackupName;
-      // old latest.ddb (uncompressed): listed as one more copy.
-      if (latest || name == legacyLatestBackupName || isTimestampedBackup(name)) {
+      // old latest.ddb[.gz]: listed as one more copy.
+      if (latest || isPrunableBackup(name)) {
         out.add(BackupEntry(f.id!, name, f.modifiedTime, latest));
       }
     }

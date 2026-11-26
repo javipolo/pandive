@@ -3,17 +3,20 @@ library;
 
 import 'dart:io';
 
-/// Backups are uploaded gzip-compressed (12 MB -> <1 MB). Old
-/// uncompressed ones (.ddb) are still listed and restored.
-const latestBackupName = 'latest.ddb.gz';
-const legacyLatestBackupName = 'latest.ddb';
-const documentsBackupName = 'documents-latest.zip';
+/// Backups are uploaded gzip-compressed (12 MB -> <1 MB), all named
+/// `PanDive-…`. Old names (`latest.ddb[.gz]`, `pandive-…`, uncompressed .ddb)
+/// are still listed, restored and pruned.
+const backupPrefix = 'PanDive-';
+const latestBackupName = '${backupPrefix}latest.ddb.gz';
+const legacyLatestBackupNames = {'latest.ddb.gz', 'latest.ddb'};
+const documentsBackupName = '${backupPrefix}documents-latest.zip';
+const legacyDocumentsBackupName = 'documents-latest.zip';
 
 String _p2(int v) => v.toString().padLeft(2, '0');
 
-/// Name with local timestamp: pandive-YYYYMMDD-HHMMSS.ddb.gz
+/// Name with local timestamp: PanDive-YYYYMMDD-HHMMSS.ddb.gz
 String backupFileName(DateTime t) =>
-    'pandive-${t.year}${_p2(t.month)}${_p2(t.day)}-'
+    '$backupPrefix${t.year}${_p2(t.month)}${_p2(t.day)}-'
     '${_p2(t.hour)}${_p2(t.minute)}${_p2(t.second)}.ddb.gz';
 
 /// Decompresses if gzip (header 1f 8b); an old .ddb passes through as is.
@@ -28,10 +31,15 @@ List<int> maybeGunzip(List<int> bytes) =>
 bool restoreWouldLoseData(DateTime? local, DateTime? backup) =>
     local != null && (backup == null || local.isAfter(backup));
 
-/// Is it a timestamped copy (not the "latest")?
-bool isTimestampedBackup(String name) =>
-    name.startsWith('pandive-') &&
-    (name.endsWith('.ddb') || name.endsWith('.ddb.gz'));
+final _timestamped = RegExp(r'^(PanDive|pandive)-\d{8}-\d{6}\.ddb(\.gz)?$');
+
+/// Is it a timestamped copy (not the "latest")? Also the old `pandive-…` ones.
+bool isTimestampedBackup(String name) => _timestamped.hasMatch(name);
+
+/// Copies that count towards the [idsToPrune] limit: the timestamped ones and
+/// the old "latest" files, which are no longer updated and so age out.
+bool isPrunableBackup(String name) =>
+    isTimestampedBackup(name) || legacyLatestBackupNames.contains(name);
 
 /// Given a list of timestamped copies (id + date), returns the ids to
 /// delete to keep only the [keep] most recent.
