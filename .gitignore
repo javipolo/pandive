@@ -1,7 +1,7 @@
 # Build artifacts
 /build/
 
-# libdivecomputer: external clone (see README to clone / future submodule)
+# libdivecomputer: external clone (see docs/DEVELOPMENT.md to clone)
 /vendor/libdivecomputer/
 
 # Personal dive data (don't commit to git)

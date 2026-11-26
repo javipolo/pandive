@@ -3,7 +3,7 @@
 /// persists a refresh token (in `flutter_secure_storage`), so the
 /// background backup can refresh the access token without an Activity (headless).
 /// Requires an OAuth client **of type iOS** (gives the reversed scheme without a secret);
-/// see README. On Linux (no flutter_appauth) it uses [DesktopOAuth] with a
+/// see docs/DEVELOPMENT.md. On Linux (no flutter_appauth) it uses [DesktopOAuth] with a
 /// **Desktop app** client of the same project (so it sees the same backups). The operations logic is in the `part`.
 library;
 

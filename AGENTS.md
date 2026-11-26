@@ -4,56 +4,57 @@ Pandive is an Android dive logbook (Flutter) that replaces DiveMate. One diver,
 no photos. It reads/writes the **same SQLite `.ddb` format as DiveMate** (no
 migration), so the user's `../divemate-cli` keeps working on Pandive's database.
 
-## Reglas del proyecto (estrictas)
+## Project rules (strict)
 
-- **Localización rápida**: antes de buscar con Grep/Glob, lee `PROJECT_MAP.md`
-  para ir directo al `.dart` exacto.
-- **Arquitectura feature-first**: organiza `lib/` en `core/` (tema, rutas,
-  servicios globales, widgets genéricos) y `features/<nombre>/` (subcarpetas
-  `screens/`, `widgets/`, `logic/` o `providers/`).
-- **Anti-anidamiento (regla de oro Flutter)**: objetivo **~200 líneas** por
-  `.dart` (guía blanda, no límite duro). Si un `build()` crece o un fichero
-  mezcla responsabilidades (UI + lógica, varias pantallas), extrae sub-widgets
-  privados o ficheros en `features/<nombre>/widgets/` o `logic/`. El número
-  orienta; manda la cohesión: un fichero de ~180 líneas coherente es mejor que
-  tres de 60 troceados a la fuerza. NO comprimas código legible (borrar líneas en
-  blanco, partir expresiones) solo para bajar del número. Pasado ~250 líneas casi
-  siempre toca trocear de verdad.
-- **Separación UI vs lógica**: la lógica de negocio y el estado van fuera de los
-  widgets visuales (usa el gestor de estado que ya haya o el más simple, sin
-  sobreingeniería).
-- **Mantenimiento del mapa**: cada vez que crees, muevas o borres un fichero en
-  `lib/`, actualiza `PROJECT_MAP.md` en el mismo turno.
-- **Control de comandos**: NO ejecutes `flutter build` ni lances emuladores
-  automáticamente, EXCEPTO el build obligatorio tras cada commit (`make
-  apk`, ver Workflow). Fuera de ese caso, solo `flutter analyze` (o
-  `make analyze`) tras un cambio grande para verificar.
-- **Operaciones largas: feedback siempre y sin bloquear**. Toda acción que
-  pueda tardar (importar, exportar, leer/escribir ficheros, red, procesar
-  muchos registros) muestra **en el acto** un diálogo que diga qué está
-  pasando: spinner con texto (`withProgress`, `core/widgets/progress_dialog.dart`)
-  o barra de progreso (`withProgressBar`, `core/widgets/import_progress.dart`).
-  Nunca dejar la app "pensando" sin aviso. Y no bloquear el hilo: en Android
-  el código Dart corre en el hilo principal, y >5 s de trabajo síncrono es un
-  ANR ("la app no responde"). Trocear con `await` entre bloques y agrupar
-  escrituras en `db.inTransaction` (sin transacción cada sentencia hace su
-  propio commit a disco).
-- **Importaciones**: antes de importar, mostrar la lista de lo que se va a
-  importar para revisarla y desmarcar (verde nuevo / ámbar ya existe), y al
-  terminar llevar al usuario a la lista de buceos refrescada
-  (`requestDivesList()` + volver a la raíz), no dejarlo en la pantalla de
-  herramientas.
-- **i18n obligatorio**: TODO texto visible al usuario va traducido. Nunca
-  hardcodees cadenas en la UI; usa claves de `AppLocalizations`
-  (`final t = AppLocalizations.of(context); ... t.miClave`). Al añadir cualquier
-  feature, añade su texto a **todos** los `lib/l10n/app_<code>.arb` (mismas
-  claves en todos; `app_en.arb` es la plantilla y lleva los `@clave` con
-  placeholders) y ejecuta `flutter gen-l10n`. Fechas con
-  `DateFormat(patrón, Localizations.localeOf(context).languageCode)`, no locale
-  fijo. **Añadir un idioma nuevo** (p.ej. catalán) = crear `app_ca.arb` con las
-  mismas claves traducidas; `supportedLocales` lo recoge solo. Mantén las claves
-  sincronizadas entre idiomas (si falta una, el build avisa). Idioma elegible en
-  Ajustes (`Settings.locale`).
+- **Fast lookup**: before searching with Grep/Glob, read `PROJECT_MAP.md` to go
+  straight to the right `.dart` file.
+- **Feature-first architecture**: organize `lib/` into `core/` (theme, routes,
+  global services, generic widgets) and `features/<name>/` (subfolders
+  `screens/`, `widgets/`, `logic/` or `providers/`).
+- **No deep nesting (Flutter golden rule)**: aim for **~200 lines** per `.dart`
+  (soft guideline, not a hard limit). If a `build()` grows or a file mixes
+  responsibilities (UI + logic, several screens), extract private sub-widgets
+  or files into `features/<name>/widgets/` or `logic/`. The number is a guide;
+  cohesion rules: one coherent ~180-line file beats three 60-line files split
+  by force. Do NOT squash readable code (removing blank lines, cramming
+  expressions) just to get under the number. Past ~250 lines it almost always
+  needs a real split.
+- **UI vs logic separation**: business logic and state live outside visual
+  widgets (use the existing state management, or the simplest one, no
+  over-engineering).
+- **Keep the map up to date**: whenever you create, move or delete a file in
+  `lib/`, update `PROJECT_MAP.md` in the same turn.
+- **Command control**: do NOT run `flutter build` or launch emulators on your
+  own, EXCEPT the mandatory build after each commit (`make apk`, see
+  Workflow). Otherwise only `flutter analyze` (or `make analyze`) after a big
+  change to verify.
+- **Long operations: always give feedback, never block**. Any action that may
+  take time (import, export, reading/writing files, network, processing many
+  records) shows **immediately** a dialog saying what is going on: spinner
+  with text (`withProgress`, `core/widgets/progress_dialog.dart`) or progress
+  bar (`withProgressBar`, `core/widgets/import_progress.dart`). Never leave
+  the app "thinking" without notice. And don't block the thread: on Android
+  Dart code runs on the main thread, and >5 s of synchronous work is an ANR
+  ("app not responding"). Split work with `await` between chunks and group
+  writes in `db.inTransaction` (without a transaction every statement commits
+  to disk on its own).
+- **Imports**: before importing, show the list of what will be imported to
+  review and untick (green new / amber already exists), and when done take
+  the user to the refreshed dive list (`requestDivesList()` + pop to root),
+  not leave them on the tools screen.
+- **i18n is mandatory**: ALL user-visible text is translated. Never hardcode
+  strings in the UI; use `AppLocalizations` keys
+  (`final t = AppLocalizations.of(context); ... t.myKey`). When adding any
+  feature, add its text to **every** `lib/l10n/app_<code>.arb` (same keys in
+  all; `app_en.arb` is the template and carries the `@key` entries with
+  placeholders) and run `flutter gen-l10n`. Dates with
+  `DateFormat(pattern, Localizations.localeOf(context).languageCode)`, never a
+  fixed locale. **Adding a language** = create `app_<code>.arb` with the same
+  keys translated; `supportedLocales` picks it up automatically. Keep keys in
+  sync across languages (the build warns if one is missing). Language is
+  selectable in Settings (`Settings.locale`).
+- **Docs in English**: all `.md` files are written in English. User docs go in
+  `README.md` / `docs/importing.md`; developer docs in `docs/DEVELOPMENT.md`.
 
 ## Workflow
 
@@ -66,11 +67,10 @@ migration), so the user's `../divemate-cli` keeps working on Pandive's database.
   go together.
 - Run `make test` and `make analyze` before committing; don't commit red.
 - Commit messages: short imperative subject (`feat:`, `fix:`, `docs:`, `chore:`),
-  body only if it adds something. End with the Co-Authored-By trailer the harness
-  specifies.
+  body only if it adds something. Do **not** add a Co-Authored-By trailer.
 - **Build after every commit.** Right after committing, run `make apk`
   (arm64 release APK for sideload) so the user finds it ready. This overrides the
-  "no `flutter build`" rule below, but only for the post-commit build.
+  "no `flutter build`" rule above, but only for the post-commit build.
 
 ## Commands (see `Makefile`)
 
@@ -88,13 +88,14 @@ Gradle needs **JDK 17** (not the default Java 25); already configured via
 
 ## Layout
 
-- `lib/models.dart` — domain models (Dive, DiveProfile, Cylinder, DiveSite, LogbookStats).
-- `lib/db/divemate_db.dart` — the data layer: opens the `.ddb`, owner detection,
-  queries, profile decode, and writes (allowlisted columns). **Frontend-agnostic.**
-- `lib/settings.dart` — text scale (accessibility) + active DB path.
-- `lib/ui/` — screens: load_db, home (tabs), dives_tab, sites_tab, stats_tab,
-  dive_detail_screen, edit_dive_screen, profile_chart, text_scale_sheet.
-- `scripts/build-libdivecomputer-android.sh` — NDK cross-compile.
+See `PROJECT_MAP.md` for every file in `lib/`. Highlights:
+
+- `lib/core/db/` — the data layer (one library with `part`s): opens the `.ddb`,
+  owner detection, queries, profile decode/encode, writes. **Frontend-agnostic.**
+- `lib/core/models/` — domain models. `lib/features/<name>/` — screens/widgets/logic.
+- `native/` + `android/app/src/main/{kotlin,cpp}` + `linux/runner/dc/` — the
+  libdivecomputer bridge and BLE transports.
+- `scripts/build-libdivecomputer-*.sh` — native builds.
 - `vendor/libdivecomputer/` — upstream C library (gitignored clone).
 
 ## Database (DiveMate `.ddb`)
@@ -110,7 +111,7 @@ Gradle needs **JDK 17** (not the default Java 25); already configured via
 - Writes: respect `UUID`/`Status`; set `Updated` to `YYYY-MM-DDTHH:MM:SS` (local).
   Only write columns in the allowlist in `divemate_db.dart`.
 - The app edits its **own copy** of the `.ddb` (app documents dir), not the user's
-  original. Syncing changes out = export / Drive backup (Fase 3).
+  original. Changes leave the device via export, Drive backup or Drive sync.
 
 ## Testing
 
@@ -125,4 +126,4 @@ Gradle needs **JDK 17** (not the default Java 25); already configured via
 
 Targets (all BLE, confirmed in libdivecomputer): Shearwater Peregrine, Shearwater
 Perdix, Mares Puck 4 (`0x35`). BLE bridge via `dc_custom_open` + `DC_TRANSPORT_BLE`
-(Subsurface pattern). This is Fase 2.
+(Subsurface pattern).

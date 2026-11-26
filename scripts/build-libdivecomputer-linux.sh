@@ -16,7 +16,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/vendor/libdivecomputer"
 OUT="$ROOT/build/linux-ldc"
 
-[ -d "$SRC" ] || { echo "Falta $SRC (clona libdivecomputer, ver README)"; exit 1; }
+[ -d "$SRC" ] || { echo "Missing $SRC (clone libdivecomputer, see docs/DEVELOPMENT.md)"; exit 1; }
 
 # generate ./configure if missing (git clone)
 [ -x "$SRC/configure" ] || ( cd "$SRC" && autoreconf --install )

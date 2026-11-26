@@ -1,347 +1,75 @@
 # Pandive 🐼🤿
 
-Logbook de buceo para Android. Reemplazo propio y mantenible de DiveMate.
+A dive logbook for Android and Linux. Download your dives straight from your
+dive computer over Bluetooth, keep them in a single file you own, and back it
+up to your own Google Drive.
 
-Nombre visible: **Pandive**. Identificador de aplicación: **`org.drslump.pandive`** (dominio `drslump.org`). Logo: oso panda buceando.
+Pandive uses the same database format as **DiveMate** (`.ddb`), so you can open
+an existing DiveMate logbook as is: no conversion needed.
 
-**Accesibilidad**: la app usa **tipografía grande por defecto** (pensada para presbicia, uso sin gafas). El tamaño de letra es configurable a más pequeño para quien lo prefiera.
+## Features
 
----
+- **Download from your dive computer** over Bluetooth LE: any model supported
+  by [libdivecomputer](https://www.libdivecomputer.org/) (tested with
+  Shearwater Peregrine/Perdix, Mares Puck 4 and Heinrichs Weikamp OSTC).
+- **Full dive detail**: depth and temperature profile, gases, deco, cylinders
+  and SAC.
+- **Organize**: dive sites (with map), buddies, tags, trips, dive types and
+  cylinder presets, search and filters.
+- **Statistics** and personal records, overall or for any selection of dives.
+- **Gas planner** for a quick "how much gas do I need" check.
+- **Documents**: keep your certification cards and insurance with expiry
+  reminders.
+- **Import** from Subsurface (`.ssrf`), the SSI / MySSI CSV export and other
+  DiveMate/Pandive logbooks; **export** to Subsurface, DiveMate (`.ddb`) and
+  JSON (sites). See [what each source brings](docs/importing.md).
+- **Google Drive backup** (automatic, also in the background) and **sync
+  between phone and PC**, without ever silently losing data.
+- Large text by default, adjustable. Available in English, Spanish, Catalan,
+  Basque and French.
+- No photos, no account, no servers: your logbook is a single SQLite file.
 
-## Qué es
+## Install
 
-App móvil de registro de inmersiones (un solo buceador, una base de datos por buceador):
+### Android
 
-- Importa inmersiones directamente del ordenador de buceo por Bluetooth (Shearwater Peregrine/Perdix, Mares Puck 4, y el resto que soporte `libdivecomputer`).
-- Almacena todo en un único archivo SQLite (fácil de respaldar y mover).
-- Exporta a formato Subsurface. Importa del ordenador, de Subsurface, del CSV del logbook de SSI (MySSI) y de otros `.ddb`: qué trae cada fuente y cómo, en [docs/importar.md](docs/importar.md).
-- Copia de seguridad / restauración en Google Drive (sube y baja el archivo SQLite completo).
-- Sin gestión de fotos (decisión de diseño).
+Download the APK from the [Releases](https://github.com/javipolo/pandive/releases)
+page and install it (you may need to allow installing apps from unknown
+sources). Android 7.0 or newer.
 
-### Arquitectura (resumen)
+### Linux
 
-- **UI + lógica**: Flutter (Dart). Desarrollo rápido, SQLite (`drift`) y Google Drive (`googleapis`) bien soportados.
-- **Descarga de inmersiones**: `libdivecomputer` (C) con un núcleo común (`native/pandive_dc_core.c`) y un plugin por plataforma que pone el transporte BLE: en **Android** Kotlin + JNI sobre la API de Bluetooth; en **Linux** C sobre **BlueZ** por D-Bus (`linux/runner/dc/`). Flutter solo recibe las inmersiones ya parseadas.
-- **Por qué Flutter y no nativo puro**: la parte dura (C + BLE + threading) cuesta lo mismo en cualquier framework —hay que compilar C con el NDK y puentear BLE igualmente— pero Flutter ahorra mucho en UI, base de datos y Drive.
+There are no prebuilt packages yet: build it from source following the
+[development guide](docs/DEVELOPMENT.md), then `make install-linux`.
 
----
-
-## Requisitos del entorno de desarrollo
-
-Probado en **Fedora 44** (Linux). Para otras distros, cambia el gestor de paquetes.
-
-| Componente | Para qué |
-|---|---|
-| JDK 17 | Gradle / build de Android |
-| Flutter SDK (canal stable) | Framework de la app |
-| Android SDK (platform-tools, platform 35, build-tools 35) | Compilar/instalar APK, `adb` |
-| Android NDK | Compilar `libdivecomputer` (C) a `.so` |
-| clang, cmake, ninja, autotools, pkg-config | Build nativo de libdivecomputer |
-| Device Android físico | **Imprescindible**: el emulador no tiene Bluetooth LE |
-
-> **Android Studio NO es necesario.** Es un IDE gráfico; todo el flujo funciona desde línea de comandos con las *command-line tools*. El único extra que aporta (emulador gráfico) no sirve aquí porque el BLE requiere un dispositivo real.
-
----
-
-## Instalación paso a paso
-
-### 1. Dependencias del sistema
-
-```bash
-sudo dnf install -y java-17-openjdk-devel git unzip clang cmake ninja-build \
-  autoconf automake libtool pkgconf-pkg-config
-```
-
-### 2. Flutter SDK
-
-```bash
-git clone https://github.com/flutter/flutter.git -b stable ~/flutter
-echo 'export PATH="$HOME/flutter/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-flutter --version
-```
-
-### 3. Android SDK (command-line tools)
-
-Descarga "Command line tools only" (Linux) desde <https://developer.android.com/studio#command-line-tools-only>.
-
-```bash
-mkdir -p ~/Android/cmdline-tools
-# descomprime el zip de modo que quede en: ~/Android/cmdline-tools/latest/
-unzip ~/Downloads/commandlinetools-linux-*.zip -d /tmp/cmdline
-mv /tmp/cmdline/cmdline-tools ~/Android/cmdline-tools/latest
-
-echo 'export ANDROID_HOME=$HOME/Android' >> ~/.bashrc
-echo 'export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-Instala componentes. Google deprecó `sdkmanager` en favor del nuevo **`android` CLI** (aunque `sdkmanager` todavía funciona).
-
-Con el nuevo `android` CLI (recomendado). Es una descarga aparte; instalador oficial en Linux:
-
-```bash
-# revisa el script antes de ejecutarlo si quieres:
-#   curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/install.sh -o /tmp/android-cli.sh && less /tmp/android-cli.sh && bash /tmp/android-cli.sh
-curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/install.sh | bash
-
-android sdk install platform-tools platforms/android-35 build-tools/35.0.0 ndk/27.2.12479018
-# sin paso --licenses: las acepta automaticamente
-```
-
-Alternativa con el antiguo `sdkmanager` (muestra un warning de deprecacion, pero funciona):
-
-```bash
-sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
-sdkmanager --licenses
-```
-
-### 4. Enlazar Flutter con el SDK y verificar
-
-```bash
-flutter config --android-sdk "$ANDROID_HOME"
-flutter doctor          # resuelve lo que aparezca en rojo
-```
-
-> **JDK para Gradle**: el build de Android (Gradle) **no soporta Java 25**. Necesita **JDK 17**. Si tu Java por defecto es más nuevo, instala el 17 y apunta Flutter a él:
-> ```bash
-> sudo dnf install -y java-17-openjdk-devel    # o temurin-17-jdk
-> flutter config --jdk-dir /usr/lib/jvm/java-17-temurin-jdk   # ajusta a tu ruta
-> ```
-> Comprueba la ruta real con: `dirname $(dirname $(readlink -f $(which javac)))` tras seleccionar el 17, o busca en `/usr/lib/jvm/`.
-
-### 5. Dispositivo físico
-
-El emulador **no vale** (sin Bluetooth LE). Usa un móvil Android real:
-
-1. Ajustes → Acerca del teléfono → pulsa 7 veces en "Número de compilación" para activar Opciones de desarrollador.
-2. Opciones de desarrollador → activa **Depuración USB**.
-3. Conecta por USB y comprueba:
-
-```bash
-adb devices   # debe listar tu dispositivo
-```
-
----
-
-## Compilar e instalar la app
-
-> Disponible una vez exista el proyecto Flutter en este repositorio.
-
-```bash
-make deps                       # instalar dependencias Dart
-make run                        # compilar (release) + instalar + ejecutar en el device conectado
-make apk                        # APK de release arm64 (sideload; requiere keystore propio)
-make install                    # instalar el último APK en el device (usuario principal)
-```
-
-### APK de release (firmado)
-
-El `--release` necesita una clave de firma propia. Generación de keystore y configuración de `key.properties` se documentará cuando lleguemos a esa fase.
-
----
-
-## Compilar libdivecomputer
-
-El código fuente vive en `vendor/libdivecomputer/` (clon de git).
-
-**Build nativo** (Linux, para probar/depurar en el ordenador):
-
-```bash
-cd vendor/libdivecomputer
-autoreconf --install            # solo la primera vez (clon de git)
-./configure --prefix=/tmp/ldc-install
-make -j$(nproc)
-# CLI de prueba: lista computers soportados
-LD_LIBRARY_PATH=src/.libs ./examples/.libs/dctool list
-```
-
-**Cross-compile para Android** (requiere NDK):
-
-```bash
-export ANDROID_NDK=$HOME/Android/ndk/27.2.12479018
-./scripts/build-libdivecomputer-android.sh
-# salida: build/android/<abi>/install/lib/libdivecomputer.so
-```
-
-**Para la app Linux** (estática, se enlaza dentro del ejecutable):
-
-```bash
-make ldc-linux                  # -> linux/ldc/libdivecomputer.a
-```
-
-Se compila **sin** libusb/hidapi/bluez: el transporte BLE lo pone la app (Kotlin en Android, BlueZ en Linux) y se conecta al I/O personalizado de libdivecomputer.
-
----
-
-## App de escritorio (Linux)
-
-```bash
-make linux                      # build release -> build/linux/x64/release/bundle/pandive
-make run-linux                  # o compilar + ejecutar (release)
-```
-
-Usa `make` (no `flutter run` a pelo) para que se inyecte el client de Google
-del login (ver "Backup en Google Drive" → *App Linux*).
-
-### Instalar la app Linux
-
-Tras `make linux` (como tu usuario, nunca con sudo):
-
-```bash
-make install-linux                          # en tu home: ~/.local/opt/pandive + ~/.local/bin/pandive
-sudo make install-linux PREFIX=/usr/local   # para todos: /opt/pandive + /usr/local/bin/pandive
-```
-
-Copia el bundle entero (ejecutable + `lib/` + `data/`, que van juntos), crea
-el enlace en `bin`, el icono y la entrada de menú (`org.drslump.pandive.desktop`,
-de `linux/packaging/`). Para actualizar, `make linux` y repetir; para quitarla,
-`make uninstall-linux` con el mismo `PREFIX`. Los datos de cada usuario (ajustes,
-sesión de Google, logbook) viven en su home y no se tocan.
-
-### Bluetooth en Linux
-
-La descarga del ordenador de buceo usa **BlueZ** (el servicio `bluetooth` del sistema). No hace falta ser root ni pedir permisos: basta con que el adaptador esté encendido (`bluetoothctl show` → `Powered: yes`; la app ofrece encenderlo si está apagado).
-
-Normalmente **no hace falta emparejar**: se escanea desde la app, se elige el ordenador y descarga (probado con Shearwater). Si un modelo exige emparejamiento, la app lo intenta sola y el PIN lo pide el Bluetooth del escritorio (GNOME/KDE). Si aun así falla la conexión ("No se pudieron activar notificaciones", errores de autenticación), empareja a mano una vez:
+Downloading from a dive computer uses the system Bluetooth (BlueZ); no root
+needed. Usually no pairing is required. If a model needs it and the
+connection fails, pair it once by hand:
 
 ```bash
 bluetoothctl
-[bluetooth]# scan le             # pon el ordenador en modo Bluetooth/descarga
-[bluetooth]# devices             # localiza su MAC (p.ej. por el nombre "Perdix")
-[bluetooth]# scan off
-[bluetooth]# pair AA:BB:CC:DD:EE:FF    # introduce el PIN que muestre el ordenador
+[bluetooth]# scan le                   # put the computer in Bluetooth mode
+[bluetooth]# pair AA:BB:CC:DD:EE:FF    # enter the PIN shown on the computer
 [bluetooth]# trust AA:BB:CC:DD:EE:FF
 [bluetooth]# quit
 ```
 
-Después vuelve a descargar desde la app. Para deshacerlo: `bluetoothctl remove AA:BB:CC:DD:EE:FF`. Los mensajes de diagnóstico (`PandiveBLE:` / `PandiveDC:`) salen por la consola si lanzas la app desde un terminal.
+## Getting started
 
-## Estado del proyecto
+1. On first launch Pandive creates an empty logbook. You can instead open an
+   existing DiveMate `.ddb` or import a Subsurface file.
+2. **Dives → +** → *Dive transfer (computer)* to scan for your dive computer and
+   download new dives.
+3. **Menu → Backup** to connect your Google account. Backups go to a
+   "Pandive Backups" folder; Pandive only sees the files it creates there.
+   Turn on *Sync between devices* on each device to share the logbook between
+   phone and PC.
 
-Por fases (ver plan de desarrollo):
+> If connecting Google fails on Android with "No stored state" or "User
+> cancelled", your default browser (e.g. Brave) is losing the login redirect:
+> use Chrome for that one step.
 
-- [~] **Fase 0** — De-riesgo `libdivecomputer`:
-  - [x] Soporte de los 3 computers confirmado (código + runtime `dctool`): Peregrine, Perdix, **Mares Puck 4** (modelo `0x35`). Los tres por **BLE** (único transporte a implementar).
-  - [x] Build nativo en Linux OK (valida fuente + build system).
-  - [x] Script de cross-compile Android listo: `scripts/build-libdivecomputer-android.sh`.
-  - [x] Cross-compile con NDK OK: `.so` para arm64-v8a, armeabi-v7a, x86_64 (Android 24).
-  - [x] API de I/O personalizado (`dc_custom_open` + `DC_TRANSPORT_BLE`) confirmada: el puente BLE Kotlin↔libdivecomputer es viable (patrón de Subsurface).
-  - [x] Prototipo de descarga BLE en device real (= inicio del plugin nativo, Fase 2).
-- [x] **Fase 1** — App base (sin migración: abre el `.ddb` directamente):
-  - [x] Capa DB (`lib/db/divemate_db.dart`): abre `.ddb`, owner, lista dives, botellas, decode de perfil (validado contra `divemate-cli`).
-  - [x] Pantalla de carga de `.ddb` (file picker), lista de inmersiones, detalle con perfil (`fl_chart`) y botellas.
-  - [x] Tema de fuente grande por defecto + ajuste de tamaño (accesibilidad).
-  - [x] Compila a APK; tests unitarios + contra la DB real pasan.
-  - [x] Navegación por pestañas: Inmersiones / Sitios / Estadísticas.
-  - [x] Búsqueda y filtros en listas.
-  - [x] Estadísticas agregadas (validadas contra `divemate-cli`).
-  - [x] Edición de campos de una inmersión (escritura en el `.ddb`, respeta UUID/Status y marca `Updated`).
-  - [x] Alta manual de inmersiones nuevas (genera Number/UUID, botella opcional).
-- [x] **Fase 2** — Importar del ordenador de buceo (plugin nativo + UI de escaneo/descarga), en Android y Linux.
-- [ ] **Fase 3** — Export Subsurface + backup/restore Google Drive.
-- [ ] **Fase 4** — Pulido: estadísticas, sitios, buddies, equipo, certificaciones.
+## Contributing
 
----
-
-## Notas técnicas
-
-- **Base de datos**: Pandive usa el **mismo formato SQLite `.ddb` que DiveMate** (decisión de diseño: sin migración, abre la DB existente tal cual). Tablas relevantes: `Logbook` (inmersiones), `Place` (sitios), `Tank` (botellas), `Buddy`, `Divetype`, `Equipment`, `Brevets`. "Simplificar" = ocultar en la UI los campos no usados, no cambiar el esquema.
-- **Compatibilidad con `divemate-cli`**: existe una CLI Python (`../divemate-cli`) que consulta/estadística la misma `.ddb`. Mantener el formato la deja funcionando sobre la DB de Pandive.
-- **Un solo buceador**: la `.ddb` puede tener varios `DiverID` (demo/imports); el owner es el de más inmersiones. Pandive opera solo sobre el owner.
-- **Perfiles**: en `Logbook.Profile` (profundidad, 12 chars/muestra, 4 primeros = decímetros) y `Profile2` (temperatura, 11 chars/muestra, 4 primeros = centi-°C); `ProfileInt` = intervalo en segundos. Decode portado de `divemate-cli`.
-- **Mares Puck 4**: soporte confirmado en `libdivecomputer` (modelo `0x35`, BLE).
-- **Numeración de buceos**: con la *numeración automática* (Ajustes, activada por defecto) los buceos van siempre numerados de forma consecutiva y en orden cronológico (fecha, hora), sin contar los de la papelera. Se renumera al crear, borrar, restaurar, fusionar, importar o cambiar la fecha de un buceo, y al cambiar el *primer número* (por defecto el más bajo que hubiera; útil si traes buceos de otro logbook). Solo se marca `Updated` en los buceos cuyo número cambia. La configuración se guarda en la propia `.ddb` (`PandiveMeta`), así móvil y PC numeran igual. Sin numeración automática, al guardar un buceo fuera de orden se ofrece renumerar; y en Herramientas está *Renumerar buceos* con vista previa.
-
----
-
-## Backup en Google Drive (configuración OAuth, una vez)
-
-El backup/restore usa OAuth nativo (`flutter_appauth`) con el scope **`drive.file`**
-(no sensible, sin verificación de Google): la app solo ve los ficheros que ella
-crea, en una carpeta visible "Pandive Backups". La auth persiste un **refresh
-token** (en `flutter_secure_storage`), de modo que el **backup en segundo plano**
-puede refrescar el access token sin abrir la app (headless). Configuración única:
-
-1. [Google Cloud Console](https://console.cloud.google.com/) → crea un proyecto.
-2. **APIs y servicios → Biblioteca** → habilita **Google Drive API**.
-3. **Pantalla de consentimiento OAuth** → tipo *External* → añade tu cuenta de
-   Google como **usuario de prueba** (así no hace falta verificación).
-4. **Credenciales → Crear → ID de cliente OAuth → iOS**:
-   - Bundle ID: `org.drslump.pandive`
-   - (El tipo *iOS* es solo para obtener un esquema de redirect invertido sin
-     secreto, `com.googleusercontent.apps.<id>`; **no** implica una app iOS.)
-   - Copia su **Client ID** (`…apps.googleusercontent.com`) y guárdalo en:
-     ```
-     echo 'TU_IOS_CLIENT_ID.apps.googleusercontent.com' > android/gdrive_native_client_id.txt
-     ```
-     (fichero no versionado; `make apk` lo inyecta como
-     `--dart-define=GDRIVE_NATIVE_CLIENT_ID` y `build.gradle.kts` deriva de él el
-     `appAuthRedirectScheme`). Sin él, Conectar no funciona.
-5. Instala el APK, Ajustes → Copia de seguridad (Google Drive) → Conectar.
-
-> **Navegador para Conectar:** el consentimiento se abre en el navegador por
-> defecto. **Brave** falla (su Custom Tab pierde el estado del redirect →
-> "No stored state" / "User cancelled"); usa **Chrome** (ponlo como navegador por
-> defecto solo para ese paso). Una vez conectado, el refresh es por HTTP puro
-> (`oauth2.googleapis.com`), sin navegador: puedes volver a poner Brave. Solo
-> necesitarás Chrome de nuevo si desconectas y reconectas.
-
-### App Linux (login de Google en el escritorio)
-
-`flutter_appauth` no existe en Linux, así que el escritorio usa el flujo OAuth
-oficial para apps instaladas: abre el navegador del sistema y recoge la
-respuesta en un servidor local efímero (`http://127.0.0.1:<puerto>`, con PKCE).
-Necesita **otro** ID de cliente, en el **mismo proyecto** (así ve los mismos
-backups que el móvil: `drive.file` va por proyecto, no por cliente):
-
-1. **Credenciales → Crear → ID de cliente OAuth → App de escritorio** (*Desktop app*).
-2. Guarda su ID y su secreto (en apps instaladas Google no lo considera
-   confidencial, pero no se versiona):
-   ```
-   echo 'TU_DESKTOP_CLIENT_ID.apps.googleusercontent.com' > linux/gdrive_desktop_client_id.txt
-   echo 'TU_DESKTOP_CLIENT_SECRET' > linux/gdrive_desktop_client_secret.txt
-   ```
-3. `make linux` / `make run-linux` los inyectan como `--dart-define`. Ajustes →
-   Copia de seguridad → Conectar abre el navegador; al aceptar, la pestaña dice
-   que ya puedes cerrarla.
-
-El refresh token se guarda en el llavero del escritorio (libsecret: GNOME
-Keyring / KWallet). En Linux no hay backup en segundo plano (WorkManager es de
-Android): se hace al abrir la app y con el botón manual.
-
-### Sincronizar móvil y PC
-
-Backup → **Sincronizar entre dispositivos** (en cada dispositivo, con la misma
-cuenta). Mantiene el mismo logbook vía `sync-logbook.ddb.gz` (comprimido: 12 MB → <1 MB) en la carpeta de
-Drive, sin perder nunca datos en silencio:
-
-- Si solo cambió un lado, se sube o se baja solo (al abrir o volver a la app,
-  ~2 min después de dejar de editar, cada ~2 min y al salir). En Android, al
-  bloquear o salir se encarga además la subida a WorkManager, que la completa
-  en cuanto haya red aunque Android congele o cierre la app. Una bajada con
-  pantallas abiertas queda pendiente ("Actualizar") para no interrumpir.
-- Si cambiaron los dos, el icono de la barra se pone rojo y se elige con qué
-  versión quedarse; la otra se guarda como backup (Restaurar).
-- Un dispositivo nuevo con el logbook vacío adopta directamente el de Drive.
-- Aviso si Pandive está abierto en el otro dispositivo (presencia en Drive).
-- Las imágenes de documentos viajan en el zip de documentos.
-
-**Solo con WiFi** (dos interruptores en Backup, activados por defecto):
-- *Backups solo con WiFi* (activado por defecto): los automáticos (al abrir y en segundo plano)
-  esperan a tener WiFi; el botón manual funciona siempre.
-- *Sincronizar solo con WiFi* (desactivado por defecto): con datos móviles la sync no hace nada sola (ni
-  comprobaciones ni subidas/bajadas; icono de antena): solo el botón
-  "Sincronizar ahora". La subida de respaldo al salir espera a la WiFi.
-
-Backups: se guarda `latest.ddb.gz` (comprimido con gzip: 12 MB → <1 MB; los
-`.ddb` antiguos sin comprimir se siguen pudiendo restaurar) + copias con timestamp (se conservan las 10 más
-recientes) y un zip con las imágenes de documentos. Al restaurar, por defecto se
-ofrece `latest`. **Failsafe:** cada escritura en la DB guarda su hora UTC
-(tabla `PandiveMeta`, mantenida por triggers SQLite); si el backup elegido es
-más viejo que la última escritura local, se avisa con ambas fechas antes de
-sobrescribir. Disparadores:
-- Al abrir la app (si pasaron >24 h y la DB cambió).
-- **En segundo plano** (WorkManager, ~cada 12 h; solo WiFi si se activa), aunque la app
-  esté cerrada, si la DB cambió desde el último backup. Se activa con el toggle
-  "Copia automática" (se enciende al conectar la cuenta).
+Bug reports and pull requests are welcome. To build Pandive or hack on it, see
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).

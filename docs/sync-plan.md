@@ -1,155 +1,156 @@
-# Plan: sincronización móvil ↔ PC vía Google Drive
+# Plan: phone ↔ PC sync via Google Drive
 
-Estado: **capa 1 implementada** (2026-11-24: `sync_logic.dart`,
-`sync_controller.dart`, `drive_sync_ops.dart`). Detalles de la implementación:
-"cambió el otro" se mide con el md5 de `sync-logbook.ddb.gz` (gzip) en Drive (no con la
-revisión); la subida es una instantánea `VACUUM INTO`; un dispositivo nuevo y
-vacío adopta Drive sin preguntar. Capa 2 (fusión) pendiente. Ver "Propuesta
-recomendada" al final.
+Status: **layer 1 implemented** (2026-11-24: `sync_logic.dart`,
+`sync_controller.dart`, `drive_sync_ops.dart`). Implementation details:
+"the other side changed" is measured with the md5 of `sync-logbook.ddb.gz`
+(gzip) on Drive (not the revision); the upload is a `VACUUM INTO` snapshot; a
+new, empty device adopts Drive without asking. Layer 2 (merge) pending. See
+"Recommended proposal" at the end.
 
-## Objetivo
+## Goal
 
-Usar Pandive en el móvil y en el PC con los mismos datos. Los cambios deben
-copiarse de un sitio a otro y, si se edita en ambos a la vez (incluso sin
-conexión), no corromper ni perder datos. Sin servidor propio: el intercambio va
-por el Google Drive que ya usamos para backup.
+Use Pandive on the phone and on the PC with the same data. Changes must be
+copied from one to the other and, if both are edited at once (even offline),
+no data may be corrupted or lost. No server of our own: the exchange goes
+through the Google Drive we already use for backups.
 
-## Lo que ya tenemos
+## What we already have
 
-- Tablas DiveMate (Logbook, Place, Buddy, Tank, Divetype…) con `UUID` y
-  `Updated` por fila → identidad estable entre dispositivos y marca temporal.
-- Borrado de buceos lógico (`Status=2`): sincroniza bien.
-- Integración Drive con auth headless, backups rotativos (10) y worker
-  periódico.
+- DiveMate tables (Logbook, Place, Buddy, Tank, Divetype…) with `UUID` and
+  `Updated` per row → stable identity across devices and a timestamp.
+- Soft deletion of dives (`Status=2`): syncs well.
+- Drive integration with headless auth, rotating backups (10) and a periodic
+  worker.
 
-## Lo que falta
+## What's missing
 
-- Tablas `Pandive*` (tags, viajes, documentos, tipos de buceo, presets, …) sin
+- `Pandive*` tables (tags, trips, documents, dive types, presets, …) have no
   UUID.
-- Borrados físicos (`DELETE FROM Buddy/Place/PandiveTag/…`).
-- `ID` enteros autoincrementales asignados localmente → dos altas simultáneas
-  pueden chocar.
-- No todas las escrituras actualizan `Updated` (revisar).
+- Hard deletes (`DELETE FROM Buddy/Place/PandiveTag/…`).
+- Integer autoincrement `ID`s assigned locally → two simultaneous inserts can
+  collide.
+- Not every write updates `Updated` (to review).
 
-## Por qué un número de versión no basta
+## Why a version number is not enough
 
-Una versión (o el `headRevisionId` de Drive) responde "¿ha cambiado alguien el
-fichero desde mi última sync?". Eso resuelve gratis el caso habitual (solo
-cambió un lado → subir o bajar el fichero entero). Si cambiaron **los dos**,
-solo detecta el conflicto; para resolverlo hace falta fusionar.
+A version (or Drive's `headRevisionId`) answers "has anyone changed the file
+since my last sync?". That solves the common case for free (only one side
+changed → upload or download the whole file). If **both** changed, it only
+detects the conflict; resolving it requires merging.
 
-## Diseño: fusión de tres vías por fila, Drive como fuente de verdad
+## Design: per-row three-way merge, Drive as source of truth
 
-1. **Fichero compartido** `pandive-sync.ddb` en la carpeta de Drive (distinto
-   de los backups).
-2. **Base local**: cada dispositivo guarda una copia de la última versión que
-   sincronizó + su `headRevisionId`.
-3. **Sincronizar**:
-   - Drive sigue en mi revisión base → subo la mía (si cambié algo).
-   - Yo no cambié nada desde la base → bajo la de Drive y la adopto.
-   - Cambiaron ambos → fusión de tres vías (base, local, remota), tabla a
-     tabla, fila a fila por UUID:
-     - Fila cambiada en un solo lado → gana ese lado (incluye borrados
-       físicos: estaba en la base y ya no está).
-     - Cambiada en ambos → fusión por columna; si chocan en la misma columna,
-       gana el `Updated` más reciente.
-     - Borrada en un lado y editada en el otro → gana la edición (prudente).
-     - Fila nueva en ambos con `ID` repetido → renumerar la entrante y
-       reescribir sus referencias (`PlaceID`, `BuddyIDs`, tags, botellas…).
-       Números de buceo recalculados por fecha.
-   - Antes de subir, comprobar otra vez que Drive sigue en la misma revisión;
-     si alguien subió entretanto, repetir la fusión. Subir a temporal y
-     sustituir (nunca un fichero a medias).
-4. **Seguridad**: backup automático antes de aplicar cualquier fusión (ya
-   existe la rotación de 10).
-5. **Cuándo**: al abrir/volver a la app, unos segundos tras editar
-   (debounce), botón manual y worker periódico. Sin red no pasa nada: se
-   fusiona después.
-6. **Resumen** tras sync: "3 cambios bajados, 1 subido, 1 conflicto resuelto
-   (ver)".
+1. **Shared file** `pandive-sync.ddb` in the Drive folder (separate from the
+   backups).
+2. **Local base**: each device keeps a copy of the last version it synced +
+   its `headRevisionId`.
+3. **Sync**:
+   - Drive is still at my base revision → upload mine (if I changed anything).
+   - I changed nothing since the base → download Drive's and adopt it.
+   - Both changed → three-way merge (base, local, remote), table by table, row
+     by row by UUID:
+     - Row changed on one side only → that side wins (including hard deletes:
+       it was in the base and is gone).
+     - Changed on both → per-column merge; if they clash on the same column,
+       the most recent `Updated` wins.
+     - Deleted on one side and edited on the other → the edit wins (cautious).
+     - New row on both sides with the same `ID` → renumber the incoming one and
+       rewrite its references (`PlaceID`, `BuddyIDs`, tags, cylinders…). Dive
+       numbers recomputed by date.
+   - Before uploading, check again that Drive is still at the same revision;
+     if someone uploaded in between, merge again. Upload to a temp file and
+     replace (never a half-written file).
+4. **Safety**: automatic backup before applying any merge (the 10-backup
+   rotation already exists).
+5. **When**: on opening/returning to the app, a few seconds after editing
+   (debounce), manual button and periodic worker. No network, no problem: it
+   merges later.
+6. **Summary** after sync: "3 changes downloaded, 1 uploaded, 1 conflict
+   resolved (view)".
 
-Imágenes de documentos: aparte, un fichero por documento en una carpeta de
-Drive, comparando por nombre + hash.
+Document images: separately, one file per document in a Drive folder,
+compared by name + hash.
 
-## Trabajo previo
+## Prerequisite work
 
-- Columna `UUID` en las tablas `Pandive*` (son nuestras; no rompe DiveMate).
-  Tablas de unión (`PandiveDiveTag`, `PandiveSiteTag`, `PandiveTripBuddy`…)
-  se fusionan como conjuntos de pares de UUID.
-- Toda escritura actualiza `Updated`.
-- Mapa explícito de claves foráneas (lo usan fusión y renumeración).
-- Motor de fusión como lógica pura sobre SQLite, testeado en host con copias
-  temporales (como los tests actuales).
+- `UUID` column in the `Pandive*` tables (they're ours; doesn't break
+  DiveMate). Join tables (`PandiveDiveTag`, `PandiveSiteTag`,
+  `PandiveTripBuddy`…) are merged as sets of UUID pairs.
+- Every write updates `Updated`.
+- Explicit foreign-key map (used by merge and renumbering).
+- Merge engine as pure logic over SQLite, tested on the host with temp copies
+  (like the current tests).
 
-## Fases propuestas
+## Proposed phases
 
-1. Prerrequisitos de esquema (UUID en `Pandive*`, `Updated` siempre, mapa FK).
-2. Motor de fusión de tres vías + tests exhaustivos (sin Drive).
-3. Sync móvil ↔ Drive (fast-forward + fusión + resumen), botón manual.
-4. Disparadores automáticos (inicio, debounce, worker).
-5. App Linux contra el mismo Drive.
+1. Schema prerequisites (UUID in `Pandive*`, `Updated` always, FK map).
+2. Three-way merge engine + exhaustive tests (no Drive).
+3. Phone ↔ Drive sync (fast-forward + merge + summary), manual button.
+4. Automatic triggers (start, debounce, worker).
+5. Linux app against the same Drive.
 
-## Descartado
+## Discarded
 
-- **Lock file en Drive**: si el móvil se queda offline con el candado, el PC
-  queda bloqueado; no resuelve el trabajo sin conexión (barco, isla).
-- **Journal de operaciones**: más fino pero mucho más complejo (triggers,
-  orden de replay) y sin ventaja real para un buceador con dos dispositivos.
+- **Lock file on Drive**: if the phone goes offline holding the lock, the PC
+  is blocked; it doesn't solve offline work (boat, island).
+- **Operation journal**: finer-grained but much more complex (triggers, replay
+  order) and no real advantage for one diver with two devices.
 
-## Decisiones pendientes
+## Open decisions
 
-1. Choque en el mismo campo: ¿gana el más reciente o preguntar?
-2. ¿Sync automática desde el principio o solo manual al inicio?
-3. ¿Empezar móvil ↔ Drive y dejar el PC para cuando la app Linux esté lista?
+1. Clash on the same field: most recent wins, or ask?
+2. Automatic sync from the start, or manual only at first?
+3. Start with phone ↔ Drive and leave the PC until the Linux app is ready?
 
-## Propuesta recomendada (2026-11-24)
+## Recommended proposal (2026-11-24)
 
-Dos capas: primero una sync que **nunca pierde datos** (sin fusión), después la
-fusión automática para que el caso raro tampoco moleste.
+Two layers: first a sync that **never loses data** (no merge), then automatic
+merging so the rare case isn't a bother either.
 
-### Capa 1: sync con avance rápido + detección de divergencia
+### Layer 1: fast-forward sync + divergence detection
 
-Estado por dispositivo (local, no en la DB): `baseRevision` (revisión de Drive
-de la última sync) y `baseStamp` (`lastWriteUtc` local en ese momento).
+Per-device state (local, not in the DB): `baseRevision` (Drive revision at
+the last sync) and `baseStamp` (local `lastWriteUtc` at that moment).
 
-- **¿Cambié yo?** `lastWriteUtc local > baseStamp` (exacto gracias a los
-  triggers: cuenta cualquier escritura).
-- **¿Cambió el otro?** `headRevisionId` de `sync/pandive.ddb` en Drive ≠
+- **Did I change?** local `lastWriteUtc > baseStamp` (exact thanks to the
+  triggers: any write counts).
+- **Did the other change?** `headRevisionId` of `sync/pandive.ddb` on Drive ≠
   `baseRevision`.
 
-| yo | otro | acción |
-|----|------|--------|
-| no | no | nada |
-| sí | no | subir (y volver a comprobar la revisión justo antes de subir) |
-| no | sí | bajar y sustituir la local (con backup previo) |
-| sí | sí | **divergencia**: no se toca nada automáticamente |
+| me | other | action |
+|----|-------|--------|
+| no | no | nothing |
+| yes | no | upload (and recheck the revision right before uploading) |
+| no | yes | download and replace the local one (with a backup first) |
+| yes | yes | **divergence**: nothing is touched automatically |
 
-En divergencia: aviso "Hay cambios en el móvil y en este equipo" con *quedarme
-con esta* / *quedarme con la otra*. La versión descartada no se borra: va a
-los backups con timestamp (recuperable). En la capa 2 se añade *fusionar*.
+On divergence: notice "There are changes on the phone and on this computer"
+with *keep this one* / *keep the other one*. The discarded version is not
+deleted: it goes to the timestamped backups (recoverable). Layer 2 adds
+*merge*.
 
-Cuándo: al abrir y al volver a la app, unos segundos tras editar (debounce),
-al pasar a segundo plano y con un botón. Indicador en la barra superior:
-✓ sincronizado · ↑ subiendo · ↓ bajando · ⚠ divergencia · ⌀ sin conexión.
+When: on opening and returning to the app, a few seconds after editing
+(debounce), when going to the background, and with a button. Indicator in the
+top bar: ✓ synced · ↑ uploading · ↓ downloading · ⚠ divergence · ⌀ offline.
 
-**Aviso de uso simultáneo** (no es un candado): cada dispositivo escribe en
-Drive un pequeño `presence.json` (dispositivo + hora) mientras está abierto.
-Si el otro lo ve reciente: "Pandive está abierto en el móvil (hace 2 min)".
-Evita la mayoría de divergencias sin bloquear a nadie sin conexión.
+**Simultaneous use notice** (not a lock): each device writes a small
+`presence.json` (device + time) to Drive while open. If the other sees a
+recent one: "Pandive is open on the phone (2 min ago)". Avoids most
+divergences without blocking anyone offline.
 
-Coste: pequeño (reutiliza auth/subida de backups). Garantía: ninguna edición se
-pierde sin que el usuario lo decida.
+Cost: small (reuses backup auth/upload). Guarantee: no edit is lost without
+the user deciding so.
 
-### Capa 2: fusión de tres vías
+### Layer 2: three-way merge
 
-La de "Diseño" arriba (por fila/UUID, por columna, edición gana a borrado,
-renumerar IDs). Necesita los prerrequisitos de esquema. La base para fusionar
-es la copia local guardada en la última sync (añadirla en la capa 1 desde el
-principio para tenerla disponible).
+The one in "Design" above (per row/UUID, per column, edit beats delete,
+renumber IDs). Needs the schema prerequisites. The merge base is the local
+copy saved at the last sync (add it in layer 1 from the start so it is
+available).
 
-### Respuesta propuesta a las decisiones pendientes
+### Proposed answers to the open decisions
 
-1. Choque en el mismo campo: gana el más reciente, y se lista en el resumen.
-2. Capa 1 automática desde el principio (es segura por diseño); fusión manual
-   ("Fusionar") hasta que la capa 2 tenga muchas horas de tests.
-3. Móvil y Linux a la vez: el login de Google ya funciona en ambos.
+1. Clash on the same field: most recent wins, and it is listed in the summary.
+2. Layer 1 automatic from the start (it is safe by design); manual merge
+   ("Merge") until layer 2 has many hours of testing.
+3. Phone and Linux at once: Google login already works on both.
