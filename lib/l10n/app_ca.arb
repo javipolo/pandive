@@ -259,6 +259,8 @@
   "tools": "Eines",
   "about": "Quant a",
   "aboutIntro": "PanDive és un quadern d'immersions. Has trobat un error o tens un suggeriment? Escriu-nos.",
+  "aboutVersion": "Versió {version}",
+  "aboutCommit": "Commit {commit}",
   "contactEmail": "Envia un correu",
   "emailCopied": "Adreça de correu copiada",
   "exportLogbook": "Export DDB. PanDive / DiveMate",

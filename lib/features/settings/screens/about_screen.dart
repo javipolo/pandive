@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:pandive/core/build_info.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 const _email = 'pandive@drslump.org';
@@ -42,6 +43,10 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text('PanDive', style: tt.headlineSmall),
+            const SizedBox(height: 4),
+            SelectableText(t.aboutVersion(appVersion), style: tt.bodyMedium),
+            if (appCommit.isNotEmpty)
+              SelectableText(t.aboutCommit(appCommit), style: tt.bodySmall),
             const SizedBox(height: 16),
             Text(t.aboutIntro, textAlign: TextAlign.center, style: tt.bodyMedium),
             const SizedBox(height: 24),

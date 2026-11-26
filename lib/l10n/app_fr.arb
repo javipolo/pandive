@@ -259,6 +259,8 @@
   "tools": "Outils",
   "about": "À propos",
   "aboutIntro": "PanDive est un carnet de plongée. Un bug ou une suggestion ? Contactez-nous.",
+  "aboutVersion": "Version {version}",
+  "aboutCommit": "Commit {commit}",
   "contactEmail": "Envoyer un e-mail",
   "emailCopied": "Adresse e-mail copiée",
   "exportLogbook": "Export DDB. PanDive / DiveMate",

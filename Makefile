@@ -32,8 +32,11 @@ LINUX_DEFINES += $(if $(GDRIVE_DESKTOP_CLIENT_SECRET),--dart-define=GDRIVE_DESKT
 GIT_DESCRIBE := $(shell git describe --tags --always --dirty 2>/dev/null)
 BUILD_NAME := $(patsubst v%,%,$(GIT_DESCRIBE))
 BUILD_NUMBER := $(shell git rev-list --count HEAD 2>/dev/null)
-VERSION_FLAGS := $(if $(BUILD_NAME),--build-name=$(BUILD_NAME),) \
-	$(if $(BUILD_NUMBER),--build-number=$(BUILD_NUMBER),)
+GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)$(if $(shell git status --porcelain --untracked-files=no 2>/dev/null),-dirty,)
+# Also baked into the Dart code (core/build_info.dart) for the About screen.
+VERSION_FLAGS := $(if $(BUILD_NAME),--build-name=$(BUILD_NAME) --dart-define=PANDIVE_VERSION=$(BUILD_NAME),) \
+	$(if $(BUILD_NUMBER),--build-number=$(BUILD_NUMBER),) \
+	$(if $(GIT_COMMIT),--dart-define=PANDIVE_COMMIT=$(GIT_COMMIT),)
 RELEASE_TAG := $(shell git describe --tags --exact-match 2>/dev/null)
 RELEASES_DIR := releases
 
@@ -82,7 +85,7 @@ release: require-android ## Build the APK of the tagged HEAD into releases/PanDi
 
 .PHONY: version
 version: ## Print the versionName / versionCode a build would get
-	@echo "versionName=$(BUILD_NAME) versionCode=$(BUILD_NUMBER)"
+	@echo "versionName=$(BUILD_NAME) versionCode=$(BUILD_NUMBER) commit=$(GIT_COMMIT)"
 
 # --user 0: install only for the phone's owner (not in a work profile or a
 # Secure Folder / second space). Without other profiles it's the default anyway.

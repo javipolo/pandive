@@ -259,6 +259,8 @@
   "tools": "Tresnak",
   "about": "Honi buruz",
   "aboutIntro": "PanDive murgilketa-koadernoa da. Akatsen bat ikusi duzu edo iradokizunen bat duzu? Idatz iezaguzu.",
+  "aboutVersion": "{version} bertsioa",
+  "aboutCommit": "Commit-a: {commit}",
   "contactEmail": "Bidali mezua",
   "emailCopied": "Helbide elektronikoa kopiatu da",
   "exportLogbook": "Export DDB. PanDive / DiveMate",

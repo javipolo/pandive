@@ -60,7 +60,9 @@ The git tag is the version. `make apk` / `make run` / `make linux` pass
 `--build-name` (`git describe` without the `v`: `1.1.0`, or
 `1.1.0-3-gabc1234-dirty` for a dev build) and `--build-number` (commit
 count, so Android's `versionCode` always grows). The `version:` in
-`pubspec.yaml` is only a placeholder.
+`pubspec.yaml` is only a placeholder. The version and the short commit hash
+are also passed as `--dart-define` (`PANDIVE_VERSION`, `PANDIVE_COMMIT`) and
+shown in About; a plain `flutter run` shows "dev".
 
 ```bash
 git tag v1.1.0
