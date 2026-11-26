@@ -1,0 +1,18 @@
+PanDive v1.0.1 (2026-11-27)
+
+Changes since v1.0.0 (9 commits).
+
+New features
+
+- Tags on dive types, inherited by the dives of that type
+- Show inherited site/dive-type tags tinted in dive detail and editor
+- Cleanup section in tools with delete tanks with no data
+- Batch set/clear dive type and add/remove tag on selected dives
+- Move merge, trip and delete into the selection overflow menu
+- Ports list, trip departure/arrival port and optional port per dive
+- Open or share SSI CSV, sites JSON and .ssrf files with PanDive (e.g. from WhatsApp)
+- SSI CSV import can fill in matched existing dives instead of duplicating them
+
+Fixes
+
+- Dive type doesn't duplicate cylinders already filled on the dive
