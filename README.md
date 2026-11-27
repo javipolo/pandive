@@ -95,3 +95,20 @@ $ pdive list '(tag=cave or depth>30) and not night and period="last year"' sort 
 
 Bug reports and pull requests are welcome. To build Pandive or hack on it, see
 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
+## License
+
+Copyright (C) 2026 Javi Polo
+
+Pandive is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See [LICENSE](LICENSE) for the full text.
+
+This license also applies to every earlier version of Pandive published in this
+repository before the `LICENSE` file was added, including the v1.0.0 and v1.0.1
+releases.
+
+Pandive uses [libdivecomputer](https://www.libdivecomputer.org/) (LGPL-2.1 or
+later) and other third-party libraries under their own licenses (BSD, MIT,
+Apache-2.0, MPL-2.0), all compatible with GPL-3.0.
