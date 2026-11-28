@@ -1,9 +1,11 @@
 /// Strip shown at the bottom of the web version: the logbook lives in the
-/// browser's memory and changes are lost on reload.
+/// browser's memory and changes are lost on reload, unless Drive sync is on
+/// (then: wait for it to sync before closing).
 library;
 
 import 'package:material_ui/material_ui.dart';
 
+import 'package:pandive/core/services/sync_controller.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
 class WebPreviewBanner extends StatelessWidget {
@@ -18,13 +20,16 @@ class WebPreviewBanner extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Text(
-            AppLocalizations.of(context).webPreviewBanner,
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: cs.onTertiaryContainer),
+          child: ListenableBuilder(
+            listenable: syncController,
+            builder: (context, _) => Text(
+              syncController.enabled
+                  ? AppLocalizations.of(context).webBannerSynced
+                  : AppLocalizations.of(context).webPreviewBanner,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: cs.onTertiaryContainer),
+            ),
           ),
         ),
       ),

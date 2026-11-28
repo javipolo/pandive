@@ -1,4 +1,9 @@
 {
+  "openFromDrive": "Ireki Google Drive-tik",
+  "driveDownloading": "Logbook-a Google Drive-tik deskargatzen…",
+  "driveUnreachable": "Ezin izan da Google Drive-rekin konektatu.",
+  "driveNoSync": "Oraindik ez dago logbook sinkronizaturik Google Drive-n. Aktibatu lehenik sinkronizazioa mugikorreko PanDive-n (Babeskopia › Gailuen artean sinkronizatu).",
+  "webBannerSynced": "Web bertsioa: aldaketak Google Drive-n gordetzen dira. Itxaron sinkronizatuta agertu arte orria itxi aurretik.",
   "webPreviewBanner": "Web bertsioa (aurrebista): logbook-a memorian bakarrik gordetzen da. Aldaketak galdu egiten dira orria berriro kargatzean edo ixtean.",
   "@@locale": "eu",
   "navDives": "Murgilketak",

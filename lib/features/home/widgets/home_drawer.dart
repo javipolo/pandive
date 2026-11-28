@@ -65,17 +65,17 @@ class HomeDrawer extends StatelessWidget {
             const Divider(),
             _push(context, Icons.luggage_outlined, t.trips,
                 (_) => TripsScreen(db: db, settings: settings)),
-            // Web (for now): no files on disk, no Drive -> no documents,
-            // tools (import/export) or backup.
+            // Web (for now): no files on disk -> no documents or tools
+            // (import/export). Backup there is only the Drive account + sync.
             if (!isWeb) ...[
               _push(context, Icons.folder_outlined, t.documents,
                   (_) => DocumentsScreen(db: db),
                   alert: _docsAlert()),
               _push(context, Icons.build_outlined, t.tools,
                   (_) => ToolsScreen(settings: settings, db: db)),
-              _push(context, Icons.cloud_upload_outlined, t.backup,
-                  (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
             ],
+            _push(context, Icons.cloud_upload_outlined, t.backup,
+                (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
             _push(context, Icons.settings_outlined, t.settings,
                 (_) => SettingsScreen(
                     settings: settings, db: db, onChangeDb: onChangeDb)),

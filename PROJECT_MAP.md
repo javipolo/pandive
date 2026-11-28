@@ -14,7 +14,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/app_root.dart` -> AppRoot: picks the screen; creates an empty DB on first launch, or the load screen (Change DB / error; always on web)
 - `lib/core/locale_resolution.dart` -> resolveAppLocale: English runs as en_GB (day/month/year, 24 h, also in the system date/time pickers)
 - `lib/core/platform.dart` -> web-safe platform checks (isWeb/isAndroid/isLinux); use instead of dart:io Platform
-- `lib/core/widgets/web_preview_banner.dart` -> bottom strip on web: logbook in memory only, lost on reload
+- `lib/core/widgets/web_preview_banner.dart` -> bottom strip on web: logbook in memory only (lost on reload, or saved to Drive when sync is on)
 - `lib/core/text/relative_date.dart` -> "human" date: "Today 17:12" / "Yesterday 21:23" / full date (backup list)
 - `lib/core/services/home_navigation.dart` -> section requests to HomeScreen (requestDivesList: back to the dive list after importing)
 - `lib/core/services/share_file.dart` -> shareOrSaveFile: share (mobile) or "Save as…" (Linux) a generated file + appMessengerKey (snackbars without context)
@@ -25,6 +25,13 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/l10n/app_<code>.arb` -> translations (EN template + ES/CA/EU/FR); `AppLocalizations` is generated with `flutter gen-l10n`
 - `lib/core/services/dive_computer.dart` -> libdivecomputer bridge: models, BLE scan, permissions
 - `lib/core/services/drive_backup.dart` -> Google Drive backup/restore: native OAuth (flutter_appauth + refresh token in secure_storage, headless), folder, hash (parts)
+- `lib/core/services/drive_web_session.dart` -> Drive session on web: in-memory ~1 h token + email (DriveWebSession), webClientId
+- `lib/core/services/web_oauth.dart` -> conditional export: browser Google OAuth (initWebOAuth/requestWebToken/revokeWebToken)
+- `lib/core/services/web_oauth_web.dart` -> Google Identity Services token client (popup)
+- `lib/core/services/web_oauth_stub.dart` -> native stub of web_oauth
+- `lib/core/services/unload_guard.dart` -> conditional export: installUnloadGuard (web: ask before closing with unsynced changes)
+- `lib/core/services/unload_guard_web.dart` -> beforeunload listener
+- `lib/core/services/unload_guard_stub.dart` -> native no-op
 - `lib/core/services/desktop_oauth.dart` -> Google OAuth on desktop (Linux): loopback 127.0.0.1 + PKCE, refresh over HTTP
 - `lib/core/services/drive_backup_ops.dart` -> operations: backupNow/backupIfNeeded/backupIfChanged/list/downloadBackup+applyRestore/pruning
 - `lib/core/services/drive_sync_ops.dart` -> Drive for sync: sync-logbook.ddb.gz file (gzip, md5), discarded version as backup, documents zip if changed, per-device presence
@@ -39,7 +46,7 @@ with `screens/` and, if needed, `widgets/`).
 
 ### Core · database (one library with `part`s)
 - `lib/core/db/divemate_db.dart` -> opens .ddb, owner, helpers; declares the parts
-- `lib/core/db/open/sqlite_open.dart` -> conditional export of the SQLite backend: initSqlite/openSqlite/putMemoryFile
+- `lib/core/db/open/sqlite_open.dart` -> conditional export of the SQLite backend: initSqlite/openSqlite + DB file helpers (readDbFile/writeDbFile/deleteDbFile/tempDbPath: disk or memory)
 - `lib/core/db/open/sqlite_open_io.dart` -> native backend (FFI, file on disk)
 - `lib/core/db/open/sqlite_open_web.dart` -> web backend (WASM sqlite3.wasm + in-memory file system)
 - `lib/core/db/db_queries.dart` -> reads: list/get dives, cylinders, next number
@@ -118,7 +125,8 @@ with `screens/` and, if needed, `widgets/`).
 
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> pick/create a .ddb or import .ssrf (with enum DbLoadError)
-- `lib/features/load_db/widgets/load_db_buttons.dart` -> buttons: open .ddb / create new / import Subsurface
+- `lib/features/load_db/widgets/load_db_buttons.dart` -> buttons: open from Google Drive (web) / open .ddb / create new / import Subsurface
+- `lib/features/load_db/logic/open_from_drive.dart` -> web: sign in, download the sync logbook into memory as sync base (openFromDrive); detachWebSync for file-loaded logbooks
 - `lib/features/load_db/logic/load_db_files.dart` -> new logbook path, pick .ddb (own copy: documents dir, or in memory on web), pick text file
 
 ### tags

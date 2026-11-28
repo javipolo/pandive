@@ -81,6 +81,8 @@ dependencies:
   latlong2: ^0.10.1
   geolocator: ^14.0.2
   connectivity_plus: ^7.3.1
+  google_identity_services_web: ^0.3.3 # Google login on web (token model)
+  web: ^1.1.0 # browser APIs (beforeunload guard)
 
 # pdf caps archive <4.1 -> pub picks archive 4.0.9, and image 4.11.0 calls a
 # method (decodeLazy) that archive doesn't have. We pin image <4.11 (compatible).

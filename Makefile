@@ -24,6 +24,11 @@ GDRIVE_DESKTOP_CLIENT_ID ?= $(strip $(shell cat linux/gdrive_desktop_client_id.t
 GDRIVE_DESKTOP_CLIENT_SECRET ?= $(strip $(shell cat linux/gdrive_desktop_client_secret.txt 2>/dev/null))
 LINUX_DEFINES := $(if $(GDRIVE_DESKTOP_CLIENT_ID),--dart-define=GDRIVE_DESKTOP_CLIENT_ID=$(GDRIVE_DESKTOP_CLIENT_ID),)
 LINUX_DEFINES += $(if $(GDRIVE_DESKTOP_CLIENT_SECRET),--dart-define=GDRIVE_DESKTOP_CLIENT_SECRET=$(GDRIVE_DESKTOP_CLIENT_SECRET),)
+# Web app: OAuth "Web application" client (same project; authorized JavaScript
+# origins: https://javipolo.github.io and http://localhost:8765). Versioned on
+# purpose: a web client ID is public anyway (it ships inside the page).
+GDRIVE_WEB_CLIENT_ID ?= 161073314829-fr5k3bso1onp3vv5iquicik1fu86u13s.apps.googleusercontent.com
+WEB_DEFINES := $(if $(GDRIVE_WEB_CLIENT_ID),--dart-define=GDRIVE_WEB_CLIENT_ID=$(GDRIVE_WEB_CLIENT_ID),)
 
 # Versioning: the git tag is the source of truth (pubspec's version is a
 # placeholder). versionName = `git describe` without the leading "v"
@@ -71,7 +76,12 @@ WEB_BASE_HREF ?= /pandive/
 .PHONY: web
 web: ## Build the web app into build/web (WEB_BASE_HREF=/pandive/ by default)
 	$(FLUTTER) build web --release --base-href $(WEB_BASE_HREF) \
-		$(VERSION_FLAGS)
+		$(VERSION_FLAGS) $(WEB_DEFINES)
+
+.PHONY: run-web
+run-web: ## Serve the web build on http://localhost:8765 (an authorized origin for Google login)
+	$(MAKE) web WEB_BASE_HREF=/
+	python3 -m http.server 8765 --bind localhost -d build/web
 
 .PHONY: apk-release
 apk-release: apk ## Alias of apk

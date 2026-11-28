@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import 'db/divemate_db.dart';
+import 'db/open/sqlite_open.dart';
 import 'platform.dart';
 import 'services/backup_worker.dart';
 import 'services/drive_backup.dart';
@@ -61,10 +62,8 @@ class _AppRootState extends State<AppRoot> {
         _error = DbLoadError.invalid;
       } else {
         _db = db;
-        if (!isWeb) {
-          _maybeBackup();
-          _startSync();
-        }
+        if (!isWeb) _maybeBackup(); // no Drive backup on web
+        _startSync();
       }
     } catch (e) {
       _error = DbLoadError.openFailed;
@@ -110,16 +109,15 @@ class _AppRootState extends State<AppRoot> {
     Future.microtask(() => syncController.sync(auto: true));
   }
 
-  // Replaces the active DB with the version downloaded from Drive (close, copy,
-  // reopen). Goes back to the main screen: open ones use the old DB.
-  Future<void> _replaceFromSync(File src) async {
+  // Replaces the active DB with the version downloaded from Drive (close,
+  // write, reopen). Goes back to the main screen: open ones use the old DB.
+  Future<void> _replaceFromSync(List<int> bytes) async {
     final path = widget.settings.dbPath;
     if (path == null) return;
     if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
     _db?.close();
     _db = null;
-    await src.copy(path);
-    await src.delete();
+    await writeDbFile(path, bytes);
     _tryOpen(path);
   }
 

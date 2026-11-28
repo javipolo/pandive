@@ -1,4 +1,5 @@
-/// Load screen buttons: open .ddb, create new, import .ssrf.
+/// Load screen buttons: open from Google Drive (web), open .ddb, create new,
+/// import .ssrf.
 library;
 
 import 'package:material_ui/material_ui.dart';
@@ -10,12 +11,14 @@ class LoadDbButtons extends StatelessWidget {
   final VoidCallback onPick;
   final VoidCallback onCreate;
   final VoidCallback onImport;
+  final VoidCallback? onDrive; // null = hidden (only on web, with a client ID)
   const LoadDbButtons({
     super.key,
     required this.busy,
     required this.onPick,
     required this.onCreate,
     required this.onImport,
+    this.onDrive,
   });
 
   @override
@@ -24,7 +27,15 @@ class LoadDbButtons extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        FilledButton.icon(
+        if (onDrive != null) ...[
+          FilledButton.icon(
+            onPressed: busy ? null : onDrive,
+            icon: const Icon(Icons.cloud_download_outlined),
+            label: Text(t.openFromDrive),
+          ),
+          const SizedBox(height: 8),
+        ],
+        (onDrive != null ? FilledButton.tonalIcon : FilledButton.icon)(
           onPressed: busy ? null : onPick,
           icon: busy
               ? const SizedBox(

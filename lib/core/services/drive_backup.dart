@@ -4,7 +4,9 @@
 /// background backup can refresh the access token without an Activity (headless).
 /// Requires an OAuth client **of type iOS** (gives the reversed scheme without a secret);
 /// see docs/DEVELOPMENT.md. On Linux (no flutter_appauth) it uses [DesktopOAuth] with a
-/// **Desktop app** client of the same project (so it sees the same backups). The operations logic is in the `part`.
+/// **Desktop app** client of the same project (so it sees the same backups). On web,
+/// [DriveWebSession] (popup, short-lived token, nothing stored) with a
+/// **Web application** client. The operations logic is in the `part`.
 library;
 
 import 'dart:convert';
@@ -21,6 +23,7 @@ import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/storage/documents_storage.dart';
 import 'backup_util.dart';
 import 'desktop_oauth.dart';
+import 'drive_web_session.dart';
 import 'network.dart';
 import '../platform.dart';
 
@@ -71,17 +74,19 @@ class DriveBackupService {
   DateTime? _accessExp;
   String? _folderId;
 
-  String? get email => _email;
-  bool get connected => _refreshToken != null;
+  String? get email => isWeb ? DriveWebSession.email : _email;
+  bool get connected => isWeb ? DriveWebSession.active : _refreshToken != null;
 
   /// Desktop: our own loopback OAuth (flutter_appauth is mobile only).
   static bool get _desktop => isLinux;
   static const _desktopAuth = DesktopOAuth(_desktopClientId, _desktopClientSecret);
 
   /// Was it built with this platform's client ID? Without it there's no login.
-  static bool get configured => _desktop
-      ? _desktopClientId.isNotEmpty && _desktopClientSecret.isNotEmpty
-      : _clientId.isNotEmpty;
+  static bool get configured => isWeb
+      ? webClientId.isNotEmpty
+      : _desktop
+          ? _desktopClientId.isNotEmpty && _desktopClientSecret.isNotEmpty
+          : _clientId.isNotEmpty;
 
   // reversed scheme from the client id -> AppAuth redirect.
   String get _scheme =>
@@ -92,6 +97,7 @@ class DriveBackupService {
   /// token. Throws on failure (to show the error). [browserDoneText]: text
   /// of the browser tab on return (desktop only).
   Future<void> signIn({String browserDoneText = ''}) async {
+    if (isWeb) return DriveWebSession.signIn(_scopes);
     if (_desktop) {
       final r = await _desktopAuth.authorize(_scopes, doneText: browserDoneText);
       await _saveTokens(r.accessToken, r.expiresAt, r.refreshToken, r.idToken);
@@ -124,6 +130,11 @@ class DriveBackupService {
   }
 
   Future<void> signOut() async {
+    if (isWeb) {
+      DriveWebSession.signOut();
+      _folderId = null;
+      return;
+    }
     _refreshToken = _accessToken = _email = _folderId = null;
     _accessExp = null;
     await _storage.delete(key: _kRefresh);
@@ -133,6 +144,7 @@ class DriveBackupService {
   /// Silent reconnection (no UI): true if a refresh token is stored.
   /// Works in the background isolate (only reads the storage).
   Future<bool> signInSilently() async {
+    if (isWeb) return DriveWebSession.active; // no silent refresh on web
     _refreshToken ??= await _storage.read(key: _kRefresh);
     _email ??= await _storage.read(key: _kEmail);
     return _refreshToken != null;
@@ -140,6 +152,7 @@ class DriveBackupService {
 
   /// Valid access token (refreshes with the refresh token if needed). Headless.
   Future<String?> _freshAccessToken() async {
+    if (isWeb) return DriveWebSession.token;
     final exp = _accessExp;
     if (_accessToken != null &&
         exp != null &&

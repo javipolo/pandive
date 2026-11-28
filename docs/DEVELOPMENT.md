@@ -60,10 +60,12 @@ Google OAuth client IDs. `make install-linux` installs the Linux build into
 ### Web build
 
 `make web` builds the browser version into `build/web`, served under
-`WEB_BASE_HREF` (default `/pandive/`, the GitHub Pages project path; use
-`make web WEB_BASE_HREF=/` to serve it from the root, e.g. locally with
-`python3 -m http.server -d build/web`). `flutter run -d chrome` also works
-for development.
+`WEB_BASE_HREF` (default `/pandive/`, the GitHub Pages project path).
+`make run-web` builds it for the root and serves it on
+<http://localhost:8765>, an authorized origin of the web OAuth client, so
+Google login works locally (`127.0.0.1` does not: Google answers
+`origin_mismatch`). `flutter run -d chrome` also works, but on a random port
+where the login is refused.
 
 **GitHub Pages**: `.github/workflows/web.yml` runs `make web` on every push
 to `main` (or by hand from the Actions tab, "Run workflow") and publishes
@@ -73,7 +75,7 @@ Actions**. The workflow pins the Flutter version (`flutter-version`): bump it
 together with the local SDK. After a deploy, browsers may keep the previous
 version cached for a while; a hard reload picks up the new one.
 
-How it differs from the native apps (phase 1, preview):
+How it differs from the native apps (preview):
 
 - **SQLite in WASM**: `lib/core/db/open/` picks the backend with a
   conditional import: FFI on Android/Linux, `package:sqlite3/wasm.dart` on
@@ -82,15 +84,27 @@ How it differs from the native apps (phase 1, preview):
   `pubspec.lock` (download it from the
   [sqlite3.dart releases](https://github.com/simolus3/sqlite3.dart/releases),
   tag `sqlite3-<version>`) and be updated whenever that package is bumped.
-- **In-memory only**: the picked `.ddb` lives in an in-memory file system and
-  is gone on reload; the app always starts on the load screen and shows a
-  banner saying so.
+- **In-memory only**: the logbook lives in an in-memory file system and is
+  gone on reload; the app always starts on the load screen. Its banner says
+  changes are lost, or, with Drive sync on, to wait until it syncs.
+- **Google Drive**: *Open from Google Drive* on the load screen signs in
+  (Google Identity Services popup, `lib/core/services/web_oauth*.dart`),
+  downloads the sync file into memory and makes it the sync base, so the
+  usual `SyncController` uploads edits back. The token lasts ~1 h and nothing
+  is stored (`drive_web_session.dart`): after expiry, or on the next visit,
+  the user taps Connect again. A logbook opened from a file starts with sync
+  off and no base, so turning sync on asks what to keep instead of
+  overwriting Drive. While changes aren't on Drive yet the page asks before
+  closing (`unload_guard*.dart`). Backup there shows only the account and
+  sync; gzip uses `package:archive` (dart:io's doesn't exist in the
+  browser).
 - **Platform checks**: use `lib/core/platform.dart` (`isWeb`, `isAndroid`,
   `isLinux`), never `dart:io`'s `Platform`, which throws in the browser.
   Importing `dart:io` compiles on web, but nothing that touches files may
   run there.
 - **Hidden on web**: dive computer download, documents, tools
-  (import/export), backup/sync, and every share/export button.
+  (import/export), Drive backup/restore (sync stays), and every share/export
+  button.
 
 ### Releases
 
@@ -155,6 +169,11 @@ They are read from untracked files and injected as `--dart-define`.
    its ID and secret in `linux/gdrive_desktop_client_id.txt` and
    `linux/gdrive_desktop_client_secret.txt`. Same project means both apps see
    the same backups.
+5. **Web**: in the same project, create a **Web application** client with
+   authorized JavaScript origins `https://javipolo.github.io` and
+   `http://localhost:8765` (no redirect URIs: the token model uses a popup).
+   Its ID is public (it ships inside the page), so it lives in the
+   `Makefile` (`GDRIVE_WEB_CLIENT_ID`), which the Pages workflow also uses.
 
 ## Testing
 

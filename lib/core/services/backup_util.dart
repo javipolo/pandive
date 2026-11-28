@@ -1,7 +1,7 @@
 /// Pure (testable) utilities for Drive backup names/pruning.
 library;
 
-import 'dart:io';
+import 'package:archive/archive.dart';
 
 /// Backups are uploaded gzip-compressed (12 MB -> <1 MB), all named
 /// `PanDive-…`. Old names (`latest.ddb[.gz]`, `pandive-…`, uncompressed .ddb)
@@ -22,7 +22,7 @@ String backupFileName(DateTime t) =>
 /// Decompresses if gzip (header 1f 8b); an old .ddb passes through as is.
 List<int> maybeGunzip(List<int> bytes) =>
     bytes.length > 2 && bytes[0] == 0x1f && bytes[1] == 0x8b
-        ? gzip.decode(bytes)
+        ? GZipDecoder().decodeBytes(bytes)
         : bytes;
 
 /// Would restoring a backup with stamp [backup] overwrite data newer than the

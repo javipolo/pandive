@@ -1,4 +1,9 @@
 {
+  "openFromDrive": "Abrir desde Google Drive",
+  "driveDownloading": "Descargando el logbook de Google Drive…",
+  "driveUnreachable": "No se ha podido conectar con Google Drive.",
+  "driveNoSync": "Todavía no hay ningún logbook sincronizado en Google Drive. Activa primero la sincronización en PanDive en el móvil (Copia de seguridad › Sincronizar entre dispositivos).",
+  "webBannerSynced": "Versión web: los cambios se guardan en Google Drive. Espera a que aparezca como sincronizado antes de cerrar la página.",
   "webPreviewBanner": "Versión web (preliminar): el logbook solo se guarda en memoria. Los cambios se pierden al recargar o cerrar la página.",
   "@@locale": "es",
   "navDives": "Inmersiones",

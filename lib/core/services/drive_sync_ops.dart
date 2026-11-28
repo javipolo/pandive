@@ -49,7 +49,7 @@ extension DriveSyncOps on DriveBackupService {
     final a = await _syncApi();
     if (a == null) return null;
     final (api, folder) = a;
-    final bytes = gzip.encode(raw);
+    final bytes = GZipEncoder().encodeBytes(raw);
     final media = drive.Media(Stream.value(bytes), bytes.length);
     final f = remote.exists
         ? await api.files.update(drive.File(), remote.id!,
@@ -72,7 +72,7 @@ extension DriveSyncOps on DriveBackupService {
     await for (final chunk in media.stream) {
       bytes.addAll(chunk);
     }
-    return gzip.decode(bytes);
+    return GZipDecoder().decodeBytes(bytes);
   }
 
   /// Saves the version discarded in a divergence as a timestamped
@@ -81,12 +81,13 @@ extension DriveSyncOps on DriveBackupService {
     final a = await _syncApi();
     if (a == null) return;
     final (api, folder) = a;
-    await _upload(api, folder, backupFileName(DateTime.now()), gzip.encode(bytes));
+    await _upload(api, folder, backupFileName(DateTime.now()), GZipEncoder().encodeBytes(bytes));
     await _prune(api, folder);
   }
 
   /// Uploads the document images zip if they changed since last time.
   Future<void> syncDocumentsUp(Settings s) async {
+    if (isWeb) return; // no documents on web (no files on disk)
     final dir = await documentsDir();
     final parts = <String>[
       await for (final e in dir.list())
@@ -101,6 +102,7 @@ extension DriveSyncOps on DriveBackupService {
   }
 
   Future<void> syncDocumentsDown() async {
+    if (isWeb) return;
     final a = await _syncApi();
     if (a != null) await _restoreDocuments(a.$1, a.$2);
   }

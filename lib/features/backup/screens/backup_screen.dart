@@ -1,5 +1,6 @@
 /// Google Drive backup: connect account, manual backup, toggle
-/// for daily automatic backup and access to restore.
+/// for daily automatic backup and access to restore. On web only the account
+/// and sync (no files on disk to back up or restore into).
 library;
 
 
@@ -60,8 +61,8 @@ class _BackupScreenState extends State<BackupScreen> {
         messenger.showSnackBar(SnackBar(content: Text(t.driveNotConfigured)));
       } else {
         await _svc.signIn(browserDoneText: t.oauthBrowserDone);
-        // On connect, enable automatic backup by default.
-        if (_svc.connected) {
+        // On connect, enable automatic backup by default (not on web).
+        if (_svc.connected && !isWeb) {
           await widget.settings.setAutoBackup(true);
           await registerAutoBackup(wifiOnly: widget.settings.backupWifiOnly);
         }
@@ -109,27 +110,31 @@ class _BackupScreenState extends State<BackupScreen> {
                     child: Text(connected ? t.disconnect : t.connectAccount),
                   ),
           ),
-          const Divider(),
-          // WorkManager only exists on Android: on desktop, just a notice.
-          if (isAndroid)
+          // Web: no WorkManager, no files to back up: account + sync only.
+          if (!isWeb) ...[
+            const Divider(),
+            // WorkManager only exists on Android: on desktop, just a notice.
+            if (isAndroid)
+              SwitchListTile(
+                title: Text(t.autoBackupDaily),
+                subtitle: Text(t.autoBackupHint),
+                value: widget.settings.autoBackup,
+                onChanged: connected ? _toggleAutoBackup : null,
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(t.autoBackupAndroidOnly),
+              ),
             SwitchListTile(
-              title: Text(t.autoBackupDaily),
-              subtitle: Text(t.autoBackupHint),
-              value: widget.settings.autoBackup,
-              onChanged: connected ? _toggleAutoBackup : null,
-            )
-          else
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: Text(t.autoBackupAndroidOnly),
+              title: Text(t.backupWifiOnly),
+              subtitle: Text(t.backupWifiOnlyHint),
+              value: widget.settings.backupWifiOnly,
+              onChanged: connected ? _toggleBackupWifi : null,
             ),
-          SwitchListTile(
-            title: Text(t.backupWifiOnly),
-            subtitle: Text(t.backupWifiOnlyHint),
-            value: widget.settings.backupWifiOnly,
-            onChanged: connected ? _toggleBackupWifi : null,
-          ),
-          const Divider(),
+            const Divider(),
+          ] else
+            const Divider(),
           SwitchListTile(
             title: Text(t.syncToggle),
             subtitle: Text(t.syncToggleHint),
@@ -141,35 +146,37 @@ class _BackupScreenState extends State<BackupScreen> {
                   }
                 : null,
           ),
-          SwitchListTile(
-            title: Text(t.syncWifiOnly),
-            subtitle: Text(t.syncWifiOnlyHint),
-            value: widget.settings.syncWifiOnly,
-            onChanged: connected && widget.settings.syncEnabled
-                ? (v) async {
-                    await widget.settings.setSyncWifiOnly(v);
-                    if (mounted) setState(() {});
-                  }
-                : null,
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.backup_outlined),
-            title: Text(t.backupNow),
-            enabled: connected && !_busy,
-            onTap: () => _run(() => _svc.backupNow(widget.settings), t.backupDone),
-          ),
-          ListTile(
-            leading: const Icon(Icons.restore),
-            title: Text(t.restore),
-            enabled: connected && !_busy,
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => RestoreList(
-                  svc: _svc,
-                  settings: widget.settings,
-                  onReloadDb: widget.onReloadDb),
-            )),
-          ),
+          if (!isWeb) ...[
+            SwitchListTile(
+              title: Text(t.syncWifiOnly),
+              subtitle: Text(t.syncWifiOnlyHint),
+              value: widget.settings.syncWifiOnly,
+              onChanged: connected && widget.settings.syncEnabled
+                  ? (v) async {
+                      await widget.settings.setSyncWifiOnly(v);
+                      if (mounted) setState(() {});
+                    }
+                  : null,
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.backup_outlined),
+              title: Text(t.backupNow),
+              enabled: connected && !_busy,
+              onTap: () => _run(() => _svc.backupNow(widget.settings), t.backupDone),
+            ),
+            ListTile(
+              leading: const Icon(Icons.restore),
+              title: Text(t.restore),
+              enabled: connected && !_busy,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => RestoreList(
+                    svc: _svc,
+                    settings: widget.settings,
+                    onReloadDb: widget.onReloadDb),
+              )),
+            ),
+          ],
         ],
       ),
     );

@@ -1,4 +1,9 @@
 {
+  "openFromDrive": "Obre des de Google Drive",
+  "driveDownloading": "S'està baixant el logbook de Google Drive…",
+  "driveUnreachable": "No s'ha pogut connectar amb Google Drive.",
+  "driveNoSync": "Encara no hi ha cap logbook sincronitzat a Google Drive. Activa primer la sincronització a PanDive al mòbil (Còpia de seguretat › Sincronitzar entre dispositius).",
+  "webBannerSynced": "Versió web: els canvis es desen a Google Drive. Espera que aparegui com a sincronitzat abans de tancar la pàgina.",
   "webPreviewBanner": "Versió web (preliminar): el logbook només es desa a la memòria. Els canvis es perden en recarregar o tancar la pàgina.",
   "@@locale": "ca",
   "navDives": "Immersions",

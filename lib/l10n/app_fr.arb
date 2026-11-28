@@ -1,4 +1,9 @@
 {
+  "openFromDrive": "Ouvrir depuis Google Drive",
+  "driveDownloading": "Téléchargement du carnet depuis Google Drive…",
+  "driveUnreachable": "Impossible de joindre Google Drive.",
+  "driveNoSync": "Il n'y a pas encore de carnet synchronisé sur Google Drive. Activez d'abord la synchronisation dans PanDive sur votre téléphone (Sauvegarde › Synchroniser entre appareils).",
+  "webBannerSynced": "Version web : les modifications sont enregistrées sur Google Drive. Attendez qu'elles soient synchronisées avant de fermer la page.",
   "webPreviewBanner": "Version web (aperçu) : le carnet n'est gardé qu'en mémoire. Les modifications sont perdues en rechargeant ou en fermant la page.",
   "@@locale": "fr",
   "navDives": "Plongées",

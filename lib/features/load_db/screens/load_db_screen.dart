@@ -6,9 +6,12 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/platform.dart';
+import 'package:pandive/core/services/drive_backup.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/import_progress.dart';
 import 'package:pandive/features/load_db/logic/load_db_files.dart';
+import 'package:pandive/features/load_db/logic/open_from_drive.dart';
 import 'package:pandive/features/load_db/widgets/load_db_buttons.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -50,17 +53,34 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
     }
   }
 
+  // A logbook from a file or a new one. On web it isn't Drive's: sync off.
+  Future<void> _loaded(String path) async {
+    if (isWeb) await detachWebSync(widget.settings);
+    await widget.onLoaded(path);
+  }
+
   void _pick() => _run(() async {
         final dest = await pickDdbCopy();
         if (dest == null) return setState(() => _busy = false);
-        await widget.onLoaded(dest);
+        await _loaded(dest);
       }, (e) => AppLocalizations.of(context).errorLoad(e));
 
   void _createNew() => _run(() async {
         final dest = await newDbPath();
         DivemateDb.createEmpty(dest).close();
-        await widget.onLoaded(dest);
+        await _loaded(dest);
       }, (e) => AppLocalizations.of(context).errorCreate(e));
+
+  // Web: the synced logbook from Google Drive.
+  void _fromDrive() => _run(() async {
+        final t = AppLocalizations.of(context);
+        final path = await openFromDrive(context, widget.settings);
+        if (!mounted) return;
+        if (path == null) {
+          return setState(() => (_busy = false, _localError = t.driveNoSync));
+        }
+        await widget.onLoaded(path);
+      }, (e) => AppLocalizations.of(context).errorLoad(e));
 
   // Imports a .ssrf creating a new logbook and dumping it into it.
   void _importSsrf() => _run(() async {
@@ -71,7 +91,7 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
         if (!mounted) return db.close();
         await importSsrfWithProgress(context, db, xml);
         db.close();
-        await widget.onLoaded(dest);
+        await _loaded(dest);
       }, (e) => AppLocalizations.of(context).errorCreate(e));
 
   @override
@@ -123,6 +143,9 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
                 onPick: _pick,
                 onCreate: _createNew,
                 onImport: _importSsrf,
+                onDrive: isWeb && DriveBackupService.configured
+                    ? _fromDrive
+                    : null,
               ),
             ],
           ),

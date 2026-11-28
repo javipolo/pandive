@@ -35,7 +35,19 @@ CommonDatabase openSqlite(String path,
   );
 }
 
+/// Path for a scratch database file (root of the in-memory file system).
+String tempDbPath(String name) => '/$name';
+
+/// Whole content of the in-memory file [path].
+Future<Uint8List> readDbFile(String path) async {
+  final data = _fs.fileData[path];
+  if (data == null) throw StateError('No such file: $path');
+  return Uint8List.fromList(data);
+}
+
 /// Stores [bytes] as the file [path] (e.g. a .ddb picked by the user).
-void putMemoryFile(String path, Uint8List bytes) {
+Future<void> writeDbFile(String path, List<int> bytes) async {
   _fs.fileData[path] = Uint8Buffer()..addAll(bytes);
 }
+
+Future<void> deleteDbFile(String path) async => _fs.fileData.remove(path);

@@ -30,7 +30,7 @@ Future<String?> pickDdbCopy() async {
     final bytes = file.bytes;
     if (bytes == null) return null;
     const dest = '/logbook.ddb';
-    putMemoryFile(dest, bytes);
+    await writeDbFile(dest, bytes);
     return dest;
   }
   final path = file.path;

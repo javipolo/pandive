@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/db/open/sqlite_open.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'backup_worker.dart';
 import 'drive_backup.dart';
@@ -33,7 +34,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   final _svc = DriveBackupService();
   Settings? _s;
   DivemateDb? Function()? _db;
-  Future<void> Function(File)? _replace;
+  Future<void> Function(List<int>)? _replace;
   bool Function()? _canAutoReplace;
   Timer? _timer;
   int _ticks = 0;
@@ -51,12 +52,12 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
       (_s?.syncEnabled ?? false) && DriveBackupService.configured;
 
   /// [db]: currently open DB; [replace]: closes the DB, replaces it with the
-  /// given file and reopens it; [canAutoReplace]: whether it can be replaced without
+  /// given content and reopens it; [canAutoReplace]: whether it can be replaced without
   /// disturbing (no screen open on top of the main one).
   void attach({
     required Settings settings,
     required DivemateDb? Function() db,
-    required Future<void> Function(File) replace,
+    required Future<void> Function(List<int>) replace,
     required bool Function() canAutoReplace,
   }) {
     _s = settings;
@@ -206,10 +207,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _download(RemoteSync remote) async {
     final bytes = await _svc.downloadSync(remote);
     if (bytes == null) throw StateError('empty download');
-    final tmp = File('${Directory.systemTemp.path}/pandive-sync-'
-        '${DateTime.now().microsecondsSinceEpoch}.ddb');
-    await tmp.writeAsBytes(bytes, flush: true);
-    await _replace!(tmp);
+    await _replace!(bytes);
     await _svc.syncDocumentsDown();
     // The base stamp is that of the reopened DB (in case opening writes something).
     await _s!.setSyncBase(remote.md5, _db?.call()?.lastWriteRaw);
@@ -233,7 +231,18 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   /// Readable name of this device for presence.
   static String get deviceName => isAndroid
       ? 'Android'
-      : '${Platform.operatingSystem} (${Platform.localHostname})';
+      : isWeb
+          ? 'Web'
+          : '${Platform.operatingSystem} (${Platform.localHostname})';
+
+  /// Local changes not on Drive yet (or a pass running): leaving the page
+  /// now would lose them (web asks before closing).
+  bool get hasUnsyncedChanges {
+    if (!enabled) return false;
+    return _running ||
+        status == SyncStatus.diverged ||
+        _db?.call()?.lastWriteRaw != _s!.syncBaseStamp;
+  }
 
   void _synced() {
     lastSync = DateTime.now();
@@ -254,12 +263,12 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
 
 // Consistent snapshot + its stamp (read at the same instant).
 Future<(List<int>, String?)> _snapshot(DivemateDb db) async {
-  final f = File('${Directory.systemTemp.path}/pandive-snap-'
-      '${DateTime.now().microsecondsSinceEpoch}.ddb');
+  final path =
+      tempDbPath('pandive-snap-${DateTime.now().microsecondsSinceEpoch}.ddb');
   final stamp = db.lastWriteRaw;
-  db.snapshotTo(f.path);
-  final bytes = await f.readAsBytes();
-  await f.delete();
+  db.snapshotTo(path);
+  final bytes = await readDbFile(path);
+  await deleteDbFile(path);
   return (bytes, stamp);
 }
 
@@ -275,6 +284,7 @@ Future<void> _uploadSnapshot(DriveBackupService svc, Settings s, DivemateDb db,
 
 // Copy of the base version (the three-way merge, layer 2, will need it).
 Future<void> _saveBaseCopy(List<int> bytes) async {
+  if (isWeb) return; // in-memory only there: nothing to keep
   final dir = await getApplicationSupportDirectory();
   await File('${dir.path}/sync-base.ddb').writeAsBytes(bytes, flush: true);
 }

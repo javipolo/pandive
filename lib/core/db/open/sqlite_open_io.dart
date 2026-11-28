@@ -1,6 +1,7 @@
 /// Native SQLite (FFI): opens a real file on disk.
 library;
 
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:sqlite3/common.dart' show CommonDatabase;
@@ -20,6 +21,17 @@ CommonDatabase openSqlite(String path,
   );
 }
 
-/// Only meaningful in the browser (in-memory files): unsupported here.
-void putMemoryFile(String path, Uint8List bytes) =>
-    throw UnsupportedError('putMemoryFile is web only');
+/// Path for a scratch database file (system temp dir).
+String tempDbPath(String name) => '${Directory.systemTemp.path}/$name';
+
+/// Whole content of the database file at [path].
+Future<Uint8List> readDbFile(String path) => File(path).readAsBytes();
+
+/// Writes [bytes] as the database file [path] (replacing it).
+Future<void> writeDbFile(String path, List<int> bytes) =>
+    File(path).writeAsBytes(bytes, flush: true);
+
+Future<void> deleteDbFile(String path) async {
+  final f = File(path);
+  if (await f.exists()) await f.delete();
+}

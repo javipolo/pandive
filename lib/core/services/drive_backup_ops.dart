@@ -54,7 +54,7 @@ extension DriveBackupOps on DriveBackupService {
     final api = await _api(interactive: interactive);
     if (api == null) return false;
     final bytes = await File(path).readAsBytes();
-    final gz = gzip.encode(bytes);
+    final gz = GZipEncoder().encodeBytes(bytes);
     final folder = await _ensureFolder(api);
     await _upload(api, folder, latestBackupName, gz, replace: true);
     await _upload(api, folder, backupFileName(DateTime.now()), gz);

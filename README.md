@@ -61,9 +61,11 @@ bluetoothctl
 
 An experimental browser version runs at
 <https://javipolo.github.io/pandive/> (or build it with `make web`, see the
-[development guide](docs/DEVELOPMENT.md#web-build)). For now it only opens a
-`.ddb` to browse it: nothing is saved, and changes are lost on reload. The
-file is read inside your browser; it isn't uploaded anywhere.
+[development guide](docs/DEVELOPMENT.md#web-build)). It opens a
+`.ddb` and edits it in memory, or, with *Open from Google Drive*, the logbook
+your phone syncs (Backup › Sync between devices): then your changes go back
+to Drive. Without Drive, changes are lost on reload. A file you open is read
+inside your browser; it isn't uploaded anywhere.
 
 ## Getting started
 
