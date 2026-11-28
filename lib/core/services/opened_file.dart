@@ -4,9 +4,9 @@
 /// other platforms there is no incoming file.
 library;
 
-import 'dart:io';
 
 import 'package:flutter/services.dart';
+import '../platform.dart';
 
 class OpenedFile {
   static const _ch = MethodChannel('pandive/open');
@@ -14,10 +14,10 @@ class OpenedFile {
 
   /// Path of the file the app was launched with (and clears it), or null.
   static Future<String?> consume() async =>
-      Platform.isAndroid ? _ch.invokeMethod<String>('consume') : null;
+      isAndroid ? _ch.invokeMethod<String>('consume') : null;
 
   /// Paths of files opened while the app was already running.
-  static Stream<String> events() => Platform.isAndroid
+  static Stream<String> events() => isAndroid
       ? _events.receiveBroadcastStream().map((e) => e as String)
       : const Stream.empty();
 }

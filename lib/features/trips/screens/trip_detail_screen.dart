@@ -16,6 +16,7 @@ import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:pandive/features/trips/widgets/export_trips_dialog.dart';
 import 'package:pandive/features/trips/widgets/trip_ports_section.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/core/platform.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final DivemateDb db;
@@ -116,11 +117,12 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
     final t = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(widget.trip.name), actions: [
-        IconButton(
-          tooltip: t.exportTrip,
-          icon: const Icon(Icons.share),
-          onPressed: _export,
-        ),
+        if (!isWeb)
+          IconButton(
+            tooltip: t.exportTrip,
+            icon: const Icon(Icons.share),
+            onPressed: _export,
+          ),
       ]),
       body: ListView(
         padding: const EdgeInsets.all(16),

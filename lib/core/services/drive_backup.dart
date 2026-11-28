@@ -22,6 +22,7 @@ import 'package:pandive/core/storage/documents_storage.dart';
 import 'backup_util.dart';
 import 'desktop_oauth.dart';
 import 'network.dart';
+import '../platform.dart';
 
 part 'drive_backup_ops.dart';
 part 'drive_sync_ops.dart';
@@ -74,7 +75,7 @@ class DriveBackupService {
   bool get connected => _refreshToken != null;
 
   /// Desktop: our own loopback OAuth (flutter_appauth is mobile only).
-  static bool get _desktop => Platform.isLinux;
+  static bool get _desktop => isLinux;
   static const _desktopAuth = DesktopOAuth(_desktopClientId, _desktopClientSecret);
 
   /// Was it built with this platform's client ID? Without it there's no login.

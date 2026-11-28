@@ -6,7 +6,6 @@
 /// Android only: on Linux there are no scheduled notifications (zonedSchedule).
 library;
 
-import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -16,6 +15,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+import '../platform.dart';
 
 const _offsets = [30, 7, 1, 0]; // days before expiry (0 = same day)
 
@@ -34,7 +34,7 @@ void _onTap(NotificationResponse r) {
 /// If the app was opened (cold) by tapping a notification, returns the
 /// document id only once; otherwise null.
 Future<int?> consumeNotificationLaunch() async {
-  if (!Platform.isAndroid) return null;
+  if (!isAndroid) return null;
   await _init();
   final d = await _plugin.getNotificationAppLaunchDetails();
   if (d?.didNotificationLaunchApp != true) return null;
@@ -58,7 +58,7 @@ Future<void> _init() async {
 
 /// Reschedules all expiry notifications from the current state.
 Future<void> syncDocNotifications(DivemateDb db, AppLocalizations t) async {
-  if (!Platform.isAndroid) return;
+  if (!isAndroid) return;
   await _init();
   await _plugin.cancelAll();
 

@@ -15,6 +15,7 @@ import 'backup_worker.dart';
 import 'drive_backup.dart';
 import 'network.dart';
 import 'sync_logic.dart';
+import '../platform.dart';
 
 enum SyncStatus {
   off, synced, syncing, pendingRemote, diverged, offline,
@@ -230,7 +231,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// Readable name of this device for presence.
-  static String get deviceName => Platform.isAndroid
+  static String get deviceName => isAndroid
       ? 'Android'
       : '${Platform.operatingSystem} (${Platform.localHostname})';
 

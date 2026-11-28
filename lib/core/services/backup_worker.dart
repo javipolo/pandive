@@ -3,7 +3,6 @@
 /// Auth is silent; if there is no account or no WiFi, it's a no-op.
 library;
 
-import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:workmanager/workmanager.dart';
@@ -11,6 +10,7 @@ import 'package:workmanager/workmanager.dart';
 import 'package:pandive/core/services/drive_backup.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'sync_controller.dart';
+import '../platform.dart';
 
 const _taskName = 'pandive.autoBackup';
 const _uniqueName = 'pandive.autoBackup.periodic';
@@ -37,7 +37,7 @@ void backupCallbackDispatcher() {
 
 /// WorkManager only exists on Android; on desktop all this is a no-op (the
 /// backup on app open still works).
-bool get _supported => Platform.isAndroid;
+bool get _supported => isAndroid;
 
 /// Registers the dispatcher (once, in the main isolate at startup).
 Future<void> initBackupWorker() async {

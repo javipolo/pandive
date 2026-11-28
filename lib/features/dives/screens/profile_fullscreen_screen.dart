@@ -31,15 +31,16 @@ class ProfileFullscreenScreen extends StatelessWidget {
     final t = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(title), actions: [
-        IconButton(
-          icon: Icon(shareProfileIcon),
-          tooltip: shareProfileTooltip(t),
-          onPressed: () => shareProfileImage(context,
-              profile: profile,
-              title: shareTitle ?? title,
-              facts: facts,
-              gasChanges: gasChanges),
-        ),
+        if (canShareProfile)
+          IconButton(
+            icon: Icon(shareProfileIcon),
+            tooltip: shareProfileTooltip(t),
+            onPressed: () => shareProfileImage(context,
+                profile: profile,
+                title: shareTitle ?? title,
+                facts: facts,
+                gasChanges: gasChanges),
+          ),
         // Aligns the icon with the plot's right edge (before the temp axis).
         const SizedBox(width: 56),
       ]),

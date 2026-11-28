@@ -4,6 +4,7 @@ library;
 import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
+import 'package:pandive/core/platform.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/dive_computer/screens/computer_pick_screen.dart';
 import 'package:pandive/features/dives/screens/new_dive_screen.dart';
@@ -15,7 +16,8 @@ import 'package:pandive/l10n/app_localizations.dart';
 Future<int?> showAddDiveSheet(
     BuildContext context, DivemateDb db, Settings settings) async {
   final t = AppLocalizations.of(context);
-  final choice = await showModalBottomSheet<String>(
+  // Web: no dive computer download, so straight to manual entry.
+  final choice = isWeb ? 'new' : await showModalBottomSheet<String>(
     context: context,
     showDragHandle: true,
     builder: (_) => SafeArea(

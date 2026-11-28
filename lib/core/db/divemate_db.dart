@@ -8,7 +8,9 @@ library;
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:sqlite3/sqlite3.dart';
+import 'package:sqlite3/common.dart';
+
+import 'open/sqlite_open.dart';
 
 import '../models/models.dart';
 import '../sac.dart';
@@ -41,17 +43,14 @@ part 'db_meta.dart';
 part 'db_numbering.dart';
 
 class DivemateDb {
-  final Database _db;
+  final CommonDatabase _db;
   int? _ownerId;
 
   DivemateDb._(this._db);
 
   /// Opens an existing .ddb at [path].
   factory DivemateDb.open(String path, {bool readOnly = false}) {
-    final db = sqlite3.open(
-      path,
-      mode: readOnly ? OpenMode.readOnly : OpenMode.readWrite,
-    );
+    final db = openSqlite(path, readOnly: readOnly);
     if (!readOnly) {
       _ensureSyncTable(db); // fingerprints per device
       _ensureLastWriteTriggers(db); // UTC last-write stamp
@@ -68,7 +67,7 @@ class DivemateDb {
 
   /// Creates a new empty DiveMate database at [path] (with one diver).
   factory DivemateDb.createEmpty(String path) {
-    final db = sqlite3.open(path, mode: OpenMode.readWriteCreate);
+    final db = openSqlite(path, create: true);
     _createSchema(db);
     _ensureSyncTable(db);
     _ensureLastWriteTriggers(db);

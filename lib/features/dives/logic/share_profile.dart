@@ -17,9 +17,13 @@ import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/core/models/models.dart';
 import 'package:pandive/core/services/image_clipboard.dart';
 import 'package:pandive/core/widgets/profile_chart.dart';
+import 'package:pandive/core/platform.dart';
 import 'package:pandive/features/dives/logic/dive_facts.dart';
 import 'package:pandive/features/dives/widgets/gas_segments.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+
+/// Whether the share/copy button is shown (web: not yet, no files).
+bool get canShareProfile => !isWeb;
 
 /// Button icon and text: copy on desktop, share on mobile.
 IconData get shareProfileIcon => canCopyImages ? Icons.copy : Icons.share;

@@ -3,12 +3,12 @@
 library;
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:pandive/core/models/models.dart';
+import '../platform.dart';
 
 /// A BLE device found during the scan.
 class ScannedDevice {
@@ -75,7 +75,7 @@ class DiveComputerService {
   /// On Android 12+ uses BLUETOOTH_SCAN/CONNECT; on <=11, location.
   /// On Linux there are no app permissions: BlueZ decides via D-Bus/polkit.
   Future<bool> requestBlePermissions() async {
-    if (Platform.isLinux) return true;
+    if (isLinux) return true;
     final statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,

@@ -24,7 +24,7 @@ class DivesSelectionBar extends StatelessWidget {
   final VoidCallback onStats;
   final VoidCallback? onMerge;
   final VoidCallback onAdjustTime;
-  final VoidCallback onExport;
+  final VoidCallback? onExport; // null = hidden (web)
   final VoidCallback onAssignTrip;
   final VoidCallback onDiveType;
   final VoidCallback onAddTag;
@@ -57,7 +57,7 @@ class DivesSelectionBar extends StatelessWidget {
         _More.adjustTime => onAdjustTime(),
         _More.assignTrip => onAssignTrip(),
         _More.merge => onMerge?.call(),
-        _More.export => onExport(),
+        _More.export => onExport?.call(),
         _More.delete => onDelete(),
       };
 
@@ -93,7 +93,8 @@ class DivesSelectionBar extends StatelessWidget {
           item(_More.adjustTime, Icons.schedule, t.adjustTime),
           item(_More.assignTrip, Icons.luggage, t.assignToTrip),
           item(_More.merge, Icons.merge, t.merge, enabled: onMerge != null),
-          item(_More.export, Icons.share, t.exportSelection),
+          if (onExport != null)
+            item(_More.export, Icons.share, t.exportSelection),
           const PopupMenuDivider(),
           item(_More.delete, Icons.delete_outline, t.delete),
         ],

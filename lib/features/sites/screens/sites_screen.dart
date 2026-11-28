@@ -18,6 +18,7 @@ import 'package:pandive/features/sites/screens/site_edit_screen.dart';
 import 'package:pandive/features/sites/screens/site_info_screen.dart';
 import 'package:pandive/features/sites/widgets/sites_grouped_list.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/core/platform.dart';
 
 class SitesTab extends StatefulWidget {
   final DivemateDb db;
@@ -138,11 +139,12 @@ class _SitesTabState extends State<SitesTab> {
               icon: Icon(_allSelected ? Icons.deselect : Icons.select_all),
               onPressed: _toggleAll,
             ),
-            IconButton(
-              tooltip: t.exportSites,
-              icon: const Icon(Icons.ios_share),
-              onPressed: _sel.isEmpty ? null : _exportSel,
-            ),
+            if (!isWeb)
+              IconButton(
+                tooltip: t.exportSites,
+                icon: const Icon(Icons.ios_share),
+                onPressed: _sel.isEmpty ? null : _exportSel,
+              ),
             IconButton(
               tooltip: t.delete,
               icon: const Icon(Icons.delete_outline),

@@ -1,17 +1,14 @@
 /// Initial screen when no database is loaded: lets you pick a
-/// DiveMate .ddb file. It's copied to the app documents to have
-/// stable (read/write) access afterwards.
+/// DiveMate .ddb file (the app works on its own copy, see
+/// `load_db_files.dart`), create an empty one or import a .ssrf.
 library;
 
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/core/widgets/import_progress.dart';
+import 'package:pandive/features/load_db/logic/load_db_files.dart';
 import 'package:pandive/features/load_db/widgets/load_db_buttons.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 
@@ -53,34 +50,23 @@ class _LoadDbScreenState extends State<LoadDbScreen> {
     }
   }
 
-  Future<String> _newDbPath() async {
-    final docs = (await getApplicationDocumentsDirectory()).path;
-    return '$docs/logbook-${DateTime.now().millisecondsSinceEpoch}.ddb';
-  }
-
   void _pick() => _run(() async {
-        final res = await FilePicker.platform.pickFiles(withData: false);
-        final path = res?.files.single.path;
-        if (path == null) return setState(() => _busy = false);
-        final docs = await getApplicationDocumentsDirectory();
-        final dest = File('${docs.path}/logbook.ddb');
-        await File(path).copy(dest.path);
-        await widget.onLoaded(dest.path);
+        final dest = await pickDdbCopy();
+        if (dest == null) return setState(() => _busy = false);
+        await widget.onLoaded(dest);
       }, (e) => AppLocalizations.of(context).errorLoad(e));
 
   void _createNew() => _run(() async {
-        final dest = await _newDbPath();
+        final dest = await newDbPath();
         DivemateDb.createEmpty(dest).close();
         await widget.onLoaded(dest);
       }, (e) => AppLocalizations.of(context).errorCreate(e));
 
   // Imports a .ssrf creating a new logbook and dumping it into it.
   void _importSsrf() => _run(() async {
-        final res = await FilePicker.platform.pickFiles(withData: false);
-        final path = res?.files.single.path;
-        if (path == null) return setState(() => _busy = false);
-        final xml = await File(path).readAsString();
-        final dest = await _newDbPath();
+        final xml = await pickTextFile();
+        if (xml == null) return setState(() => _busy = false);
+        final dest = await newDbPath();
         final db = DivemateDb.createEmpty(dest);
         if (!mounted) return db.close();
         await importSsrfWithProgress(context, db, xml);

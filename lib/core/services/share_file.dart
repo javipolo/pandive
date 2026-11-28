@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:pandive/l10n/app_localizations.dart';
+import '../platform.dart';
 
 /// The app's ScaffoldMessenger (MaterialApp.scaffoldMessengerKey): messages
 /// from logic without a BuildContext.
@@ -17,7 +18,7 @@ final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 /// Shares [file] (mobile) or saves it where the user chooses (Linux).
 Future<void> shareOrSaveFile(File file, {String? text}) async {
-  if (!Platform.isLinux) {
+  if (!isLinux) {
     await SharePlus.instance
         .share(ShareParams(files: [XFile(file.path)], text: text));
     return;

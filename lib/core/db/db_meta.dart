@@ -9,7 +9,7 @@ part of 'divemate_db.dart';
 const _kLastWrite = 'lastWriteUtc';
 
 /// Creates PandiveMeta and one INSERT/UPDATE/DELETE trigger per table (idempotent).
-void _ensureLastWriteTriggers(Database db) {
+void _ensureLastWriteTriggers(CommonDatabase db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveMeta '
       '(Key TEXT PRIMARY KEY, Value TEXT)');
   final tables = db.select("SELECT name FROM sqlite_master WHERE type='table' "

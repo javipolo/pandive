@@ -11,7 +11,9 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/main.dart` -> startup: init locale, load settings, launch the app
 - `lib/core/app.dart` -> MaterialApp, global text scale
 - `lib/core/build_info.dart` -> appVersion / appCommit baked in by the Makefile (--dart-define) for the About screen
-- `lib/core/app_root.dart` -> AppRoot: picks the screen; creates an empty DB on first launch, or the load screen (Change DB / error)
+- `lib/core/app_root.dart` -> AppRoot: picks the screen; creates an empty DB on first launch, or the load screen (Change DB / error; always on web)
+- `lib/core/platform.dart` -> web-safe platform checks (isWeb/isAndroid/isLinux); use instead of dart:io Platform
+- `lib/core/widgets/web_preview_banner.dart` -> bottom strip on web: logbook in memory only, lost on reload
 - `lib/core/text/relative_date.dart` -> "human" date: "Today 17:12" / "Yesterday 21:23" / full date (backup list)
 - `lib/core/services/home_navigation.dart` -> section requests to HomeScreen (requestDivesList: back to the dive list after importing)
 - `lib/core/services/share_file.dart` -> shareOrSaveFile: share (mobile) or "Save as…" (Linux) a generated file + appMessengerKey (snackbars without context)
@@ -36,6 +38,9 @@ with `screens/` and, if needed, `widgets/`).
 
 ### Core · database (one library with `part`s)
 - `lib/core/db/divemate_db.dart` -> opens .ddb, owner, helpers; declares the parts
+- `lib/core/db/open/sqlite_open.dart` -> conditional export of the SQLite backend: initSqlite/openSqlite/putMemoryFile
+- `lib/core/db/open/sqlite_open_io.dart` -> native backend (FFI, file on disk)
+- `lib/core/db/open/sqlite_open_web.dart` -> web backend (WASM sqlite3.wasm + in-memory file system)
 - `lib/core/db/db_queries.dart` -> reads: list/get dives, cylinders, next number
 - `lib/core/db/db_profile.dart` -> profile decode (depth/temperature)
 - `lib/core/db/db_stats.dart` -> dive sites and aggregate stats + personalRecords
@@ -113,6 +118,7 @@ with `screens/` and, if needed, `widgets/`).
 ### load_db
 - `lib/features/load_db/screens/load_db_screen.dart` -> pick/create a .ddb or import .ssrf (with enum DbLoadError)
 - `lib/features/load_db/widgets/load_db_buttons.dart` -> buttons: open .ddb / create new / import Subsurface
+- `lib/features/load_db/logic/load_db_files.dart` -> new logbook path, pick .ddb (own copy: documents dir, or in memory on web), pick text file
 
 ### tags
 - `lib/features/tags/screens/tags_tab.dart` -> tag list (create/rename/delete, view dives)

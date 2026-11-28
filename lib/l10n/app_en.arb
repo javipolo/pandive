@@ -1,4 +1,6 @@
 {
+  "webPreviewBanner": "Web version (preview): the logbook is kept in memory only. Changes are lost when you reload or close the page.",
+  "@webPreviewBanner": {"description": "Bottom strip of the web version: data is in memory only"},
   "@@locale": "en",
   "navDives": "Dives",
   "navSites": "Sites",

@@ -15,6 +15,8 @@
   Flutter only receives parsed dives (JSON) over the `pandive/dc*` channels.
 - **Google Drive**: backup, restore and phone↔PC sync with the `drive.file`
   scope. Design notes in [sync-plan.md](sync-plan.md).
+- **Web (preview)**: the same app compiled for the browser. See
+  [Web build](#web-build).
 
 ## Requirements
 
@@ -47,12 +49,40 @@ make deps           # flutter pub get
 make run            # build, install and launch on the connected device
 make apk            # arm64 release APK
 make linux          # Linux desktop app (make ldc-linux first)
+make web            # web app into build/web (see Web build)
 make help           # all targets
 ```
 
 `make linux` / `make run-linux` (rather than plain `flutter run`) inject the
 Google OAuth client IDs. `make install-linux` installs the Linux build into
 `~/.local` (or `sudo make install-linux PREFIX=/usr/local` system-wide).
+
+### Web build
+
+`make web` builds the browser version into `build/web`, served under
+`WEB_BASE_HREF` (default `/pandive/`, the GitHub Pages project path; use
+`make web WEB_BASE_HREF=/` to serve it from the root, e.g. locally with
+`python3 -m http.server -d build/web`). `flutter run -d chrome` also works
+for development.
+
+How it differs from the native apps (phase 1, preview):
+
+- **SQLite in WASM**: `lib/core/db/open/` picks the backend with a
+  conditional import: FFI on Android/Linux, `package:sqlite3/wasm.dart` on
+  web. The data layer only uses `CommonDatabase`, so it compiles for both.
+  `web/sqlite3.wasm` must match the `sqlite3` package version in
+  `pubspec.lock` (download it from the
+  [sqlite3.dart releases](https://github.com/simolus3/sqlite3.dart/releases),
+  tag `sqlite3-<version>`) and be updated whenever that package is bumped.
+- **In-memory only**: the picked `.ddb` lives in an in-memory file system and
+  is gone on reload; the app always starts on the load screen and shows a
+  banner saying so.
+- **Platform checks**: use `lib/core/platform.dart` (`isWeb`, `isAndroid`,
+  `isLinux`), never `dart:io`'s `Platform`, which throws in the browser.
+  Importing `dart:io` compiles on web, but nothing that touches files may
+  run there.
+- **Hidden on web**: dive computer download, documents, tools
+  (import/export), backup/sync, and every share/export button.
 
 ### Releases
 

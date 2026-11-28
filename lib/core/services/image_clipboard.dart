@@ -2,14 +2,14 @@
 /// the native runner does it (channel `pandive/clipboard`, GTK).
 library;
 
-import 'dart:io';
 
 import 'package:flutter/services.dart';
+import '../platform.dart';
 
 const _channel = MethodChannel('pandive/clipboard');
 
 /// Can images be copied on this platform?
-bool get canCopyImages => Platform.isLinux;
+bool get canCopyImages => isLinux;
 
 /// Copies [png] to the clipboard. Returns false if it couldn't.
 Future<bool> copyPngToClipboard(Uint8List png) async {

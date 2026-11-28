@@ -56,7 +56,7 @@ const _schemaSql = <String>[
 ];
 
 /// Creates the schema and a diver (owner) row with ID 1.
-void _createSchema(Database db) {
+void _createSchema(CommonDatabase db) {
   for (final sql in _schemaSql) {
     db.execute(sql);
   }

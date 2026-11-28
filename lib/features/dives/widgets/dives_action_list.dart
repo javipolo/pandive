@@ -19,6 +19,7 @@ import 'package:pandive/features/dives/widgets/month_grouped_dives.dart';
 import 'package:pandive/features/stats/screens/selection_stats_screen.dart';
 import 'package:pandive/features/trips/logic/assign_trip_action.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/core/platform.dart';
 
 class DivesActionList extends StatefulWidget {
   final DivemateDb db;
@@ -175,7 +176,7 @@ class _DivesActionListState extends State<DivesActionList> {
             onStats: _showStats,
             onMerge: _sel.length >= 2 ? _mergeSel : null,
             onAdjustTime: _adjustTimeSel,
-            onExport: _exportSel,
+            onExport: isWeb ? null : _exportSel,
             onAssignTrip: _assignTripSel,
             onDiveType: () => _bulk(runBulkDiveType),
             onAddTag: () => _bulk(runBulkAddTag),

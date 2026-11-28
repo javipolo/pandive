@@ -18,6 +18,7 @@ analyzer:
     # Global*Localizations from flutter_localizations, marked deprecated by the
     # SDK but with no stable alternative (material_ui clashes with the export).
     - lib/l10n/app_localizations*.dart
+    - web/**
 
 linter:
   # The lint rules applied to this project can be customized in the

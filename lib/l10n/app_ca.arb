@@ -1,4 +1,5 @@
 {
+  "webPreviewBanner": "Versió web (preliminar): el logbook només es desa a la memòria. Els canvis es perden en recarregar o tancar la pàgina.",
   "@@locale": "ca",
   "navDives": "Immersions",
   "navSites": "Punts",

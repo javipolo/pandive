@@ -57,6 +57,12 @@ bluetoothctl
 [bluetooth]# quit
 ```
 
+### Web (preview)
+
+An experimental browser version can be built with `make web` (see the
+[development guide](docs/DEVELOPMENT.md#web-build)). For now it only opens a
+`.ddb` to browse it: nothing is saved, and changes are lost on reload.
+
 ## Getting started
 
 1. On first launch Pandive creates an empty logbook. You can instead open an

@@ -44,16 +44,18 @@ class ProfileSection extends StatelessWidget {
             right: 0,
             top: 0,
             child: Row(children: [
-              IconButton.filledTonal(
-                icon: Icon(shareProfileIcon),
-                tooltip: shareProfileTooltip(t),
-                onPressed: () => shareProfileImage(context,
-                    profile: profile,
-                    title: shareTitle,
-                    facts: facts,
-                    gasChanges: gasChanges),
-              ),
-              const SizedBox(width: 8),
+              if (canShareProfile) ...[
+                IconButton.filledTonal(
+                  icon: Icon(shareProfileIcon),
+                  tooltip: shareProfileTooltip(t),
+                  onPressed: () => shareProfileImage(context,
+                      profile: profile,
+                      title: shareTitle,
+                      facts: facts,
+                      gasChanges: gasChanges),
+                ),
+                const SizedBox(width: 8),
+              ],
               IconButton.filledTonal(
                 icon: const Icon(Icons.fullscreen),
                 tooltip: t.fullscreen,

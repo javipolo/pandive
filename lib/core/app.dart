@@ -7,8 +7,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 import 'app_root.dart';
+import 'platform.dart';
 import 'settings/settings.dart';
 import 'theme/app_theme.dart';
+import 'widgets/web_preview_banner.dart';
 
 class PandiveApp extends StatelessWidget {
   final Settings settings;
@@ -44,7 +46,13 @@ class PandiveApp extends StatelessWidget {
               data: mq.copyWith(
                 textScaler: TextScaler.linear(settings.textScale),
               ),
-              child: child!,
+              // Web: warn that the logbook isn't saved (phase 1).
+              child: isWeb
+                  ? Column(children: [
+                      Expanded(child: child!),
+                      const WebPreviewBanner(),
+                    ])
+                  : child!,
             );
           },
           home: AppRoot(settings: settings),

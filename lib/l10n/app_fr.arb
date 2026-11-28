@@ -1,4 +1,5 @@
 {
+  "webPreviewBanner": "Version web (aperçu) : le carnet n'est gardé qu'en mémoire. Les modifications sont perdues en rechargeant ou en fermant la page.",
   "@@locale": "fr",
   "navDives": "Plongées",
   "navSites": "Sites",

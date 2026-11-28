@@ -16,6 +16,7 @@ import 'package:pandive/features/trips/logic/export_trip.dart';
 import 'package:pandive/features/trips/widgets/export_trips_dialog.dart';
 import 'package:pandive/features/trips/screens/trip_detail_screen.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/core/platform.dart';
 
 class TripsScreen extends StatefulWidget {
   final DivemateDb db;
@@ -110,10 +111,11 @@ class _TripsScreenState extends State<TripsScreen> {
           : Column(children: [
               if (_select)
                 SelectionBar(count: _sel.length, onClose: _exitSel, actions: [
-                  IconButton(
-                      tooltip: t.exportTrip,
-                      icon: const Icon(Icons.share),
-                      onPressed: _exportSel),
+                  if (!isWeb)
+                    IconButton(
+                        tooltip: t.exportTrip,
+                        icon: const Icon(Icons.share),
+                        onPressed: _exportSel),
                 ]),
               Expanded(
                 child: ListView(

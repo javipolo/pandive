@@ -2,7 +2,6 @@
 /// for daily automatic backup and access to restore.
 library;
 
-import 'dart:io';
 
 import 'package:material_ui/material_ui.dart';
 
@@ -12,6 +11,7 @@ import 'package:pandive/core/services/sync_controller.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/widgets/restore_list.dart';
 import 'package:pandive/l10n/app_localizations.dart';
+import 'package:pandive/core/platform.dart';
 
 class BackupScreen extends StatefulWidget {
   final Settings settings;
@@ -111,7 +111,7 @@ class _BackupScreenState extends State<BackupScreen> {
           ),
           const Divider(),
           // WorkManager only exists on Android: on desktop, just a notice.
-          if (Platform.isAndroid)
+          if (isAndroid)
             SwitchListTile(
               title: Text(t.autoBackupDaily),
               subtitle: Text(t.autoBackupHint),

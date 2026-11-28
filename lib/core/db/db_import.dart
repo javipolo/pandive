@@ -2,7 +2,7 @@ part of 'divemate_db.dart';
 
 /// Creates the sync table (fingerprints per device) if missing.
 /// Pandive-specific; divemate-cli ignores it.
-void _ensureSyncTable(Database db) {
+void _ensureSyncTable(CommonDatabase db) {
   db.execute('CREATE TABLE IF NOT EXISTS PandiveSync '
       '(DeviceId TEXT PRIMARY KEY, Fingerprint TEXT, Updated TEXT)');
   // "My cylinders": reusable size + material presets.

@@ -1,4 +1,5 @@
 {
+  "webPreviewBanner": "Versión web (preliminar): el logbook solo se guarda en memoria. Los cambios se pierden al recargar o cerrar la página.",
   "@@locale": "es",
   "navDives": "Inmersiones",
   "navSites": "Sitios",

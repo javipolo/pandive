@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:pandive/core/db/divemate_db.dart';
 import 'package:pandive/core/models/models.dart';
+import 'package:pandive/core/platform.dart';
 import 'package:pandive/core/settings/settings.dart';
 import 'package:pandive/features/backup/screens/backup_screen.dart';
 import 'package:pandive/features/documents/screens/documents_screen.dart';
@@ -64,13 +65,17 @@ class HomeDrawer extends StatelessWidget {
             const Divider(),
             _push(context, Icons.luggage_outlined, t.trips,
                 (_) => TripsScreen(db: db, settings: settings)),
-            _push(context, Icons.folder_outlined, t.documents,
-                (_) => DocumentsScreen(db: db),
-                alert: _docsAlert()),
-            _push(context, Icons.build_outlined, t.tools,
-                (_) => ToolsScreen(settings: settings, db: db)),
-            _push(context, Icons.cloud_upload_outlined, t.backup,
-                (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
+            // Web (for now): no files on disk, no Drive -> no documents,
+            // tools (import/export) or backup.
+            if (!isWeb) ...[
+              _push(context, Icons.folder_outlined, t.documents,
+                  (_) => DocumentsScreen(db: db),
+                  alert: _docsAlert()),
+              _push(context, Icons.build_outlined, t.tools,
+                  (_) => ToolsScreen(settings: settings, db: db)),
+              _push(context, Icons.cloud_upload_outlined, t.backup,
+                  (_) => BackupScreen(settings: settings, onReloadDb: onReloadDb)),
+            ],
             _push(context, Icons.settings_outlined, t.settings,
                 (_) => SettingsScreen(
                     settings: settings, db: db, onChangeDb: onChangeDb)),

@@ -65,6 +65,14 @@ apk: require-android ## Build an arm64 release APK (sideload)
 	$(FLUTTER) build apk --release --target-platform android-arm64 \
 		--no-tree-shake-icons $(VERSION_FLAGS) $(DART_DEFINES)
 
+# Base path the web app is served under (GitHub Pages project page: /pandive/).
+WEB_BASE_HREF ?= /pandive/
+
+.PHONY: web
+web: ## Build the web app into build/web (WEB_BASE_HREF=/pandive/ by default)
+	$(FLUTTER) build web --release --base-href $(WEB_BASE_HREF) \
+		$(VERSION_FLAGS)
+
 .PHONY: apk-release
 apk-release: apk ## Alias of apk
 

@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import 'db/divemate_db.dart';
+import 'platform.dart';
 import 'services/backup_worker.dart';
 import 'services/drive_backup.dart';
 import 'services/sync_controller.dart';
@@ -28,12 +29,14 @@ class _AppRootState extends State<AppRoot> {
   DivemateDb? _db;
   DbLoadError? _error;
   String? _errorDetail;
-  bool _forceLoad = false; // true = show the load screen (Change DB)
+  // true = show the load screen (Change DB). On web the logbook lives in
+  // memory and is gone on reload: always start by picking a file.
+  bool _forceLoad = isWeb;
 
   @override
   void initState() {
     super.initState();
-    _tryOpen(widget.settings.dbPath);
+    _tryOpen(isWeb ? null : widget.settings.dbPath);
   }
 
   void _tryOpen(String? path) {
@@ -58,8 +61,10 @@ class _AppRootState extends State<AppRoot> {
         _error = DbLoadError.invalid;
       } else {
         _db = db;
-        _maybeBackup();
-        _startSync();
+        if (!isWeb) {
+          _maybeBackup();
+          _startSync();
+        }
       }
     } catch (e) {
       _error = DbLoadError.openFailed;
