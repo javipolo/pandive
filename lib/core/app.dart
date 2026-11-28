@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:pandive/core/services/share_file.dart';
 import 'package:pandive/l10n/app_localizations.dart';
 import 'app_root.dart';
+import 'locale_resolution.dart';
 import 'platform.dart';
 import 'settings/settings.dart';
 import 'theme/app_theme.dart';
@@ -39,6 +40,7 @@ class PandiveApp extends StatelessWidget {
             ...GlobalMaterialLocalizations.delegates,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
+          localeListResolutionCallback: resolveAppLocale, // en -> en_GB
           builder: (context, child) {
             // Global text scale (accessibility / presbyopia).
             final mq = MediaQuery.of(context);

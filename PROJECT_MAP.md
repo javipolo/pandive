@@ -12,6 +12,7 @@ with `screens/` and, if needed, `widgets/`).
 - `lib/core/app.dart` -> MaterialApp, global text scale
 - `lib/core/build_info.dart` -> appVersion / appCommit baked in by the Makefile (--dart-define) for the About screen
 - `lib/core/app_root.dart` -> AppRoot: picks the screen; creates an empty DB on first launch, or the load screen (Change DB / error; always on web)
+- `lib/core/locale_resolution.dart` -> resolveAppLocale: English runs as en_GB (day/month/year, 24 h, also in the system date/time pickers)
 - `lib/core/platform.dart` -> web-safe platform checks (isWeb/isAndroid/isLinux); use instead of dart:io Platform
 - `lib/core/widgets/web_preview_banner.dart` -> bottom strip on web: logbook in memory only, lost on reload
 - `lib/core/text/relative_date.dart` -> "human" date: "Today 17:12" / "Yesterday 21:23" / full date (backup list)

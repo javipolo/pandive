@@ -28,7 +28,8 @@ class DateTimeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat('EEEE d MMM yyyy, HH:mm', 'es');
+    final fmt = DateFormat('EEEE d MMM yyyy, HH:mm',
+        Localizations.localeOf(context).languageCode);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.event),
