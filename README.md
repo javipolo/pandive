@@ -59,9 +59,11 @@ bluetoothctl
 
 ### Web (preview)
 
-An experimental browser version can be built with `make web` (see the
+An experimental browser version runs at
+<https://javipolo.github.io/pandive/> (or build it with `make web`, see the
 [development guide](docs/DEVELOPMENT.md#web-build)). For now it only opens a
-`.ddb` to browse it: nothing is saved, and changes are lost on reload.
+`.ddb` to browse it: nothing is saved, and changes are lost on reload. The
+file is read inside your browser; it isn't uploaded anywhere.
 
 ## Getting started
 

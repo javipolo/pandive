@@ -65,6 +65,14 @@ Google OAuth client IDs. `make install-linux` installs the Linux build into
 `python3 -m http.server -d build/web`). `flutter run -d chrome` also works
 for development.
 
+**GitHub Pages**: `.github/workflows/web.yml` runs `make web` on every push
+to `main` (or by hand from the Actions tab, "Run workflow") and publishes
+`build/web` to <https://javipolo.github.io/pandive/>. One-time setup in the
+repository: Settings → Pages → Build and deployment → Source: **GitHub
+Actions**. The workflow pins the Flutter version (`flutter-version`): bump it
+together with the local SDK. After a deploy, browsers may keep the previous
+version cached for a while; a hard reload picks up the new one.
+
 How it differs from the native apps (phase 1, preview):
 
 - **SQLite in WASM**: `lib/core/db/open/` picks the backend with a
